@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<link th:href="@{/assets/plugins/bootstrap-fileinput/css/fileinput.css}" media="all" rel="stylesheet" type="text/css">
+<link th:href="@{/assets/plugins/bootstrap-fileinput/css/fileinput-rtl.css}">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-category-add">
+        <input id="id" name="id"
+               th:value="${category.id}" type="hidden">
+        <input id="treeId" name="parentId" type="hidden" th:value="${category.parentId}"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">上级：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" id="treeName" onclick="selectTree()" readonly="true"
+                       th:value="${category.parentName}"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">栏目模块：</label>
+            <div class="col-sm-8">
+                <select id="module" name="module"  class="form-control">
+                    <option value="">公共模型</option>
+                    <option value="article">文章模型</option>
+                    <option value="link">链接模型</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">栏目名称：</label>
+            <div class="col-sm-8">
+                <input id="name" name="name" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">栏目图片：</label>
+            <div class="col-sm-8">
+<!--                <input id="image" name="image" class="file" style="width: 100px" data-preview-file-type="text" >-->
+                <input id="input-id" type="file" class="file" style="width: 100px" multiple>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">链接：</label>
+            <div class="col-sm-8">
+                <input id="href" name="href" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">目标：</label>
+            <div class="col-sm-8">
+                <input id="target" name="target" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">描述：</label>
+            <div class="col-sm-8">
+                <textarea id="description" name="description" class="form-control" type="text">
+                </textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">关键字：</label>
+            <div class="col-sm-8">
+                <input id="keywords" name="keywords" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">排序（升序）：</label>
+            <div class="col-sm-8">
+                <input id="sort" name="sort" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否在导航中显示：</label>
+            <div class="col-sm-8">
+                <input id="inMenu" name="inMenu" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否在分类页中显示列表：</label>
+            <div class="col-sm-8">
+                <input id="inList" name="inList" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">展现方式：</label>
+            <div class="col-sm-8">
+                <input id="showModes" name="showModes" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否允许评论：</label>
+            <div class="col-sm-8">
+                <input id="allowComment" name="allowComment" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否需要审核：</label>
+            <div class="col-sm-8">
+                <input id="isAudit" name="isAudit" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">自定义列表视图：</label>
+            <div class="col-sm-8">
+                <input id="customListView" name="customListView" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">自定义内容视图：</label>
+            <div class="col-sm-8">
+                <input id="customContentView" name="customContentView" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">视图配置：</label>
+            <div class="col-sm-8">
+                <input id="viewConfig" name="viewConfig" class="form-control" type="text">
+            </div>
+        </div>
+        <!--<div class="form-group">
+            <label class="col-sm-3 control-label">创建者：</label>
+            <div class="col-sm-8">
+                <input id="createBy" name="createBy" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">创建时间：</label>
+            <div class="col-sm-8">
+                <input id="createDate" name="createDate" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">更新者：</label>
+            <div class="col-sm-8">
+                <input id="updateBy" name="updateBy" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">更新时间：</label>
+            <div class="col-sm-8">
+                <input id="updateDate" name="updateDate" class="form-control" type="text">
+            </div>
+        </div>-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注信息：</label>
+            <div class="col-sm-8">
+                <input id="remarks" name="remarks" class="form-control" type="text">
+            </div>
+        </div>
+<!--        <div class="form-group">
+            <label class="col-sm-3 control-label">删除标记：</label>
+            <div class="col-sm-8">
+                <input id="delFlag" name="delFlag" class="form-control" type="text">
+            </div>
+        </div>-->
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/assets/plugins/bootstrap-fileinput/js/fileinput.js}"></script>
+<script th:src="@{/assets/plugins/bootstrap-fileinput/js/locales/zh.js}"></script>
+<script th:src="@{/assets/plugins/bootstrap-fileinput/js/plugins/sortable.js}"></script>
+
+<script type="text/javascript">
+    // initialize with defaults
+    $("#input-id").fileinput({
+        'language':'zh',
+        'showUpload':false,
+        'previewFileType':'any',
+        'dropZoneEnabled':false,
+        'maxFileCount': 1, // 最大上传的文件数
+        'maxFileSize': 1000, // 最大上传文件的大小(KB)(1M = 1000Kb)
+        'allowedFileExtensions': ["jpg", "png", "jpeg"]
+    });
+    var prefix = ctx + "cms/category"
+    $("#form-category-add").validate({
+        onkeyup: false,
+        rules: {
+            xxxx: {
+                required: true,
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/addDo", $('#form-category-add').serialize());
+        }
+    }
+
+    function selectTree() {
+        var id = $("#treeId").val();
+        var options = {
+            title: '选择上级',
+            width: "380",
+            url: prefix + "/selectTree/" + $("#treeId").val(),
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero) {
+        var tree = layero.find("iframe")[0].contentWindow.$._tree;
+        // 不允许最后层级节点选择
+        // if ($.tree.notAllowLastLevel(tree)) {
+        //     var body = layer.getChildFrame('body', index);
+        //     $("#treeId").val(body.find('#treeId').val());
+        //     $("#treeName").val(body.find('#treeName').val());
+        //     layer.close(index);
+        // }
+    }
+</script>
+</body>
+</html>
