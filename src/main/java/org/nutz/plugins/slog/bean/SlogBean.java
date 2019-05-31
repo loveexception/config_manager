@@ -1,4 +1,4 @@
-package cn.tico.iot.configmanger.bean;
+package org.nutz.plugins.slog.bean;
 
 import java.io.Serializable;
 import java.util.Date;
