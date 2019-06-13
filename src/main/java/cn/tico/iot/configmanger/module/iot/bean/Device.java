@@ -1,27 +1,22 @@
-package cn.tico.iot.configmanger.bean;
-
+package cn.tico.iot.configmanger.module.iot.models;
 
 import lombok.*;
 import org.nutz.dao.entity.annotation.*;
-import  org.nutz.dao.pager.Pager;
 
 import java.util.List;
 
 
-
-
 @Data
 @RequiredArgsConstructor
-@Table("T_Drives")
-public class Driver {
+@Table("T_Devices")
+public class Device {
     @Id
     long id;
 
     @Column
     long created_time;
 
-    public List<Device> devices(Pager page){
+    public List<Tag> getTags(){
         return null;
     }
-
 }

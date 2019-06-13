@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     
-    <title>NutzSite管理系统</title>
-    <meta name="keywords" content="NutzSite,NutzSite开源,NutzSite框架,NutzSite系统,NutzSite">
-    <meta name="description" content="NutzSite基于nutzboot的权限管理系统 易读易懂、界面简洁美观。 核心技术采用nutz、nutzboot、Shiro没有任何其它重度依赖">
+    <title>天创IOT管理系统</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
     <link href="../static/assets/css/bootstrap.min.css" th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet"/>
     <link href="../static/assets/css/font-awesome.min.css" th:href="@{/assets/css/font-awesome.min.css}" rel="stylesheet"/>
     <link href="../static/assets/css/style.css" th:href="@{/assets/css/style.css}" rel="stylesheet"/>
@@ -29,23 +29,22 @@
             <div class="col-sm-7">
                 <div class="signin-info">
                     <div class="logopanel m-b">
-                        <h1><img alt="[ NutzSite ]" src="../static/nutzsite.png" th:src="@{/nutzsite.png}"></h1>
+                        <h1><img alt="[ NutzSite ]" src="../static/nutzsite.png" th:src="@{/ticologo.png}"></h1>
                     </div>
                     <div class="m-b"></div>
-                    <h4>欢迎使用 <strong>NutzSite 后台管理系统</strong></h4>
+                    <h4>欢迎使用 <strong>天创 IOT 后台管理系统</strong></h4>
                     <ul class="m-b">
                         <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Nutzboot</li>
                         <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Shiro</li>
                         <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Thymeleaf</li>
                         <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Bootstrap</li>
                     </ul>
-                    <strong>还没有账号？ <a href="#">立即注册&raquo;</a></strong>
                 </div>
             </div>
             <div class="col-sm-5">
                 <form id="signupForm">
                     <h4 class="no-margins">登录：</h4>
-                    <p class="m-t-md">做个开发框架</p>
+                    <p class="m-t-md"></p>
                     <input type="text"     name="username" class="form-control uname"     placeholder="用户名" value="admin"    />
                     <input type="password" name="password" class="form-control pword"     placeholder="密码"   value="123456" />
 					<div class="row m-t" th:if="${captchaEnabled==true}">
@@ -58,16 +57,14 @@
 							</a>
 						</div>
 					</div>
-                    <div class="checkbox-custom">
-				        <input type="checkbox" id="rememberme" name="rememberme"> <label for="rememberme">记住我</label>
-				    </div>
+
                     <button class="btn btn-success btn-block" id="btnSubmit" data-loading="正在验证登录，请稍后...">登录</button>
                 </form>
             </div>
         </div>
         <div class="signup-footer">
             <div class="pull-left">
-                &copy; 2018 All Rights Reserved. NutzSite <br>
+                &copy; 2019 All Rights Reserved. Cito.cn <br>
                 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">备案号</a><br>
             </div>
         </div>

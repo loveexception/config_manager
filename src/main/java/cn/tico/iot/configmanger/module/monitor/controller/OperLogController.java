@@ -3,7 +3,7 @@ package cn.tico.iot.configmanger.module.monitor.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.module.monitor.services.OperLogService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -14,7 +14,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
-import cn.tico.iot.configmanger.bean.SlogBean;
+import org.nutz.plugins.slog.bean.SlogBean;
 
 import javax.servlet.http.HttpServletRequest;
 

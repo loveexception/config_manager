@@ -55,6 +55,7 @@ public class LoginController {
             User user = (User) subject.getPrincipal();
             AsyncManager.me().execute(asyncFactory.recordLogininfor(user.getLoginName(), true,"登录成功"));
             userService.recordLoginInfo(user);
+
             return Result.success("login.success");
         } catch (LockedAccountException e) {
             AsyncManager.me().execute(asyncFactory.recordLogininfor(username, false,"账号锁定"));

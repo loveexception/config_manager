@@ -4,10 +4,9 @@ import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.bean.Amap;
 import cn.tico.iot.configmanger.common.bean.Districts;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
-import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Area;
 import cn.tico.iot.configmanger.module.sys.services.AreaService;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -32,15 +31,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
+
+
 /**
  * 区域 信息操作处理
  *
- * @author haiming
+ * @author maodajun
  * @date 2019-04-11
  */
 @IocBean
-@At("/sys/area")
-public class AreaController {
+@At("/sys/location")
+public class LocationController {
     private static final Log log = Logs.get();
 
     public static List<Area> areaList = new ArrayList<>();
@@ -48,9 +50,9 @@ public class AreaController {
     @Inject
     private AreaService areaService;
 
-    @RequiresPermissions("sys:area:view")
+    @RequiresPermissions("sys:location:view")
     @At("")
-    @Ok("th:/sys/area/area.html")
+    @Ok("th:/sys/location/location.html")
     public void index(HttpServletRequest req) {
 
     }
@@ -58,7 +60,7 @@ public class AreaController {
     /**
      * 查询区域列表
      */
-    @RequiresPermissions("sys:area:list")
+   // @RequiresPermissions("sys:location:list")
     @At
     @Ok("json")
     public Object list(@Param("name") String name, HttpServletRequest req) {
@@ -91,7 +93,7 @@ public class AreaController {
     /**
      * 新增保存区域
      */
-    @RequiresPermissions("sys:area:add")
+    //@RequiresPermissions("sys:location:add")
     @At
     @POST
     @Ok("json")
@@ -109,7 +111,7 @@ public class AreaController {
      * 修改区域
      */
     @At("/edit/?")
-    @Ok("th://sys/area/edit.html")
+    @Ok("th://sys/location/edit.html")
     public void edit(String id, HttpServletRequest req) {
         Area area = areaService.fetch(id);
         if (area != null) {
@@ -124,7 +126,7 @@ public class AreaController {
     /**
      * 修改保存区域
      */
-    @RequiresPermissions("sys:area:edit")
+    //@RequiresPermissions("sys:location:edit")
     @At
     @POST
     @Ok("json")
@@ -148,7 +150,7 @@ public class AreaController {
      */
     @At("/remove/?")
     @Ok("json")
-    @RequiresPermissions("sys:area:remove")
+    @RequiresPermissions("sys:location:remove")
     @Slog(tag ="区域", after= "删除区域:${args[0]}")
     public Object remove(String id, HttpServletRequest req) {
         try {
@@ -249,5 +251,4 @@ public class AreaController {
         return "successs";
 
     }
-
 }

@@ -3,7 +3,8 @@ package cn.tico.iot.configmanger.common.shiro.session;
 import cn.tico.iot.configmanger.common.bean.OnlineSession;
 import cn.tico.iot.configmanger.common.manager.AsyncManager;
 import cn.tico.iot.configmanger.common.manager.factory.AsyncFactory;
-import cn.tico.iot.configmanger.module.monitor.models.UserOnline;
+import cn.tico.iot.configmanger.module.monitor.models.
+        UserOnline;
 import cn.tico.iot.configmanger.module.monitor.services.UserOnlineService;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;

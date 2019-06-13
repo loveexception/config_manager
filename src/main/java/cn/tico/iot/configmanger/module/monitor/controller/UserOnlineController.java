@@ -4,7 +4,7 @@ import cn.tico.iot.configmanger.common.base.Result;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.monitor.models.UserOnline;
 import cn.tico.iot.configmanger.module.monitor.services.UserOnlineService;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;

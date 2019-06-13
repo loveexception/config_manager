@@ -1,9 +1,15 @@
 package cn.tico.iot.configmanger.module.sys.controllers;
 
 import cn.tico.iot.configmanger.common.base.Result;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
+import cn.tico.iot.configmanger.module.sys.models.Role;
+import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
+import cn.tico.iot.configmanger.module.sys.services.UserService;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -18,8 +24,11 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 部门控制类
@@ -34,6 +43,9 @@ public class DeptController {
     @Inject
     DeptService deptService;
 
+    @Inject
+    UserService userService;
+
     @At("")
     @Ok("th:/sys/dept/dept.html")
     @RequiresPermissions("sys:dept:view")
@@ -41,16 +53,44 @@ public class DeptController {
 
     }
 
+//    @At
+//    @Ok("json")
+//    public Object listBack(@Param("deptName") String deptName, HttpServletRequest req) {
+//        Cnd cnd = Cnd.NEW();
+//        if (Strings.isNotBlank(deptName)) {
+//            cnd.and("dept_name", "like", "%" + deptName + "%");
+//        }
+//        cnd.and("del_flag", "=", false);
+//        return deptService.query(cnd);
+//    }
     @At
     @Ok("json")
     public Object list(@Param("deptName") String deptName, HttpServletRequest req) {
+
         Cnd cnd = Cnd.NEW();
         if (Strings.isNotBlank(deptName)) {
             cnd.and("dept_name", "like", "%" + deptName + "%");
         }
+
+        User user = ShiroUtils.getSysUser();
+
+        user =userService.fetchLinks(user,"dept|image");
+        Set roles = userService.getRoleCodeList(user);
         cnd.and("del_flag", "=", false);
-        return deptService.query(cnd);
+
+        if(roles.contains("admin")){
+             List list = deptService.query(cnd);
+             return list;
+        }else{
+            cnd.and("ancestors","like","%"+user.getDeptId()+"%");
+            List list = deptService.query(cnd);
+            return list;
+        }
+
+
+
     }
+
 
     @At("/add/?")
     @Ok("th:/sys/dept/add.html")
@@ -144,6 +184,25 @@ public class DeptController {
                                               @Param("deptName") String deptName) {
         List<Map<String, Object>> tree = deptService.selectTree(parentId, deptName);
         return tree;
+    }
+    @At
+    @Ok("json")
+    public List<Map<String, Object>> treeDataOrg(@Param("parentId") String parentId,
+                                              @Param("deptName") String deptName) {
+        User user = ShiroUtils.getSysUser();
+
+        user =userService.fetchLinks(user,"dept|image");
+        Set roles = userService.getRoleCodeList(user);
+
+        if(roles.contains("admin")){
+            List<Map<String, Object>> tree = deptService.selectFathers("100", null);
+            return tree;
+        }else{
+            List<Map<String, Object>> tree = deptService.selectFathers("100" , user.getDept().getDeptName());
+            return tree;
+        }
+
+
     }
 
     @At

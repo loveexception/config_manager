@@ -5,7 +5,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.sys.models.Dict;
 import cn.tico.iot.configmanger.module.sys.services.DictService;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;

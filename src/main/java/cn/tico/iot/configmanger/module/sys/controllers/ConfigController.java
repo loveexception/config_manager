@@ -7,7 +7,7 @@ import cn.tico.iot.configmanger.common.utils.excel.ExportExcel;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.sys.models.Config;
 import cn.tico.iot.configmanger.module.sys.services.ConfigService;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;

@@ -5,8 +5,8 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.sys.models.Role;
 import cn.tico.iot.configmanger.module.sys.services.RoleService;
 import cn.tico.iot.configmanger.module.sys.models.User;
+
 import cn.tico.iot.configmanger.module.sys.services.UserService;
-;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;

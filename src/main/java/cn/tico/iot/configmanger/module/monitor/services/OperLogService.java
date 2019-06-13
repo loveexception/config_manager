@@ -5,8 +5,9 @@ import org.nutz.dao.Cnd;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
-import cn.tico.iot.configmanger.bean.SlogBean;
-import cn.tico.iot.configmanger.service.SlogService;
+import org.nutz.plugins.slog.bean.SlogBean;
+import org.nutz.plugins.slog.service.SlogService;
+
 
 import java.util.ArrayList;
 import java.util.List;
