@@ -1,10 +1,11 @@
-package cn.tico.iot.configmanger.module.sys.services;
+package cn.tico.iot.configmanger.module.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
-import cn.tico.iot.configmanger.module.sys.models.Dept;
+import cn.tico.iot.configmanger.module.iot.models.Location;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
@@ -12,40 +13,33 @@ import org.nutz.lang.Strings;
 import java.util.*;
 
 /**
- * 部门service
+ * 地址service
  * @author haiming
  */
 @IocBean(args = {"refer:dao"})
-public class DeptService extends Service<Dept> {
+public class LocationService extends Service<Location> {
 
-    public DeptService(Dao dao) {
+    public LocationService(Dao dao) {
         super(dao);
     }
 
     /**
-     * 对象转部门树
+     * 对象转树表
      *
-     * @param deptList     部门列表
+     * @param locations 列表
      * @return
      */
-    public List<Map<String, Object>> getTrees(List<Dept> deptList) {
+    public List<Map<String, Object>> getTrees(List<Location> locations) {
 
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
-        for (Dept dept : deptList) {
-            if (!dept.isStatus()) {
+        for (Location location : locations) {
                 Map<String, Object> dataMap = new HashMap<String, Object>();
-                dataMap.put("id", dept.getId());
-                dataMap.put("pId", dept.getParentId());
-                dataMap.put("name", dept.getDeptName());
-                dataMap.put("title", dept.getDeptName());
+                dataMap.put("id", location.getId());
+                dataMap.put("pId", location.getParentId());
+
                 dataMap.put("checked", false);
-//                if (isCheck) {
-//                    deptMap.put("checked", roleDeptList.contains(dept.getId() + dept.getDeptName()));
-//                } else {
-//                    deptMap.put("checked", false);
-//                }
+
                 trees.add(dataMap);
-            }
         }
         return trees;
     }
@@ -59,13 +53,16 @@ public class DeptService extends Service<Dept> {
     public List<Map<String, Object>> selectTree(String parentId, String name) {
         Cnd cnd = Cnd.NEW();
         if (Strings.isNotBlank(name)) {
-            cnd.and("dept_name", "like", "%" + name + "%");
+            SqlExpressionGroup group = Cnd
+                    .exps("cn_name", "like", "%" + name + "%")
+                    .or("en_name", "like", "%" + name + "%");
+           cnd.and(group);
         }
         if (Strings.isNotBlank(parentId)) {
             cnd.and("parent_id", "=", parentId);
         }
-        cnd.and("status", "=", false).and("del_flag", "=", false);
-        List<Dept> deptList = this.query(cnd);
+        cnd.and("status", "=", 0);//
+        List<Location> deptList = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
         trees = getTrees(deptList);
         return trees;
@@ -78,43 +75,42 @@ public class DeptService extends Service<Dept> {
      */
     public List<Map<String, Object>> selectFathers(String parentId, String name) {
         Cnd cnd = Cnd.NEW();
-        if(Strings.isNotBlank(name)){
-            cnd.or("dept_name", "like", "%" + name + "%");
-        }else {
-            cnd.or("parent_id","=",parentId);
+
+        if (Strings.isNotBlank(name)) {
+            SqlExpressionGroup group = Cnd
+                    .exps("cn_name", "like", "%" + name + "%")
+                    .or("en_name", "like", "%" + name + "%");
+            cnd.and(group);
         }
-        if(Strings.isNotBlank(parentId)){
-            cnd.or("id", "=", parentId);
-        }else {
-            return new ArrayList<Map<String, Object>>();
+        if (Strings.isNotBlank(parentId)) {
+            SqlExpressionGroup group = Cnd
+                    .exps("id", "=", parentId)
+                    .or("parent_id", "=", parentId);
+            cnd.and(group);
         }
 
-        List<Dept> deptList = this.query(cnd);
+        List<Location> locations = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
-        trees = getTrees(deptList);
+        trees = getTrees(locations);
         return trees;
     }
-    public Dept insertDept(Dept dept) throws Exception {
-        Dept info = this.fetch(dept.getParentId());
-        if(info.isStatus()){
-            throw new Exception("dept.stop");
-        }
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
-        return this.dao().insert(dept);
+    public Location insertLocation(Location location) throws Exception {
+        Location info = this.fetch(location.getParentId());
+        location.setAncestors(info.getAncestors() + "," + location.getParentId());
+        location.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
+        return this.dao().insert(location);
     }
 
-    public int update(Dept dept) throws Exception {
-        Dept info = this.fetch(dept.getParentId());
-        if(info.isStatus()){
-            throw new Exception("dept.stop");
-        }
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
-        dept.setUpdateBy(ShiroUtils.getSysUserId());
-        dept.setUpdateTime(new Date());
-        return this.dao().update(dept);
+    public int update(Location location) throws Exception {
+        Location info = this.fetch(location.getParentId());
+        location.setAncestors(info.getAncestors() + "," + location.getParentId());
+        location.setUpdateBy(ShiroUtils.getSysUserId());
+        location.setUpdateTime(new Date());
+        return this.dao().update(location);
     }
 
-    public boolean checkDeptNameUnique(String id,String parentId,String menuName) {
+    public boolean checkLocationNameUnique(String id,String parentId,String cn_name,
+                                           String en_name) {
         Cnd cnd =Cnd.NEW();
         if(Strings.isNotBlank(id)){
             cnd.and("id","!=",id);
@@ -122,10 +118,10 @@ public class DeptService extends Service<Dept> {
         if(Strings.isNotBlank(parentId)){
             cnd.and("parent_id","=",parentId);
         }
-        if(Strings.isNotBlank(menuName)){
-            cnd.and("dept_name", "=", menuName);
+        if(Strings.isNotBlank(cn_name)){
+            cnd.and("cn_name", "=", cn_name);
         }
-        List<Dept> list = this.query(cnd);
+        List<Location> list = this.query(cnd);
         if (Lang.isEmpty(list)) {
             return true;
         }

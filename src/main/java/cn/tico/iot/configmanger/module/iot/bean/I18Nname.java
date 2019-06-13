@@ -1,4 +1,4 @@
-package cn.tico.iot.configmanger.module.iot.models;
+package cn.tico.iot.configmanger.module.iot.bean;
 
 import lombok.Data;
 import org.nutz.dao.entity.annotation.Column;

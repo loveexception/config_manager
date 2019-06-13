@@ -1,6 +1,7 @@
-package cn.tico.iot.configmanger.module.iot.models;
+package cn.tico.iot.configmanger.module.iot.bean;
 
 
+import cn.tico.iot.configmanger.module.iot.bean.Device;
 import lombok.*;
 import org.nutz.dao.entity.annotation.*;
 import  org.nutz.dao.pager.Pager;

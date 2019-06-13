@@ -1,19 +1,18 @@
-package cn.tico.iot.configmanger.module.sys.controllers;
+package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.base.Result;
-import cn.tico.iot.configmanger.common.bean.Amap;
-import cn.tico.iot.configmanger.common.bean.Districts;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
+import cn.tico.iot.configmanger.module.iot.models.Location;
 import cn.tico.iot.configmanger.module.sys.models.Area;
-import cn.tico.iot.configmanger.module.sys.services.AreaService;
-import com.alibaba.fastjson.JSON;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
+import cn.tico.iot.configmanger.module.sys.services.DeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
-import org.nutz.lang.random.R;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
@@ -23,15 +22,10 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-
 
 
 /**
@@ -41,66 +35,74 @@ import java.util.Map;
  * @date 2019-04-11
  */
 @IocBean
-@At("/sys/location")
+@At("/iot/location")
 public class LocationController {
     private static final Log log = Logs.get();
 
-    public static List<Area> areaList = new ArrayList<>();
+    public static List<Location> areaList = new ArrayList<>();
 
     @Inject
-    private AreaService areaService;
+    private LocationService locationService;
+    @Inject
+    private DeptService deptService;
 
-    @RequiresPermissions("sys:location:view")
+    @RequiresPermissions("iot:location:view")
     @At("")
-    @Ok("th:/sys/location/location.html")
+    @Ok("th:/iot/location/location.html")
     public void index(HttpServletRequest req) {
+        Dept dept = ShiroUtils.getSysUser().getDept();
+
+        req.setAttribute("dept",dept);
+
 
     }
 
     /**
      * 查询区域列表
      */
-   // @RequiresPermissions("sys:location:list")
+    @RequiresPermissions("iot:location:list")
     @At
     @Ok("json")
     public Object list(@Param("name") String name, HttpServletRequest req) {
         Cnd cnd = Cnd.NEW();
-//        if (!Strings.isBlank(name)) {
-//            cnd.and("name", "like", "%" + name +"%");
-//        }
-        cnd.asc("adcode");
-        return areaService.query(cnd);
+        if (!Strings.isBlank(name)) {
+            cnd.and("name", "like", "%" + name +"%");
+        }
+
+        return locationService.query(cnd);
     }
 
-    /**
+/**
      * 新增区域
      */
     @At({"/add","/add/*"})
-    @Ok("th:/sys/area/add.html")
+    @Ok("th:/iot/location/add.html")
     public void add(@Param("id") String id, HttpServletRequest req) {
-        Area area = null;
+        Location location = null;
         if (Strings.isNotBlank(id)) {
-            area = areaService.fetch(id);
+            location = locationService.fetch(id);
         }
-        if (area ==null) {
-            area =new Area();
-            area.setParentId("0");
-            area.setName("无");
+        if (location ==null) {
+            location =new Location();
+            location.setParentId(id);
+            location.setCnName("");
+            location.setEnName("");
+            location.setStatus("0");
         }
-        req.setAttribute("area", area);
+        req.setAttribute("location", location);
     }
 
     /**
      * 新增保存区域
      */
-    //@RequiresPermissions("sys:location:add")
+    @RequiresPermissions("iot:location:add")
     @At
     @POST
     @Ok("json")
-    @Slog(tag="区域", after="新增保存区域id=${args[0].id}")
-    public Object addDo(@Param("..") Area area, HttpServletRequest req) {
+    @Slog(tag="区域", after="新增保存区域id=${location[0].id}")
+    public Object addDo(@Param("..") Location location, HttpServletRequest req) {
         try {
-            areaService.insert(area);
+            locationService.insert(location);
             return Result.success("system.success");
         } catch (Exception e) {
             return Result.error("system.error");
@@ -111,32 +113,34 @@ public class LocationController {
      * 修改区域
      */
     @At("/edit/?")
-    @Ok("th://sys/location/edit.html")
+    @Ok("th://iot/location/edit.html")
     public void edit(String id, HttpServletRequest req) {
-        Area area = areaService.fetch(id);
-        if (area != null) {
-            Area parentData = areaService.fetch(area.getParentId());
+        Location location = locationService.fetch(id);
+        if (location != null) {
+            Location parentData = locationService.fetch(location.getParentId());
+            Dept dept = deptService.fetch(location.getDeptid());
             if (parentData != null) {
-                area.setParentName(parentData.getName());
+                location.setDeptName(dept.getDeptName());
+                location.setParentName(parentData.getCnName());
             }
         }
-        req.setAttribute("area", area);
+        req.setAttribute("location", location);
     }
 
     /**
      * 修改保存区域
      */
-    //@RequiresPermissions("sys:location:edit")
+    @RequiresPermissions("iot:location:edit")
     @At
     @POST
     @Ok("json")
     @Slog(tag="区域", after="修改保存区域")
-    public Object editDo(@Param("..") Area area, HttpServletRequest req) {
+    public Object editDo(@Param("..") Location location, HttpServletRequest req) {
         try {
-            if(Lang.isNotEmpty(area)){
-                area.setUpdateBy(ShiroUtils.getSysUserId());
-                area.setUpdateTime(new Date());
-                areaService.update(area);
+            if(Lang.isNotEmpty(location)){
+                location.setUpdateBy(ShiroUtils.getSysUserId());
+                location.setUpdateTime(new Date());
+                locationService.update(location);
             }
 
             return Result.success("system.success");
@@ -150,11 +154,11 @@ public class LocationController {
      */
     @At("/remove/?")
     @Ok("json")
-    @RequiresPermissions("sys:location:remove")
+    @RequiresPermissions("iot:location:remove")
     @Slog(tag ="区域", after= "删除区域:${args[0]}")
     public Object remove(String id, HttpServletRequest req) {
         try {
-            areaService.delete(id);
+            locationService.delete(id);
             return Result.success("system.success");
         } catch (Exception e) {
             return Result.error("system.error");
@@ -165,18 +169,18 @@ public class LocationController {
      * 选择菜单树
      */
     @At("/selectTree/?")
-    @Ok("th:/sys/area/tree.html")
+    @Ok("th:/iot/location/tree.html")
     public void selectTree(String id, HttpServletRequest req) {
-        Area area = null;
+        Location location = null;
         if (Strings.isNotBlank(id)) {
-            area = areaService.fetch(id);
+            location = locationService.fetch(id);
         }
-        if (area ==null) {
-            area =new Area();
-            area.setParentId("0");
-            area.setName("无");
+        if (location ==null) {
+            location =new Location();
+            location.setParentId("100000");
+           location.setCnName("");
         }
-        req.setAttribute("area", area);
+        req.setAttribute("location", location);
     }
 
     /**
@@ -190,65 +194,66 @@ public class LocationController {
     @Ok("json")
     public List<Map<String, Object>> treeData(@Param("parentId") String parentId,
                                               @Param("name") String name) {
-        List<Map<String, Object>> tree = areaService.selectTree(parentId, name);
+        List<Map<String, Object>> tree = locationService.selectTree(parentId, name);
         return tree;
     }
 
-    public static void getAreaList(List<Districts> list, String pid){
-        list.forEach(districts -> {
-            Area area =new Area();
-            area.setId(R.UU32().toLowerCase());
-            area.setParentId(pid);
-            area.setAdcode(districts.getAdcode());
-            area.setName(districts.getName());
-            area.setLevel(districts.getLevel());
-            if(districts.getCitycode()!=null && districts.getCitycode().size()>0){
-                area.setCitycode(districts.getCitycode().get(0));
-            }
 
-            areaList.add(area);
-            if(districts.getDistricts()!=null && districts.getDistricts().size()>0){
-                getAreaList(districts.getDistricts(),area.getId());
-            }
-        });
-    }
-
-    @At
-    @Ok("json")
-    public String  initData(){
-        //读取文件
-        String fileName = "/Users/apple/Desktop/area.txt";
-        //读取文件
-        BufferedReader br = null;
-        StringBuffer sb = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName),"UTF-8")); //这里可以控制编码
-            sb = new StringBuffer();
-            String line = null;
-            while((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                br.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        String data = new String(sb); //StringBuffer ==> String
-        Amap amap = JSON.parseObject(data,Amap.class);
-        if(amap!=null && amap.getDistricts()!=null && amap.getDistricts().size()>0){
-            getAreaList(amap.getDistricts(),"0");
-        }
+//    public static void getAreaList(List<Districts> list, String pid){
+//        list.forEach(districts -> {
+//            Area area =new Area();
+//            area.setId(R.UU32().toLowerCase());
+//            area.setParentId(pid);
+//            area.setAdcode(districts.getAdcode());
+//            area.setName(districts.getName());
+//            area.setLevel(districts.getLevel());
+//            if(districts.getCitycode()!=null && districts.getCitycode().size()>0){
+//                area.setCitycode(districts.getCitycode().get(0));
+//            }
+//
+//            areaList.add(area);
+//            if(districts.getDistricts()!=null && districts.getDistricts().size()>0){
+//                getAreaList(districts.getDistricts(),area.getId());
+//            }
+//        });
+//    }
+//
+//    @At
+//    @Ok("json")
+//    public String  initData(){
+//        //读取文件
+//        String fileName = "/Users/apple/Desktop/area.txt";
+//        //读取文件
+//        BufferedReader br = null;
+//        StringBuffer sb = null;
+//        try {
+//            br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName),"UTF-8")); //这里可以控制编码
+//            sb = new StringBuffer();
+//            String line = null;
+//            while((line = br.readLine()) != null) {
+//                sb.append(line);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                br.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        String data = new String(sb); //StringBuffer ==> String
+//        Amap amap = JSON.parseObject(data,Amap.class);
+//        if(amap!=null && amap.getDistricts()!=null && amap.getDistricts().size()>0){
+//            getAreaList(amap.getDistricts(),"0");
+//        }
 //        if(areaList!=null && areaList.size()>0){
 //            areaList.forEach(area -> {
 //                areaService.insert(area);
 //            });
 //        }
-        return "successs";
-
-    }
+//        return "successs";
+//
+//    }
 }

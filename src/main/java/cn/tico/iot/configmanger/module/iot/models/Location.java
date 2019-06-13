@@ -1,6 +1,7 @@
-package cn.tico.iot.configmanger.module.sys.models;
+package cn.tico.iot.configmanger.module.iot.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -16,7 +17,7 @@ import java.util.Date;
  * @date 2019-04-11
  */
 @Data
-@Table("sys_locations")
+@Table("t_iot_locations")
 public class Location extends BaseModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -38,31 +39,58 @@ public class Location extends BaseModel implements Serializable {
      */
     @Column("ancestors")
     @Comment("祖节点 ")
+    @ColDefine(type = ColType.TEXT)
     private String ancestors;
+
     /**
-     * 城市编码
+     * 名称
      */
-    @Column("citycode")
-    @Comment("城市编码 ")
-    private String citycode;
+    @Column("cn_name")
+    @Comment("名称")
+    private String cnName;
     /**
-     * 区域编码
+     * 编码
      */
-    @Column("adcode")
-    @Comment("区域编码 ")
-    private String adcode;
+    @Column("en_name")
+    @Comment("编码")
+    private String enName;
+
     /**
-     * 行政区名称
+     * 编码
      */
-    @Column("name")
-    @Comment("行政区名称 ")
-    private String name;
+    @Column("dept_id")
+    @Comment("组织")
+    private String deptid;
+
     /**
-     * 行政区划级别
+     * 级别
      */
     @Column("level")
-    @Comment("行政区划级别 ")
-    private String level;
+    @Comment("级别 ")
+    private String level="0";
+
+    /**
+     * 详细信息
+     */
+    @Column("context")
+    @Comment("会议室信息 ")
+    @ColDefine(type = ColType.TEXT)
+    private String context;
+
+
+    /**
+     * 级别
+     */
+    @Column("lng")
+    @Comment("级别 ")
+    private double lng;
+
+    /**
+     * 级别
+     */
+    @Column("lat")
+    @Comment("级别 ")
+    private double lat;
 
     /**
      * 创建者
@@ -96,13 +124,15 @@ public class Location extends BaseModel implements Serializable {
     @Prev(els = {@EL("$me.now()")})
     private Date updateTime;
 
+    /**
+     * 状态
+     */
+    @Column("status")
+    @Comment("状态，0正常，1异常状态，")
+    private  String status="0";
 
+    private String deptName;
     private String parentName;
-
-
-
-
-
 
 
 }

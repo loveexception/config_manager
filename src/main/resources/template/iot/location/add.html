@@ -4,65 +4,72 @@
 <head th:include="include :: header"></head>
 <body class="white-bg">
 	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
-		<form class="form-horizontal m" id="form-dept-add">
-			<input id="treeId" name="parentId" type="hidden" th:value="${dept.id}"   />
+		<form class="form-horizontal m" id="form-add">
+			<input id="treeId" name="parentId" type="hidden" th:value="${location.id}"   />
 			<div class="form-group">
-				<label class="col-sm-3 control-label ">上级部门：</label>
+				<label class="col-sm-3 control-label ">父地域：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" onclick="selectDeptTree()" id="treeName" readonly="true" th:value="${dept.deptName}"/>
+					<input class="form-control" type="text" onclick="selectLocationTree()" id="treeName" readonly="true" th:value="${location.cnName}"/>
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-3 control-label">部门名称：</label>
+				<label class="col-sm-3 control-label">名称：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="deptName" id="deptName">
+					<input class="form-control" type="text" name="cnName" id="cnName">
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-3 control-label">显示排序：</label>
+				<label class="col-sm-3 control-label">编码：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="orderNum">
+					<input class="form-control" type="text" name="enName">
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-3 control-label">负责人：</label>
+				<label class="col-sm-3 control-label">组织：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="leader">
+					<input class="form-control" type="text" onclick="selectDeptTree()" id="deptId" readonly="true" th:value="${location.deptid}" name="deptid">
+				</div>
+			</div>
+
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">经度：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="lng">
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-3 control-label">联系电话：</label>
+				<label class="col-sm-3 control-label">纬度：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="phone">
+					<input class="form-control" type="text" name="lat">
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-3 control-label">邮箱：</label>
-				<div class="col-sm-8">
-					<input class="form-control" type="text" name="email">
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-3 control-label">部门状态：</label>
+				<label class="col-sm-3 control-label">状态：</label>
 				<div class="col-sm-8">
 					<label class="radio-box"> <input type="radio" name="status" value="false" checked /> 正常 </label>
 					<label class="radio-box"> <input type="radio" name="status" value="true" /> 停用 </label>
 				</div>
 			</div>
-
+			<div class="form-group">
+				<label class="col-sm-3 control-label">会议室介绍：</label>
+				<div class="col-sm-8">
+					<textarea class="form-control"  name="context">
+				</div>
+			</div>
 		</form>
 	</div>
 	<div th:include="include::footer"></div>
 	<script type="text/javascript">
-		var prefix = ctx + "sys/dept";
+		var prefix = ctx + "iot/location";
 		
-		$("#form-dept-add").validate({
+		$("#form-add").validate({
 			onkeyup: false,
 			rules:{
-				deptName:{
+				cnName:{
 					required:true,
 					remote: {
-		                url: prefix + "/checkDeptNameUnique",
+		                url: prefix + "/checkLocationNameUnique",
 		                type: "post",
 		                dataType: "json",
 		                data: {
@@ -70,27 +77,18 @@
 		                		return $("input[name='parentId']").val();
 		                    },
 		                	"name" : function() {
-		                        return $.common.trim($("#deptName").val());
+		                        return $.common.trim($("#cnName").val());
 		                    }
 		                },
 		                dataFilter: function(data, type) {
 		                	return data;
 		                }
 		            }
-				},
-				orderNum:{
-					required:true,
-					digits:true
-				},
-				email:{
-                    email:true,
-        		},
-        		phone:{
-        			isPhone:true,
-        		},
+				}
+
 			},
 			messages: {
-		        "deptName": {
+		        "cnName": {
 		            remote: "部门已经存在"
 		        }
 		    }
@@ -98,27 +96,45 @@
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
-	        	$.operate.save(prefix + "/addDo", $('#form-dept-add').serialize());
+	        	$.operate.save(prefix + "/addDo", $('#form-add').serialize());
 	        }
 	    }
 	
-		/*部门管理-新增-选择父部门树*/
-		function selectDeptTree() {
-			var options = {
-				title: '部门选择',
-				width: "380",
-				url: prefix + "/selectTree/" + $("#treeId").val(),
-				callBack: doSubmit
-			};
-			$.modal.openOptions(options);
-		}
-		
-		function doSubmit(index, layero){
+		/*地理管理-新增-选择父部门树*/
+		function selectLocationTree() {
+            var options = {
+                title: '地区选择',
+                width: "380",
+                url: prefix + "/selectTree/" + $("#treeId").val(),
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
 			var body = layer.getChildFrame('body', index);
    			$("#treeId").val(body.find('#treeId').val());
    			$("#treeName").val(body.find('#treeName').val());
    			layer.close(index);
 		}
+
+
+        /*部门管理-新增-选择父部门树*/
+        function selectDeptTree() {
+            var options = {
+                title: '地区选择',
+                width: "380",
+                url: "dept" + "/selectTree/",
+                callBack: doSubmitdept
+            };
+            $.modal.openOptions(options);
+        }
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            $("#deptId").val(body.find('#treeId').val());
+            $("#deptName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
 	</script>
 </body>
 </html>
