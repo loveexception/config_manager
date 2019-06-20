@@ -73,7 +73,7 @@ public class Dept extends BaseModel implements Serializable {
      * 状态（0正常 1停用）
      */
     @Column("status")
-    @Comment("状态（0正常 1停用） ")
+    @Comment("状态（true 正常 false停用） ")
     private boolean status;
 
     @Column("del_flag")

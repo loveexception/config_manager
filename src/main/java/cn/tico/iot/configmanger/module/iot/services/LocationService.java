@@ -3,8 +3,11 @@ package cn.tico.iot.configmanger.module.iot.services;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.Location;
+import cn.tico.iot.configmanger.module.sys.models.User;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -36,6 +39,8 @@ public class LocationService extends Service<Location> {
                 Map<String, Object> dataMap = new HashMap<String, Object>();
                 dataMap.put("id", location.getId());
                 dataMap.put("pId", location.getParentId());
+                dataMap.put("name",location.getCnName());
+                dataMap.put("title",location.getEnName());
 
                 dataMap.put("checked", false);
 
@@ -61,7 +66,7 @@ public class LocationService extends Service<Location> {
         if (Strings.isNotBlank(parentId)) {
             cnd.and("parent_id", "=", parentId);
         }
-        cnd.and("status", "=", 0);//
+        cnd.and("status", "=", "true");//
         List<Location> deptList = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
         trees = getTrees(deptList);
@@ -88,6 +93,7 @@ public class LocationService extends Service<Location> {
                     .or("parent_id", "=", parentId);
             cnd.and(group);
         }
+        cnd.and("status", "=", "true");//
 
         List<Location> locations = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
@@ -98,15 +104,26 @@ public class LocationService extends Service<Location> {
         Location info = this.fetch(location.getParentId());
         location.setAncestors(info.getAncestors() + "," + location.getParentId());
         location.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
+        User user =  ShiroUtils.getSysUser();
+        location.setDeptid(user.getDeptId());
+
+        location.setCreateBy(ShiroUtils.getSysUserId());
+        location.setCreateTime(new Date());
         return this.dao().insert(location);
     }
 
     public int update(Location location) throws Exception {
+
+
         Location info = this.fetch(location.getParentId());
         location.setAncestors(info.getAncestors() + "," + location.getParentId());
+        location.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
+        location.setDeptid(null);
         location.setUpdateBy(ShiroUtils.getSysUserId());
         location.setUpdateTime(new Date());
-        return this.dao().update(location);
+
+         Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class, true));
+         return forup.update(location);
     }
 
     public boolean checkLocationNameUnique(String id,String parentId,String cn_name,
@@ -127,5 +144,6 @@ public class LocationService extends Service<Location> {
         }
         return false;
     }
+
 
 }

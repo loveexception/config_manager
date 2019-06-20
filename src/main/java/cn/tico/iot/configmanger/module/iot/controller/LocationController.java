@@ -4,11 +4,13 @@ import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.iot.models.Location;
-import cn.tico.iot.configmanger.module.sys.models.Area;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
+import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
+import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -22,10 +24,7 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -45,12 +44,15 @@ public class LocationController {
     private LocationService locationService;
     @Inject
     private DeptService deptService;
+    @Inject
+    private UserService userService;
 
     @RequiresPermissions("iot:location:view")
     @At("")
     @Ok("th:/iot/location/location.html")
     public void index(HttpServletRequest req) {
-        Dept dept = ShiroUtils.getSysUser().getDept();
+        User user = ShiroUtils.getSysUser();
+        Dept dept = deptService.fetch(user.getDeptId());
 
         req.setAttribute("dept",dept);
 
@@ -63,16 +65,45 @@ public class LocationController {
     @RequiresPermissions("iot:location:list")
     @At
     @Ok("json")
-    public Object list(@Param("name") String name, HttpServletRequest req) {
+    public Object list(@Param("cnName") String name, @Param("status") String status ,HttpServletRequest req) {
         Cnd cnd = Cnd.NEW();
         if (!Strings.isBlank(name)) {
-            cnd.and("name", "like", "%" + name +"%");
+            SqlExpressionGroup
+                    group = Cnd
+                    .exps("cn_name", "like", "%" + name + "%")
+                    .or("en_name", "like", "%" + name + "%");
+            cnd.and(group);
         }
+        if(!Strings.isBlank(status)){
+            cnd.and("status","=",status);
+        }
+
+        if(!isAdmin()){
+            SqlExpressionGroup
+                    group = Cnd
+                    .exps("dept_id", "=", "100")
+                    .or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+            cnd.and(group);
+        }
+
 
         return locationService.query(cnd);
     }
 
-/**
+    /**
+     * 用户权限
+     * @return
+     */
+    private boolean isAdmin() {
+
+        User user = ShiroUtils.getSysUser();
+
+        Set roles = userService.getRoleCodeList(user);
+
+        return roles.contains("admin");
+    }
+
+    /**
      * 新增区域
      */
     @At({"/add","/add/*"})
@@ -85,9 +116,9 @@ public class LocationController {
         if (location ==null) {
             location =new Location();
             location.setParentId(id);
-            location.setCnName("");
-            location.setEnName("");
-            location.setStatus("0");
+            location.setLat(0);
+            location.setLng(0);
+
         }
         req.setAttribute("location", location);
     }
@@ -102,7 +133,7 @@ public class LocationController {
     @Slog(tag="区域", after="新增保存区域id=${location[0].id}")
     public Object addDo(@Param("..") Location location, HttpServletRequest req) {
         try {
-            locationService.insert(location);
+            locationService.insertLocation(location);
             return Result.success("system.success");
         } catch (Exception e) {
             return Result.error("system.error");
@@ -138,8 +169,7 @@ public class LocationController {
     public Object editDo(@Param("..") Location location, HttpServletRequest req) {
         try {
             if(Lang.isNotEmpty(location)){
-                location.setUpdateBy(ShiroUtils.getSysUserId());
-                location.setUpdateTime(new Date());
+
                 locationService.update(location);
             }
 

@@ -39,7 +39,7 @@ public class LoginController {
 
     @Ok("json")
     @Fail("http:500")
-    @POST
+   // @POST
     @At("/login")
     public Result login(@Param("username")String username,
                         @Param("password")String password,

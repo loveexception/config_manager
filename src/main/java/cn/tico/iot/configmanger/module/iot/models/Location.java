@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
+import cn.tico.iot.configmanger.module.iot.bean.FatherModel;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -18,42 +19,9 @@ import java.util.Date;
  */
 @Data
 @Table("t_iot_locations")
-public class Location extends BaseModel implements Serializable {
+public class Location extends FatherModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Name
-    @Column("id")
-    @Comment
-    @ColDefine(type = ColType.VARCHAR, width = 64)
-    @Prev(els = {@EL("uuid()")})
-    private String id;
-
-    /**
-     * 父节点
-     */
-    @Column("parent_id")
-    @Comment("父节点 ")
-    private String parentId;
-    /**
-     * 祖节点
-     */
-    @Column("ancestors")
-    @Comment("祖节点 ")
-    @ColDefine(type = ColType.TEXT)
-    private String ancestors;
-
-    /**
-     * 名称
-     */
-    @Column("cn_name")
-    @Comment("名称")
-    private String cnName;
-    /**
-     * 编码
-     */
-    @Column("en_name")
-    @Comment("编码")
-    private String enName;
 
     /**
      * 编码
@@ -62,12 +30,8 @@ public class Location extends BaseModel implements Serializable {
     @Comment("组织")
     private String deptid;
 
-    /**
-     * 级别
-     */
-    @Column("level")
-    @Comment("级别 ")
-    private String level="0";
+    @One (field = "deptid",key = "id")
+    private Dept dept;
 
     /**
      * 详细信息
@@ -79,57 +43,29 @@ public class Location extends BaseModel implements Serializable {
 
 
     /**
-     * 级别
+     * 经度
      */
     @Column("lng")
-    @Comment("级别 ")
+    @Comment("经度 ")
     private double lng;
 
     /**
-     * 级别
+     * 纬度
      */
     @Column("lat")
-    @Comment("级别 ")
+    @Comment("纬度 ")
     private double lat;
-
-    /**
-     * 创建者
-     */
-    @Column("create_by")
-    @Comment("创建者 ")
-    @Prev(els = @EL("$me.uid()"))
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    @Column("create_time")
-    @Comment("创建时间 ")
-    @Prev(els = {@EL("$me.now()")})
-    private Date createTime;
-
-    /**
-     * 更新者
-     */
-    @Column("update_by")
-    @Comment("更新者 ")
-    @Prev(els = @EL("$me.uid()"))
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    @Column("update_time")
-    @Comment("更新时间 ")
-    @Prev(els = {@EL("$me.now()")})
-    private Date updateTime;
 
     /**
      * 状态
      */
     @Column("status")
-    @Comment("状态，0正常，1异常状态，")
-    private  String status="0";
+    @Comment("状态，true正常，false异常状态，")
+    private  String status="true";
+
+
+
+
 
     private String deptName;
     private String parentName;
