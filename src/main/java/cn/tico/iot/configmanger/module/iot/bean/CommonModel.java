@@ -17,11 +17,22 @@ public abstract class CommonModel {
     @Name
     @Column("id")
     @Comment
-    @ColDefine(type = ColType.VARCHAR, width = 64)
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     @Prev(els = {@EL("uuid()")})
     @GraphQLQuery
     private String id;
 
+
+
+    @Column("status")
+    @Comment("状态")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    protected String status="0";
+
+    @Column("delFlag")
+    @Comment("删除")
+    @ColDefine(type = ColType.VARCHAR ,width = 32)
+    protected String delFlag="false";
 
     @Column("create_by")
     @Comment("创建者")
@@ -31,6 +42,7 @@ public abstract class CommonModel {
 
 
     @Column("create_time")
+    @Comment("建立时间")
     @Prev(els = {@EL("$me.now()")})
     protected Date createTime;
 
@@ -41,6 +53,7 @@ public abstract class CommonModel {
     protected String updateBy;
 
     @Prev(els=@EL("$me.now()"))
+    @Comment("更新时间")
     @Column("update_time")
     protected Date updateTime;
 

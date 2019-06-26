@@ -73,7 +73,7 @@ public class DevTest {
 
 
         String json = Json.toJson(dev);
-        DeviceEnvModel model = dev.getEnv();
+        Map model = dev.getEnv();
 
         System.out.println(json);
         System.out.println(model);
@@ -121,15 +121,17 @@ public class DevTest {
                             "cn_name" +
                             ",driver { " +
                                 //"handle numberOfTweets " +
-                                "cn_name"+
+                                "i18n"+
                             "} " +
                             ",dept2{" +
-                                "cn_name" +
+                                "i18n" +
                                 ",depts"+
                                 ",deptArray"+
                                 ",deptMap{sno}"+
                                 ",max{sno}"+
                             "}" +
+                            ",sno,env,i18n" +
+                            "" +
                         "}}");
 
         System.out.println("----------mao-----------");

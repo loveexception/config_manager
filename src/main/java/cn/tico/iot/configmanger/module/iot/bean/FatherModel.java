@@ -14,7 +14,6 @@ public  class FatherModel extends I18NModel {
      */
     @Column("parent_id")
     @Comment("父节点 ")
-
     private String parentId;
     /**
      * 祖节点
@@ -28,12 +27,14 @@ public  class FatherModel extends I18NModel {
      */
     @Column("level")
     @Comment("级别 ")
+    @GraphQLQuery(name = "level", description = "层级")
     private String level="0";
     /**
      * 排序
      */
     @Column("order_num")
     @Comment("排序 ")
+    @GraphQLQuery(name = "order_num", description = "排序")
     private int orderNum;
 
     @One(field = "parentId",key = "id")

@@ -56,16 +56,6 @@ public class Location extends FatherModel implements Serializable {
     @Comment("纬度 ")
     private double lat;
 
-    /**
-     * 状态
-     */
-    @Column("status")
-    @Comment("状态，true正常，false异常状态，")
-    private  String status="true";
-
-
-
-
 
     private String deptName;
     private String parentName;

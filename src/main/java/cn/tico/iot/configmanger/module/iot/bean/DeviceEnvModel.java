@@ -7,12 +7,12 @@ import cn.tico.iot.configmanger.module.iot.models.Tag;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
-import org.nutz.dao.entity.annotation.Column;
-import org.nutz.dao.entity.annotation.Comment;
-import org.nutz.dao.entity.annotation.ManyMany;
-import org.nutz.dao.entity.annotation.One;
+import org.nutz.dao.entity.annotation.*;
+import org.nutz.lang.util.NutMap;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class DeviceEnvModel extends I18NModel {
@@ -23,6 +23,7 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("sno")
     @Comment("机器码")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "sno", description = "机器码")
     private String sno;
 
@@ -31,7 +32,14 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("kind_id")
     @Comment("类型")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     private String kindid;
+
+    @Column("kind_map")
+    @Comment("类型冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    @GraphQLQuery(name = "kindmap", description = "全类图")
+    private String kindmap;
 
     @One(field = "kindid",key = "id")
     private Kind kind;
@@ -43,6 +51,7 @@ public class DeviceEnvModel extends I18NModel {
      * 业务标签
      */
     @ManyMany(relation ="t_iot_tag_dev",from = "dev_id",to="tag_id")
+    @GraphQLQuery(name = "tags", description = "全业务")
     private List<Tag> tags ;
 
     /**
@@ -50,7 +59,7 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("ip")
     @Comment("ip ")
-
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     private String ip;
     /**
      * 采集间隔
@@ -64,6 +73,7 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("unit")
     @Comment("单位")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     private String unit="ms";
 
     /**
@@ -71,6 +81,7 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("username")
     @Comment("用户名")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
     private String username="";
 
     /**
@@ -78,39 +89,58 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("password")
     @Comment("密码")
+    @ColDefine(type = ColType.VARCHAR, width = 64)
     private String password="";
     /**
      * 组织
      */
     @Column("dept_id")
     @Comment("组织")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     private String deptid;
-
-
 
     @One(field = "deptid",key = "id")
     private Dept dept;
+
     /**
      * 地域
      */
     @Column("location_id")
     @Comment("地域")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
     private String locationid;
+
+    @Column("location_map")
+    @Comment("地域名冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    @GraphQLQuery(name = "locationmap", description = "全类图")
+    private String locationmap;
+
 
     @One(field = "locationid",key="id")
     private Location location;
 
+
     private List<Location> locations;
 
-
-    public DeviceEnvModel getEnv(){
+    @GraphQLQuery(name = "env", description = "运行时数据")
+    public Map<String,Object> getEnv(){
         DeviceEnvModel env =  new DeviceEnvModel();
         env.setIp(this.ip);
         env.setCycle(this.cycle);
         env.setUnit(this.unit);
         env.setUsername(this.username);
         env.setPassword(this.password);
-        return env;
+        NutMap result = NutMap.NEW();
+        result
+            .addv("ip",this.ip)
+            .addv("cycle",this.cycle)
+            .addv("unit",this.unit)
+            .addv("username",this.username)
+            .addv("password",this.password);
+
+
+        return result;
     }
 
 

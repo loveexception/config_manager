@@ -93,26 +93,19 @@ public class KindTest {
     }
 
     @Test
-    public  void getGraphQL(){
-        String schema = "type Query { " +
-                " hello(what:String = \"World\"): String " +
-                " }";
-
-        SchemaParser schemaParser = new SchemaParser();
-        TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schema);
-
-        RuntimeWiring runtimeWiring = newRuntimeWiring()
-                .type("Query",
-                        builder -> builder.dataFetcher("hello",
-                                env -> "Hello "+env.getArgument("what")+"!"))
-                .build();
-
-        SchemaGenerator schemaGenerator = new SchemaGenerator();
-        GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-
-        GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
-        ExecutionResult executionResult = build.execute("{hello(what:\"Java\")}");
-
-        System.out.println(executionResult.<Map<String,Object>>getData());
+    public  void getTag(){
+        dao.create(Tag.class,true);
     }
+
+    @Test
+    public  void getKind(){
+        dao.create(Kind.class,true);
+
+    }
+
+    @Test
+    public void allTable(){
+        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true );
+    }
+
 }

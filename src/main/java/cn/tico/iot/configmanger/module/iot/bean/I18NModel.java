@@ -5,6 +5,9 @@ import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Comment;
+import org.nutz.lang.util.NutMap;
+
+import java.util.Map;
 
 @Data
 public  class I18NModel extends CommonModel {
@@ -22,6 +25,14 @@ public  class I18NModel extends CommonModel {
     @Comment("编码")
     @GraphQLQuery(name = "en_name", description = "english name")
     private String enName;
+
+    @GraphQLQuery(name = "i18n", description = "组合名")
+    public Map<String,Object> geti18n(){
+        return NutMap.NEW().addv("cn_name",this.cnName).addv("en_name",this.enName);
+    }
+
+
+
 
 
 }

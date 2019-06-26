@@ -2,7 +2,8 @@ package cn.tico.iot.configmanger.module.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
-import cn.tico.iot.configmanger.module.iot.models.Location;
+import cn.tico.iot.configmanger.module.iot.models.Kind;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
@@ -16,35 +17,35 @@ import org.nutz.lang.Strings;
 import java.util.*;
 
 /**
- * 地址service
+ * 类型service
  * @author haiming
  */
 @IocBean(args = {"refer:dao"})
-public class LocationService extends Service<Location> {
+public class KindService extends Service<Kind> {
 
-    public LocationService(Dao dao) {
+    public KindService(Dao dao) {
         super(dao);
     }
 
     /**
      * 对象转树表
      *
-     * @param locations 列表
+     * @param kinds 列表
      * @return
      */
-    public List<Map<String, Object>> getTrees(List<Location> locations) {
+    public List<Map<String, Object>> getTrees(List<Kind> kinds) {
 
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
-        for (Location location : locations) {
-                Map<String, Object> dataMap = new HashMap<String, Object>();
-                dataMap.put("id", location.getId());
-                dataMap.put("pId", location.getParentId());
-                dataMap.put("name",location.getCnName());
-                dataMap.put("title",location.getEnName());
+        for (Kind kind : kinds) {
+            Map<String, Object> dataMap = new HashMap<String, Object>();
+            dataMap.put("id", kind.getId());
+            dataMap.put("pId", kind.getParentId());
+            dataMap.put("name",kind.getCnName());
+            dataMap.put("title",kind.getEnName());
 
-                dataMap.put("checked", false);
+            dataMap.put("checked", false);
 
-                trees.add(dataMap);
+            trees.add(dataMap);
         }
         return trees;
     }
@@ -61,13 +62,13 @@ public class LocationService extends Service<Location> {
             SqlExpressionGroup group = Cnd
                     .exps("cn_name", "like", "%" + name + "%")
                     .or("en_name", "like", "%" + name + "%");
-           cnd.and(group);
+            cnd.and(group);
         }
         if (Strings.isNotBlank(parentId)) {
             cnd.and("parent_id", "=", parentId);
         }
         cnd.and("status", "=", "true");//
-        List<Location> deptList = this.query(cnd);
+        List<Kind> deptList = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
         trees = getTrees(deptList);
         return trees;
@@ -95,40 +96,45 @@ public class LocationService extends Service<Location> {
         }
         cnd.and("status", "=", "true");//
 
-        List<Location> locations = this.query(cnd);
+        List<Kind> kinds = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
-        trees = getTrees(locations);
+        trees = getTrees(kinds);
         return trees;
     }
-    public Location insertLocation(Location location) throws Exception {
-        Location info = this.fetch(location.getParentId());
-        location.setAncestors(info.getAncestors() + "," + location.getParentId());
-        location.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
+    public Kind insertKind(Kind kind) throws Exception {
+        Kind info = this.fetch(kind.getParentId());
+        if(info !=  null){
+            kind.setAncestors(info.getAncestors() + "," + kind.getParentId());
+            kind.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
+        }else{
+            kind.setParentId("0");
+            kind.setAncestors("0");
+            kind.setLevel("1");
+            kind.setDelFlag("0");
+        }
+
         User user =  ShiroUtils.getSysUser();
-        location.setDeptid(user.getDeptId());
 
-        location.setCreateBy(ShiroUtils.getSysUserId());
-        location.setCreateTime(new Date());
-        return this.dao().insert(location);
+        kind.setCreateBy(ShiroUtils.getSysUserId());
+        kind.setCreateTime(new Date());
+        return this.dao().insert(kind);
     }
 
-    public int update(Location location) throws Exception {
+    public int update(Kind kind) throws Exception {
 
 
-        // Location info = this.fetch(location.getParentId());
-        location.setAncestors(null);
-        location.setLevel(null);
-        location.setDeptid(null);
-        location.setParentId(null);
-        location.setUpdateBy(ShiroUtils.getSysUserId());
-        location.setUpdateTime(new Date());
+        Kind info = this.fetch(kind.getParentId());
+        kind.setAncestors(info.getAncestors() + "," + kind.getParentId());
+        kind.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
+        kind.setUpdateBy(ShiroUtils.getSysUserId());
+        kind.setUpdateTime(new Date());
 
-         Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class, true));
-         return forup.update(location);
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(Kind.class, true));
+        return forup.update(kind);
     }
 
-    public boolean checkLocationNameUnique(String id,String parentId,String cn_name,
-                                           String en_name) {
+    public boolean checkKindNameUnique(String id,String parentId,String cn_name,
+                                       String en_name) {
         Cnd cnd =Cnd.NEW();
         if(Strings.isNotBlank(id)){
             cnd.and("id","!=",id);
@@ -139,7 +145,7 @@ public class LocationService extends Service<Location> {
         if(Strings.isNotBlank(cn_name)){
             cnd.and("cn_name", "=", cn_name);
         }
-        List<Location> list = this.query(cnd);
+        List<Kind> list = this.query(cnd);
         if (Lang.isEmpty(list)) {
             return true;
         }
@@ -147,4 +153,21 @@ public class LocationService extends Service<Location> {
     }
 
 
+    public boolean checkDeptNameUnique(String id, String parentId, String menuName) {
+        Cnd cnd =Cnd.NEW();
+        if(Strings.isNotBlank(id)){
+            cnd.and("id","!=",id);
+        }
+        if(Strings.isNotBlank(parentId)){
+            cnd.and("parent_id","=",parentId);
+        }
+        if(Strings.isNotBlank(menuName)){
+            cnd.and("cn_name", "=", menuName);
+        }
+        List<Kind> list = this.query(cnd);
+        if (Lang.isEmpty(list)) {
+            return true;
+        }
+        return false;
+    }
 }
