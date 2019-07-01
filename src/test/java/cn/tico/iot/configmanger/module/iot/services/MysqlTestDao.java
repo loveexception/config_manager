@@ -11,7 +11,7 @@ public class MysqlTestDao {
         String mysqldriver ="com.mysql.cj.jdbc.Driver";
         dataSource.setDriverClassName(mysqldriver);
         dataSource.setUsername("root");
-        dataSource.setPassword("123456");
+        dataSource.setPassword("qweasdzxc");
 
         return  new NutDao(dataSource);
     }
