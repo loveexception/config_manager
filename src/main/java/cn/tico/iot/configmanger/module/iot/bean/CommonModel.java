@@ -27,7 +27,7 @@ public abstract class CommonModel {
     @Column("status")
     @Comment("状态")
     @ColDefine(type = ColType.VARCHAR, width = 32)
-    protected String status="0";
+    protected String status="true";
 
     @Column("delflag")
     @Comment("删除")

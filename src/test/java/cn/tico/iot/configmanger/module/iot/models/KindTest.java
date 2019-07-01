@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
+import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import com.alibaba.druid.pool.DruidDataSource;
 import graphql.ExecutionResult;
@@ -28,14 +29,9 @@ public class KindTest {
 
     @Before
     public void setUp() throws Exception {
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setUrl("jdbc:mysql://localhost/nutztest");
-        String mysqldriver ="com.mysql.cj.jdbc.Driver";
-        dataSource.setDriverClassName(mysqldriver);
-        dataSource.setUsername("root");
-        dataSource.setPassword("123456");
 
-        dao = new NutDao(dataSource);
+
+        dao = MysqlTestDao.NEW();
        // Daos.createTablesInPackage(dao, "cn.tico.iot.configmanger.module.iot.models", true);
 
         //Daos.migration(dao, "cn.tico.iot.configmanger.module.iot.models", true, false, false);

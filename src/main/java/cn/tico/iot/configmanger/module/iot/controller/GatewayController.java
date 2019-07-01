@@ -30,7 +30,6 @@ import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -204,7 +203,7 @@ public class GatewayController implements AdminKey {
 	 */
 	@At("/selectExtSno")
 	@Ok("th:/iot/gateway/extsno.html")
-	public void selectTree(HttpServletRequest req) {
+	public void selectExtSno(HttpServletRequest req) {
 
 		//req.setAttribute("dept", deptService.fetch(id));
 
