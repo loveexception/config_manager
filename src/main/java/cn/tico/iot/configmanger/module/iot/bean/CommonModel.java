@@ -29,7 +29,7 @@ public abstract class CommonModel {
     @ColDefine(type = ColType.VARCHAR, width = 32)
     protected String status="0";
 
-    @Column("delFlag")
+    @Column("delflag")
     @Comment("删除")
     @ColDefine(type = ColType.VARCHAR ,width = 32)
     protected String delFlag="false";

@@ -71,7 +71,6 @@ public class DevTest {
         dev.getLocations().add(new Location());
         dev.getDriver().setCnName("maodajun");
 
-
         String json = Json.toJson(dev);
         Map model = dev.getEnv();
 
@@ -120,16 +119,18 @@ public class DevTest {
                 "{dev(sno:\"abc\"){" +
                             "cn_name" +
                             ",driver { " +
-                                //"handle numberOfTweets " +
                                 "i18n"+
-                            "} " +
+                                ",devdri(sno:\"ddd\")"+
+
+                        "} " +
                             ",dept2{" +
                                 "i18n" +
                                 ",depts"+
                                 ",deptArray"+
                                 ",deptMap{sno}"+
                                 ",max{sno}"+
-                            "}" +
+
+                        "}" +
                             ",sno,env,i18n" +
                             "" +
                         "}}");

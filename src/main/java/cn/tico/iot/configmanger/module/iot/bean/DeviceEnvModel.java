@@ -18,14 +18,7 @@ import java.util.Map;
 public class DeviceEnvModel extends I18NModel {
 
 
-    /**
-     * SNO 机器码
-     */
-    @Column("sno")
-    @Comment("机器码")
-    @ColDefine(type = ColType.VARCHAR, width = 32)
-    @GraphQLQuery(name = "sno", description = "机器码")
-    private String sno;
+
 
     /**
      * 类型
@@ -61,10 +54,11 @@ public class DeviceEnvModel extends I18NModel {
     @Comment("ip ")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     private String ip;
+
     /**
      * 采集间隔
      */
-    @Column("cycel")
+    @Column("cycle")
     @Comment("采集间隔")
     private int cycle;
 
@@ -110,9 +104,35 @@ public class DeviceEnvModel extends I18NModel {
     @ColDefine(type = ColType.VARCHAR, width = 32)
     private String locationid;
 
-    @Column("location_map")
-    @Comment("地域名冗余用于查寻")
+    @Column("location_country")
+    @Comment("地域国 冗余用于查寻")
     @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationCountry;
+
+    @Column("location_state")
+    @Comment("地域 省冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationState;
+
+    @Column("location_city")
+    @Comment("地域市余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationCity;
+
+    @Column("location_company")
+    @Comment("地域公司冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationCompany;
+
+    @Column("location_room")
+    @Comment("地域 会议室 名冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationRoom;
+
+
+    @Column("location_map")
+    @Comment("地域ID 用于查寻")
+    @ColDefine(type = ColType.TEXT, width = 255)
     @GraphQLQuery(name = "locationmap", description = "全类图")
     private String locationmap;
 

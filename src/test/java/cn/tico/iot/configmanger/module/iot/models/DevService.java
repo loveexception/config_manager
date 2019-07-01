@@ -1,8 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
-import io.leangen.graphql.annotations.GraphQLArgument;
-import io.leangen.graphql.annotations.GraphQLContext;
-import io.leangen.graphql.annotations.GraphQLQuery;
+import io.leangen.graphql.annotations.*;
 import org.nutz.lang.Lang;
 import org.nutz.lang.util.NutMap;
 import org.nutz.mapl.Mapl;
@@ -61,6 +59,14 @@ public class DevService {
 
 
         return Arrays.asList(gateway,gateway);
+
+    }
+    @GraphQLQuery(name="devdri")
+    public List<String> devdri(@GraphQLContext Driver driver, @GraphQLArgument(name = "sno") String sno) {
+        Device device = new Device();
+       // device =dev;
+
+        return Arrays.asList(driver.toString(),sno);
 
     }
 

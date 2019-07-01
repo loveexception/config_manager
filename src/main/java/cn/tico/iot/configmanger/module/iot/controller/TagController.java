@@ -23,18 +23,17 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.Set;
 
 /**
- * 字典 信息操作处理
+ * 业务 信息操作处理
  *
  * @author haiming
  * @date 2019-04-16
  */
 @IocBean
 @At("/iot/tag")
-public class TagController {
+public class TagController implements AdminKey {
 	private static final Log log = Logs.get();
 
 	@Inject
@@ -55,7 +54,7 @@ public class TagController {
 	}
 
 	/**
-	 * 查询字典列表
+	 * 查询业务列表
 	 */
 	@RequiresPermissions("iot:tag:list")
 	@At
@@ -76,7 +75,7 @@ public class TagController {
 		if(!isAdmin()){
 			SqlExpressionGroup
 					group = Cnd
-					.exps("dept_id", "=", "100")
+					.exps("dept_id", "=", DEPT_ADMIN)
 					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
 			cnd.and(group);
 		}
@@ -95,11 +94,11 @@ public class TagController {
 
 		Set roles = userService.getRoleCodeList(user);
 
-		return roles.contains("admin");
+		return roles.contains(ROLE_ADMIN);
 	}
 
 	/**
-	 * 新增字典
+	 * 新增业务
 	 */
 	@At("/add")
 	@Ok("th:/iot/tag/add.html")
@@ -108,13 +107,13 @@ public class TagController {
 	}
 
 	/**
-	 * 新增保存字典
+	 * 新增保存业务
 	 */
 	@RequiresPermissions("iot:tag:add")
 	@At
 	@POST
 	@Ok("json")
-	@Slog(tag="字典", after="新增保存字典id=${args[0].id}")
+	@Slog(tag="业务", after="新增保存业务id=${args[0].id}")
 	public Object addDo(@Param("..") Tag tag,HttpServletRequest req) {
 		try {
 			tagService.insertTag(tag);
@@ -125,7 +124,7 @@ public class TagController {
 	}
 
 	/**
-	 * 修改字典
+	 * 修改业务
 	 */
 	@At("/edit/?")
 	@Ok("th://iot/tag/edit.html")
@@ -155,12 +154,12 @@ public class TagController {
 	}
 
 	/**
-	 * 删除字典
+	 * 删除业务
 	 */
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("iot:tag:remove")
-	@Slog(tag ="字典", after= "删除字典:${array2str(args[0])}")
+	@Slog(tag ="业务", after= "删除业务:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
 			tagService.delete(ids);

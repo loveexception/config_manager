@@ -72,8 +72,59 @@
                     sortable: true
                 },
                 {
-                    field : 'enName',
-                    title : '编码',
+                    field : 'sno',
+                    title : 'SNO',
+                    sortable: true
+                },
+
+                {
+                    field : 'dept.deptName',
+                    title : '组织',
+                    sortable: true
+                },
+                {
+                    field : 'location.cnName',
+                    title : '位置',
+                    sortable: true
+                },
+                {
+                    field : 'subGateway.extSno',
+                    title : '绑定SNO',
+                    sortable: true
+                },
+                {
+                    field : 'ip',
+                    title : '内网ip',
+                    sortable: true
+                },
+                {
+                    field : 'extIP',
+                    title : '外网ip',
+                    sortable: true
+                },
+                {
+                    field : 'status',
+                    title : '状态',
+                    sortable: true
+                },
+                {
+                    field : 'cycle',
+                    title : '周期',
+                    sortable: true
+                },
+                {
+                    field : 'desription',
+                    title : '描述',
+                    sortable: true
+                },
+                {
+                    field : 'updateTime',
+                    title : '更新时间',
+                    sortable: true
+                },
+                {
+                    field : 'createTime',
+                    title : '创建时间',
                     sortable: true
                 },
 
@@ -90,12 +141,12 @@
                         if (userdept == "100") {
                             var actions = [];
                             actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit">编辑</i></a> ');
-                            actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove">删除</i></a>');
+                            actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove">删除</i></a>');
                             return actions.join('');
                         }else if(row.deptid == userdept) {
                             var actions = [];
                             actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit">编辑</i></a> ');
-                            actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove">删除</i></a>');
+                            actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove">删除</i></a>');
                             return actions.join('');
                         }else {
                             return "";
@@ -105,6 +156,24 @@
         };
         $.table.init(options);
     });
+
+
+    function remove(id) {
+        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗？", function() {
+            $.ajax({
+                type : 'post',
+                url: prefix + "/remove/" + id,
+                success : function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.modal.msgSuccess(result.msg);
+                        $.treeTable.refresh();
+                    } else {
+                        $.modal.msgError(result.msg);
+                    }
+                }
+            });
+        });
+    }
 </script>
 </body>
 </html>

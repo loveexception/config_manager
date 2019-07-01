@@ -38,7 +38,7 @@ import java.util.Set;
  */
 @IocBean
 @At("/iot/kind")
-public class KindController {
+public class KindController  implements AdminKey {
     private static final Log log = Logs.get();
 
     public static List<Kind> areaList = new ArrayList<>();
@@ -84,7 +84,7 @@ public class KindController {
         if(!isAdmin()){
             SqlExpressionGroup
                     group = Cnd
-                    .exps("dept_id", "=", "100")
+                    .exps("dept_id", "=", DEPT_ADMIN)
                     .or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
             cnd.and(group);
         }
@@ -103,7 +103,7 @@ public class KindController {
 
         Set roles = userService.getRoleCodeList(user);
 
-        return roles.contains("admin");
+        return roles.contains(ROLE_ADMIN);
     }
 
     /**
@@ -206,7 +206,7 @@ public class KindController {
         }
         if (kind ==null) {
             kind =new Kind();
-            kind.setParentId("100000");
+            kind.setParentId(KIND_ROOT);
             kind.setCnName("");
         }
         req.setAttribute("kind", kind);

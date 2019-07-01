@@ -35,7 +35,7 @@ import java.util.*;
  */
 @IocBean
 @At("/iot/location")
-public class LocationController {
+public class LocationController implements AdminKey {
     private static final Log log = Logs.get();
 
     public static List<Location> areaList = new ArrayList<>();
@@ -81,7 +81,7 @@ public class LocationController {
         if(!isAdmin()){
             SqlExpressionGroup
                     group = Cnd
-                    .exps("dept_id", "=", "100")
+                    .exps("dept_id", "=", DEPT_ADMIN)
                     .or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
             cnd.and(group);
         }
@@ -100,7 +100,7 @@ public class LocationController {
 
         Set roles = userService.getRoleCodeList(user);
 
-        return roles.contains("admin");
+        return roles.contains(ROLE_ADMIN);
     }
 
     /**
@@ -207,7 +207,7 @@ public class LocationController {
         }
         if (location ==null) {
             location =new Location();
-            location.setParentId("100000");
+            location.setParentId(LOCATION_ROOT);
            location.setCnName("");
         }
         req.setAttribute("location", location);

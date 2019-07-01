@@ -3,9 +3,15 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.Gateway;
+import cn.tico.iot.configmanger.module.iot.models.Kind;
+import cn.tico.iot.configmanger.module.iot.models.Location;
+import cn.tico.iot.configmanger.module.iot.models.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.GatewayService;
+import cn.tico.iot.configmanger.module.iot.services.KindService;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
+import cn.tico.iot.configmanger.module.sys.services.DeptService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
@@ -23,6 +29,8 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,7 +41,7 @@ import java.util.Set;
  */
 @IocBean
 @At("/iot/gateway")
-public class GatewayController {
+public class GatewayController implements AdminKey {
 	private static final Log log = Logs.get();
 
 	@Inject
@@ -41,6 +49,12 @@ public class GatewayController {
 
 	@Inject
 	private UserService userService;
+	@Inject
+	private KindService kindService;
+	@Inject
+	private LocationService locationService;
+	@Inject
+	private DeptService deptService;
 
 	@RequiresPermissions("iot:gateway:view")
 	@At("")
@@ -71,16 +85,17 @@ public class GatewayController {
 			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
 			cnd.and(group);
 		}
-
 		if(!isAdmin()){
 			SqlExpressionGroup
 					group = Cnd
-					.exps("dept_id", "=", "100")
+					.exps("dept_id", "=", DEPT_ADMIN)
 					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
 			cnd.and(group);
 		}
-		//cnd.and("del_flag","=",false);
-		return gatewayService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+		cnd.and("delflag","=","false");
+		Object obj =gatewayService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"^dept|subGateway|kind|location$");
+
+		return obj;
 	}
 
 
@@ -94,7 +109,7 @@ public class GatewayController {
 
 		Set roles = userService.getRoleCodeList(user);
 
-		return roles.contains("admin");
+		return roles.contains(ROLE_ADMIN);
 	}
 
 	/**
@@ -103,6 +118,21 @@ public class GatewayController {
 	@At("/add")
 	@Ok("th:/iot/gateway/add.html")
 	public void add( HttpServletRequest req) {
+		User user = ShiroUtils.getSysUser();
+		String deptid = user.getDeptId();
+		Dept dept =deptService.fetch(deptid);
+		req.setAttribute("dept",dept);
+
+		Kind kind =  kindService.fetch(KIND_ROOT);
+
+		req.setAttribute("kind", kind);
+
+		Location location = locationService.fetch(LOCATION_ROOT);
+
+		req.setAttribute("location", location);
+
+
+
 
 	}
 
@@ -162,11 +192,37 @@ public class GatewayController {
 	@Slog(tag ="网关", after= "删除网关:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
-			gatewayService.delete(ids);
+			gatewayService.vDelete(ids);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
+
+	/**
+	 * 选择GATEWAY注册表
+	 */
+	@At("/selectExtSno")
+	@Ok("th:/iot/gateway/extsno.html")
+	public void selectTree(HttpServletRequest req) {
+
+		//req.setAttribute("dept", deptService.fetch(id));
+
+	}
+
+	/**
+	 * 删除网关
+	 */
+	@At("/subgateway")
+	@Ok("json")
+	@Slog(tag ="注册过网关", after= "注册过的网关")
+	public List<SubGateway> subgateway(HttpServletRequest req) {
+
+
+			List<SubGateway> tree = gatewayService.selectSub();
+			return tree;
+
+	}
+
 
 }

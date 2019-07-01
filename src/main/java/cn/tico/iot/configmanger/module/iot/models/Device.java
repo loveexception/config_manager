@@ -19,11 +19,14 @@ public class Device extends DeviceEnvModel implements Serializable {
 
 
 
-
-
-
-
-
+    /**
+     * SNO 机器码
+     */
+    @Column("sno")
+    @Comment("机器码")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "sno", description = "机器码")
+    private String sno;
 
 
 
@@ -34,6 +37,13 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("网关")
     private String gatewayid;
 
+    /**
+     * 所属网关，SNO
+     */
+    @Column("gateway_extsno")
+    @Comment("冗余的SNO")
+    private String gatewayExtsno;
+
     @One(field = "gatewayid",key="id")
     private Gateway gateway;
 
@@ -43,6 +53,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Column("driver_id")
     @Comment("驱动")
     private String driverid;
+
 
     @One(field = "driverid",key="id")
     private Driver driver;
