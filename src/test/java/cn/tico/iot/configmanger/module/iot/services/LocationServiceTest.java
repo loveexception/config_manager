@@ -38,6 +38,7 @@ public class LocationServiceTest {
     @Test
     public void autoID() {
         Location location = new Location();
+        location.setStatus("true");
         //location.setId();
         dao.insert(location);
         List<Map<String,Object>> list = service.selectTree(null,null);
@@ -48,6 +49,7 @@ public class LocationServiceTest {
     public void getTrees100() {
         Location location = new Location();
         location.setId("100");
+        location.setStatus("true");
         dao.insert(location);
         List list = service.selectTree(null,null);
         assertEquals(1,list.size());
