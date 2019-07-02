@@ -7,11 +7,11 @@ import org.nutz.dao.impl.NutDao;
 public class MysqlTestDao {
     public static Dao NEW() {
         DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setUrl("jdbc:mysql://localhost/nutztest");
+        dataSource.setUrl("jdbc:mysql://172.16.16.10/nutztest");
         String mysqldriver ="com.mysql.cj.jdbc.Driver";
         dataSource.setDriverClassName(mysqldriver);
         dataSource.setUsername("root");
-        dataSource.setPassword("qweasdzxc");
+        dataSource.setPassword("123456");
 
         return  new NutDao(dataSource);
     }
