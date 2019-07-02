@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
+import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
@@ -20,14 +21,8 @@ public class LocationTest {
 
     @Before
     public void setUp() throws Exception {
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setUrl("jdbc:mysql://localhost/nutztest");
-         String mysqldriver ="com.mysql.cj.jdbc.Driver";
-        dataSource.setDriverClassName(mysqldriver);
-        dataSource.setUsername("root");
-        dataSource.setPassword("123456");
+        dao = MysqlTestDao.NEW();
 
-        dao = new NutDao(dataSource);
         dao.create(Location.class,true);
 
     }

@@ -30,7 +30,6 @@ import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -160,6 +159,7 @@ public class GatewayController implements AdminKey {
 	@Ok("th://iot/gateway/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Gateway gateway = gatewayService.fetch(id);
+		gateway = gatewayService.fetchLinks(gateway,"^dept|subGateway|kind|location$");
 		req.setAttribute("gateway",gateway);
 	}
 
@@ -204,7 +204,7 @@ public class GatewayController implements AdminKey {
 	 */
 	@At("/selectExtSno")
 	@Ok("th:/iot/gateway/extsno.html")
-	public void selectTree(HttpServletRequest req) {
+	public void selectExtSno(HttpServletRequest req) {
 
 		//req.setAttribute("dept", deptService.fetch(id));
 
@@ -216,12 +216,19 @@ public class GatewayController implements AdminKey {
 	@At("/subgateway")
 	@Ok("json")
 	@Slog(tag ="注册过网关", after= "注册过的网关")
-	public List<SubGateway> subgateway(HttpServletRequest req) {
+	public Object subgateway(@Param("pageNum")int pageNum,
+									   @Param("pageSize")int pageSize,
+									   @Param("name") String name,
+									   @Param("orderByColumn") String orderByColumn,
+									   @Param("isAsc") String isAsc,
+									   HttpServletRequest req) {
+
+		Cnd cnd = Cnd.NEW();
 
 
-			List<SubGateway> tree = gatewayService.selectSub();
-			return tree;
+		Object obj =gatewayService.selectSub(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 
+		return obj;
 	}
 
 

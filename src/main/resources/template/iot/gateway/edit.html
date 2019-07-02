@@ -1,46 +1,171 @@
 <!DOCTYPE HTML>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-    <form class="form-horizontal m" id="form-gateway-edit">
-        <input id="id" name="id" th:value="${gateway.id}" type="hidden">
+    <form class="form-horizontal m" id="form-add">
         <div class="form-group">
-            <label class="col-sm-3 control-label">中文名：</label>
+            <label class="col-sm-3 control-label">网关名称：</label>
             <div class="col-sm-8">
-                <input id="cnName" name="cnName" th:value="${gateway.cnName}" class="form-control" type="text">
+                <input id="cnName" name="cnName" class="form-control" type="text" th:value="${gateway.cnName}" >
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">编码：</label>
+            <label class="col-sm-3 control-label ">ExtSNO：</label>
             <div class="col-sm-8">
-                <input id="label" name="enName" th:value="${gateway.enName}" class="form-control" type="text">
+                <input class="form-control" type="text" onclick="selectSno()" id="extSno" name="extSno" readonly=""  th:value="${gateway.subgateway.extSno}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">SNO：</label>
+            <div class="col-sm-8">
+                <input id="sno" name="sno" type="text" th:value="${gateway.sno}" />
+                <input id="subid" name="subid" type="hidden"  th:value="${gateway.subid}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">内网IP</label>
+            <div class="col-sm-8">
+                <input id="ip" name="ip" class="form-control" type="text"  th:value="${gateway.ip}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">外网IP</label>
+            <div class="col-sm-8">
+                <input id="extIP" name="extIP" class="form-control" type="text"  th:value="${gateway.extIP}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">心跳周期</label>
+            <div class="col-sm-8">
+                <input id="cycle" name="cycle" class="form-control" type="text"  th:value="${gateway.cycle}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">组织：</label>
+            <div class="col-sm-8">
+                <input id="deptid" name="deptid" type="hidden"  th:value="${gateway.deptid}" />
+                <input class="form-control" type="text" onclick="selectDeptTree()" id="deptName" readonly="true"  th:value="${gateway.dept.deptName}"  />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">地域：</label>
+            <div class="col-sm-8">
+                <input id="locationid" name="locationid" type="hidden"th:value="${gateway.locationid}" />
+                <input class="form-control" type="text" onclick="selectLocation()" id="locationName" readonly="true" th:value="${gateway.location.cnName}"/>
             </div>
         </div>
 
 
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <label class="radio-box"> <input type="radio" name="status" value="true" checked /> 正常 </label>
+                <label class="radio-box"> <input type="radio" name="status" value="false" /> 停用 </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Git</label>
+            <div class="col-sm-8">
+                <input class="form-control" id="gitPath" name="gitPath" readonly="true" type="text">
+            </div>
+        </div>
 
-
+        <div class="form-group">
+            <label class="col-sm-3 control-label">描述</label>
+            <div class="col-sm-8">
+                <input id="desription" name="desription" class="form-control" type="text">
+            </div>
+        </div>
     </form>
 </div>
 <div th:include="include::footer"></div>
 <script type="text/javascript">
-    var prefix = ctx + "iot/gateway";
-    $("#form-gateway-edit").validate({
+    var prefix = ctx + "iot/gateway"
+    $("#form-add").validate({
         onkeyup: false,
-        rules: {
-            xxxx: {
-                required: true,
+        rules:{
+            xxxx:{
+                required:true,
             },
         }
     });
 
     function submitHandler() {
         if ($.validate.form()) {
-            $.operate.save(prefix + "/editDo", $('#form-gateway-edit').serialize());
+            $.operate.save(prefix + "/addDo", $('#form-add').serialize());
         }
     }
+
+
+
+    /*选择注册库中的GATEWAY*/
+    function selectSno() {
+        var options = {
+            title: '未绑定GATEWAY',
+            width: "380",
+            url: prefix + "/selectExtSno" ,
+            callBack: function (index, layero){
+                var body = layer.getChildFrame('body', index);
+                $("#subid").val(body.find('#id').val());
+                $("#extSno").val(body.find('#extSno').val());
+                $("#sno").val(body.find('#sno').val());
+                layer.close(index);
+            }
+        };
+        $.modal.openOptions(options);
+    }
+    /*选择组织*/
+    function selectDept() {
+        var options = {
+            title: '选择组织',
+            width: "380",
+            url: prefix + "/selectDept/" + $("#deptid").val(),
+            callBack: function (index, layero){
+                var body = layer.getChildFrame('body', index);
+                $("#deptid").val(body.find('#id').val());
+                $("#deptName").val(body.find('#cnName').val());
+                layer.close(index);
+            }
+        };
+        $.modal.openOptions(options);
+    }
+    /*选择地域*/
+    function selectLocation() {
+        var options = {
+            title: '选择地域',
+            width: "380",
+            url: ctx + "iot/location/selectTree/" + "10000",
+            callBack: function (index, layero){
+                var body = layer.getChildFrame('body', index);
+                $("#locationid").val(body.find('#treeId').val());
+                $("#locationName").val(body.find('#treeName').val());
+                layer.close(index);
+            }
+        };
+        $.modal.openOptions(options);
+    }
+    /*用户管理-新增-选择部门树*/
+    function selectDeptTree() {
+        var deptId =  "100" ;
+        var options = {
+            title: '选择部门',
+            width: "380",
+            url: ctx + "sys/dept/selectTree/" + deptId,
+            callBack: function (index, layero){
+                var tree = layero.find("iframe")[0].contentWindow.$._tree;
+                if ($.tree.notAllowParents(tree)) {
+                    var body = layer.getChildFrame('body', index);
+                    $("#deptid").val(body.find('#treeId').val());
+                    $("#deptName").val(body.find('#treeName').val());
+                    layer.close(index);
+                }
+            }
+        };
+        $.modal.openOptions(options);
+    }
+
 </script>
 </body>
 </html>

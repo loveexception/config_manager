@@ -73,10 +73,19 @@ public class GatewayService extends Service<Gateway> {
 
 	}
 
-	public List<SubGateway> selectSub() {
+	public Object selectSub(int pageNumber, int pageSize,Cnd cnd,String orderByColumn,String isAsc,String linkname) {
 
-		Cnd cnd = Cnd.NEW();
-		//cnd.and("");
-		return this.dao().query(SubGateway.class,cnd);
+		Pager pager = this.dao().createPager(pageNumber, pageSize);
+		if (Strings.isNotBlank(orderByColumn) && Strings.isNotBlank(isAsc)) {
+			MappingField field =dao().getEntity(SubGateway.class).getField(orderByColumn);
+			if(Lang.isNotEmpty(field)){
+				cnd.orderBy(field.getColumnName(),isAsc);
+			}
+		}
+		List<SubGateway> list = this.dao().query(SubGateway.class, cnd, pager);
+		if (!Strings.isBlank(linkname)) {
+			this.dao().fetchLinks(list, linkname);
+		}
+		return new TableDataInfo(list, this.dao().count(SubGateway.class,cnd));
 	}
 }
