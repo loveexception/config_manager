@@ -16,10 +16,7 @@ button{font-family: "SimSun","Helvetica Neue",Helvetica,Arial;}
 		<label for="keyword">关键字：</label><input type="text" class="empty" id="keyword" maxlength="50">
 		<button class="btn" id="btn" onclick="$.tree.searchNode()"> 搜索 </button>
 	</div>
-	<div class="treeExpandCollapse">
-		<a href="#" onclick="$.tree.expand()">展开</a> /
-		<a href="#" onclick="$.tree.collapse()">折叠1</a>
-	</div>
+
 		<div class="col-sm-12 select-table table-striped">
 			<table id="bootstrap-table" data-mobile-responsive="true"></table>
 		</div>
@@ -32,56 +29,59 @@ button{font-family: "SimSun","Helvetica Neue",Helvetica,Arial;}
 			var prefix = ctx+"iot/gateway";
             var options = {
                 url: url,
+                search: false,
+                showExport: false,
+                showSearch: false,   // 是否显示检索信息
+                showRefresh: false, // 是否显示刷新按钮
+                showColumns: false, // 是否显示隐藏某列下拉框
+                showToggle:false,   // 是否显示详细视图和列表视图的切换按钮
+                showExport: false,   // 是否支持导出文件
 
-				onclick: zOnClick,
                 columns: [
 
                     {
+                        field : 'id',
+                        title : 'id',
+                    },
+                    {
                         field : 'sno',
                         title : 'SNO',
-                        sortable: true
                     },
                     {
                         field : 'extSno',
                         title : '绑定SNO',
-                        sortable: true
                     },
                     {
                         field : 'gwid',
                         title : 'Gateway',
-                        sortable: true
-                    },
+                    },{
+                        title: '操作',
+                        align: 'center',
+                        formatter: function(value, row, index) {
+							var actions = [];
+							actions.push('<a class="btn btn-success btn-xs" href="#" onclick="me(\'' + row.id + '\',\'' + row.sno + '\',\'' + row.extSno + '\')"><i class="fa fa-arrow-right">选中</i></a>');
+							return actions.join('');
 
-                    {
-                        field : 'updateTime',
-                        title : '更新时间',
-                        sortable: true
-                    },
-                    {
-                        field : 'createTime',
-                        title : '创建时间',
-                        sortable: true
+                        }
                     }]
             };
 			$.table.init(options);
 
 
-		});
 
-        function zOnClick(event, ID, treeNode) {
-            var id = treeNode.id;
-            var sno = treeNode.sno;
-            var extsno = treeNode.extsno;
+		});
+        function me(id,sno,extsno){
             $("#id").val(id);
             $("#sno").val(sno);
-            $("#extsno").val(extsno);
+            $("#extSno").val(extsno);
         }
+
 	</script>
 <div class="hidden">
 
 	<input  type="text" id="id" name="id"/>
 	<input type="text" id="sno" name="sno"/>
-	<input type="text" id="extsno" name="extsno" />
+	<input type="text" id="extSno" name="extSno" />
 </div>
 </body>
 </html>
