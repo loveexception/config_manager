@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+	</head>
+	<body>
+		<table
+			id="table"
+			data-toggle="table"
+			data-height="460"
+			data-pagination="true"
+			data-search="true"
+			data-url=""
+		>
+			<thead>
+				<tr>
+					<th data-field="id">ID</th>
+					<th data-field="name">Item Name</th>
+					<th data-field="price">Item Price</th>
+				</tr>
+			</thead>
+		</table>
+		<div>
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/bootstrap.min.js"></script>
+
+			<!-- bootstrap-table 表格插件 -->
+			<script src="/assets/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+			<script src="/assets/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+			<script src="/assets/plugins/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js"></script>
+			<script src="/assets/plugins/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js"></script>
+			<!-- jquery-validate 表单验证插件 -->
+			<script src="/assets/plugins/validate/jquery.validate.min.js"></script>
+			<script src="/assets/plugins/validate/messages_zh.min.js"></script>
+			<script src="/assets/plugins/validate/jquery.validate.extend.js"></script>
+			<!-- jquery-validate 表单树插件 -->
+			<script src="/assets/plugins/bootstrap-treetable/bootstrap-treetable.js"></script>
+			<!-- jquery-export 表格导出插件 -->
+			<script src="/assets/plugins/bootstrap-table/extensions/export/bootstrap-table-export.js"></script>
+			<script src="/assets/plugins/bootstrap-table/extensions/export/tableExport.js"></script>
+			<!-- 遮罩层 -->
+			<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
+			<script src="/assets/plugins/iCheck/icheck.min.js"></script>
+			<script src="/assets/plugins/layer/layer.min.js"></script>
+			<script src="/assets/plugins/layui/layui.js"></script>
+			<script src="/assets/js/common.js?v=3.1.0"></script>
+			<script src="/assets/js/ui.js?v=3.1.0"></script>
+			<script>
+				var ctx = '\/';
+			</script>
+			<script></script>
+		</div>
+		<script>
+			window.ddd = [
+				{
+					id: '1',
+					roleName: '管理员',
+					roleKey: 'admin',
+					roleSort: '1',
+					status: false,
+					delFlag: false,
+					flag: false,
+					remark: '管理员',
+					updateBy: '1',
+					updateTime: '2019-06-26 17:40:01'
+				},
+				{
+					id: '4430d56d459742299acd5690b694a9df',
+					roleName: '应用管理',
+					roleKey: 'maodajun',
+					roleSort: '1',
+					status: false,
+					delFlag: false,
+					flag: false,
+					remark: '',
+					updateBy: '1',
+					updateTime: '2019-06-26 17:40:08'
+				},
+				{
+					id: '2',
+					roleName: '公司运维',
+					roleKey: 'manager',
+					roleSort: '2',
+					status: false,
+					delFlag: false,
+					flag: false,
+					remark: '普通角色',
+					updateBy: '1',
+					updateTime: '2019-06-26 17:40:15'
+				},
+				{
+					id: '4976f24fe9674bbcb6472737f85f6c62',
+					roleName: '前台用户',
+					roleKey: 'user',
+					roleSort: '3',
+					status: false,
+					delFlag: false,
+					flag: false,
+					remark: '前台使用',
+					updateBy: '1',
+					updateTime: '2019-06-26 17:40:21'
+				}
+			];
+			console.log(document.getElementById('table'));
+			document
+				.getElementById('table')
+				.setAttribute('data-url', JSON.stringify(window.ddd));
+		</script>
+	</body>
+</html>

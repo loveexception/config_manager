@@ -56,6 +56,5 @@ mvn clean package nutzboot:shade
 ## start 命令:
 
 ```
-	1:mvn compile nutzboot:run
-	2:mvn exec:java -Dexec.mainClass="cn.tico.iot.configmanger.MainLauncher"
+	mvn compile nutzboot:run
 ```

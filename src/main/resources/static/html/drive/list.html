@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<meta charset="utf-8" />
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title></title>
+		<meta name="keywords" content="" />
+		<meta name="description" content="" />
+		<link rel="shortcut icon" href="favicon.ico" />
+		<!-- react.js -->
+		<script src="/assets/react/react.development.js"></script>
+		<script src="/assets/react/react-dom.development.js"></script>
+		<!-- babel.js -->
+		<script src="/assets/react/babel.min.js"></script>
+		<!-- moment.js -->
+		<script src="/assets/react/moment-with-locales.js"></script>
+		<!-- antd.css -->
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="/assets/react/antd/antd.min.css"
+		/>
+		<!-- antd.js -->
+		<script src="/assets/react/antd/antd.min.js"></script>
+	</head>
+	<body class="gray-bg">
+		<div id="app"></div>
+		<script type="text/babel">
+			class ListBox extends React.PureComponent {
+				render = () => {
+					let { Table, Select, Button, Input } = antd;
+					const columns = [
+						{
+							title: 'Full Name',
+							width: 100,
+							dataIndex: 'name',
+							key: 'name',
+							fixed: 'left'
+						},
+						{
+							title: 'Age',
+							width: 100,
+							dataIndex: 'age',
+							key: 'age',
+							fixed: 'left'
+						},
+						{ title: 'Column 1', dataIndex: 'address', key: '1' },
+						{ title: 'Column 2', dataIndex: 'address', key: '2' },
+						{ title: 'Column 3', dataIndex: 'address', key: '3' },
+						{ title: 'Column 4', dataIndex: 'address', key: '4' },
+						{ title: 'Column 5', dataIndex: 'address', key: '5' },
+						{ title: 'Column 6', dataIndex: 'address', key: '6' },
+						{ title: 'Column 7', dataIndex: 'address', key: '7' },
+						{ title: 'Column 8', dataIndex: 'address', key: '8' },
+						{
+							title: 'Action',
+							key: 'operation',
+							fixed: 'right',
+							width: 100,
+							render: () => <a href="javascript:;">action</a>
+						}
+					];
+
+					const data = [
+						{
+							key: '1',
+							name: 'John Brown',
+							age: 32,
+							address: 'New York Park'
+						},
+						{
+							key: '2',
+							name: 'Jim Green',
+							age: 40,
+							address: 'London Park'
+						}
+					];
+					return (
+						<div>
+							<div>驱动管理</div>
+							<div>
+								<Select
+									defaultValue="lucy"
+									style={{ width: 120 }}
+									// onChange={handleChange}
+								>
+									<Select.Option value="jack">
+										Jack
+									</Select.Option>
+									<Select.Option value="lucy">
+										Lucy
+									</Select.Option>
+									<Select.Option value="disabled" disabled>
+										Disabled
+									</Select.Option>
+									<Select.Option value="Yiminghe">
+										yiminghe
+									</Select.Option>
+								</Select>
+								<Input.Search
+									placeholder="input search text"
+									onSearch={value =>
+										console.log('点击搜索', value)
+									}
+									style={{ width: 200 }}
+								/>
+							</div>
+							<Button type="primary">新增</Button>
+							<Table
+								columns={columns}
+								dataSource={data}
+								scroll={{ x: 1300 }}
+							/>
+						</div>
+					);
+				};
+			}
+			ReactDOM.render(<ListBox />, document.getElementById('app'));
+		</script>
+	</body>
+</html>

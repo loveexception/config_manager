@@ -1,1 +1,1 @@
-mvn exec:java -Dexec.mainClass="cn.tico.iot.configmanger.MainLauncher"
+mvn compile nutzboot:run
