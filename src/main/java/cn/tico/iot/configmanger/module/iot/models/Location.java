@@ -36,10 +36,10 @@ public class Location extends FatherModel implements Serializable {
     /**
      * 详细信息
      */
-    @Column("context")
+    @Column("desription")
     @Comment("会议室信息 ")
     @ColDefine(type = ColType.TEXT)
-    private String context;
+    private String desription;
 
 
     /**

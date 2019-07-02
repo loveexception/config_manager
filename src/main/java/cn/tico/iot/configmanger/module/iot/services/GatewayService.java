@@ -16,6 +16,7 @@ import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.trans.Atom;
 
 import java.util.Date;
 import java.util.List;
@@ -64,11 +65,16 @@ public class GatewayService extends Service<Gateway> {
 	}
 
 	public int updateGateway(Gateway gateway) {
-		gateway.setDeptid(null);
 		gateway.setUpdateBy(ShiroUtils.getSysUserId());
 		gateway.setUpdateTime(new Date());
-		Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class, true));
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class,null,"^create_by|create_time$", true));
 		return forup.update(gateway);
+//		FieldFilter.create(Location.class, true).run(new Atom(){
+//			public void run(){
+//				dao().update(gateway);
+//			}
+//		});
+//		return 1;
 
 
 	}

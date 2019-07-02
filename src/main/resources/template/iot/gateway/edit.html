@@ -5,6 +5,8 @@
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-add">
+        <input id="id" name="id" class="form-control" type="hidden" th:value="${gateway.id}" >
+
         <div class="form-group">
             <label class="col-sm-3 control-label">网关名称：</label>
             <div class="col-sm-8">
@@ -75,7 +77,7 @@
         <div class="form-group">
             <label class="col-sm-3 control-label">描述</label>
             <div class="col-sm-8">
-                <input id="desription" name="desription" class="form-control" type="text">
+                <input id="desription" name="desription" class="form-control" type="text" th:value="${gateway.desription}" />
             </div>
         </div>
     </form>
@@ -94,7 +96,7 @@
 
     function submitHandler() {
         if ($.validate.form()) {
-            $.operate.save(prefix + "/addDo", $('#form-add').serialize());
+            $.operate.save(prefix + "/editDo", $('#form-add').serialize());
         }
     }
 
