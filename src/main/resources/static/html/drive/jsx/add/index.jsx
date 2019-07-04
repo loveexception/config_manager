@@ -6,6 +6,45 @@ for (var i = 0; i < scripts.length; i++) {
 		domId = script.getAttribute('domId');
 	}
 }
+$.modal.open = function(title, url, width, height) {
+	//如果是移动端，就使用自适应大小弹窗
+	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+		width = 'auto';
+		height = 'auto';
+	}
+	if ($.common.isEmpty(title)) {
+		title = false;
+	}
+	if ($.common.isEmpty(url)) {
+		url = '/404.html';
+	}
+	if ($.common.isEmpty(width)) {
+		width = 800;
+	}
+	if ($.common.isEmpty(height)) {
+		height = $(window).height() - 50;
+	}
+	layer.open({
+		type: 2,
+		area: [width + 'px', height + 'px'],
+		fix: false,
+		//不固定
+		maxmin: true,
+		shade: 0.3,
+		title: title,
+		content: url,
+		btn: ['保存', '取消'],
+		// 弹层外区域关闭
+		shadeClose: false,
+		yes: function(index, layero) {
+			var iframeWin = layero.find('iframe')[0];
+			iframeWin.contentWindow.submitHandler();
+		},
+		cancel: function(index) {
+			return true;
+		}
+	});
+};
 let {
 	Steps,
 	Button,
@@ -21,6 +60,9 @@ let {
 	Radio
 } = antd;
 const { Step } = Steps;
+
+var _list_data = {};
+
 function submitHandler() {
 	console.log('--点击确定--');
 }
@@ -389,6 +431,8 @@ class EditableTable extends React.PureComponent {
 				render: (text, record) =>
 					this.state.dataSource.length >= 1 ? (
 						<Popconfirm
+							cancelText="取消"
+							okText="确定"
 							title="确定删除?"
 							onConfirm={() => this.handleDelete(record.key)}
 						>
@@ -667,11 +711,18 @@ class AlarmConfiguration extends React.PureComponent {
 				title: '告警配置操作',
 				width: '10%',
 				dataIndex: 'operation',
-				render: () => {
+				render: (text, record) => {
 					return (
 						<Button
 							onClick={() => {
-								console.log('---');
+								_list_data = {
+									record: record,
+									list: data
+								};
+								$.modal.open(
+									'告警规则设置',
+									'/html/drive/alarmRules.html'
+								);
 							}}
 						>
 							配置
@@ -688,7 +739,13 @@ class AlarmConfiguration extends React.PureComponent {
 				}}
 			>
 				<div className="title">{title}</div>
-				<Table columns={columns} dataSource={data} />
+				<Table
+					columns={columns}
+					dataSource={data}
+					pagination={{
+						simple: true
+					}}
+				/>
 			</div>
 		);
 	}
