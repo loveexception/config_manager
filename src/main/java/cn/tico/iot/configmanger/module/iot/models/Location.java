@@ -58,7 +58,6 @@ public class Location extends FatherModel implements Serializable {
 
 
     private String deptName;
-    private String parentName;
 
 
 }

@@ -129,7 +129,7 @@ public class KindService extends Service<Kind> {
         kind.setUpdateBy(ShiroUtils.getSysUserId());
         kind.setUpdateTime(new Date());
 
-        Dao forup = Daos.ext(this.dao(), FieldFilter.create(Kind.class, true));
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(kind.getClass(), true));
         return forup.update(kind);
     }
 

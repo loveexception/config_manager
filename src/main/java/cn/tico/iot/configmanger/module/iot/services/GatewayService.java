@@ -35,27 +35,7 @@ public class GatewayService extends Service<Gateway> {
 	}
 
 
-	/**
-	 * 分页查询数据封装 查询关联数据
 
-	 * @return
-
-	public TableDataInfo tableList(int pageNumber, int pageSize, Cnd cnd, String orderByColumn, String isAsc, String linkname){
-		Pager pager = this.dao().createPager(pageNumber, pageSize);
-		if (Strings.isNotBlank(orderByColumn) && Strings.isNotBlank(isAsc)) {
-			MappingField field =dao().getEntity(this.getEntityClass()).getField(orderByColumn);
-			if(Lang.isNotEmpty(field)){
-				cnd.orderBy(field.getColumnName(),isAsc);
-			}
-		}
-
-		List<Gateway> list = this.dao().query(Gateway.class cnd, pager);
-		if (!Strings.isBlank(linkname)) {
-			this.dao().fetchLinks(list, linkname);
-		}
-		return new TableDataInfo(list, this.dao().count(this.getEntityClass(),cnd));
-	}
-	 */
 	public Gateway insertGateway(Gateway gateway) {
 
 
@@ -67,16 +47,8 @@ public class GatewayService extends Service<Gateway> {
 	public int updateGateway(Gateway gateway) {
 		gateway.setUpdateBy(ShiroUtils.getSysUserId());
 		gateway.setUpdateTime(new Date());
-		Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class,null,"^create_by|create_time$", true));
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(gateway.getClass(),null,"^create_by|create_time$", true));
 		return forup.update(gateway);
-//		FieldFilter.create(Location.class, true).run(new Atom(){
-//			public void run(){
-//				dao().update(gateway);
-//			}
-//		});
-//		return 1;
-
-
 	}
 
 	public Object selectSub(int pageNumber, int pageSize,Cnd cnd,String orderByColumn,String isAsc,String linkname) {

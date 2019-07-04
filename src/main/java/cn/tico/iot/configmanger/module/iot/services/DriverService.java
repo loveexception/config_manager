@@ -26,8 +26,7 @@ public class DriverService extends Service<Driver> {
 	}
 
 	public Driver insertDriver(Driver tag) {
-		User user =  ShiroUtils.getSysUser();
-		tag.setDeptid(user.getDeptId());
+
 
 		tag.setCreateBy(ShiroUtils.getSysUserId());
 		tag.setCreateTime(new Date());
@@ -35,10 +34,9 @@ public class DriverService extends Service<Driver> {
 	}
 
 	public int updateDriver(Driver tag) {
-		tag.setDeptid(null);
 		tag.setUpdateBy(ShiroUtils.getSysUserId());
 		tag.setUpdateTime(new Date());
-		Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class, true));
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(tag.getClass(), true));
 		return forup.update(tag);
 	}
 

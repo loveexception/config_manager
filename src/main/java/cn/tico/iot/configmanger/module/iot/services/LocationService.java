@@ -123,7 +123,7 @@ public class LocationService extends Service<Location> {
         location.setUpdateBy(ShiroUtils.getSysUserId());
         location.setUpdateTime(new Date());
 
-         Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class, true));
+         Dao forup = Daos.ext(this.dao(), FieldFilter.create(location.getClass(), true));
          return forup.update(location);
     }
 

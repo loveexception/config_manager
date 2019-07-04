@@ -16,9 +16,6 @@ public class Device extends DeviceEnvModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
-
-
     /**
      * SNO 机器码
      */
@@ -57,11 +54,6 @@ public class Device extends DeviceEnvModel implements Serializable {
 
     @One(field = "driverid",key="id")
     private Driver driver;
-
-
-
-
-
 
 
 

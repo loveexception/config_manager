@@ -3,7 +3,9 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.Driver;
+import cn.tico.iot.configmanger.module.iot.models.Normal;
 import cn.tico.iot.configmanger.module.iot.services.DriverService;
+import cn.tico.iot.configmanger.module.iot.services.NormalService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
@@ -23,6 +25,7 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,7 +41,8 @@ public class DriverController implements AdminKey {
 
 	@Inject
 	private DriverService driverService;
-
+	@Inject
+	private NormalService normalService;
 	@Inject
 	private UserService userService;
 
@@ -56,7 +60,6 @@ public class DriverController implements AdminKey {
 	/**
 	 * 查询业务列表
 	 */
-	@RequiresPermissions("iot:driver:list")
 	@At
 	@Ok("json")
 	public Object list(@Param("pageNum")int pageNum,
@@ -67,19 +70,13 @@ public class DriverController implements AdminKey {
 					   HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
+			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("sno", "like", "%" + name + "%");
 			cnd.and(group);
 		}
 
 		if(!isAdmin()){
-			SqlExpressionGroup
-					group = Cnd
-					.exps("dept_id", "=", DEPT_ADMIN)
-					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
-			cnd.and(group);
+			return null;
 		}
-		//cnd.and("del_flag","=",false);
 		return driverService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
 
@@ -97,19 +94,11 @@ public class DriverController implements AdminKey {
 		return roles.contains(ROLE_ADMIN);
 	}
 
-	/**
-	 * 新增业务
-	 */
-	@At("/add")
-	@Ok("th:/iot/driver/add.html")
-	public void add( HttpServletRequest req) {
 
-	}
 
 	/**
 	 * 新增保存业务
 	 */
-	@RequiresPermissions("iot:driver:add")
 	@At
 	@POST
 	@Ok("json")
@@ -124,19 +113,28 @@ public class DriverController implements AdminKey {
 	}
 
 	/**
-	 * 修改业务
+	 * 新增保存业务
 	 */
-	@At("/edit/?")
-	@Ok("th://iot/driver/edit.html")
-	public void edit(String id, HttpServletRequest req) {
-		Driver driver = driverService.fetch(id);
-		req.setAttribute("driver",driver);
+	@At
+	@POST
+	@Ok("json")
+	@Slog(tag="业务", after="新增保存业务id=${args[0].id}")
+	public Object addNormals(List<Normal> normals, HttpServletRequest req) {
+		try {
+			normalService.insertAllNormal(normals);
+			return Result.success("system.success");
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
 	}
+
+
+
+
 
 	/**
 	 * 修改保存字典
 	 */
-	@RequiresPermissions("iot:driver:edit")
 	@At
 	@POST
 	@Ok("json")

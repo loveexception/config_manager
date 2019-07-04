@@ -40,4 +40,7 @@ public  class FatherModel extends I18NModel {
     @One(field = "parentId",key = "id")
     private Location parent;
 
+    private String parentName;
+
+
 }

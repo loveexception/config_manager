@@ -39,7 +39,7 @@ public class TagService extends Service<Tag> {
 		tag.setDeptid(null);
 		tag.setUpdateBy(ShiroUtils.getSysUserId());
 		tag.setUpdateTime(new Date());
-		Dao forup = Daos.ext(this.dao(), FieldFilter.create(Location.class, true));
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(tag.getClass(), true));
 		return forup.update(tag);
 
 
