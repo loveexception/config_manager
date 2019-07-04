@@ -8,6 +8,8 @@
 		<meta name="keywords" content="" />
 		<meta name="description" content="" />
 		<link rel="shortcut icon" href="favicon.ico" />
+
+		<link href="/assets/css/style.css" rel="stylesheet" />
 		<!-- react.js -->
 		<script src="/assets/react/react.development.js"></script>
 		<script src="/assets/react/react-dom.development.js"></script>
@@ -24,209 +26,21 @@
 		<!-- antd.js -->
 		<script src="/assets/react/antd/antd.min.js"></script>
 
-		<link href="/assets/css/style.css" rel="stylesheet" />
-		<style>
-			#drive-list-box {
-			}
-			#drive-list-box .drive-list-body {
-				padding: 20px 80px 20px 50px;
-			}
-			#drive-list-box .drive-list-body .drive-list-content {
-				height: 100px;
-				/* line-height: 100px; */
-				background-color: #fff;
-				box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
-				border-radius: 2px;
-				padding: 12px 20px 20px;
-				margin-bottom: 20px;
-			}
-			#drive-list-box
-				.drive-list-body
-				.drive-list-content
-				.drive-list-content-li {
-				margin-bottom: 10px;
-			}
-			#drive-list-box
-				.drive-list-body
-				.drive-list-content
-				.drive-list-content-li
-				.ant-btn {
-				height: 30px;
-				font-size: 14px;
-				min-width: 114px;
-				border-radius: 15px;
-				background-color: #1875f0;
-				border: none;
-			}
-			#drive-list-box
-				.drive-list-body
-				.drive-list-content
-				.drive-list-content-li
-				.ant-select-selection--single {
-				height: 30px;
-				border-radius: 15px;
-				border-color: #8f8f8f;
-			}
-		</style>
+		<!-- less.js -->
+		<link
+			rel="stylesheet/less"
+			type="text/css"
+			href="./jsx/list/index.less"
+		/>
+		<script src="/assets/js/less.min.js"></script>
 	</head>
 	<body class="gray-bg">
 		<div id="drive-list-box"></div>
-		<script type="text/babel">
-			$.modal.openFull = function(title, url, width, height) {
-				//如果是移动端，就使用自适应大小弹窗
-				if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
-					width = 'auto';
-					height = 'auto';
-				}
-				if ($.common.isEmpty(title)) {
-					title = false;
-				}
-				if ($.common.isEmpty(url)) {
-					url = '/404.html';
-				}
-				if ($.common.isEmpty(width)) {
-					width = 800;
-				}
-				if ($.common.isEmpty(height)) {
-					height = $(window).height() - 50;
-				}
-				var index = layer.open({
-					type: 2,
-					area: [width + 'px', height + 'px'],
-					fix: true,
-					//不固定
-					maxmin: false,
-					shade: 0.3,
-					title: title,
-					content: url,
-					// btn: ['确定', '关闭'],
-					// 弹层外区域关闭
-					shadeClose: false,
-					yes: function(index, layero) {
-						var iframeWin = layero.find('iframe')[0];
-						iframeWin.contentWindow.submitHandler();
-					},
-					cancel: function(index, layero) {
-						var iframeWin = layero.find('iframe')[0];
-						return iframeWin.contentWindow.cancelHandler();
-						// return true;
-					}
-				});
-				layer.full(index);
-			};
-			let { Table, Select, Button, Input } = antd;
-			class ListBox extends React.PureComponent {
-				render = () => {
-					const columns = [
-						{
-							title: 'Full Name',
-							width: 100,
-							dataIndex: 'name',
-							key: 'name',
-							fixed: 'left'
-						},
-						{
-							title: 'Age',
-							width: 100,
-							dataIndex: 'age',
-							key: 'age',
-							fixed: 'left'
-						},
-						{ title: 'Column 1', dataIndex: 'address', key: '1' },
-						{ title: 'Column 2', dataIndex: 'address', key: '2' },
-						{ title: 'Column 3', dataIndex: 'address', key: '3' },
-						{ title: 'Column 4', dataIndex: 'address', key: '4' },
-						{ title: 'Column 5', dataIndex: 'address', key: '5' },
-						{ title: 'Column 6', dataIndex: 'address', key: '6' },
-						{ title: 'Column 7', dataIndex: 'address', key: '7' },
-						{ title: 'Column 8', dataIndex: 'address', key: '8' },
-						{
-							title: 'Action',
-							key: 'operation',
-							fixed: 'right',
-							width: 100,
-							render: () => <a href="javascript:;">action</a>
-						}
-					];
-
-					const data = [
-						{
-							key: '1',
-							name: 'John Brown',
-							age: 32,
-							address: 'New York Park'
-						},
-						{
-							key: '2',
-							name: 'Jim Green',
-							age: 40,
-							address: 'London Park'
-						}
-					];
-					return (
-						<div className="drive-list-body">
-							<div className="drive-list-content">
-								<div className="drive-list-content-li">
-									<Select
-										defaultValue="lucy"
-										style={{ width: 114 }}
-										// onChange={handleChange}
-									>
-										<Select.Option value="">
-											请选择分类
-										</Select.Option>
-										<Select.Option value="a">
-											驱动名称
-										</Select.Option>
-										<Select.Option value="b">
-											设备分类
-										</Select.Option>
-										<Select.Option value="c">
-											设备子类
-										</Select.Option>
-										<Select.Option value="d">
-											设备品牌
-										</Select.Option>
-										<Select.Option value="e">
-											设备型号
-										</Select.Option>
-									</Select>
-									<Input.Search
-										placeholder="请输入关键字"
-										onSearch={value =>
-											console.log('点击搜索', value)
-										}
-										style={{ width: 254 }}
-									/>
-								</div>
-								<div className="drive-list-content-li">
-									<Button
-										type="primary"
-										onClick={() => {
-											$.modal.openFull(
-												'新增驱动',
-												'/html/drive/add.html'
-											);
-										}}
-									>
-										新增
-									</Button>
-								</div>
-							</div>
-							<Table
-								columns={columns}
-								dataSource={data}
-								scroll={{ x: 1300 }}
-							/>
-						</div>
-					);
-				};
-			}
-			ReactDOM.render(
-				<ListBox />,
-				document.getElementById('drive-list-box')
-			);
-		</script>
+		<script
+			type="text/babel"
+			src="./jsx/list/index.jsx"
+			domId="drive-list-box"
+		></script>
 
 		<script src="/assets/js/jquery.min.js"></script>
 		<!-- 遮罩层 -->

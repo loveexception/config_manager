@@ -122,13 +122,18 @@
 
 				.editable-cell-value-wrap {
 					padding: 5px 12px;
+					min-height: 20px;
 					cursor: pointer;
 				}
 
-				.editable-row:hover .editable-cell-value-wrap {
-					border: 1px solid #d9d9d9;
-					border-radius: 4px;
-					padding: 4px 11px;
+				.editable-row {
+					&:hover {
+						.editable-cell-value-wrap {
+							border: 1px solid #d9d9d9;
+							border-radius: 4px;
+							padding: 4px 11px;
+						}
+					}
 				}
 				.editable-table-content {
 					.ant-btn {
