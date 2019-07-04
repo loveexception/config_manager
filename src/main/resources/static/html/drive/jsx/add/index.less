@@ -1,0 +1,172 @@
+#drive-add-box {
+	.drive-add-body {
+		padding: 20px 80px 20px 50px;
+		.steps-content {
+			.steps-content-body {
+				margin-top: 38px;
+			}
+			.ant-steps {
+				width: 80%;
+				margin: 0 auto;
+				.ant-steps-item {
+					> .ant-steps-item-content {
+						> .ant-steps-item-title {
+							font-size: 18px;
+							&:after {
+								top: -28px;
+								height: 2px;
+								background: #cccccc;
+							}
+						}
+					}
+					.ant-steps-item-icon {
+						width: 80px;
+						height: 56px;
+						line-height: 60px;
+						margin: 0;
+						display: block;
+						border: none;
+						position: relative;
+						&:after {
+							content: '';
+							position: absolute;
+							width: 46px;
+							height: 46px;
+							transform: rotate(45deg);
+							left: 18px;
+							top: 5px;
+							border-radius: 14px;
+							background-color: #cccccc;
+							box-shadow: inset 0px 5px 6px 0px
+								rgba(0, 0, 0, 0.34);
+						}
+						.ant-steps-icon {
+							font-size: 24px;
+							position: relative;
+							z-index: 9;
+							color: #fff;
+						}
+					}
+				}
+				.ant-steps-item-process .ant-steps-item-icon,
+				.ant-steps-item-finish .ant-steps-item-icon {
+					background: transparent;
+					border-radius: 0;
+					&:after {
+						background: #ffae00;
+						box-shadow: none;
+					}
+				}
+				.ant-steps-item-process {
+					> .ant-steps-item-content {
+						> .ant-steps-item-title {
+							color: #ffae00;
+							&:after {
+								background-color: #ffae00;
+							}
+						}
+					}
+				}
+				.ant-steps-item-finish {
+					> .ant-steps-item-content {
+						> .ant-steps-item-title {
+							color: #ffae00;
+							&:after {
+								background-color: #ffae00;
+							}
+						}
+					}
+				}
+			}
+		}
+		.steps-action {
+			text-align: right;
+			margin-top: 40px;
+		}
+		.drive-add-basic-information-box {
+			.title {
+				color: #ffffff;
+				font-size: 20px;
+				height: 55px;
+				line-height: 55px;
+				text-align: center;
+				background-color: #1875f0;
+			}
+			.descriptions {
+				.upload {
+					display: flex;
+					.ant-upload-list {
+						flex-grow: 1;
+					}
+				}
+				.ant-descriptions-view .ant-descriptions-item-label {
+					width: 180px;
+					text-align: right;
+				}
+			}
+		}
+		.drive-add-indicators-box {
+			.title {
+				color: #ffffff;
+				font-size: 20px;
+				height: 55px;
+				line-height: 55px;
+				text-align: center;
+				background-color: #1875f0;
+			}
+
+			.editable-table-box {
+				.editable-cell {
+					position: relative;
+				}
+
+				.editable-cell-value-wrap {
+					padding: 5px 12px;
+					min-height: 20px;
+					cursor: pointer;
+				}
+
+				.editable-row {
+					&:hover {
+						.editable-cell-value-wrap {
+							border: 1px solid #d9d9d9;
+							border-radius: 4px;
+							padding: 4px 11px;
+						}
+					}
+				}
+				.editable-table-content {
+					.ant-btn {
+						min-width: 114px;
+						margin-right: 16px;
+						border-radius: 15px;
+					}
+					.right-btn-box {
+						.upload-wrap {
+							display: inline-block;
+							position: relative;
+							// width: 124px;
+							// padding: 3px 5px;
+							overflow: hidden;
+							.file-uploader {
+								position: absolute;
+								width: 100%;
+								height: 100%;
+								top: 0;
+								left: 0;
+								outline: none;
+								opacity: 0;
+								background-color: transparent;
+							}
+
+							.upload-text {
+								display: inline-block;
+								margin-left: 5px;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

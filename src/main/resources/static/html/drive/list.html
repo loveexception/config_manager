@@ -8,6 +8,8 @@
 		<meta name="keywords" content="" />
 		<meta name="description" content="" />
 		<link rel="shortcut icon" href="favicon.ico" />
+
+		<link href="/assets/css/style.css" rel="stylesheet" />
 		<!-- react.js -->
 		<script src="/assets/react/react.development.js"></script>
 		<script src="/assets/react/react-dom.development.js"></script>
@@ -23,100 +25,30 @@
 		/>
 		<!-- antd.js -->
 		<script src="/assets/react/antd/antd.min.js"></script>
+
+		<!-- less.js -->
+		<link
+			rel="stylesheet/less"
+			type="text/css"
+			href="./jsx/list/index.less"
+		/>
+		<script src="/assets/js/less.min.js"></script>
 	</head>
 	<body class="gray-bg">
-		<div id="app"></div>
-		<script type="text/babel">
-			class ListBox extends React.PureComponent {
-				render = () => {
-					let { Table, Select, Button, Input } = antd;
-					const columns = [
-						{
-							title: 'Full Name',
-							width: 100,
-							dataIndex: 'name',
-							key: 'name',
-							fixed: 'left'
-						},
-						{
-							title: 'Age',
-							width: 100,
-							dataIndex: 'age',
-							key: 'age',
-							fixed: 'left'
-						},
-						{ title: 'Column 1', dataIndex: 'address', key: '1' },
-						{ title: 'Column 2', dataIndex: 'address', key: '2' },
-						{ title: 'Column 3', dataIndex: 'address', key: '3' },
-						{ title: 'Column 4', dataIndex: 'address', key: '4' },
-						{ title: 'Column 5', dataIndex: 'address', key: '5' },
-						{ title: 'Column 6', dataIndex: 'address', key: '6' },
-						{ title: 'Column 7', dataIndex: 'address', key: '7' },
-						{ title: 'Column 8', dataIndex: 'address', key: '8' },
-						{
-							title: 'Action',
-							key: 'operation',
-							fixed: 'right',
-							width: 100,
-							render: () => <a href="javascript:;">action</a>
-						}
-					];
+		<div id="drive-list-box"></div>
+		<script
+			type="text/babel"
+			src="./jsx/list/index.jsx"
+			domId="drive-list-box"
+		></script>
 
-					const data = [
-						{
-							key: '1',
-							name: 'John Brown',
-							age: 32,
-							address: 'New York Park'
-						},
-						{
-							key: '2',
-							name: 'Jim Green',
-							age: 40,
-							address: 'London Park'
-						}
-					];
-					return (
-						<div>
-							<div>驱动管理</div>
-							<div>
-								<Select
-									defaultValue="lucy"
-									style={{ width: 120 }}
-									// onChange={handleChange}
-								>
-									<Select.Option value="jack">
-										Jack
-									</Select.Option>
-									<Select.Option value="lucy">
-										Lucy
-									</Select.Option>
-									<Select.Option value="disabled" disabled>
-										Disabled
-									</Select.Option>
-									<Select.Option value="Yiminghe">
-										yiminghe
-									</Select.Option>
-								</Select>
-								<Input.Search
-									placeholder="input search text"
-									onSearch={value =>
-										console.log('点击搜索', value)
-									}
-									style={{ width: 200 }}
-								/>
-							</div>
-							<Button type="primary">新增</Button>
-							<Table
-								columns={columns}
-								dataSource={data}
-								scroll={{ x: 1300 }}
-							/>
-						</div>
-					);
-				};
-			}
-			ReactDOM.render(<ListBox />, document.getElementById('app'));
-		</script>
+		<script src="/assets/js/jquery.min.js"></script>
+		<!-- 遮罩层 -->
+		<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
+		<script src="/assets/plugins/iCheck/icheck.min.js"></script>
+		<script src="/assets/plugins/layer/layer.min.js"></script>
+		<script src="/assets/plugins/layui/layui.js"></script>
+		<script src="/assets/js/common.js?v=3.1.0"></script>
+		<script src="/assets/js/ui.js?v=3.1.0"></script>
 	</body>
 </html>
