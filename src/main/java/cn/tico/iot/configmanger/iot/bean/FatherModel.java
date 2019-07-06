@@ -44,7 +44,7 @@ public  class FatherModel extends I18NModel {
 
     private String parentName;
 
-    private List<Location> children ;
+    private List children ;
 
 
 }

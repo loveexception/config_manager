@@ -3,16 +3,19 @@ package cn.tico.iot.configmanger.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.base.Kind;
+import cn.tico.iot.configmanger.iot.models.base.Location;
 import cn.tico.iot.configmanger.iot.services.KindService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
+import com.google.gson.Gson;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.json.Json;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
@@ -236,6 +239,19 @@ public class KindController  implements AdminKey {
         return kindService.checkDeptNameUnique(id, parentId, menuName);
     }
 
+    @At
+    @Ok("json")
+    public Object  treeObject(@Param("id") String id) {
+        List<Kind> locations =  kindService.query();
+        Kind root = kindService.zip(locations);
+
+
+
+
+        String json = new Gson().toJson(root);
+        Object obj  = Json.fromJson(json);
+        return Result.success("system.success",obj);
+    }
 
 
 //    /**

@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.iot.services;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.base.Kind;
+import cn.tico.iot.configmanger.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
@@ -168,5 +169,30 @@ public class KindService extends Service<Kind> {
             return true;
         }
         return false;
+    }
+
+    public Kind zip(List<Kind> locations) {
+
+        Map<String, Kind> map = new LinkedHashMap<>();
+        Kind root = null;
+        for(Kind location : locations){
+            map.put(location.getId(),location);
+        }
+        for (Kind location : locations){
+            Kind father =  map.get(location.getParentId());
+            if(father==null){
+                root = location;
+            }else {
+                List<Kind> list = father.getChildren();
+                if(list==null){
+                    list = new ArrayList<Kind>();
+                }
+                list.add(location);
+                father.setChildren(list);
+
+            }
+            map.put(location.getParentId(),father);
+        }
+        return root;
     }
 }
