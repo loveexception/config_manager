@@ -240,7 +240,7 @@ public class LocationController implements AdminKey {
 
         String json = new Gson().toJson(root);
          Object obj  = Json.fromJson(json);
-        return obj;
+        return Result.success("system.success",obj);
     }
 
 
