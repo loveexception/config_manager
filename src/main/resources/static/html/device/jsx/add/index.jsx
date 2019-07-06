@@ -384,7 +384,62 @@ const LISTDATA2 = [
 		]
 	}
 ];
-
+let LISTDATA3 = [
+	{
+		value: '国网',
+		label: '国网',
+		children: [
+			{
+				value: '北京市',
+				label: '北京市',
+				children: [
+					{
+						value: '东城区',
+						label: '东城区',
+						children: [
+							{
+								value: '公司一',
+								label: '公司一',
+								children: [
+									{
+										value: '会议室一',
+										label: '会议室一'
+									}
+								]
+							},
+							{
+								value: '公司二',
+								label: '公司二',
+								children: [
+									{
+										value: '会议室二',
+										label: '会议室二'
+									}
+								]
+							}
+						]
+					},
+					{
+						value: '西城区',
+						label: '西城区',
+						children: [
+							{
+								value: '公司三',
+								label: '公司三',
+								children: [
+									{
+										value: '会议室三',
+										label: '会议室三'
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+];
 $.modal.open = function(title, url, width, height) {
 	//如果是移动端，就使用自适应大小弹窗
 	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
@@ -439,7 +494,9 @@ let {
 	Radio,
 	Modal,
 	Row,
-	Col
+	Col,
+	DatePicker,
+	InputNumber
 } = antd;
 const { Step } = Steps;
 const { confirm } = Modal;
@@ -485,6 +542,7 @@ function iframeClose() {
 		parent.layer.close(index);
 	}
 }
+
 class BasicInformation extends React.PureComponent {
 	calibrationMethod = callback => {
 		this.props.form.validateFields((err, values) => {
@@ -504,16 +562,6 @@ class BasicInformation extends React.PureComponent {
 	componentDidMount() {
 		this.props.onRef && this.props.onRef(this);
 	}
-	normFile = e => {
-		let fileList = [...e.fileList];
-		// Only to show two recent uploaded files, and old ones will be replaced by the new
-		fileList = fileList.slice(-1);
-		e.fileList = fileList;
-		if (Array.isArray(e)) {
-			return e;
-		}
-		return e && e.fileList;
-	};
 
 	render() {
 		let { show, title } = this.props;
@@ -542,69 +590,94 @@ class BasicInformation extends React.PureComponent {
 		];
 		return (
 			<div
-				className="drive-add-basic-information-box"
+				className="device-add-basic-information-box"
 				style={{
 					display: show ? 'block' : 'none'
 				}}
 			>
 				<div className="title">{title}</div>
-				<Form {...formItemLayout[1]} className="content">
+				<Form {...formItemLayout[0]} className="login-form">
 					{this._getLi([
-						<Form.Item
-							label="驱动文件"
-							// extra="上传文件类型为.py"
-						>
-							{getFieldDecorator('驱动文件', {
-								valuePropName: 'fileList',
-								getValueFromEvent: this.normFile,
+						<Form.Item label="SN编号">
+							{getFieldDecorator('SN编号', {
 								rules: [
 									{
 										required: true,
-										message: '驱动文件不为空'
+										message: 'SN编号不为空'
+									}
+								]
+							})(<Input />)}
+						</Form.Item>,
+						<Form.Item label="设备名称">
+							{getFieldDecorator('设备名称', {
+								rules: [
+									{
+										required: true,
+										message: '设备名称不为空'
+									}
+								]
+							})(<Input />)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item label="所属组织">
+							{getFieldDecorator('所属组织', {
+								initialValue: '组织一',
+								rules: [
+									{
+										required: true,
+										message: '所属组织不为空'
+									}
+								]
+							})(<Input disabled />)}
+						</Form.Item>,
+						<Form.Item label="IP地址">
+							{getFieldDecorator('IP地址', {
+								rules: [
+									{
+										required: true,
+										message: 'IP地址不为空'
+									}
+								]
+							})(<Input />)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item {...formItemLayout[1]} label="地理位置">
+							{getFieldDecorator('地理位置', {
+								initialValue: [
+									'国网',
+									'北京市',
+									'东城区',
+									'公司一',
+									'会议室一'
+								],
+								rules: [
+									{
+										required: true,
+										message: '地理位置不为空'
 									}
 								]
 							})(
-								<Upload className="upload">
-									<Button>
-										<Icon type="upload" /> 点击上传
-									</Button>
-								</Upload>
+								<Cascader
+									disabled
+									options={LISTDATA3}
+									placeholder="请选择"
+									style={{
+										width: '100%'
+									}}
+								/>
 							)}
 						</Form.Item>
 					])}
 					{this._getLi([
-						<Form.Item label="驱动名称">
-							{getFieldDecorator('驱动名称', {
-								rules: [
-									{
-										required: true,
-										message: '驱动名称不为空'
-									}
-								]
-							})(<Input />)}
-						</Form.Item>
-					])}
-					{this._getLi([
-						<Form.Item label="版本号">
-							{getFieldDecorator('版本号', {
-								rules: [
-									{
-										required: true,
-										message: '版本号不为空'
-									}
-								]
-							})(<Input />)}
-						</Form.Item>
-					])}
-
-					{this._getLi([
-						<Form.Item label="设备类型">
+						<Form.Item {...formItemLayout[1]} label="设备类型">
 							{getFieldDecorator('设备类型', {
 								rules: [
-									{
-										required: true,
-										message: '设备类型不为空'
-									}
+									// {
+									// 	required: true,
+									// 	message: '设备类型不为空'
+									// }
 								]
 							})(
 								<Cascader
@@ -617,13 +690,156 @@ class BasicInformation extends React.PureComponent {
 							)}
 						</Form.Item>
 					])}
+					{this._getLi([
+						<Form.Item {...formItemLayout[1]} label="采集用户名">
+							{getFieldDecorator('采集用户名', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '采集用户名不为空'
+									// }
+								]
+							})(<Input />)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item label="采集密码">
+							{getFieldDecorator('采集密码', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '采集密码不为空'
+									// }
+								]
+							})(<Input />)}
+						</Form.Item>,
+						<Form.Item label="确认采集密码">
+							{getFieldDecorator('确认采集密码', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '确认采集密码不为空'
+									// }
+								]
+							})(<Input />)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item
+							{...formItemLayout[1]}
+							label="采集频率(毫秒)"
+						>
+							{getFieldDecorator('采集频率', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '采集频率不为空'
+									// }
+								]
+							})(<Input />)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item {...formItemLayout[1]} label="状态">
+							{getFieldDecorator('状态', {
+								initialValue: '激活',
+								rules: [
+									{
+										required: true,
+										message: '状态不为空'
+									}
+								]
+							})(
+								<Radio.Group>
+									<Radio value="激活">激活</Radio>
+									<Radio value="停用">停用</Radio>
+								</Radio.Group>
+							)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item label="价格">
+							{getFieldDecorator('价格', {
+								initialValue: 1000,
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '价格不为空'
+									// }
+								]
+							})(
+								<InputNumber
+									formatter={value =>
+										`$ ${value}`.replace(
+											/\B(?=(\d{3})+(?!\d))/g,
+											','
+										)
+									}
+									parser={value =>
+										value.replace(/\$\s?|(,*)/g, '')
+									}
+									style={{ width: '100%' }}
+								/>
+							)}
+						</Form.Item>,
+						<Form.Item label="购入日期">
+							{getFieldDecorator('购入日期', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '购入日期不为空'
+									// }
+								]
+							})(
+								<DatePicker
+									placeholder="选择日期"
+									showToday={false}
+									style={{ width: '100%' }}
+								/>
+							)}
+						</Form.Item>
+					])}
+					{this._getLi([
+						<Form.Item label="使用年限">
+							{getFieldDecorator('使用年限', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '使用年限不为空'
+									// }
+								]
+							})(
+								<DatePicker
+									placeholder="选择日期"
+									showToday={false}
+									style={{ width: '100%' }}
+								/>
+							)}
+						</Form.Item>,
+						<Form.Item label="报废时间">
+							{getFieldDecorator('报废时间', {
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '报废时间不为空'
+									// }
+								]
+							})(
+								<DatePicker
+									placeholder="选择日期"
+									showToday={false}
+									style={{ width: '100%' }}
+								/>
+							)}
+						</Form.Item>
+					])}
 				</Form>
 			</div>
 		);
 	}
 	_getLi(data = []) {
 		return (
-			<Row className="content-li">
+			<Row>
 				{data.map((item, index, _d) => {
 					let span = 24 / _d.length;
 					return (
@@ -636,10 +852,9 @@ class BasicInformation extends React.PureComponent {
 		);
 	}
 }
-const BasicInformationForm = Form.create({ name: 'drive_basic_info' })(
+const BasicInformationForm = Form.create({ name: 'device_basic_info' })(
 	BasicInformation
 );
-
 const EditableContext = React.createContext();
 
 const EditableRow = ({ form, index, ...props }) => (
@@ -1171,7 +1386,7 @@ class AlarmConfiguration extends React.PureComponent {
 								};
 								$.modal.open(
 									'告警规则设置',
-									'/html/drive/alarmRules.html'
+									'/html/device/alarmRules.html'
 								);
 							}}
 						>
@@ -1183,7 +1398,7 @@ class AlarmConfiguration extends React.PureComponent {
 		];
 		return (
 			<div
-				className="drive-add-indicators-box"
+				className="device-add-indicators-box"
 				style={{
 					display: show ? 'block' : 'none'
 				}}
@@ -1206,7 +1421,7 @@ class Indicators extends React.PureComponent {
 		let { show, title, onRef } = this.props;
 		return (
 			<div
-				className="drive-add-indicators-box"
+				className="device-add-indicators-box"
 				style={{
 					display: show ? 'block' : 'none'
 				}}
@@ -1249,7 +1464,7 @@ class AddBox extends React.PureComponent {
 		];
 		const { current } = this.state;
 		return (
-			<div className="drive-add-body">
+			<div className="device-add-body">
 				<div className="steps-content">
 					<Steps current={current}>
 						{steps.map((item, index) => (

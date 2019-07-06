@@ -1,15 +1,31 @@
-#drive-list-box {
-	.drive-list-body {
+#device-list-box {
+	.device-list-body {
 		padding: 20px 40px 20px 30px;
-		.drive-list-content {
+		.device-list-content {
 			height: 124px;
-			/* line-height: 100px; */
 			background-color: #fff;
 			box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
 			border-radius: 2px;
 			padding: 20px;
 			margin-bottom: 20px;
-			.drive-list-content-li {
+			.device-list-content-li-2 {
+				display: flex;
+				.ant-cascader-picker {
+					flex-grow: 1;
+				}
+				.ant-btn {
+					min-width: 194px;
+					width: 194px;
+					height: 33px;
+					border-radius: 0;
+					background-color: #1875f0;
+					color: #fff;
+					font-size: 14px;
+					margin-left: 15px;
+					margin-right: 150px;
+				}
+			}
+			.device-list-content-li {
 				margin-bottom: 10px;
 				.select-box {
 					.ant-select-selection {
@@ -34,6 +50,20 @@
 					border-radius: 15px;
 					border-color: #8f8f8f;
 				}
+				.content-li-dropdown {
+					width: 114px;
+					height: 28px;
+					border-radius: 14px;
+					border: solid 1px #8f8f8f;
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					padding: 0 11px;
+					color: #8f8f8f;
+					font-size: 14px;
+					margin-left: 20px;
+					cursor: pointer;
+				}
 			}
 		}
 		.ant-table {
@@ -56,6 +86,7 @@
 			// }
 		}
 		.ant-table-bordered {
+			.ant-table-fixed-left table,
 			.ant-table-fixed-right table,
 			.ant-table-placeholder,
 			.ant-table-body > table,

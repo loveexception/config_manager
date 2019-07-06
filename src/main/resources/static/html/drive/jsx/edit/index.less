@@ -1,0 +1,160 @@
+#drive-edit-box {
+	.drive-edit-body {
+		padding: 20px 40px;
+		.btn-1 {
+			width: 114px;
+			height: 29px;
+			margin-right: 16px;
+			border-radius: 15px;
+			background-color: #4c71fe;
+			font-size: 14px;
+		}
+		.btn-2 {
+			width: 91px;
+			height: 29px;
+			border-radius: 14px;
+			border: solid 1px #8f8f8f;
+			font-size: 14px;
+			color: #8f8f8f;
+		}
+		.btn-group {
+			text-align: right;
+			margin-top: 40px;
+			.ant-btn {
+				width: 178px;
+				background-color: #4c71fe;
+				border-radius: 0;
+			}
+		}
+		.drive-edit-basic {
+			margin-bottom: 40px;
+			.title {
+				font-size: 24px;
+				font-weight: bold;
+				color: #404040;
+				margin-bottom: 20px;
+			}
+			.descriptions {
+				box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
+				.ant-descriptions-view .ant-descriptions-item-label {
+					width: 170px;
+					text-align: right;
+				}
+			}
+		}
+		.drive-edit-content {
+			.content-collapse {
+				background: transparent;
+				.panel-li {
+					// background: pink;
+					border-radius: 0;
+					border: 0;
+					.ant-collapse-header {
+						font-size: 24px;
+						color: #404040;
+						font-weight: bold;
+						padding: 0;
+						margin-bottom: 20px;
+						line-height: 1.5;
+						i {
+							left: -20px;
+						}
+					}
+					.ant-collapse-content {
+						.ant-collapse-content-box {
+							padding: 0;
+						}
+					}
+				}
+			}
+			.edit-indicators {
+				.editable-table-box {
+					.ant-form-explain {
+						font-size: 12px;
+						position: absolute;
+						bottom: -8px;
+					}
+					.has-error {
+						.ant-form-item-children {
+							.ant-input {
+								margin-bottom: 16px;
+							}
+						}
+					}
+					.ant-form-item-children {
+						.ant-input {
+							height: 24px;
+						}
+					}
+					.editable-cell {
+						position: relative;
+					}
+
+					.editable-cell-value-wrap {
+						padding: 5px 12px;
+						min-height: 31px;
+						cursor: pointer;
+					}
+
+					.editable-row {
+						&:hover {
+							.editable-cell-value-wrap {
+								border: 1px solid #d9d9d9;
+								border-radius: 4px;
+								padding: 4px 11px;
+							}
+						}
+					}
+					.editable-table-content {
+						display: flex;
+						justify-content: space-between;
+						margin-bottom: 20px;
+					}
+				}
+			}
+			.ant-table {
+				box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
+				.ant-table-thead > tr > th {
+					background-color: #e3e3e3;
+				}
+				.ant-table-tbody > tr > td,
+				.ant-table-thead > tr > th {
+					padding: 8px;
+				}
+				.ant-table-tbody {
+					background-color: #fff;
+				}
+
+				// .ant-table-body > table {
+				// 	border-color: #8f8f8f;
+				// }
+			}
+			.ant-table-bordered {
+				.ant-table-placeholder,
+				.ant-table-body > table,
+				.ant-table-tbody > tr > td,
+				.ant-table-thead > tr > th {
+					border-color: #8f8f8f;
+				}
+			}
+			.ant-pagination {
+				margin: 20px 0 0;
+				.ant-pagination-item-link {
+					width: 24px;
+					height: 24px;
+					background-color: #cccccc;
+					border-radius: 0;
+					i {
+						color: #fff;
+					}
+				}
+				.ant-pagination-simple-pager {
+					input {
+						border: solid 1px #cccccc;
+						border-radius: 0;
+					}
+				}
+			}
+		}
+	}
+}
