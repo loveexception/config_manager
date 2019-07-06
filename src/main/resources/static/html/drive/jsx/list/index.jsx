@@ -75,9 +75,17 @@ class ListBox extends React.PureComponent {
 				render: () => {
 					return (
 						<div>
-							<Icon type="edit" />
-							&nbsp;&nbsp;
-							<Icon type="delete" />
+							<Button
+								onClick={() => {
+									$.modal.openFull(
+										'修改驱动',
+										'/html/drive/edit.html'
+									);
+								}}
+							>
+								修改
+							</Button>
+							<Button>删除</Button>
 						</div>
 					);
 				}
@@ -138,6 +146,7 @@ class ListBox extends React.PureComponent {
 					</div>
 				</div>
 				<Table
+					bordered
 					columns={columns}
 					dataSource={data}
 					scroll={{ x: '150%' }}
