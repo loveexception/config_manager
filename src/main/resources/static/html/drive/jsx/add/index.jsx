@@ -505,10 +505,32 @@ class BasicInformation extends React.PureComponent {
 		this.props.onRef && this.props.onRef(this);
 	}
 	normFile = e => {
+		console.log('读取文件开始...');
 		let fileList = [...e.fileList];
 		// Only to show two recent uploaded files, and old ones will be replaced by the new
 		fileList = fileList.slice(-1);
 		e.fileList = fileList;
+		if (e.file.status === 'done') {
+			// Get this url from response in real world.
+			console.log('读取文件完毕...', e.response);
+			// $.ajax({
+			// 	url: '/iot/driver/driver_upload',
+			// 	// data: {},
+			// 	cache: false,
+			// 	contentType: false,
+			// 	processData: false,
+			// 	type: 'POST',
+			// 	success: results => {
+			// 		if (results.code != 0) {
+			// 			message.error('接口错误');
+			// 			return;
+			// 		}
+			// 		this.setState({
+			// 			data: results.rows
+			// 		});
+			// 	}
+			// });
+		}
 		if (Array.isArray(e)) {
 			return e;
 		}
@@ -564,7 +586,14 @@ class BasicInformation extends React.PureComponent {
 									}
 								]
 							})(
-								<Upload className="upload">
+								<Upload
+									name="Filedata"
+									action={'/iot/driver/driver_upload'}
+									headers={{
+										authorization: 'authorization-text'
+									}}
+									className="upload"
+								>
 									<Button>
 										<Icon type="upload" /> 点击上传
 									</Button>
