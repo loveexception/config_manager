@@ -50,23 +50,60 @@ $.modal.openFull = function(title, url, width, height) {
 };
 let { Table, Select, Button, Input, Icon } = antd;
 class ListBox extends React.PureComponent {
+	state = { data: [] };
+	componentDidMount() {
+		$.ajax({
+			url: '/iot/driver/driver_list',
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误');
+					return;
+				}
+				this.setState({
+					data: results.rows
+				});
+			}
+		});
+	}
 	render = () => {
 		const columns = [
 			{
 				title: '驱动名称',
-				dataIndex: 'name',
-				key: 'name'
+				dataIndex: 'cnName'
 			},
 			{
 				title: '驱动文件',
-				dataIndex: 'age',
-				key: 'age'
+				dataIndex: 'enName'
 			},
-			{ title: '驱动版本', dataIndex: 'address', key: '1' },
-			{ title: '分类', dataIndex: 'address', key: '2' },
-			{ title: '子类', dataIndex: 'address', key: '3' },
-			{ title: '采集设备品牌', dataIndex: 'address', key: '4' },
-			{ title: '设备型号', dataIndex: 'address', key: '5' },
+			{
+				title: '驱动版本',
+				dataIndex: 'driverVer'
+			},
+			{
+				title: '分类',
+				dataIndex: 'kindKind'
+			},
+			{
+				title: '子类',
+				dataIndex: 'kindSubkind'
+			},
+			{
+				title: '采集设备品牌',
+				dataIndex: 'kindCompany'
+			},
+			{
+				title: '设备型号',
+				dataIndex: 'kindType'
+			},
+			{
+				title: 'updateTime',
+				dataIndex: 'updateTime'
+			},
 			{
 				title: '操作',
 				key: 'operation',
@@ -91,21 +128,7 @@ class ListBox extends React.PureComponent {
 				}
 			}
 		];
-
-		const data = [
-			{
-				key: '1',
-				name: 'John Brown',
-				age: 32,
-				address: 'New York Park'
-			},
-			{
-				key: '2',
-				name: 'Jim Green',
-				age: 40,
-				address: 'London Park'
-			}
-		];
+		let { data = [] } = this.state;
 		return (
 			<div className="drive-list-body">
 				<div className="drive-list-content">
@@ -146,6 +169,7 @@ class ListBox extends React.PureComponent {
 					</div>
 				</div>
 				<Table
+					rowKey={record => record.id}
 					bordered
 					columns={columns}
 					dataSource={data}
