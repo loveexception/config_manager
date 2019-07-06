@@ -15,6 +15,7 @@ import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Strings;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -66,12 +67,12 @@ public class DriverController implements AdminKey {
 	@Ok("json")
 	public Object driverList(HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		return driverService.tableList(0,1000,cnd,null,null,"^kind|$");
+		return driverService.tableList(0,1000,cnd,"updateTime","desc","^kind|$");
 	}
 
 
 	/**
-	 * 删除业务
+	 * 查寻业务
 	 */
 	@At("/driver_one")
 	@Ok("json")
@@ -92,10 +93,11 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/driver_remove")
 	@Ok("json")
-	@Slog(tag ="驱动", after= "删除驱动:${array2str(args[0])}")
-	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
+	@AdaptBy(type = JsonAdaptor.class)
+//	@Slog(tag ="驱动", after= "删除驱动:${array2str(args[0])}")
+	public Object abc(@Param("..")Driver driver, HttpServletRequest req) {
 		try {
-			int  i = driverService.vDelete(ids);
+			int  i = driverService.vDelete(driver.getId());
 			return Result.success("system.success",i);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -262,15 +264,12 @@ public class DriverController implements AdminKey {
 
 		Cnd cnd = Cnd.NEW();
 		cnd.and("normal_id","=",grade.getNormalid());
+		if(Strings.isNotBlank(grade.getGrade())){
+			cnd.and("grade","=",grade.getGrade());
+		}
 
-
-
-
-
-
-
-
-		return gradeService.query(cnd);
+		obj =  gradeService.query(cnd);
+		return  Result.success("等级",   obj );
 
 	}
 
