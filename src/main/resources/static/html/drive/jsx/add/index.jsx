@@ -296,94 +296,6 @@ const LISTDATA = [
 		key: 35
 	}
 ];
-const LISTDATA2 = [
-	{
-		value: '0.7686050876320942',
-		label: '分类一',
-		children: [
-			{
-				value: 'hangzhou',
-				label: '子类一',
-				children: [
-					{
-						value: '0.6497000345160961',
-						label: '品牌一',
-						children: [
-							{
-								value: '0.12439953739115461',
-								label: '型号一'
-							},
-							{
-								value: '0.1911278735970452',
-								label: '型号二'
-							}
-						]
-					}
-				]
-			}
-		]
-	},
-	{
-		value: '0.5416814158011563',
-		label: '分类二',
-		children: [
-			{
-				value: '0.9090047796735239',
-				label: '子类一',
-				children: [
-					{
-						value: '0.7937843230672577',
-						label: '品牌一',
-						children: [
-							{
-								value: '0.7971342102079821',
-								label: '型号三'
-							},
-							{
-								value: '0.06762476699147046',
-								label: '型号四'
-							}
-						]
-					},
-					{
-						value: '0.5549236152120482',
-						label: '品牌二',
-						children: [
-							{
-								value: '0.9267693982102065',
-								label: '型号五'
-							},
-							{
-								value: '0.8490652019739944',
-								label: '型号六'
-							}
-						]
-					}
-				]
-			},
-			{
-				value: '0.4772728975306575',
-				label: '子类二',
-				children: [
-					{
-						value: '0.7045117916921957',
-						label: '品牌一',
-						children: [
-							{
-								value: '0.061172155525954786',
-								label: '型号七'
-							},
-							{
-								value: '0.7963683741000656',
-								label: '型号八'
-							}
-						]
-					}
-				]
-			}
-		]
-	}
-];
 
 $.modal.open = function(title, url, width, height) {
 	//如果是移动端，就使用自适应大小弹窗
@@ -486,6 +398,9 @@ function iframeClose() {
 	}
 }
 class BasicInformation extends React.PureComponent {
+	state = {
+		cascader_data: []
+	};
 	calibrationMethod = callback => {
 		this.props.form.validateFields((err, values) => {
 			if (!err) {
@@ -504,8 +419,7 @@ class BasicInformation extends React.PureComponent {
 	componentDidMount() {
 		this.props.onRef && this.props.onRef(this);
 		$.ajax({
-			url: '/iot/location/treeObject',
-			// data: {},
+			url: `/iot/kind/treeObject?level=${4}`,
 			cache: false,
 			contentType: false,
 			processData: false,
@@ -515,7 +429,19 @@ class BasicInformation extends React.PureComponent {
 					message.error('接口错误');
 					return;
 				}
-				console.log(results);
+				// const LISTDATA2 = [
+				// 	{
+				// 		value: '0.7686050876320942',
+				// 		label: '分类一',
+				// 		children: [
+				// 		]
+				// 	},
+				// ];
+				let cascader_data =
+					(results.data && results.data.children) || [];
+				this.setState({
+					cascader_data
+				});
 			}
 		});
 	}
@@ -559,6 +485,7 @@ class BasicInformation extends React.PureComponent {
 				}
 			}
 		];
+		console.log('cascader_data', this.state.cascader_data);
 		return (
 			<div
 				className="drive-add-basic-information-box"
@@ -634,7 +561,12 @@ class BasicInformation extends React.PureComponent {
 								]
 							})(
 								<Cascader
-									options={LISTDATA2}
+									fieldNames={{
+										label: 'cnName',
+										value: 'cnName',
+										children: 'children'
+									}}
+									options={this.state.cascader_data}
 									placeholder="请选择"
 									style={{
 										width: '100%'
