@@ -61,12 +61,11 @@ public class Normal extends I18NModel {
     private List<Personal> personals;
 
 
-
-
-
-
-
-
+    @Column("order_num")
+    @Comment("顺序")
+    @ColDefine(type = ColType.INT)
+    @GraphQLQuery(name = "order_num", description = "顺序")
+    private int  orderNum ;
 
 
 

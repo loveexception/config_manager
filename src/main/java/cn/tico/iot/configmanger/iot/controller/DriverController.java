@@ -27,10 +27,7 @@ import org.nutz.mvc.upload.UploadAdaptor;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 业务 信息操作处理
@@ -68,7 +65,7 @@ public class DriverController implements AdminKey {
 	public Object driverList(HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		cnd.and("delflag","=","false");
-		return driverService.tableList(0,1000,cnd,"updateTime","desc","^kind|$");
+		return driverService.tableList(0,1000,cnd,"updateTime","desc","^kind|normals$");
 	}
 
 
@@ -214,8 +211,8 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/normal_remove")
 	@Ok("json")
-	@POST
-	public Object removeNormal(@Param("ids")String[] ids, HttpServletRequest req) {
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object removeNormal(@Param("data")String[] ids, HttpServletRequest req) {
 		try {
 			int  i = normalService.vDelete(ids);
 			return Result.success("system.success",i);
@@ -284,12 +281,39 @@ public class DriverController implements AdminKey {
 		}
 
 		obj =  gradeService.query(cnd);
-		return  Result.success("等级",   obj );
+		return  Result.success("system.success",   obj );
+
+	}
+	@At("/grade_add")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
+	@Ok("json")
+	public Object gradeAdd(@Param("..") Grade grade, HttpServletRequest req) {
+
+		try {
+			Object obj =  gradeService.insert(grade);
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
 
 	}
 
 
-
+	/**
+	 * 删除业务
+	 */
+	@At("/grade_remove")
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object removeGrade(@Param("data")String[] ids, HttpServletRequest req) {
+		try {
+			int  i = gradeService.vDelete(ids);
+			return Result.success("system.success",i);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 
 
 }
