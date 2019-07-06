@@ -1,9 +1,9 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
+import cn.tico.iot.configmanger.iot.models.device.Device;
+import cn.tico.iot.configmanger.iot.models.device.Gateway;
+import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import io.leangen.graphql.annotations.*;
-import org.nutz.lang.Lang;
-import org.nutz.lang.util.NutMap;
-import org.nutz.mapl.Mapl;
 
 import java.util.*;
 
@@ -16,7 +16,7 @@ public class DevService {
             return null;
         }
 
-        DevTest t = new DevTest();
+        GraphQLTest t = new GraphQLTest();
         List<Device> list = new ArrayList();
         list.add(t.json());
         return t.json();

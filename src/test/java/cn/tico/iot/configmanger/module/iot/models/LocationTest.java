@@ -1,19 +1,12 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
+import cn.tico.iot.configmanger.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
-import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.nutz.dao.Dao;
-import org.nutz.dao.impl.NutDao;
-import org.nutz.dao.impl.SimpleDataSource;
-
-import javax.sql.DataSource;
-
-import static org.junit.Assert.*;
 
 public class LocationTest {
     Dao dao ;

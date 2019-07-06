@@ -80,37 +80,8 @@ public class Dept extends BaseModel implements Serializable {
     @Comment("删除标记")
     @ColDefine(type = ColType.BOOLEAN)
     private boolean delFlag;
-    /**
-     * 创建者
-     */
-    @Column("create_by")
-    @Comment("创建者 ")
-    @Prev(els = @EL("$me.uid()"))
-    private String createBy;
 
-    /**
-     * 创建时间
-     */
-    @Column("create_time")
-    @Comment("创建时间 ")
-    @Prev(els = {@EL("$me.now()")})
-    private Date createTime;
 
-    /**
-     * 更新者
-     */
-    @Column("update_by")
-    @Comment("更新者 ")
-    @Prev(els = @EL("$me.uid()"))
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    @Column("update_time")
-    @Comment("更新时间 ")
-    @Prev(els = {@EL("$me.now()")})
-    private Date updateTime;
 
 
     /**

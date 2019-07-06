@@ -1,26 +1,17 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
+import cn.tico.iot.configmanger.iot.models.base.Kind;
+import cn.tico.iot.configmanger.iot.models.base.Tag;
+import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
-import com.alibaba.druid.pool.DruidDataSource;
-import graphql.ExecutionResult;
-import graphql.GraphQL;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.nutz.dao.Dao;
-import org.nutz.dao.impl.NutDao;
 import org.nutz.dao.util.Daos;
 import org.nutz.json.Json;
 
-import java.util.Map;
-
-import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 import static org.junit.Assert.*;
 
 public class KindTest {
