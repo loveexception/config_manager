@@ -138,7 +138,8 @@ class ListBox extends React.PureComponent {
 												message.error('接口错误');
 												return;
 											}
-											console.log('--data', data);
+											message.info(results.msg);
+											this.init();
 										}
 									});
 								}}

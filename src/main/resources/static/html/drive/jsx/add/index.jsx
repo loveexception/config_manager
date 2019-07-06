@@ -1091,7 +1091,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 0
+			current: 1,
+			driver_id: '54a49fa28e7e408987eab49ad8634f3a'
 		};
 	}
 	next() {
@@ -1184,6 +1185,11 @@ class AddBox extends React.PureComponent {
 															return;
 														}
 														console.log('--data', data);
+														// this.setState({
+														// 	driver_id: '54a49fa28e7e408987eab49ad8634f3a'
+														// },()=>{
+														// 	this.next();
+														// })
 														this.next();
 													}
 												});
@@ -1191,14 +1197,16 @@ class AddBox extends React.PureComponent {
 										});
 									}
 								} else if (steps[current].title == '添加指标项') {
-									this.next();
-									// if (this.indicators) {
-									// 	let data = this.indicators.calibrationMethod();
-									// 	if (data) {
-									// 		console.log(data);
-									// 		this.next();
-									// 	}
-									// }
+									// this.next();
+									let id = this.state.driver_id;
+									console.log('id---', id);
+									if (this.indicators) {
+										let data = this.indicators.calibrationMethod();
+										if (data) {
+											console.log(data);
+											// this.next();
+										}
+									}
 								}
 							}}
 						>
