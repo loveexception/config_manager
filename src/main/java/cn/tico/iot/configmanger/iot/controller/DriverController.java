@@ -7,6 +7,7 @@ import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.iot.services.DriverService;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.iot.services.GradeService;
 import cn.tico.iot.configmanger.iot.services.NormalService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -47,6 +48,9 @@ public class DriverController implements AdminKey {
 	private NormalService normalService;
 	@Inject
 	private UserService userService;
+
+	@Inject
+	private GradeService gradeService;
 
 	@RequiresPermissions("iot:driver:view")
 	@At("")
@@ -256,13 +260,17 @@ public class DriverController implements AdminKey {
 	public Object gradeList(@Param("..") Grade grade, HttpServletRequest req) {
 		Object obj = null;
 
+		Cnd cnd = Cnd.NEW();
+		cnd.and("normal_id","=",grade.getNormalid());
 
 
 
 
 
 
-		return Result.success("下载地址",   obj );
+
+
+		return gradeService.query(cnd);
 
 	}
 

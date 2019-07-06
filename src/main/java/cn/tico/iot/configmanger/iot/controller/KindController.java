@@ -241,8 +241,12 @@ public class KindController  implements AdminKey {
 
     @At
     @Ok("json")
-    public Object  treeObject(@Param("id") String id) {
-        List<Kind> locations =  kindService.query();
+    public Object  treeObject(@Param("level") String level) {
+        Cnd cnd = Cnd.NEW();
+        if(Strings.isNotBlank(level)){
+            cnd.and("level","<=",level);
+        }
+        List<Kind> locations =  kindService.query(cnd);
         Kind root = kindService.zip(locations);
 
 
