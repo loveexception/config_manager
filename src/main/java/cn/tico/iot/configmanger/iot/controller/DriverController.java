@@ -103,7 +103,21 @@ public class DriverController implements AdminKey {
 		}
 	}
 
-
+	/**
+	 * 新增保存业务
+	 */
+	@At("/driver_insert_one")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
+	@Ok("json")
+	public Object addNormalOne(@Param("data") Driver normal, HttpServletRequest req) {
+		try {
+			Object obj = driverService.insert(normal);
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 
 
 
@@ -185,9 +199,9 @@ public class DriverController implements AdminKey {
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object addNormals(@Param("data") Normal[] normals, HttpServletRequest req) {
+	public Object addNormals(@Param("data") Normal[] normals,@Param("driverid") String driverid, HttpServletRequest req) {
 		try {
-			Object obj = normalService.insertAllNormal(Arrays.asList(normals));
+			Object obj = normalService.insertAllNormal(Arrays.asList(normals),driverid);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
