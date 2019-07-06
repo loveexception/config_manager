@@ -15,14 +15,12 @@ public class NormalService extends Service<Normal> {
     }
 
     public List<Normal> insertAllNormal(List<Normal> normals,String driverid) {
-        List<Normal> result = new ArrayList<Normal>();
         for (Normal normal : normals) {
             normal.setDriverid(driverid);
-            Normal temp =  this.dao().insert(normal);
-            result.add(temp);
         }
+        this.dao().insert(normals);
 
-        return result;
+        return normals;
     }
 
     public List<Normal> updateAllNormal(List<Normal> normals) {
