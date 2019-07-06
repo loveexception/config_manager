@@ -67,6 +67,7 @@ public class DriverController implements AdminKey {
 	@Ok("json")
 	public Object driverList(HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
+		cnd.and("delflag","=","false");
 		return driverService.tableList(0,1000,cnd,"updateTime","desc","^kind|$");
 	}
 
