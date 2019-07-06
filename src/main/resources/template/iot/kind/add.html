@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-add">
+
+		<div class="form-group">
+			<label class="col-sm-3 control-label ">父地域：</label>
+			<div class="col-sm-8">
+				<input id="treeId" name="parentId" type="hidden"th:value="${kind.id}" />
+				<input class="form-control" type="text" onclick="selectKindTree()" id="treeName" readonly="true" th:value="${kind.cnName}"/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">名称：</label>
+			<div class="col-sm-8">
+				<input class="form-control" type="text" name="cnName"   id="cnName">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">编码：</label>
+			<div class="col-sm-8">
+				<input class="form-control" type="text" name="enName" >
+			</div>
+		</div>
+
+
+		<div class="form-group">
+			<label class="col-sm-3 control-label">状态：</label>
+			<div class="col-sm-8">
+				<label class="radio-box"> <input type="radio" name="status" value="true" checked /> 正常 </label>
+				<label class="radio-box"> <input type="radio" name="status" value="false" /> 停用 </label>
+			</div>
+		</div>
+
+	</form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "iot/kind";
+
+    $("#form-add").validate({
+        onkeyup: false,
+        rules:{
+            cnName:{
+                required:true,
+                remote: {
+                    url: prefix + "/checkKindNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "parentId": function() {
+                            return $("input[name='parentId']").val();
+                        },
+                        "name" : function() {
+                            return $.common.trim($("#cnName").val());
+                        }
+                    },
+                    dataFilter: function(data, type) {
+                        return data;
+                    }
+                }
+            }
+
+        },
+        messages: {
+            "cnName": {
+                remote: "地区已经存在"
+            }
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/addDo", $('#form-add').serialize());
+        }
+    }
+
+    /*地理管理-新增-选择父部门树*/
+    function selectKindTree() {
+        var options = {
+            title: '地区选择',
+            width: "380",
+            url: prefix + "/selectTree/" + $("#treeId").val(),
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#treeId").val(body.find('#treeId').val());
+        $("#treeName").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+
+
+</script>
+</body>
+</html>
