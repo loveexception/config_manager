@@ -48,7 +48,6 @@ public class DriverModel extends I18NModel {
 
     @One(field = "kindid",key="id")
     private Kind kind;
-
     private List<Kind> kinds;
 
 

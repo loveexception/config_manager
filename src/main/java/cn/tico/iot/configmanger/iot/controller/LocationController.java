@@ -236,13 +236,7 @@ public class LocationController implements AdminKey {
          Location root = locationService.zip(locations);
 
 
-//        System.out.println(Json.toJson(root));
-//        root = root.getChildren().get(0);
-//        System.out.println(Json.toJson(root));
-//        root = root.getChildren().get(0);
-//        System.out.println(Json.toJson(root));
-//        root = root.getChildren().get(0);
-//        System.out.println(Json.toJson(root));
+
 
         String json = new Gson().toJson(root);
          Object obj  = Json.fromJson(json);

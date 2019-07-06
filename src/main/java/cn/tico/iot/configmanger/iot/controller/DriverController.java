@@ -1,7 +1,9 @@
 package cn.tico.iot.configmanger.iot.controller;
 
+import cn.tico.iot.configmanger.common.base.Globals;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.UpLoadUtil;
+import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.iot.services.DriverService;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
@@ -24,7 +26,9 @@ import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 业务 信息操作处理
@@ -58,7 +62,7 @@ public class DriverController implements AdminKey {
 	@Ok("json")
 	public Object driverList(HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		return driverService.tableList(0,1000,cnd,null,null,"^location|kind|$");
+		return driverService.tableList(0,1000,cnd,null,null,"^kind|$");
 	}
 
 
@@ -188,6 +192,7 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/normal_remove")
 	@Ok("json")
+	@POST
 	@Slog(tag ="驱动", after= "删除驱动:${array2str(args[0])}")
 	public Object removeNormal(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
@@ -220,9 +225,14 @@ public class DriverController implements AdminKey {
 			} else if (tf == null) {
 				return Result.error("空文件");
 			} else {
+				Map map = new HashMap<String,String>();
+				String name = tf.getName();
 				String url = UpLoadUtil.upLoadFileSysConfigPath(tf,"driver");
 				String u = req.getServletContext().getContextPath();
-				return Result.success("上传成功",  u + url );
+				map.put("name",name);
+				map.put("url",url);
+				map.put("file",tf.getFile().getName());
+				return Result.success("上传成功",  map );
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -231,7 +241,28 @@ public class DriverController implements AdminKey {
 			return Result.error("格式错误");
 		}
 	}
+	@At("/normal_csv_path")
+	@Ok("json")
+	public Object csvPath( HttpServletRequest req) {
 
+				String url = Globals.AppUploadPath+"/csv/"+"normal.csv";
+				return Result.success("下载地址",   url );
+
+	}
+
+
+	@At("/grade_list")
+	@Ok("json")
+	public Object gradeList(@Param("..") Grade grade, HttpServletRequest req) {
+		Object obj = null;
+
+
+
+
+
+		return Result.success("下载地址",   obj );
+
+	}
 
 
 
