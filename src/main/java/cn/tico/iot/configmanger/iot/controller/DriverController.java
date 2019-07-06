@@ -229,7 +229,7 @@ public class DriverController implements AdminKey {
 				String name = tf.getName();
 				String url = UpLoadUtil.upLoadFileSysConfigPath(tf,"driver");
 				String u = req.getServletContext().getContextPath();
-				map.put("name",name);
+				map.put("name",tf.getSubmittedFileName());
 				map.put("url",url);
 				map.put("file",tf.getFile().getName());
 				return Result.success("上传成功",  map );
