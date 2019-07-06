@@ -503,6 +503,21 @@ class BasicInformation extends React.PureComponent {
 	};
 	componentDidMount() {
 		this.props.onRef && this.props.onRef(this);
+		$.ajax({
+			url: '/iot/location/treeObject',
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误');
+					return;
+				}
+				console.log(results);
+			}
+		});
 	}
 	normFile = e => {
 		console.log('读取文件开始...');
@@ -510,27 +525,9 @@ class BasicInformation extends React.PureComponent {
 		// Only to show two recent uploaded files, and old ones will be replaced by the new
 		fileList = fileList.slice(-1);
 		e.fileList = fileList;
-		if (e.file.status === 'done') {
-			// Get this url from response in real world.
-			console.log('读取文件完毕...', e.response);
-			// $.ajax({
-			// 	url: '/iot/driver/driver_upload',
-			// 	// data: {},
-			// 	cache: false,
-			// 	contentType: false,
-			// 	processData: false,
-			// 	type: 'POST',
-			// 	success: results => {
-			// 		if (results.code != 0) {
-			// 			message.error('接口错误');
-			// 			return;
-			// 		}
-			// 		this.setState({
-			// 			data: results.rows
-			// 		});
-			// 	}
-			// });
-		}
+		// if (e.file.status === 'done') {
+		// 	console.log('读取文件完毕...', e.file.response);
+		// }
 		if (Array.isArray(e)) {
 			return e;
 		}
@@ -627,12 +624,12 @@ class BasicInformation extends React.PureComponent {
 					])}
 
 					{this._getLi([
-						<Form.Item label="设备类型">
-							{getFieldDecorator('设备类型', {
+						<Form.Item label="采集设备信息">
+							{getFieldDecorator('采集设备信息', {
 								rules: [
 									{
 										required: true,
-										message: '设备类型不为空'
+										message: '采集设备信息不为空'
 									}
 								]
 							})(
@@ -1333,8 +1330,57 @@ class AddBox extends React.PureComponent {
 										this.basicInformation.calibrationMethod(
 											data => {
 												if (data) {
-													console.log(data);
-													this.next();
+													let _file =
+														(data['驱动文件'] ||
+															[])[0] || {};
+													let _info =
+														data['采集设备信息'] ||
+														[];
+													let file_response =
+														_file.response || {};
+													let params = [
+														{
+															cnName:
+																data[
+																	'驱动名称'
+																],
+															driverVer:
+																data['版本号'],
+															enName: (
+																file_response.data ||
+																{}
+															).name,
+															kindCompany:
+																_info[2],
+															kindKind: _info[0],
+															kindSubkind:
+																_info[1],
+															kindType: _info[3],
+															path: (
+																file_response.data ||
+																{}
+															).url
+														}
+													];
+													console.log(params);
+													// $.ajax({
+													// 	url: '/iot/driver/driver_insert_all',
+													// 	data: {...params},
+													// 	cache: false,
+													// 	contentType: false,
+													// 	processData: false,
+													// 	type: 'GET',
+													// 	success: results => {
+													// 		if (results.code != 0) {
+													// 			message.error('接口错误');
+													// 			return;
+													// 		}
+													// 		this.setState({
+													// 			data: results.rows
+													// 		});
+													// 	}
+													// });
+													// this.next();
 												}
 											}
 										);
