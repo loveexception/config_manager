@@ -48,10 +48,13 @@ $.modal.openFull = function(title, url, width, height) {
 	});
 	layer.full(index);
 };
-let { Table, Select, Button, Input, Icon } = antd;
+let { Table, Select, Button, Input, Icon, message } = antd;
 class ListBox extends React.PureComponent {
 	state = { data: [] };
 	componentDidMount() {
+		this.init();
+	}
+	init = () => {
 		$.ajax({
 			url: '/iot/driver/driver_list',
 			// data: {},
@@ -69,7 +72,7 @@ class ListBox extends React.PureComponent {
 				});
 			}
 		});
-	}
+	};
 	render = () => {
 		const columns = [
 			{
@@ -109,20 +112,39 @@ class ListBox extends React.PureComponent {
 				key: 'operation',
 				fixed: 'right',
 				width: 100,
-				render: () => {
+				render: (text, record) => {
 					return (
 						<div>
 							<Button
 								onClick={() => {
-									$.modal.openFull(
-										'修改驱动',
-										'/html/drive/edit.html'
-									);
+									$.modal.openFull('修改驱动', '/html/drive/edit.html');
 								}}
 							>
 								修改
 							</Button>
-							<Button>删除</Button>
+							<Button
+								onClick={() => {
+									$.ajax({
+										cache: true,
+										type: 'POST',
+										url: '/iot/driver/driver_remove',
+										data: JSON.stringify({
+											id: record.id
+										}),
+										dataType: 'json',
+										async: false,
+										success: results => {
+											if (results.code != 0) {
+												message.error('接口错误');
+												return;
+											}
+											console.log('--data', data);
+										}
+									});
+								}}
+							>
+								删除
+							</Button>
 						</div>
 					);
 				}
@@ -147,21 +169,13 @@ class ListBox extends React.PureComponent {
 							<Select.Option value="d">设备品牌</Select.Option>
 							<Select.Option value="e">设备型号</Select.Option>
 						</Select>
-						<Input.Search
-							className="input-box"
-							placeholder="请输入关键字"
-							onSearch={value => console.log('点击搜索', value)}
-							style={{ width: 254 }}
-						/>
+						<Input.Search className="input-box" placeholder="请输入关键字" onSearch={value => console.log('点击搜索', value)} style={{ width: 254 }} />
 					</div>
 					<div className="drive-list-content-li">
 						<Button
 							type="primary"
 							onClick={() => {
-								$.modal.openFull(
-									'新增驱动',
-									'/html/drive/add.html'
-								);
+								$.modal.openFull('新增驱动', '/html/drive/add.html');
 							}}
 						>
 							新增

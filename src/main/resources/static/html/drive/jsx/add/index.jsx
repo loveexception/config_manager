@@ -336,23 +336,7 @@ $.modal.open = function(title, url, width, height) {
 		}
 	});
 };
-let {
-	Steps,
-	Button,
-	message,
-	Input,
-	Descriptions,
-	Upload,
-	Icon,
-	Cascader,
-	Table,
-	Popconfirm,
-	Form,
-	Radio,
-	Modal,
-	Row,
-	Col
-} = antd;
+let { Steps, Button, message, Input, Descriptions, Upload, Icon, Cascader, Table, Popconfirm, Form, Radio, Modal, Row, Col } = antd;
 const { Step } = Steps;
 const { confirm } = Modal;
 
@@ -406,6 +390,7 @@ class BasicInformation extends React.PureComponent {
 			if (!err) {
 				console.log('基本信息校验成功');
 				callback(values);
+				return;
 			}
 			message.error('基本信息填写错误', 0.5);
 			callback();
@@ -437,8 +422,7 @@ class BasicInformation extends React.PureComponent {
 				// 		]
 				// 	},
 				// ];
-				let cascader_data =
-					(results.data && results.data.children) || [];
+				let cascader_data = (results.data && results.data.children) || [];
 				this.setState({
 					cascader_data
 				});
@@ -485,7 +469,6 @@ class BasicInformation extends React.PureComponent {
 				}
 			}
 		];
-		console.log('cascader_data', this.state.cascader_data);
 		return (
 			<div
 				className="drive-add-basic-information-box"
@@ -594,9 +577,7 @@ class BasicInformation extends React.PureComponent {
 		);
 	}
 }
-const BasicInformationForm = Form.create({ name: 'drive_basic_info' })(
-	BasicInformation
-);
+const BasicInformationForm = Form.create({ name: 'drive_basic_info' })(BasicInformation);
 
 const EditableContext = React.createContext();
 
@@ -635,13 +616,7 @@ class EditableCell extends React.PureComponent {
 
 	renderCell = form => {
 		this.form = form;
-		const {
-			children,
-			dataIndex,
-			record,
-			title,
-			parentdata = []
-		} = this.props;
+		const { children, dataIndex, record, title, parentdata = [] } = this.props;
 		const { editing } = this.state;
 		let bool = dataIndex == '指标项英文简称';
 		return editing ? (
@@ -658,13 +633,9 @@ class EditableCell extends React.PureComponent {
 										}
 
 										let arr = [];
-										arr = parentdata.filter(
-											item => item[dataIndex] === value
-										);
+										arr = parentdata.filter(item => item[dataIndex] === value);
 
-										arr = arr.filter(
-											item => item.key != record.key
-										);
+										arr = arr.filter(item => item.key != record.key);
 										if (arr.length > 0) {
 											cb(`${title} 重复了`);
 										}
@@ -677,47 +648,18 @@ class EditableCell extends React.PureComponent {
 							  }
 					],
 					initialValue: record[dataIndex]
-				})(
-					<Input
-						ref={node => (this.input = node)}
-						onPressEnter={this.save}
-						onBlur={this.save}
-					/>
-				)}
+				})(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save} />)}
 			</Form.Item>
 		) : (
-			<div
-				className="editable-cell-value-wrap"
-				style={{ paddingRight: 24 }}
-				onClick={this.toggleEdit}
-			>
+			<div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={this.toggleEdit}>
 				{children}
 			</div>
 		);
 	};
 
 	render() {
-		const {
-			editable,
-			dataIndex,
-			title,
-			record,
-			index,
-			handleSave,
-			children,
-			...restProps
-		} = this.props;
-		return (
-			<td {...restProps}>
-				{editable ? (
-					<EditableContext.Consumer>
-						{this.renderCell}
-					</EditableContext.Consumer>
-				) : (
-					children
-				)}
-			</td>
-		);
+		const { editable, dataIndex, title, record, index, handleSave, children, ...restProps } = this.props;
+		return <td {...restProps}>{editable ? <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer> : children}</td>;
 	}
 }
 class EditableTableRadio extends React.PureComponent {
@@ -799,12 +741,7 @@ class EditableTable extends React.PureComponent {
 				dataIndex: 'operation',
 				render: (text, record) =>
 					this.state.dataSource.length >= 1 ? (
-						<Popconfirm
-							cancelText="取消"
-							okText="确定"
-							title="确定删除?"
-							onConfirm={() => this.handleDelete(record.key)}
-						>
+						<Popconfirm cancelText="取消" okText="确定" title="确定删除?" onConfirm={() => this.handleDelete(record.key)}>
 							<Button className="btn-2">删除</Button>
 						</Popconfirm>
 					) : null
@@ -906,13 +843,7 @@ class EditableTable extends React.PureComponent {
 			Sheets: {
 				Sheet1: Object.assign({}, output, {
 					'!ref': ref,
-					'!cols': [
-						{ wpx: 200 },
-						{ wpx: 300 },
-						{ wpx: 300 },
-						{ wpx: 200 },
-						{ wpx: 150 }
-					]
+					'!cols': [{ wpx: 200 }, { wpx: 300 }, { wpx: 300 }, { wpx: 200 }, { wpx: 150 }]
 				})
 			}
 		};
@@ -938,9 +869,7 @@ class EditableTable extends React.PureComponent {
 					// esline-disable-next-line
 					if (workbook.Sheets.hasOwnProperty(sheet)) {
 						// 利用 sheet_to_json 方法将 excel 转成 json 数据
-						data = data.concat(
-							XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
-						);
+						data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
 						// break; // 如果只取第一张表，就取消注释这行
 					}
 				}
@@ -1010,21 +939,12 @@ class EditableTable extends React.PureComponent {
 						justifyContent: 'space-between'
 					}}
 				>
-					<Button
-						className="btn-1"
-						onClick={this.handleAdd}
-						type="primary"
-					>
+					<Button className="btn-1" onClick={this.handleAdd} type="primary">
 						新增
 					</Button>
 					<div className="right-btn-box">
 						<Button className="upload-wrap btn-3">
-							<input
-								className={'file-uploader'}
-								type="file"
-								accept=".xlsx, .xls"
-								onChange={this.onImportExcel}
-							/>
+							<input className={'file-uploader'} type="file" accept=".xlsx, .xls" onChange={this.onImportExcel} />
 							<span className={'upload-text'}>导入</span>
 						</Button>
 						<Button
@@ -1034,14 +954,8 @@ class EditableTable extends React.PureComponent {
 									message.info('未选择下载数据', 0.5);
 									return;
 								}
-								let columns_new = columns.filter(
-									(item, index, _d) => index != _d.length - 1
-								);
-								this.onExportExcel(
-									columns_new,
-									dataSource,
-									'测试指标项.xlsx'
-								);
+								let columns_new = columns.filter((item, index, _d) => index != _d.length - 1);
+								this.onExportExcel(columns_new, dataSource, '测试指标项.xlsx');
 							}}
 						>
 							导出
@@ -1127,10 +1041,7 @@ class AlarmConfiguration extends React.PureComponent {
 									record: record,
 									list: data
 								};
-								$.modal.open(
-									'告警规则设置',
-									'/html/drive/alarmRules.html'
-								);
+								$.modal.open('告警规则设置', '/html/drive/alarmRules.html');
 							}}
 						>
 							告警配置
@@ -1211,31 +1122,13 @@ class AddBox extends React.PureComponent {
 				<div className="steps-content">
 					<Steps current={current}>
 						{steps.map((item, index) => (
-							<Step
-								key={item.title}
-								title={item.title}
-								icon={<span>{index + 1}</span>}
-							/>
+							<Step key={item.title} title={item.title} icon={<span>{index + 1}</span>} />
 						))}
 					</Steps>
 					<div className="steps-content-body">
-						<BasicInformationForm
-							onRef={el => (this.basicInformation = el)}
-							title={steps[current].title}
-							show={steps[current].title == '基本信息'}
-						/>
-						<Indicators
-							onRef={el => (this.indicators = el)}
-							title={steps[current].title}
-							show={steps[current].title == '添加指标项'}
-						/>
-						{this.indicators && (
-							<AlarmConfiguration
-								ref={el => (this.alarmConfiguration = el)}
-								title={steps[current].title}
-								show={steps[current].title == '告警配置'}
-							/>
-						)}
+						<BasicInformationForm onRef={el => (this.basicInformation = el)} title={steps[current].title} show={steps[current].title == '基本信息'} />
+						<Indicators onRef={el => (this.indicators = el)} title={steps[current].title} show={steps[current].title == '添加指标项'} />
+						{this.indicators && <AlarmConfiguration ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '告警配置'} />}
 					</div>
 				</div>
 				<div className="steps-action">
@@ -1259,67 +1152,45 @@ class AddBox extends React.PureComponent {
 								if (steps[current].title == '基本信息') {
 									// this.next();
 									if (this.basicInformation) {
-										this.basicInformation.calibrationMethod(
-											data => {
-												if (data) {
-													let _file =
-														(data['驱动文件'] ||
-															[])[0] || {};
-													let _info =
-														data['采集设备信息'] ||
-														[];
-													let file_response =
-														_file.response || {};
-													let params = [
-														{
-															cnName:
-																data[
-																	'驱动名称'
-																],
-															driverVer:
-																data['版本号'],
-															enName: (
-																file_response.data ||
-																{}
-															).name,
-															kindCompany:
-																_info[2],
-															kindKind: _info[0],
-															kindSubkind:
-																_info[1],
-															kindType: _info[3],
-															path: (
-																file_response.data ||
-																{}
-															).url
+										this.basicInformation.calibrationMethod(data => {
+											if (data) {
+												let _file = (data['驱动文件'] || [])[0] || {};
+												let _info = data['采集设备信息'] || [];
+												let file_response = _file.response || {};
+												let params = [
+													{
+														cnName: data['驱动名称'],
+														driverVer: data['版本号'],
+														enName: (file_response.data || {}).name,
+														kindCompany: _info[2],
+														kindKind: _info[0],
+														kindSubkind: _info[1],
+														kindType: _info[3],
+														path: (file_response.data || {}).url
+													}
+												];
+												$.ajax({
+													cache: true,
+													type: 'POST',
+													url: '/iot/driver/driver_insert_all',
+													data: JSON.stringify({
+														data: params
+													}),
+													dataType: 'json',
+													async: false,
+													success: results => {
+														if (results.code != 0) {
+															message.error('接口错误');
+															return;
 														}
-													];
-													console.log(params);
-													// $.ajax({
-													// 	url: '/iot/driver/driver_insert_all',
-													// 	data: {...params},
-													// 	cache: false,
-													// 	contentType: false,
-													// 	processData: false,
-													// 	type: 'GET',
-													// 	success: results => {
-													// 		if (results.code != 0) {
-													// 			message.error('接口错误');
-													// 			return;
-													// 		}
-													// 		this.setState({
-													// 			data: results.rows
-													// 		});
-													// 	}
-													// });
-													// this.next();
-												}
+														console.log('--data', data);
+														this.next();
+													}
+												});
 											}
-										);
+										});
 									}
-								} else if (
-									steps[current].title == '添加指标项'
-								) {
+								} else if (steps[current].title == '添加指标项') {
 									this.next();
 									// if (this.indicators) {
 									// 	let data = this.indicators.calibrationMethod();
