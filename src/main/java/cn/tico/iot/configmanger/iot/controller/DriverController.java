@@ -77,7 +77,6 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/driver_one")
 	@Ok("json")
-	@Slog(tag ="驱动", after= "删除驱动:${array2str(args[0])}")
 	public Object fetch(@Param("id") String id, HttpServletRequest req) {
 		try {
 			Driver obj =  driverService.fetch(id);
@@ -95,7 +94,6 @@ public class DriverController implements AdminKey {
 	@At("/driver_remove")
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-//	@Slog(tag ="驱动", after= "删除驱动:${array2str(args[0])}")
 	public Object abc(@Param("..")Driver driver, HttpServletRequest req) {
 		try {
 			int  i = driverService.vDelete(driver.getId());
@@ -147,13 +145,16 @@ public class DriverController implements AdminKey {
 	/**
 	 * 新增保存业务
 	 */
-	@At("/normal_insert_all")
-	@POST
+	@At("/normal_list")
 	@Ok("json")
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object addAllnormal(@Param("data") Normal[] driver,HttpServletRequest req) {
+	public Object allnormal(@Param("..") Normal driver,HttpServletRequest req) {
+
+
 		try {
-			Object obj =  normalService.insertAllNormal(Arrays.asList(driver));
+			Cnd cnd = Cnd.NEW();
+			cnd.and("delflag","=","false");
+			cnd.and("driver_id","=",driver.getDriverid());
+			Object obj = normalService.query(cnd);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -182,12 +183,12 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/normal_insert_all")
 	@POST
+	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	@Slog(tag="业务", after="新增保存业务id=${args[0].id}")
-	public Object addNormals(List<Normal> normals, HttpServletRequest req) {
+	public Object addNormals(@Param("data") Normal[] normals, HttpServletRequest req) {
 		try {
-			normalService.insertAllNormal(normals);
-			return Result.success("system.success");
+			Object obj = normalService.insertAllNormal(Arrays.asList(normals));
+			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -200,7 +201,6 @@ public class DriverController implements AdminKey {
 	@At("/normal_remove")
 	@Ok("json")
 	@POST
-	@Slog(tag ="驱动", after= "删除驱动:${array2str(args[0])}")
 	public Object removeNormal(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
 			int  i = normalService.vDelete(ids);
