@@ -307,7 +307,8 @@ public class DriverController implements AdminKey {
 			cnd.and("grade","=",grade.getGrade());
 		}
 
-		obj =  gradeService._query(cnd,null,"^rulers$");
+
+		obj =  gradeService.queryGrade(cnd);
 		return  Result.success("system.success",   obj );
 
 	}
@@ -329,10 +330,10 @@ public class DriverController implements AdminKey {
     @POST
     @AdaptBy(type = JsonAdaptor.class)
     @Ok("json")
-    public Object rulerAdd(@Param("data") Ruler ruler, HttpServletRequest req) {
+    public Object rulerAdd(@Param("data") Ruler[] ruler, @Param("gradeid") String gradeid,HttpServletRequest req) {
 
         try {
-            Object obj =  rulerService.insert(ruler);
+            Object obj =  rulerService.insertRuler(ruler,gradeid);
             return Result.success("system.success",obj);
         } catch (Exception e) {
             return Result.error("system.error");
@@ -347,10 +348,13 @@ public class DriverController implements AdminKey {
 	@Ok("json")
     @POST
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object removeGrade(@Param("data")String[] ids, HttpServletRequest req) {
+	public Object removeGrade(@Param("data")String id, HttpServletRequest req) {
 		try {
-			gradeService.deleteGrade(ids);
-			return Result.success("system.success");
+		    Grade grade = new Grade();
+		    grade.setId(id);
+		    grade = gradeService.fetchLinks(grade,"^rulers$");
+			int i = gradeService._deleteLinks(grade,"^rulers$");
+			return Result.success("system.success",i );
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -363,10 +367,10 @@ public class DriverController implements AdminKey {
     @Ok("json")
     @POST
     @AdaptBy(type = JsonAdaptor.class)
-    public Object removeRule(@Param("data")String[] ids, HttpServletRequest req) {
+    public Object removeRule(@Param("data")String ids, HttpServletRequest req) {
         try {
-            rulerService.delete(ids);
-            return Result.success("system.success",ids);
+            int i = rulerService.delete(ids);
+            return Result.success("system.success",i);
         } catch (Exception e) {
             return Result.error("system.error");
         }
