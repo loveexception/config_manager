@@ -67,7 +67,7 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
     @GraphQLQuery(name = "order_num", description = "顺序")
     private int  orderNum ;
 
-    private int key ;
+    private String key ;
 
 
     @Override

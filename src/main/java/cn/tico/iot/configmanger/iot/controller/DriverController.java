@@ -9,6 +9,7 @@ import cn.tico.iot.configmanger.iot.services.DriverService;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.iot.services.GradeService;
 import cn.tico.iot.configmanger.iot.services.NormalService;
+import cn.tico.iot.configmanger.iot.services.RulerService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
@@ -49,6 +50,9 @@ public class DriverController implements AdminKey {
 
 	@Inject
 	private GradeService gradeService;
+
+	@Inject
+    private RulerService rulerService;
 
 	@RequiresPermissions("iot:driver:view")
 	@At("")
@@ -337,6 +341,21 @@ public class DriverController implements AdminKey {
 			return Result.error("system.error");
 		}
 	}
+
+    /**
+     * 删除业务
+     */
+    @At("/ruler_remove")
+    @Ok("json")
+    @AdaptBy(type = JsonAdaptor.class)
+    public Object removeRule(@Param("data")String[] ids, HttpServletRequest req) {
+        try {
+            int  i = rulerService.vDelete(ids);
+            return Result.success("system.success",i);
+        } catch (Exception e) {
+            return Result.error("system.error");
+        }
+    }
 
 
 }
