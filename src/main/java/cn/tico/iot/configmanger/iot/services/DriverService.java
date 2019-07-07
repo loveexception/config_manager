@@ -58,6 +58,8 @@ public class DriverService extends Service<Driver> {
 	}
 
 	public Object insertNormal(Driver driver) {
-		return this.dao().insertOrUpdate(driver);
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
+
+		return forup.insertOrUpdate(driver);
 	}
 }
