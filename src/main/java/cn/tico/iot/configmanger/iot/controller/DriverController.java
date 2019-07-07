@@ -202,12 +202,9 @@ public class DriverController implements AdminKey {
 			List obj1 = normalService.insertAllNormal(Arrays.asList(innormals),driverid);
 
 			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals));
-			List result = new ArrayList();
-
-			result.addAll(obj1);
-			result.addAll(obj2);
-			Collections.sort(result);
-			return Result.success("system.success",result);
+            Normal normal = new Normal();
+            normal.setDriverid(driverid);
+            return allNormals(normal,req);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -225,7 +222,9 @@ public class DriverController implements AdminKey {
 	public Object addNormals(@Param("data") Normal[] normals , @Param("driverid") String driverid, HttpServletRequest req) {
 		try {
 			Object obj = normalService.insertAllNormal(Arrays.asList(normals),driverid);
-			return Result.success("system.success",obj);
+			Normal normal = new Normal();
+			normal.setDriverid(driverid);
+			return allNormals(normal,req);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
