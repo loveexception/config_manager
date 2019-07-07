@@ -50,11 +50,12 @@ $.modal.openFull = function(title, url, width, height) {
 };
 let { Table, Select, Button, Input, Icon, message } = antd;
 class ListBox extends React.PureComponent {
-	state = { data: [] };
+	state = { data: [], loading: false };
 	componentDidMount() {
 		this.init();
 	}
 	init = () => {
+		this.setState({ loading: true });
 		$.ajax({
 			url: '/iot/driver/driver_list',
 			// data: {},
@@ -65,11 +66,16 @@ class ListBox extends React.PureComponent {
 			success: results => {
 				if (results.code != 0) {
 					message.error('接口错误');
+					this.setState({ loading: false });
 					return;
 				}
 				this.setState({
-					data: results.rows
+					data: results.rows,
+					loading: false
 				});
+			},
+			error: () => {
+				this.setState({ loading: false });
 			}
 		});
 	};
@@ -185,6 +191,7 @@ class ListBox extends React.PureComponent {
 				</div>
 				<Table
 					rowKey={record => record.id}
+					loading={this.state.loading}
 					bordered
 					columns={columns}
 					dataSource={data}
