@@ -54,4 +54,8 @@ public class DriverService extends Service<Driver> {
 		}
 		return drivers;
 	}
+
+	public Object insertNormal(Driver driver) {
+		return this.dao().insertOrUpdate(driver);
+	}
 }

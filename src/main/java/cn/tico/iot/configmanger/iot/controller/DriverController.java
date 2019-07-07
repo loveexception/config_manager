@@ -103,13 +103,13 @@ public class DriverController implements AdminKey {
 	/**
 	 * 新增保存业务
 	 */
-	@At("/driver_insert_one")
+	@At("/driver_insert_update")
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object addNormalOne(@Param("data") Driver normal, HttpServletRequest req) {
+	public Object addNormalupdate(@Param("data") Driver driver, HttpServletRequest req) {
 		try {
-			Object obj = driverService.insert(normal);
+			Object obj = driverService.insertNormal(driver);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -158,13 +158,13 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/normal_list")
 	@Ok("json")
-	public Object allnormal(@Param("..") Normal driver,HttpServletRequest req) {
-
-
+	public Object allNormals(@Param("..") Normal normal,HttpServletRequest req) {
 		try {
+
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
-			cnd.and("driver_id","=",driver.getDriverid());
+			cnd.and("driver_id","=",normal.getDriverid());
+			cnd.orderBy("order_num","asc");
 			Object obj = normalService.query(cnd);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
@@ -196,7 +196,7 @@ public class DriverController implements AdminKey {
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object addNormals(@Param("data") Normal[] normals,@Param("driverid") String driverid, HttpServletRequest req) {
+	public Object addNormals(@Param("data") Normal[] normals , @Param("driverid") String driverid, HttpServletRequest req) {
 		try {
 			Object obj = normalService.insertAllNormal(Arrays.asList(normals),driverid);
 			return Result.success("system.success",obj);
