@@ -3,6 +3,8 @@ package cn.tico.iot.configmanger.iot.services;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.IocBean;
 
 import java.util.ArrayList;
@@ -28,8 +30,9 @@ public class NormalService extends Service<Normal> {
         for (Normal normal : normals) {
             normal.setOrderNum(normal.getKey());
         }
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
 
-         this.dao().update(normals);
+         forup.update(normals);
 
          return normals;
     }

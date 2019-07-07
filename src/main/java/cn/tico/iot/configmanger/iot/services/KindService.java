@@ -153,23 +153,6 @@ public class KindService extends Service<Kind> {
     }
 
 
-    public boolean checkDeptNameUnique(String id, String parentId, String menuName) {
-        Cnd cnd =Cnd.NEW();
-        if(Strings.isNotBlank(id)){
-            cnd.and("id","!=",id);
-        }
-        if(Strings.isNotBlank(parentId)){
-            cnd.and("parent_id","=",parentId);
-        }
-        if(Strings.isNotBlank(menuName)){
-            cnd.and("cn_name", "=", menuName);
-        }
-        List<Kind> list = this.query(cnd);
-        if (Lang.isEmpty(list)) {
-            return true;
-        }
-        return false;
-    }
 
     public Kind zip(List<Kind> locations) {
 
