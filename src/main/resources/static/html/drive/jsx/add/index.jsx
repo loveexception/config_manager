@@ -845,6 +845,26 @@ class AddBox extends React.PureComponent {
 			driver_id: 'b56cd5ad993748159068c8d59621c476'
 		};
 	}
+	indicatorsListInit = (driver_id, cb) => {
+		if (driver_id) {
+			$.ajax({
+				url: `/iot/driver/normal_list?driverid=${driver_id}`,
+				// data: {},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'GET',
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						cb();
+						return;
+					}
+					cb(results.data);
+				}
+			});
+		}
+	};
 	next() {
 		const current = this.state.current + 1;
 		this.setState({ current });
