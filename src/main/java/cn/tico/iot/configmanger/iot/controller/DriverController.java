@@ -168,7 +168,7 @@ public class DriverController implements AdminKey {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("driver_id","=",normal.getDriverid());
-			cnd.orderBy("order_num","desc");
+			cnd.orderBy("order_num","asc");
 			Object obj = normalService.query(cnd);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
