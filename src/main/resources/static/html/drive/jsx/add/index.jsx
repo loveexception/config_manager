@@ -6,297 +6,6 @@ for (var i = 0; i < scripts.length; i++) {
 		domId = script.getAttribute('domId');
 	}
 }
-const LISTDATA = [
-	{
-		指标项中文简称: '数据采集时间',
-		指标项英文简称: 'data_create_time',
-		操作码: 'nbiot_create_time',
-		单位: 'ms',
-		告警使能: '是',
-		key: 0
-	},
-	{
-		指标项中文简称: '双流输入连接状态',
-		指标项英文简称: 'dualFlow_connectedStatus',
-		操作码: 'camera[2].connected;',
-		单位: '_',
-		告警使能: '否',
-		key: 1
-	},
-	{
-		指标项中文简称: '麦克风静音状态',
-		指标项英文简称: 'micro_mutedStatus',
-		操作码: 'micro_muted',
-		单位: '_',
-		告警使能: '是',
-		key: 2
-	},
-	{
-		指标项中文简称: '主摄像头连接状态',
-		指标项英文简称: 'mainCamera_connectedStatus',
-		操作码: 'camera[0].connected',
-		单位: '_',
-		告警使能: '是',
-		key: 3
-	},
-	{
-		指标项中文简称: '第二个摄像头连接状态',
-		指标项英文简称: 'viceCamera_connectedStatus',
-		操作码: 'camera[1].connected',
-		单位: '_',
-		告警使能: '否',
-		key: 4
-	},
-	{
-		指标项中文简称: '全向麦连接状态',
-		指标项英文简称: 'omniMic_connectedStatus',
-		操作码: 'system_status_microphones',
-		单位: '_',
-		告警使能: '是',
-		key: 5
-	},
-	{
-		指标项中文简称: '全向麦音频输入状态',
-		指标项英文简称: 'omniMic_inputStatus',
-		操作码: 'micro.POLYCOM_MIC',
-		单位: '_',
-		告警使能: '否',
-		key: 6
-	},
-	{
-		指标项中文简称: '线性麦音频输入状态',
-		指标项英文简称: 'lineMic_inputStatus',
-		操作码: 'micro.LINE_IN',
-		单位: '_',
-		告警使能: '是',
-		key: 7
-	},
-	{
-		指标项中文简称: '与会状态',
-		指标项英文简称: 'meeting_status ',
-		操作码: 'system_status_inacall',
-		单位: '_',
-		告警使能: '否',
-		key: 8
-	},
-	{
-		指标项中文简称: '音频接收网络抖动',
-		指标项英文简称: 'audioRX_jitter',
-		操作码: 'meeting[1].jitter',
-		单位: 'ms',
-		告警使能: '是',
-		key: 9
-	},
-	{
-		指标项中文简称: '音频发送网络抖动',
-		指标项英文简称: 'audioTX_jitter',
-		操作码: 'meeting[0].jitter',
-		单位: 'ms',
-		告警使能: '是',
-		key: 10
-	},
-	{
-		指标项中文简称: '音频发送丢包数',
-		指标项英文简称: 'audioTx_packetLoss',
-		操作码: 'meeting[0].packetLoss',
-		单位: '个',
-		告警使能: '是',
-		key: 11
-	},
-	{
-		指标项中文简称: '音频接收丢包数',
-		指标项英文简称: 'audioRx_packetLoss',
-		操作码: 'meeting[1].packetLoss',
-		单位: '个',
-		告警使能: '是',
-		key: 12
-	},
-	{
-		指标项中文简称: '音频接收丢包率',
-		指标项英文简称: 'audioRX_percentPacketLoss',
-		操作码: 'meeting[1].percentPacketLoss',
-		单位: '%',
-		告警使能: '是',
-		key: 13
-	},
-	{
-		指标项中文简称: '音频传输丢包率',
-		指标项英文简称: 'audioTX_percentPacketLoss',
-		操作码: 'meeting[0].percentPacketLoss',
-		单位: '%',
-		告警使能: '是',
-		key: 14
-	},
-	{
-		指标项中文简称: '音频发送延迟',
-		指标项英文简称: 'audioTX_latency',
-		操作码: 'meeting[0].latency',
-		单位: 'ms',
-		告警使能: '是',
-		key: 15
-	},
-	{
-		指标项中文简称: '音频接收延迟',
-		指标项英文简称: 'audioRX_latency',
-		操作码: 'meeting[1].latency',
-		单位: 'ms',
-		告警使能: '是',
-		key: 16
-	},
-	{
-		指标项中文简称: '视频接收网络抖动',
-		指标项英文简称: 'videoRX_jitter',
-		操作码: 'meeting[3].jitter',
-		单位: 'ms',
-		告警使能: '是',
-		key: 17
-	},
-	{
-		指标项中文简称: '视频传输网络抖动',
-		指标项英文简称: 'videoTX_jitter',
-		操作码: 'meeting[2].jitter',
-		单位: 'ms',
-		告警使能: '是',
-		key: 18
-	},
-	{
-		指标项中文简称: '视频发送丢包数',
-		指标项英文简称: 'videoTx_packetLoss',
-		操作码: 'meeting[2].packetLoss',
-		单位: 'ms',
-		告警使能: '是',
-		key: 19
-	},
-	{
-		指标项中文简称: '视频接收丢包数',
-		指标项英文简称: 'videoRx_packetLoss',
-		操作码: 'meeting[3].packetLoss',
-		单位: 'ms',
-		告警使能: '是',
-		key: 20
-	},
-	{
-		指标项中文简称: '视频接收丢包率',
-		指标项英文简称: 'videoRx_percentPacketLoss',
-		操作码: 'meeting[3].percentPacketLoss',
-		单位: '%',
-		告警使能: '是',
-		key: 21
-	},
-	{
-		指标项中文简称: '视频传输丢包率',
-		指标项英文简称: 'videoTx_percentPacketLoss',
-		操作码: 'meeting[2].percentPacketLoss',
-		单位: '%',
-		告警使能: '是',
-		key: 22
-	},
-	{
-		指标项中文简称: '视频发送延迟',
-		指标项英文简称: 'videoTX_latency',
-		操作码: 'meeting[2].latency',
-		单位: 'ms',
-		告警使能: '是',
-		key: 23
-	},
-	{
-		指标项中文简称: '视频接收延迟',
-		指标项英文简称: 'videoRX_latency',
-		操作码: 'meeting[3].latency',
-		单位: 'ms',
-		告警使能: '是',
-		key: 24
-	},
-	{
-		指标项中文简称: '音频发送质量',
-		指标项英文简称: 'audioTx_qualityIndicator',
-		操作码: 'meeting[0].qualityIndicator',
-		单位: '_',
-		告警使能: '是',
-		key: 25
-	},
-	{
-		指标项中文简称: '音频接收质量',
-		指标项英文简称: 'audioRx_qualityIndicator',
-		操作码: 'meeting[1].qualityIndicator',
-		单位: '_',
-		告警使能: '是',
-		key: 26
-	},
-	{
-		指标项中文简称: '视频发送质量',
-		指标项英文简称: 'videoTx_qualityIndicator',
-		操作码: 'meeting[2].qualityIndicator',
-		单位: '_',
-		告警使能: '是',
-		key: 27
-	},
-	{
-		指标项中文简称: '视频接收质量',
-		指标项英文简称: 'videoRx_qualityIndicator',
-		操作码: 'meeting[3].qualityIndicator',
-		单位: '_',
-		告警使能: '是',
-		key: 28
-	},
-	{
-		指标项中文简称: '视频发送码率',
-		指标项英文简称: 'videoTx_actualBitRate',
-		操作码: 'meeting[2].actualBitRate',
-		单位: 'Kb',
-		告警使能: '是',
-		key: 29
-	},
-	{
-		指标项中文简称: '视频接收码率',
-		指标项英文简称: 'videoRx_actualBitRate',
-		操作码: 'meeting[3].actualBitRate',
-		单位: 'Kb',
-		告警使能: '是',
-		key: 30
-	},
-	{
-		指标项中文简称: '使用时长',
-		指标项英文简称: 'usageTime_statistics',
-		操作码: 'comm_statistics_totaltimeincalls',
-		单位: '_',
-		告警使能: '否',
-		key: 31
-	},
-	{
-		指标项中文简称: '音频发送质量',
-		指标项英文简称: 'audioTx_meetingquality',
-		操作码: 'meeting[0].qualityIndicator',
-		单位: '_',
-		告警使能: '否',
-		key: 32
-	},
-	{
-		指标项中文简称: '音频接收质量',
-		指标项英文简称: 'audioRx_meetingquality',
-		操作码: 'meeting[1].qualityIndicator',
-		单位: '_',
-		告警使能: '否',
-		key: 33
-	},
-	{
-		指标项中文简称: '视频发送质量',
-		指标项英文简称: 'videoTx_meetingquality',
-		操作码: 'meeting[2].qualityIndicator',
-		单位: '_',
-		告警使能: '否',
-		key: 34
-	},
-	{
-		指标项中文简称: '视频接收质量',
-		指标项英文简称: 'videoRx_meetingquality',
-		操作码: 'meeting[3].qualityIndicator',
-		单位: '_',
-		告警使能: '否',
-		key: 35
-	}
-];
-
 $.modal.open = function(title, url, width, height) {
 	//如果是移动端，就使用自适应大小弹窗
 	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
@@ -414,14 +123,6 @@ class BasicInformation extends React.PureComponent {
 					message.error('接口错误');
 					return;
 				}
-				// const LISTDATA2 = [
-				// 	{
-				// 		value: '0.7686050876320942',
-				// 		label: '分类一',
-				// 		children: [
-				// 		]
-				// 	},
-				// ];
 				let cascader_data = (results.data && results.data.children) || [];
 				this.setState({
 					cascader_data
@@ -705,35 +406,33 @@ class EditableTable extends React.PureComponent {
 		this.columns = [
 			{
 				title: '指标项中文简称',
-				dataIndex: '指标项中文简称',
+				dataIndex: 'cnName',
 				width: '30%',
 				editable: true
 			},
 			{
 				title: '指标项英文简称',
 				width: '30%',
-				dataIndex: '指标项英文简称',
+				dataIndex: 'enName',
 				editable: true
 			},
 			{
 				title: '操作码',
-				dataIndex: '操作码',
+				dataIndex: 'operateKey',
 				width: '10%',
 				editable: true
 			},
 			{
 				title: '单位',
-				dataIndex: '单位',
+				dataIndex: 'unit',
 				width: '10%',
 				editable: true
 			},
 			{
 				title: '告警使能',
 				width: '10%',
-				dataIndex: '告警使能'
-				// render: (text, record) => {
-				// 	return <EditableTableRadio data={record} />;
-				// }
+				dataIndex: 'status'
+				// render: (text, record) => <EditableTableRadio data={record} />
 			},
 			{
 				title: '操作',
@@ -749,7 +448,7 @@ class EditableTable extends React.PureComponent {
 		];
 
 		this.state = {
-			dataSource: LISTDATA
+			dataSource: []
 		};
 	}
 
@@ -765,13 +464,13 @@ class EditableTable extends React.PureComponent {
 		let key = Math.random();
 		const newData = {
 			key,
-			指标项中文简称: '',
-			指标项英文简称: Math.random()
+			cn_name: '',
+			en_name: Math.random()
 				.toString()
 				.slice('10'),
-			操作码: '',
-			单位: '',
-			告警使能: '否'
+			operateKey: '',
+			unit: '',
+			status: '否'
 		};
 		this.setState({
 			dataSource: [newData, ...dataSource]
@@ -891,17 +590,19 @@ class EditableTable extends React.PureComponent {
 		// 以二进制方式打开文件
 		fileReader.readAsBinaryString(files[0]);
 	};
-	calibrationMethod = () => {
+	calibrationMethod = callback => {
 		let _d = document.querySelectorAll('.editable-table-box .has-error');
 		if (this.state.dataSource.length <= 0) {
 			message.error('未添加指标项', 0.5);
+			callback();
 			return;
 		}
 		if (_d.length != 0) {
 			message.error('添加指标项错误', 0.5);
+			callback();
 			return;
 		}
-		return this.state.dataSource;
+		callback(this.state.dataSource);
 	};
 	render() {
 		const { dataSource = [] } = this.state;
@@ -982,17 +683,39 @@ class AlarmConfiguration extends React.PureComponent {
 	state = {
 		data: []
 	};
+	init = driver_id => {
+		if (driver_id) {
+			$.ajax({
+				url: `/iot/driver/normal_list?driverid=${driver_id}`,
+				// data: {},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'GET',
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						return;
+					}
+					console.log(results.data);
+					this.setState({
+						data: results.data
+					});
+				}
+			});
+		}
+	};
 	componentDidMount() {
-		this.setState({
-			data: LISTDATA
-		});
+		// this.init('c0b9ef473e1342318379216296835f5d');
 	}
-	calibrationMethod = () => {
+
+	calibrationMethod = callback => {
 		if (this.state.data.length <= 0) {
 			message.error('未添加指标项', 0.5);
+			callback();
 			return;
 		}
-		return this.state.data;
+		callback(this.state.data);
 	};
 	render() {
 		let { show, title } = this.props;
@@ -1000,32 +723,32 @@ class AlarmConfiguration extends React.PureComponent {
 		let columns = [
 			{
 				title: '指标项中文简称',
-				dataIndex: '指标项中文简称',
+				dataIndex: 'cnName',
 				width: '30%',
 				editable: true
 			},
 			{
 				title: '指标项英文简称',
 				width: '30%',
-				dataIndex: '指标项英文简称',
+				dataIndex: 'enName',
 				editable: true
 			},
 			{
 				title: '操作码',
-				dataIndex: '操作码',
+				dataIndex: 'operateKey',
 				width: '10%',
 				editable: true
 			},
 			{
 				title: '单位',
-				dataIndex: '单位',
+				dataIndex: 'unit',
 				width: '10%',
 				editable: true
 			},
 			{
 				title: '告警使能',
 				width: '10%',
-				dataIndex: '告警使能',
+				dataIndex: 'status',
 				render: (text, record) => <EditableTableRadio data={record} />
 			},
 			{
@@ -1091,8 +814,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 1,
-			driver_id: '54a49fa28e7e408987eab49ad8634f3a'
+			current: 0,
+			driver_id: ''
 		};
 	}
 	next() {
@@ -1129,7 +852,7 @@ class AddBox extends React.PureComponent {
 					<div className="steps-content-body">
 						<BasicInformationForm onRef={el => (this.basicInformation = el)} title={steps[current].title} show={steps[current].title == '基本信息'} />
 						<Indicators onRef={el => (this.indicators = el)} title={steps[current].title} show={steps[current].title == '添加指标项'} />
-						{this.indicators && <AlarmConfiguration ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '告警配置'} />}
+						<AlarmConfiguration ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '告警配置'} />
 					</div>
 				</div>
 				<div className="steps-action">
@@ -1158,22 +881,20 @@ class AddBox extends React.PureComponent {
 												let _file = (data['驱动文件'] || [])[0] || {};
 												let _info = data['采集设备信息'] || [];
 												let file_response = _file.response || {};
-												let params = [
-													{
-														cnName: data['驱动名称'],
-														driverVer: data['版本号'],
-														enName: (file_response.data || {}).name,
-														kindCompany: _info[2],
-														kindKind: _info[0],
-														kindSubkind: _info[1],
-														kindType: _info[3],
-														path: (file_response.data || {}).url
-													}
-												];
+												let params = {
+													cnName: data['驱动名称'],
+													driverVer: data['版本号'],
+													enName: (file_response.data || {}).name,
+													kindCompany: _info[2],
+													kindKind: _info[0],
+													kindSubkind: _info[1],
+													kindType: _info[3],
+													path: (file_response.data || {}).url
+												};
 												$.ajax({
 													cache: true,
 													type: 'POST',
-													url: '/iot/driver/driver_insert_all',
+													url: '/iot/driver/driver_insert_one',
 													data: JSON.stringify({
 														data: params
 													}),
@@ -1184,13 +905,16 @@ class AddBox extends React.PureComponent {
 															message.error('接口错误');
 															return;
 														}
-														console.log('--data', data);
-														// this.setState({
-														// 	driver_id: '54a49fa28e7e408987eab49ad8634f3a'
-														// },()=>{
-														// 	this.next();
-														// })
-														this.next();
+														if (results.data) {
+															this.setState(
+																{
+																	driver_id: results.data.id
+																},
+																() => {
+																	this.next();
+																}
+															);
+														}
 													}
 												});
 											}
@@ -1198,14 +922,43 @@ class AddBox extends React.PureComponent {
 									}
 								} else if (steps[current].title == '添加指标项') {
 									// this.next();
-									let id = this.state.driver_id;
-									console.log('id---', id);
+									let driverid = this.state.driver_id;
 									if (this.indicators) {
-										let data = this.indicators.calibrationMethod();
-										if (data) {
-											console.log(data);
-											// this.next();
-										}
+										this.indicators.calibrationMethod(data => {
+											if (data) {
+												$.ajax({
+													cache: true,
+													type: 'POST',
+													url: '/iot/driver/normal_insert_all',
+													data: JSON.stringify({
+														driverid,
+														data
+													}),
+													dataType: 'json',
+													async: false,
+													success: results => {
+														if (results.code != 0) {
+															message.error('接口错误');
+															return;
+														}
+														if (this.alarmConfiguration) {
+															this.alarmConfiguration.init(driverid);
+															this.next();
+														}
+														// if (results.data) {
+														// 	this.setState(
+														// 		{
+														// 			driver_id: results.data.id
+														// 		},
+														// 		() => {
+														// 			this.next();
+														// 		}
+														// 	);
+														// }
+													}
+												});
+											}
+										});
 									}
 								}
 							}}
@@ -1220,10 +973,12 @@ class AddBox extends React.PureComponent {
 							onClick={() => {
 								message.success('操作完成', 0.5);
 								if (this.alarmConfiguration) {
-									let data = this.alarmConfiguration.calibrationMethod();
-									if (data) {
-										iframeClose();
-									}
+									this.alarmConfiguration.calibrationMethod(data => {
+										if (data) {
+											console.log('-----data', data);
+											// iframeClose();
+										}
+									});
 								}
 							}}
 						>
