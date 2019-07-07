@@ -67,6 +67,7 @@ public class Normal extends I18NModel {
     @GraphQLQuery(name = "order_num", description = "顺序")
     private int  orderNum ;
 
+    private int key ;
 
 
 }
