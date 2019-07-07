@@ -8,7 +8,7 @@ import org.nutz.dao.entity.annotation.*;
 import java.util.List;
 
 @Data
-@Table("t_iot_normals")
+@Table("t_iot_grades")
 public class Grade extends I18NModel {
 
 
