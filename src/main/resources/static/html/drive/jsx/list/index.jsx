@@ -110,7 +110,7 @@ class ListBox extends React.PureComponent {
 				dataIndex: 'kindType'
 			},
 			{
-				title: 'updateTime',
+				title: '更新时间',
 				dataIndex: 'updateTime'
 			},
 			{
