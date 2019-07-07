@@ -44,7 +44,7 @@ public class GatewayService extends Service<Gateway> {
 	public int updateGateway(Gateway gateway) {
 		gateway.setUpdateBy(ShiroUtils.getSysUserId());
 		gateway.setUpdateTime(new Date());
-		Dao forup = Daos.ext(this.dao(), FieldFilter.create(gateway.getClass(),null,"^create_by|create_time$", true));
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
 		return forup.update(gateway);
 	}
 

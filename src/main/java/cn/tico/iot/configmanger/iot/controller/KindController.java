@@ -230,14 +230,7 @@ public class KindController  implements AdminKey {
         return tree;
     }
 
-    @At
-    @POST
-    @Ok("json")
-    public boolean checkKindNameUnique(@Param("id") String id,
-                                       @Param("parentId") String parentId,
-                                       @Param("name") String menuName) {
-        return kindService.checkDeptNameUnique(id, parentId, menuName);
-    }
+
 
     @At
     @Ok("json")
