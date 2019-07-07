@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @Table("t_iot_normals")
-public class Normal extends I18NModel {
+public class Normal extends I18NModel implements  Comparable<Normal>{
 
 
     /**
@@ -70,4 +70,8 @@ public class Normal extends I18NModel {
     private int key ;
 
 
+    @Override
+    public int compareTo(Normal o) {
+        return this.orderNum-o.orderNum;
+    }
 }
