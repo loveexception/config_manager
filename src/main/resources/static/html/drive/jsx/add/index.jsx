@@ -440,7 +440,7 @@ class EditableTable extends React.PureComponent {
 				dataIndex: 'operation',
 				render: (text, record) =>
 					this.state.dataSource.length >= 1 ? (
-						<Popconfirm cancelText="取消" okText="确定" title="确定删除?" onConfirm={() => this.handleDelete(record.key)}>
+						<Popconfirm cancelText="取消" okText="确定" title="确定删除?" onConfirm={() => this.handleDelete(record)}>
 							<Button className="btn-2">删除</Button>
 						</Popconfirm>
 					) : null
@@ -452,11 +452,38 @@ class EditableTable extends React.PureComponent {
 		};
 	}
 
-	handleDelete = key => {
+	init = (dataSource = []) => {
+		console.log('更新-----', dataSource);
+		this.setState({ dataSource });
+	};
+	handleDelete = record => {
 		const dataSource = [...this.state.dataSource];
-		this.setState({
-			dataSource: dataSource.filter(item => item.key !== key)
-		});
+		if (record.id) {
+			$.ajax({
+				cache: true,
+				type: 'POST',
+				url: '/iot/driver/normal_remove',
+				data: JSON.stringify({
+					data: [record.id]
+				}),
+				dataType: 'json',
+				async: false,
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						return;
+					}
+					message.error('删除成功');
+				}
+			});
+			this.setState({
+				dataSource: dataSource.filter(item => item.id !== record.id)
+			});
+		} else {
+			this.setState({
+				dataSource: dataSource.filter(item => item.key !== record.key)
+			});
+		}
 	};
 
 	handleAdd = () => {
@@ -464,10 +491,8 @@ class EditableTable extends React.PureComponent {
 		let key = Math.random();
 		const newData = {
 			key,
-			cn_name: '',
-			en_name: Math.random()
-				.toString()
-				.slice('10'),
+			cnName: '',
+			enName: key.toString().slice('10'),
 			operateKey: '',
 			unit: '',
 			status: '否'
@@ -591,6 +616,7 @@ class EditableTable extends React.PureComponent {
 		fileReader.readAsBinaryString(files[0]);
 	};
 	calibrationMethod = callback => {
+		console.log('获取-----', this.state.dataSource);
 		let _d = document.querySelectorAll('.editable-table-box .has-error');
 		if (this.state.dataSource.length <= 0) {
 			message.error('未添加指标项', 0.5);
@@ -665,6 +691,7 @@ class EditableTable extends React.PureComponent {
 					</div>
 				</div>
 				<Table
+					// rowKey={(record, index) => index}
 					components={components}
 					rowClassName={() => 'editable-row'}
 					bordered
@@ -814,10 +841,30 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 0,
-			driver_id: ''
+			current: 1,
+			driver_id: 'b56cd5ad993748159068c8d59621c476'
 		};
 	}
+	indicatorsListInit = (driver_id, cb) => {
+		if (driver_id) {
+			$.ajax({
+				url: `/iot/driver/normal_list?driverid=${driver_id}`,
+				// data: {},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'GET',
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						cb();
+						return;
+					}
+					cb(results.data);
+				}
+			});
+		}
+	};
 	next() {
 		const current = this.state.current + 1;
 		this.setState({ current });
@@ -876,12 +923,14 @@ class AddBox extends React.PureComponent {
 								if (steps[current].title == '基本信息') {
 									// this.next();
 									if (this.basicInformation) {
+										let driverid = this.state.driver_id;
 										this.basicInformation.calibrationMethod(data => {
 											if (data) {
 												let _file = (data['驱动文件'] || [])[0] || {};
 												let _info = data['采集设备信息'] || [];
 												let file_response = _file.response || {};
 												let params = {
+													id: driverid,
 													cnName: data['驱动名称'],
 													driverVer: data['版本号'],
 													enName: (file_response.data || {}).name,
@@ -894,7 +943,7 @@ class AddBox extends React.PureComponent {
 												$.ajax({
 													cache: true,
 													type: 'POST',
-													url: '/iot/driver/driver_insert_one',
+													url: '/iot/driver/driver_insert_update',
 													data: JSON.stringify({
 														data: params
 													}),
@@ -922,41 +971,65 @@ class AddBox extends React.PureComponent {
 									}
 								} else if (steps[current].title == '添加指标项') {
 									// this.next();
-									let driverid = this.state.driver_id;
 									if (this.indicators) {
+										let driverid = this.state.driver_id;
+
+										// normal_update_all
 										this.indicators.calibrationMethod(data => {
 											if (data) {
-												$.ajax({
-													cache: true,
-													type: 'POST',
-													url: '/iot/driver/normal_insert_all',
-													data: JSON.stringify({
-														driverid,
-														data
-													}),
-													dataType: 'json',
-													async: false,
-													success: results => {
-														if (results.code != 0) {
-															message.error('接口错误');
-															return;
+												let data_id_list = data.filter(item => item.id);
+												let data_notid_list = data.filter(item => !item.id);
+												console.log('---pp---ppp--', data_id_list, data_notid_list);
+												// this.indicators.init([{ driverid: 'b56cd5ad993748159068c8d59621c476', operateKey: '', unit: '', orderNum: 0, key: 0, cnName: '11111', enName: '65192767', id: '23dc3e03fc6d46bf827000e6630b35b9', status: '否', delFlag: 'false', createBy: '', createTime: '2019-07-07 12:10:45', updateBy: '', updateTime: '2019-07-07 12:10:45' }]);
+												if (data_id_list.length > 0) {
+													console.log('更新指标项');
+													$.ajax({
+														cache: true,
+														type: 'POST',
+														url: '/iot/driver/normal_change',
+														data: JSON.stringify({
+															driverid,
+															insert: data_notid_list,
+															update: data_id_list
+														}),
+														dataType: 'json',
+														async: false,
+														success: results => {
+															if (results.code != 0) {
+																message.error('接口错误');
+																return;
+															}
+															this.indicators.init(results.data);
+															if (this.alarmConfiguration) {
+																this.alarmConfiguration.init(driverid);
+																this.next();
+															}
 														}
-														if (this.alarmConfiguration) {
-															this.alarmConfiguration.init(driverid);
-															this.next();
+													});
+												} else {
+													$.ajax({
+														cache: true,
+														type: 'POST',
+														url: '/iot/driver/normal_insert_all',
+														data: JSON.stringify({
+															driverid,
+															data
+														}),
+														dataType: 'json',
+														async: false,
+														success: results => {
+															if (results.code != 0) {
+																message.error('接口错误');
+																return;
+															}
+															this.indicators.init(results.data);
+															if (this.alarmConfiguration) {
+																this.alarmConfiguration.init(driverid);
+																this.next();
+															}
 														}
-														// if (results.data) {
-														// 	this.setState(
-														// 		{
-														// 			driver_id: results.data.id
-														// 		},
-														// 		() => {
-														// 			this.next();
-														// 		}
-														// 	);
-														// }
-													}
-												});
+													});
+												}
 											}
 										});
 									}
