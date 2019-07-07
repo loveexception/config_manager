@@ -211,6 +211,7 @@ public class DriverController implements AdminKey {
 	 */
 	@At("/normal_remove")
 	@Ok("json")
+	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object removeNormal(@Param("data")String[] ids, HttpServletRequest req) {
 		try {
