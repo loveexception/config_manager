@@ -111,7 +111,7 @@ public class DriverController implements AdminKey {
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object addNormalupdate(@Param("data") Driver driver, HttpServletRequest req) {
+	public Object addDriverupdate(@Param("data") Driver driver, HttpServletRequest req) {
 		try {
 			Object obj = driverService.insertNormal(driver);
 			return Result.success("system.success",obj);
@@ -168,7 +168,7 @@ public class DriverController implements AdminKey {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("driver_id","=",normal.getDriverid());
-			cnd.orderBy("order_num","asc");
+			cnd.orderBy("order_num","desc");
 			Object obj = normalService.query(cnd);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
@@ -349,8 +349,8 @@ public class DriverController implements AdminKey {
     @AdaptBy(type = JsonAdaptor.class)
     public Object removeRule(@Param("data")String[] ids, HttpServletRequest req) {
         try {
-            int  i = rulerService.vDelete(ids);
-            return Result.success("system.success",i);
+            rulerService.delete(ids);
+            return Result.success("system.success",ids);
         } catch (Exception e) {
             return Result.error("system.error");
         }
