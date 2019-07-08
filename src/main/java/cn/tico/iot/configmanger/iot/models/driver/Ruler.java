@@ -70,7 +70,6 @@ public class Ruler extends I18NModel {
     @Comment("排序")
     @ColDefine(type = ColType.VARCHAR, width = 255)
     @GraphQLQuery(name = "order_num", description = "排序")
-
     private String  orderNum ;
 
 

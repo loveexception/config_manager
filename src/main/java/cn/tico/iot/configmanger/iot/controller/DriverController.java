@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.UpLoadUtil;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
+import cn.tico.iot.configmanger.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.iot.services.DriverService;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.iot.services.GradeService;
@@ -111,7 +112,7 @@ public class DriverController implements AdminKey {
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object addNormalupdate(@Param("data") Driver driver, HttpServletRequest req) {
+	public Object addDriverupdate(@Param("data") Driver driver, HttpServletRequest req) {
 		try {
 			Object obj = driverService.insertNormal(driver);
 			return Result.success("system.success",obj);
@@ -306,7 +307,7 @@ public class DriverController implements AdminKey {
 			cnd.and("grade","=",grade.getGrade());
 		}
 
-		obj =  gradeService.query(cnd);
+		obj =  gradeService._query(cnd,null,"^rulers$");
 		return  Result.success("system.success",   obj );
 
 	}
@@ -314,7 +315,7 @@ public class DriverController implements AdminKey {
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object gradeAdd(@Param("..") Grade grade, HttpServletRequest req) {
+	public Object gradeAdd(@Param("data") Grade grade, HttpServletRequest req) {
 
 		try {
 			Object obj =  gradeService.insert(grade);
@@ -324,18 +325,32 @@ public class DriverController implements AdminKey {
 		}
 
 	}
+    @At("/ruler_add")
+    @POST
+    @AdaptBy(type = JsonAdaptor.class)
+    @Ok("json")
+    public Object rulerAdd(@Param("data") Ruler ruler, HttpServletRequest req) {
 
+        try {
+            Object obj =  rulerService.insert(ruler);
+            return Result.success("system.success",obj);
+        } catch (Exception e) {
+            return Result.error("system.error");
+        }
+
+    }
 
 	/**
 	 * 删除业务
 	 */
 	@At("/grade_remove")
 	@Ok("json")
+    @POST
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object removeGrade(@Param("data")String[] ids, HttpServletRequest req) {
 		try {
-			int  i = gradeService.vDelete(ids);
-			return Result.success("system.success",i);
+			gradeService.deleteGrade(ids);
+			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -346,15 +361,17 @@ public class DriverController implements AdminKey {
      */
     @At("/ruler_remove")
     @Ok("json")
+    @POST
     @AdaptBy(type = JsonAdaptor.class)
     public Object removeRule(@Param("data")String[] ids, HttpServletRequest req) {
         try {
-            int  i = rulerService.vDelete(ids);
-            return Result.success("system.success",i);
+            rulerService.delete(ids);
+            return Result.success("system.success",ids);
         } catch (Exception e) {
             return Result.error("system.error");
         }
     }
+
 
 
 }
