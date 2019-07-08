@@ -65,7 +65,7 @@ class ListBox extends React.PureComponent {
 			type: 'GET',
 			success: results => {
 				if (results.code != 0) {
-					message.error('接口错误');
+					message.error('接口错误', 0.5);
 					this.setState({ loading: false });
 					return;
 				}
@@ -141,10 +141,10 @@ class ListBox extends React.PureComponent {
 										async: false,
 										success: results => {
 											if (results.code != 0) {
-												message.error('接口错误');
+												message.error('接口错误', 0.5);
 												return;
 											}
-											message.info(results.msg);
+											// message.info('删除成功', 0.5);
 											this.init();
 										}
 									});

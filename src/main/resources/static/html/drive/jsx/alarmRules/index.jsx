@@ -12,9 +12,23 @@ function submitHandler() {
 let { Button, Input, Tabs, Collapse, Icon, Select } = antd;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
-
+// 获取search解析为对象导出
+function urlArgs() {
+	let args = {};
+	let query = location.search.substring(1);
+	let pairs = query.split('&');
+	for (let i = 0; i < pairs.length; i++) {
+		let pos = pairs[i].indexOf('=');
+		if (pos == -1) continue;
+		let name = pairs[i].substring(0, pos);
+		let value = pairs[i].substring(pos + 1);
+		value = decodeURIComponent(value);
+		args[name] = value;
+	}
+	return args;
+}
 class RulesCardContentBottom extends React.PureComponent {
-	state = { data: [] };
+	state = { data: [], select_list: [] };
 	addContentLi = () => {
 		this.setState({
 			data: [
@@ -35,15 +49,41 @@ class RulesCardContentBottom extends React.PureComponent {
 		});
 	};
 	componentDidMount() {
+		this.selectListData();
 		let { data = [] } = this.props;
+		console.log('---', data);
 		this.setState({
 			data
 		});
 	}
+	selectListData = () => {
+		let { driver_id } = urlArgs();
+		if (driver_id) {
+			$.ajax({
+				url: `/iot/driver/normal_list?driverid=${driver_id}`,
+				// data: {},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'GET',
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误', 0.5);
+						return;
+					}
+					this.setState({
+						select_list: results.data
+					});
+				}
+			});
+		}
+	};
 	render() {
-		let { _list_data = {} } = parent;
+		let { _list_data = {} } = this.props;
 		let { list = [], record = {} } = _list_data;
-		let { data = [] } = this.state;
+		let { data = [], select_list = [] } = this.state;
+		let { driver_id, id } = urlArgs();
+		console.log('---pp---', driver_id, id);
 		return data.map((item, index) => {
 			return (
 				<div key={item.key}>
@@ -53,21 +93,16 @@ class RulesCardContentBottom extends React.PureComponent {
 						</div>
 						<Select
 							className="select-box"
-							defaultValue={
-								index == 0 ? record['指标项英文简称'] : ''
-							}
+							defaultValue={index == 0 ? record['enName'] : ''}
 							disabled={index == 0}
 							style={{ width: 150 }}
 							// onChange={handleChange}
 							// placeholder="请选择分类"
 						>
-							{list.map((item, index) => {
+							{select_list.map((item, index) => {
 								return (
-									<Select.Option
-										key={item.key}
-										value={item['指标项英文简称']}
-									>
-										{item['指标项中文简称']}
+									<Select.Option key={index} value={item['enName']}>
+										{item['cnName']}
 									</Select.Option>
 								);
 							})}
@@ -121,11 +156,7 @@ class RulesCardContent extends React.PureComponent {
 				<div className="rules-card-content-body">
 					<div className="content-top">
 						<label htmlFor="tips">提示内容：</label>
-						<Input
-							id="tips"
-							placeholder="请输入提示内容"
-							defaultValue={data.content}
-						/>
+						<Input id="tips" placeholder="请输入提示内容" defaultValue={data.content} />
 					</div>
 					<div className="content-bottom">
 						<RulesCardContentBottom data={li_data} />
@@ -185,15 +216,7 @@ class RulesCard extends React.PureComponent {
 		let { data = [] } = this.state;
 		return (
 			<div className="drive-alarm-rules-card-box">
-				<Collapse
-					className="card-collapse"
-					accordion
-					bordered={false}
-					defaultActiveKey={[data[0].key]}
-					expandIcon={({ isActive }) => (
-						<Icon type="caret-right" rotate={isActive ? 90 : 0} />
-					)}
-				>
+				<Collapse className="card-collapse" accordion bordered={false} defaultActiveKey={[data[0].key]} expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}>
 					{data.map((item, index) => {
 						return (
 							<Panel
@@ -201,9 +224,7 @@ class RulesCard extends React.PureComponent {
 								className="panel-li"
 								header={
 									<div className="panel-li-tips">
-										<span className="tip">
-											{index == 0 ? '开始' : '或'}
-										</span>
+										<span className="tip">{index == 0 ? '开始' : '或'}</span>
 										{index == data.length - 1 && (
 											<span
 												className="add-btn"
@@ -270,11 +291,7 @@ class AlarmRulesBox extends React.PureComponent {
 				>
 					{tabs_data.map((item, index) => {
 						return (
-							<TabPane
-								className="device-tabs-pane"
-								tab={item.title}
-								key={index}
-							>
+							<TabPane className="device-tabs-pane" tab={item.title} key={index}>
 								<RulesCard />
 							</TabPane>
 						);

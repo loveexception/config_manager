@@ -120,7 +120,7 @@ class BasicInformation extends React.PureComponent {
 			type: 'GET',
 			success: results => {
 				if (results.code != 0) {
-					message.error('接口错误');
+					message.error('接口错误', 0.5);
 					return;
 				}
 				let cascader_data = (results.data && results.data.children) || [];
@@ -131,7 +131,6 @@ class BasicInformation extends React.PureComponent {
 		});
 	}
 	normFile = e => {
-		console.log('读取文件开始...');
 		let fileList = [...e.fileList];
 		// Only to show two recent uploaded files, and old ones will be replaced by the new
 		fileList = fileList.slice(-1);
@@ -344,8 +343,8 @@ class EditableCell extends React.PureComponent {
 									}
 							  }
 							: {
-									required: true,
-									message: `${title} 不能为空.`
+									// required: true,
+									// message: `${title} 不能为空.`
 							  }
 					],
 					initialValue: record[dataIndex]
@@ -365,12 +364,12 @@ class EditableCell extends React.PureComponent {
 }
 class EditableTableRadio extends React.PureComponent {
 	state = {
-		value: '否'
+		value: 'false'
 	};
 	componentWillMount() {
 		let { data = {} } = this.props;
 		this.setState({
-			value: data['告警使能']
+			value: data['status']
 		});
 	}
 	render() {
@@ -378,14 +377,30 @@ class EditableTableRadio extends React.PureComponent {
 		return (
 			<Radio.Group
 				onChange={e => {
-					this.setState(
-						{
-							value: e.target.value
-						},
-						() => {
-							data['告警使能'] = e.target.value;
+					data['status'] = e.target.value;
+					$.ajax({
+						cache: true,
+						type: 'POST',
+						url: '/iot/driver/normal_update_all',
+						data: JSON.stringify({
+							data: [
+								{
+									...data
+								}
+							]
+						}),
+						dataType: 'json',
+						async: false,
+						success: results => {
+							if (results.code != 0) {
+								message.error('接口错误', 0.5);
+								return;
+							}
+							this.setState({
+								value: e.target.value
+							});
 						}
-					);
+					});
 				}}
 				// defaultValue={data['告警使能']}
 				value={this.state.value}
@@ -393,8 +408,8 @@ class EditableTableRadio extends React.PureComponent {
 					display: 'flex'
 				}}
 			>
-				<Radio value={'是'}>是</Radio>
-				<Radio value={'否'}>否</Radio>
+				<Radio value={'true'}>是</Radio>
+				<Radio value={'false'}>否</Radio>
 			</Radio.Group>
 		);
 	}
@@ -431,8 +446,8 @@ class EditableTable extends React.PureComponent {
 			{
 				title: '告警使能',
 				width: '10%',
-				dataIndex: 'status'
-				// render: (text, record) => <EditableTableRadio data={record} />
+				dataIndex: 'status',
+				render: (text, record) => (text == 'true' ? '是' : '否')
 			},
 			{
 				title: '操作',
@@ -453,7 +468,6 @@ class EditableTable extends React.PureComponent {
 	}
 
 	init = (dataSource = []) => {
-		console.log('更新-----', dataSource);
 		this.setState({ dataSource });
 	};
 	handleDelete = record => {
@@ -470,10 +484,10 @@ class EditableTable extends React.PureComponent {
 				async: false,
 				success: results => {
 					if (results.code != 0) {
-						message.error('接口错误');
+						message.error('接口错误', 0.5);
 						return;
 					}
-					message.error('删除成功');
+					// message.error('删除成功',0.5);
 				}
 			});
 			this.setState({
@@ -488,14 +502,14 @@ class EditableTable extends React.PureComponent {
 
 	handleAdd = () => {
 		const { dataSource } = this.state;
-		let key = Math.random();
+		let key = new Date().getTime();
 		const newData = {
 			key,
 			cnName: '',
-			enName: key.toString().slice('10'),
+			enName: key,
 			operateKey: '',
 			unit: '',
-			status: '否'
+			status: 'false'
 		};
 		this.setState({
 			dataSource: [newData, ...dataSource]
@@ -504,7 +518,10 @@ class EditableTable extends React.PureComponent {
 
 	handleSave = row => {
 		const newData = [...this.state.dataSource];
-		const index = newData.findIndex(item => row.key === item.key);
+		let index = newData.findIndex(item => row.key === item.key);
+		if (row.id) {
+			index = newData.findIndex(item => row.id === item.id);
+		}
 		const item = newData[index];
 		newData.splice(index, 1, {
 			...item,
@@ -616,7 +633,6 @@ class EditableTable extends React.PureComponent {
 		fileReader.readAsBinaryString(files[0]);
 	};
 	calibrationMethod = callback => {
-		console.log('获取-----', this.state.dataSource);
 		let _d = document.querySelectorAll('.editable-table-box .has-error');
 		if (this.state.dataSource.length <= 0) {
 			message.error('未添加指标项', 0.5);
@@ -632,7 +648,6 @@ class EditableTable extends React.PureComponent {
 	};
 	render() {
 		const { dataSource = [] } = this.state;
-		// console.log('--------', dataSource);
 		const components = {
 			body: {
 				row: EditableFormRow,
@@ -721,10 +736,9 @@ class AlarmConfiguration extends React.PureComponent {
 				type: 'GET',
 				success: results => {
 					if (results.code != 0) {
-						message.error('接口错误');
+						message.error('接口错误', 0.5);
 						return;
 					}
-					console.log(results.data);
 					this.setState({
 						data: results.data
 					});
@@ -733,7 +747,7 @@ class AlarmConfiguration extends React.PureComponent {
 		}
 	};
 	componentDidMount() {
-		// this.init('c0b9ef473e1342318379216296835f5d');
+		this.init('b56cd5ad993748159068c8d59621c476');
 	}
 
 	calibrationMethod = callback => {
@@ -745,7 +759,7 @@ class AlarmConfiguration extends React.PureComponent {
 		callback(this.state.data);
 	};
 	render() {
-		let { show, title } = this.props;
+		let { show, title, driver_id } = this.props;
 		let { data = [] } = this.state;
 		let columns = [
 			{
@@ -787,11 +801,7 @@ class AlarmConfiguration extends React.PureComponent {
 						<Button
 							className="btn-2"
 							onClick={() => {
-								_list_data = {
-									record: record,
-									list: data
-								};
-								$.modal.open('告警规则设置', '/html/drive/alarmRules.html');
+								$.modal.open('告警规则设置', `/html/drive/alarmRules.html?driver_id=${driver_id}&id=${record.id}`);
 							}}
 						>
 							告警配置
@@ -841,30 +851,11 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 1,
+			current: 2,
 			driver_id: 'b56cd5ad993748159068c8d59621c476'
 		};
 	}
-	indicatorsListInit = (driver_id, cb) => {
-		if (driver_id) {
-			$.ajax({
-				url: `/iot/driver/normal_list?driverid=${driver_id}`,
-				// data: {},
-				cache: false,
-				contentType: false,
-				processData: false,
-				type: 'GET',
-				success: results => {
-					if (results.code != 0) {
-						message.error('接口错误');
-						cb();
-						return;
-					}
-					cb(results.data);
-				}
-			});
-		}
-	};
+
 	next() {
 		const current = this.state.current + 1;
 		this.setState({ current });
@@ -899,7 +890,7 @@ class AddBox extends React.PureComponent {
 					<div className="steps-content-body">
 						<BasicInformationForm onRef={el => (this.basicInformation = el)} title={steps[current].title} show={steps[current].title == '基本信息'} />
 						<Indicators onRef={el => (this.indicators = el)} title={steps[current].title} show={steps[current].title == '添加指标项'} />
-						<AlarmConfiguration ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '告警配置'} />
+						<AlarmConfiguration driver_id={this.state.driver_id} ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '告警配置'} />
 					</div>
 				</div>
 				<div className="steps-action">
@@ -910,7 +901,31 @@ class AddBox extends React.PureComponent {
 								height: 40,
 								marginRight: 20
 							}}
-							onClick={() => this.prev()}
+							onClick={() => {
+								if (steps[current].title == '告警配置') {
+									let driver_id = this.state.driver_id;
+									if (driver_id) {
+										$.ajax({
+											url: `/iot/driver/normal_list?driverid=${driver_id}`,
+											// data: {},
+											cache: false,
+											contentType: false,
+											processData: false,
+											type: 'GET',
+											success: results => {
+												if (results.code != 0) {
+													message.error('接口错误', 0.5);
+													return;
+												}
+												this.indicators.init(results.data);
+												this.prev();
+											}
+										});
+									}
+								} else {
+									this.prev();
+								}
+							}}
 						>
 							上一步
 						</Button>
@@ -951,7 +966,7 @@ class AddBox extends React.PureComponent {
 													async: false,
 													success: results => {
 														if (results.code != 0) {
-															message.error('接口错误');
+															message.error('接口错误', 0.5);
 															return;
 														}
 														if (results.data) {
@@ -979,10 +994,7 @@ class AddBox extends React.PureComponent {
 											if (data) {
 												let data_id_list = data.filter(item => item.id);
 												let data_notid_list = data.filter(item => !item.id);
-												console.log('---pp---ppp--', data_id_list, data_notid_list);
-												// this.indicators.init([{ driverid: 'b56cd5ad993748159068c8d59621c476', operateKey: '', unit: '', orderNum: 0, key: 0, cnName: '11111', enName: '65192767', id: '23dc3e03fc6d46bf827000e6630b35b9', status: '否', delFlag: 'false', createBy: '', createTime: '2019-07-07 12:10:45', updateBy: '', updateTime: '2019-07-07 12:10:45' }]);
 												if (data_id_list.length > 0) {
-													console.log('更新指标项');
 													$.ajax({
 														cache: true,
 														type: 'POST',
@@ -996,7 +1008,7 @@ class AddBox extends React.PureComponent {
 														async: false,
 														success: results => {
 															if (results.code != 0) {
-																message.error('接口错误');
+																message.error('接口错误', 0.5);
 																return;
 															}
 															this.indicators.init(results.data);
@@ -1019,7 +1031,7 @@ class AddBox extends React.PureComponent {
 														async: false,
 														success: results => {
 															if (results.code != 0) {
-																message.error('接口错误');
+																message.error('接口错误', 0.5);
 																return;
 															}
 															this.indicators.init(results.data);
@@ -1048,7 +1060,6 @@ class AddBox extends React.PureComponent {
 								if (this.alarmConfiguration) {
 									this.alarmConfiguration.calibrationMethod(data => {
 										if (data) {
-											console.log('-----data', data);
 											// iframeClose();
 										}
 									});
