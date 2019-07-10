@@ -385,6 +385,7 @@ public class DriverController implements AdminKey {
             int i = rulerService.delete(ids);
             return Result.success("system.success",i);
         } catch (Exception e) {
+        	e.printStackTrace();
             return Result.error("system.error");
         }
     }
