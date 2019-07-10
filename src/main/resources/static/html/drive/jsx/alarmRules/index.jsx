@@ -262,6 +262,35 @@ class DynamicFieldSet extends React.Component {
 			});
 		}
 	};
+	deleteRules = id => {
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: '/iot/driver/ruler_remove',
+			data: JSON.stringify({
+				data: id
+			}),
+			dataType: 'json',
+			async: false,
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误');
+					return;
+				}
+				console.log('results', results);
+				// if (results.data) {
+				// 	this.setState(
+				// 		{
+				// 			driver_id: results.data.id
+				// 		},
+				// 		() => {
+				// 			this.next();
+				// 		}
+				// 	);
+				// }
+			}
+		});
+	};
 	render() {
 		const { getFieldDecorator, getFieldValue, getFieldError } = this.props.form;
 		const formItemLayout = {
@@ -374,7 +403,8 @@ class DynamicFieldSet extends React.Component {
 														className="close-btn"
 														type="close-circle"
 														onClick={e => {
-															console.log('删除');
+															console.log('删除', item.id);
+															this.deleteRules(item.id);
 															// this.removeContentLi(index);
 														}}
 													/>
@@ -393,7 +423,7 @@ class DynamicFieldSet extends React.Component {
 															}}
 														>
 															{getFieldDecorator(`rules[${j}].enName`, {
-																initialValue: j == 0 ? selectNorma['id'] : undefined,
+																initialValue: item.normalid,
 																validateTrigger: ['onChange', 'onBlur'],
 																rules: [
 																	{
@@ -478,6 +508,7 @@ class DynamicFieldSet extends React.Component {
 												<span
 													className="add-btn"
 													onClick={e => {
+														console.log('---');
 														rulers.push({
 															symble: '=',
 															enName: undefined,
