@@ -24,11 +24,14 @@ public class Ruler extends I18NModel {
     /**
      * 操作码
      */
-    @Column("operate_key")
-    @Comment("操作码")
-    @ColDefine(type = ColType.VARCHAR, width = 255)
-    @GraphQLQuery(name = "operate_key", description = "驱动")
-    private String  operateKey ;
+    @Column("normalid")
+    @Comment("列名")
+    @ColDefine(type = ColType.VARCHAR, width = 64)
+    @GraphQLQuery(name = "normalid", description = "列名")
+    private String  normalid ;
+
+    @One(field = "normalid",key="id")
+    private Normal normal;
 
 
     /**
