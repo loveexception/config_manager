@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.iot.models.device;
 
 
 import cn.tico.iot.configmanger.iot.bean.I18NModel;
+import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
@@ -12,14 +13,14 @@ public class PersonRuler extends I18NModel {
     /**
      * sno
      */
-    @Column("person_id")
+    @Column("grade_id")
     @Comment("设备个性化")
     @ColDefine(type = ColType.VARCHAR, width = 255)
-    @GraphQLQuery(name = "person_id", description = "设备个性化")
-    private String  personid ;
+    @GraphQLQuery(name = "grade_id", description = "设备个性化")
+    private String  gradeid ;
 
-    @One(field = "personid",key="id")
-    private Personal personal;
+    @One(field = "gradeid",key="id")
+    private Grade grade;
 
 
     /**

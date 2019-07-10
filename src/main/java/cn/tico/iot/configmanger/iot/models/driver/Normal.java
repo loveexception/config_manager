@@ -1,8 +1,8 @@
 package cn.tico.iot.configmanger.iot.models.driver;
 
 
-import cn.tico.iot.configmanger.iot.models.device.Personal;
 import cn.tico.iot.configmanger.iot.bean.I18NModel;
+import cn.tico.iot.configmanger.iot.models.device.Person;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
@@ -58,7 +58,7 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
 
 
     @Many(field = "normalid")
-    private List<Personal> personals;
+    private List<Person> personals;
 
 
     @Column("order_num")

@@ -29,7 +29,7 @@ public class Grade extends I18NModel {
      * 级别
      */
     @Column("grade")
-    @Comment("级别")
+    @Comment("级别;")
     @ColDefine(type = ColType.VARCHAR, width = 255)
     @GraphQLQuery(name = "grade", description = "级别")
     private String  grade ;

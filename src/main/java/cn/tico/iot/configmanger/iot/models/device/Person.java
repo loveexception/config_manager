@@ -9,9 +9,9 @@ import org.nutz.dao.entity.annotation.*;
 import java.util.List;
 
 @Data
-@Table("t_iot_personals")
+@Table("t_iot_persons")
 @Comment("设备个性化")
-public class Personal extends I18NModel {
+public class Person extends I18NModel {
 
     /**
      * 属性
@@ -47,17 +47,10 @@ public class Personal extends I18NModel {
     @One(field = "deviceid",key = "id")
     private Device device;
 
-    /**
-     * grade
-     */
-    @Column("grade")
-    @Comment("等级")
-    @ColDefine(type = ColType.VARCHAR, width = 255)
-    @GraphQLQuery(name = "grade", description = "等级")
-    private String  grade ;
 
 
-    private List<PersonRuler> personRulers;
+    @Many(field = "personid",key = "id")
+    private List<PersonGrade> personGrades;
 
 
 
