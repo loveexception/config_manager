@@ -49,7 +49,7 @@ let { Steps, Button, message, Input, Descriptions, Upload, Icon, Cascader, Table
 const { Step } = Steps;
 const { confirm } = Modal;
 
-var _list_data = {};
+// var _list_data = {};
 
 function submitHandler() {
 	console.log('--点击确定--');
@@ -370,7 +370,7 @@ class EditableTableRadio extends React.PureComponent {
 	componentWillMount() {
 		let { data = {} } = this.props;
 		this.setState({
-			value: data['告警使能']
+			value: data['status']
 		});
 	}
 	render() {
@@ -383,7 +383,7 @@ class EditableTableRadio extends React.PureComponent {
 							value: e.target.value
 						},
 						() => {
-							data['告警使能'] = e.target.value;
+							data['status'] = e.target.value;
 						}
 					);
 				}}
@@ -724,7 +724,6 @@ class AlarmConfiguration extends React.PureComponent {
 						message.error('接口错误');
 						return;
 					}
-					console.log(results.data);
 					this.setState({
 						data: results.data
 					});
@@ -733,7 +732,7 @@ class AlarmConfiguration extends React.PureComponent {
 		}
 	};
 	componentDidMount() {
-		// this.init('c0b9ef473e1342318379216296835f5d');
+		this.init('e605c13926904b2a8cc040584baff157');
 	}
 
 	calibrationMethod = callback => {
@@ -787,11 +786,11 @@ class AlarmConfiguration extends React.PureComponent {
 						<Button
 							className="btn-2"
 							onClick={() => {
-								_list_data = {
-									record: record,
-									list: data
-								};
-								$.modal.open('告警规则设置', '/html/drive/alarmRules.html');
+								// _list_data = {
+								// 	record: record,
+								// 	list: data
+								// };
+								$.modal.open('告警规则设置', `/html/drive/alarmRules.html?driverid=${record.driverid}&normalid=${record.id}`);
 							}}
 						>
 							告警配置
@@ -841,8 +840,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 1,
-			driver_id: 'b56cd5ad993748159068c8d59621c476'
+			current: 2,
+			driver_id: 'e605c13926904b2a8cc040584baff157'
 		};
 	}
 	indicatorsListInit = (driver_id, cb) => {

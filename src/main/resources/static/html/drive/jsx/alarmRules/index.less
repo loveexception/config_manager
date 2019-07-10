@@ -32,6 +32,19 @@
 					margin-right: 8px;
 					padding: 0;
 					box-shadow: #8f8f8f 0 0 1px inset;
+					.point {
+						position: relative;
+						.sup {
+							z-index: 10;
+							width: 6px;
+							height: 6px;
+							background: #f5222d;
+							border-radius: 100%;
+							position: absolute;
+							top: 6px;
+							right: 6px;
+						}
+					}
 				}
 				.ant-tabs-tab-active {
 					background-color: #4c71fe;
@@ -57,6 +70,15 @@
 					&:last-child {
 						margin-bottom: 42px;
 					}
+					.item-li {
+						margin: 0;
+						.ant-form-item-control {
+							.ant-form-explain {
+								position: absolute;
+								display: none;
+							}
+						}
+					}
 					.ant-collapse-header {
 						height: 32px;
 						border-bottom: 1px solid #fff;
@@ -64,12 +86,17 @@
 						.ant-collapse-arrow {
 							top: 16px;
 						}
+
 						.ant-collapse-extra {
 							float: none;
 							position: absolute;
-							right: 16px;
-							top: 5px;
+							right: 0;
+							top: 0;
 							font-size: 12px;
+							transform: scale(0.8);
+							width: 18px;
+							height: 18px;
+							text-align: center;
 						}
 					}
 					.ant-collapse-content {
@@ -93,16 +120,23 @@
 							width: 1px;
 							height: 100%;
 						}
-						.tip {
-							width: 30px;
-							height: 30px;
-							line-height: 30px;
-							text-align: center;
-							background-color: #4c71fe;
-							border-radius: 50%;
-							font-size: 12px;
-							color: #fff;
-							display: inline-block;
+						.panel-li-tips-content {
+							position: relative;
+							.ant-badge {
+								position: absolute;
+								top: 15px;
+							}
+							.tip {
+								width: 30px;
+								height: 30px;
+								line-height: 30px;
+								text-align: center;
+								background-color: #4c71fe;
+								border-radius: 50%;
+								font-size: 12px;
+								color: #fff;
+								display: inline-block;
+							}
 						}
 						.add-btn {
 							width: 100%;
@@ -122,6 +156,7 @@
 					}
 				}
 				.rules-card-content-box {
+					margin-top: 10px;
 					.rules-card-content-body {
 						.content-top {
 							display: flex;
@@ -147,7 +182,7 @@
 								text-align: center;
 								cursor: pointer;
 								position: relative;
-								margin-top: 6px;
+								margin-top: 10px;
 								&:before {
 									content: '';
 									background: #4c71fe;
@@ -178,7 +213,7 @@
 									left: -40px;
 									top: 50%;
 									width: 1px;
-									height: 165%;
+									height: 150%;
 									z-index: 9;
 									background: #4c71fe;
 									.tip {
