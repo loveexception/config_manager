@@ -335,7 +335,25 @@ public class DriverController implements AdminKey {
         }
 
     }
+	/**
+	 * 新增变更业务
+	 */
+	@At("/ruler_change")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object rulerChange(@Param("insert") Normal[] innormals,@Param("update") Normal[] upnormals, @Param("driverid") String driverid,HttpServletRequest req) {
+		try {
+			List obj1 = normalService.insertAllNormal(Arrays.asList(innormals),driverid);
 
+			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals));
+			Normal normal = new Normal();
+			normal.setDriverid(driverid);
+			return allNormals(normal,req);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 	/**
 	 * 删除业务
 	 */
