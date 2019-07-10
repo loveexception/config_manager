@@ -24,10 +24,10 @@ public class Ruler extends I18NModel {
     /**
      * 操作码
      */
-    @Column("normalid")
+    @Column("normal_id")
     @Comment("列名")
     @ColDefine(type = ColType.VARCHAR, width = 64)
-    @GraphQLQuery(name = "normalid", description = "列名")
+    @GraphQLQuery(name = "normal_id", description = "列名")
     private String  normalid ;
 
     @One(field = "normalid",key="id")
