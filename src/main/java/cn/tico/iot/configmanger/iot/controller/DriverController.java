@@ -14,6 +14,7 @@ import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
+import org.nutz.lang.random.R;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -382,7 +383,9 @@ public class DriverController implements AdminKey {
     @AdaptBy(type = JsonAdaptor.class)
     public Object removeRule(@Param("data")String ids, HttpServletRequest req) {
         try {
-            int i = rulerService.delete(ids);
+			Ruler ruler = new Ruler();
+			ruler.setId(ids);
+            int i = rulerService._delete(ruler);
             return Result.success("system.success",i);
         } catch (Exception e) {
         	e.printStackTrace();

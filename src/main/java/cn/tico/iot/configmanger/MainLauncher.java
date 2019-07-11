@@ -123,23 +123,23 @@ public class MainLauncher {
      * @param ioc
      */
     private void initSysTask(Ioc ioc) {
-        QuartzManager quartzManager = ioc.get(QuartzManager.class);
-        TaskService taskService = ioc.get(TaskService.class);
-        quartzManager.clear();
-        List<Task> taskList = taskService.query( Cnd.where("status", "=", true));
-        for (Task sysTask : taskList) {
-            try {
-                QuartzJob qj = new QuartzJob();
-                qj.setJobName(sysTask.getId());
-                qj.setJobGroup(sysTask.getId());
-                qj.setClassName(sysTask.getJobClass());
-                qj.setCron(sysTask.getCron());
-                qj.setComment(sysTask.getNote());
-                qj.setDataMap(sysTask.getData());
-                quartzManager.add(qj);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
+//        QuartzManager quartzManager = ioc.get(QuartzManager.class);
+//        TaskService taskService = ioc.get(TaskService.class);
+//        quartzManager.clear();
+//        List<Task> taskList = taskService.query( Cnd.where("status", "=", true));
+//        for (Task sysTask : taskList) {
+//            try {
+//                QuartzJob qj = new QuartzJob();
+//                qj.setJobName(sysTask.getId());
+//                qj.setJobGroup(sysTask.getId());
+//                qj.setClassName(sysTask.getJobClass());
+//                qj.setCron(sysTask.getCron());
+//                qj.setComment(sysTask.getNote());
+//                qj.setDataMap(sysTask.getData());
+//                quartzManager.add(qj);
+//            } catch (Exception e) {
+//                log.error(e.getMessage());
+//            }
+//        }
     }
 }
