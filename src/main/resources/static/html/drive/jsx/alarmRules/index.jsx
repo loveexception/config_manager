@@ -268,7 +268,7 @@ class DynamicFieldSet extends React.Component {
 			type: 'POST',
 			url: '/iot/driver/ruler_remove',
 			data: JSON.stringify({
-				data: id
+				id: id
 			}),
 			dataType: 'json',
 			async: false,
