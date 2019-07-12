@@ -133,7 +133,7 @@ public class DeviceEnvModel extends I18NModel {
     @Comment("地域ID 用于查寻")
     @ColDefine(type = ColType.TEXT, width = 255)
     @GraphQLQuery(name = "locationmap", description = "全类图")
-    private String locationmap;
+    private String locationMap;
 
 
     @One(field = "locationid",key="id")

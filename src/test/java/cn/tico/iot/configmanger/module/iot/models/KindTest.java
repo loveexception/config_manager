@@ -95,6 +95,7 @@ public class KindTest {
     public void allTable(){
 
         Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.iot.models",true );
+        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.other.models",true );
     }
 
 }

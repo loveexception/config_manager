@@ -24,6 +24,32 @@ public class Device extends DeviceEnvModel implements Serializable {
     @GraphQLQuery(name = "sno", description = "机器码")
     private String sno;
 
+    @Column("price")
+    @Comment("价格")
+    @ColDefine(type = ColType.FLOAT ,width = 20 ,precision = 2 )
+    @GraphQLQuery(name = "price", description = "价格")
+    private Double price;
+
+
+    @Column("order_time")
+    @Comment("购买日期")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "order_time", description = "购买日期")
+    private String orderTime;
+
+
+
+    @Column("quality")
+    @Comment("使用年限")
+    @ColDefine(type = ColType.INT, width = 32)
+    @GraphQLQuery(name = "quality", description = "使用年限")
+    private Integer quality;
+
+    @Column("discard_time")
+    @Comment("报废时间")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "discard_time", description = "报废时间")
+    private String discardTime;
 
 
     /**

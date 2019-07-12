@@ -383,7 +383,9 @@ public class DriverController implements AdminKey {
     @AdaptBy(type = JsonAdaptor.class)
     public Object removeRule(@Param("..")Ruler ruler, HttpServletRequest req) {
         try {
+
             int i = rulerService._delete(ruler);
+            i = rulerService.delete(ruler.getId());
             return Result.success("system.success",i);
         } catch (Exception e) {
         	e.printStackTrace();
