@@ -36,8 +36,13 @@ public  class FatherModel extends I18NModel {
      */
     @Column("order_num")
     @Comment("排序 ")
+    @ColDefine(type = ColType.INT)
     @GraphQLQuery(name = "order_num", description = "排序")
     private int orderNum;
+
+
+
+
 
     @One(field = "parentId",key = "id")
     private Location parent;

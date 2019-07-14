@@ -40,7 +40,10 @@ public class GradeService  extends Service<Grade> {
 
     public Object gradeAllSave(Grade[] grades) {
         Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
-        for (Grade grade:grades) {
+        for (int i =0 ; i < grades.length; i++) {
+
+            Grade grade = grades[i];
+
             grade = InsertOrUpdate(grade);
             List<Ruler> rulers = InsertOrUpdateRulers(grade.getRulers());
             grade.setRulers(rulers);
@@ -51,14 +54,15 @@ public class GradeService  extends Service<Grade> {
 
 
         }
-        return null;
+        return grades;
 
     }
 
     private List<Ruler> InsertOrUpdateRulers(List<Ruler> rulers) {
         List<Ruler> result = new ArrayList<Ruler>();
-        for (Ruler ruler:rulers) {
-
+        for (int i =0 ; i < rulers.size() ; i ++ ) {
+                Ruler ruler = rulers.get(i);
+                ruler.setOrderNum(i);
                 ruler.setCreateTime(new Date());
                 ruler.setCreateBy(ShiroUtils.getSysUserId());
                 ruler.setUpdateTime(new Date());

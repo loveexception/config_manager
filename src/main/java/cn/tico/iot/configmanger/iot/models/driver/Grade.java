@@ -41,5 +41,16 @@ public class Grade extends I18NModel {
 
 
 
+    /**
+     * 排序
+     */
+    @Column("order_num")
+    @Comment("排序")
+    @ColDefine(type = ColType.INT)
+    @GraphQLQuery(name = "order_num", description = "排序")
+    private int  orderNum ;
+
+
+
 
 }
