@@ -14,9 +14,7 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @IocBean(args = {"refer:dao"})
@@ -30,7 +28,13 @@ public class GradeService  extends Service<Grade> {
 
     public Object queryGrade(Cnd cnd) {
 
-        Object obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
+        List<Grade> obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
+        for (Grade grade:obj) {
+            List<Ruler> rulers = grade.getRulers();
+            Collections.sort(rulers, Comparator.comparing(Ruler::getOrderNum));
+            grade.setRulers(rulers);
+        }
+
         return obj;
     }
 
