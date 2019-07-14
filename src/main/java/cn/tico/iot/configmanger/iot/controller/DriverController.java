@@ -302,7 +302,7 @@ public class DriverController implements AdminKey {
 		if(Strings.isNotBlank(grade.getGrade())){
 			cnd.and("grade","=",grade.getGrade());
 		}
-
+		cnd.orderBy("order_num","asc");
 
 		obj =  gradeService.queryGrade(cnd);
 		return  Result.success("system.success",   obj );
