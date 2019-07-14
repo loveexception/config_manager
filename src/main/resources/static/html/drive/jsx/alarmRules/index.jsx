@@ -49,7 +49,21 @@ class AlarmRulesBox extends React.PureComponent {
 				title: '告警提示',
 				value: 'warning'
 			}
-		]
+		],
+		TabComponent: {
+			critical: Form.create({
+				name: 'alarm_rules_critical'
+			})(DynamicFieldSet),
+			major: Form.create({
+				name: 'alarm_rules_major'
+			})(DynamicFieldSet),
+			minor: Form.create({
+				name: 'alarm_rules_minor'
+			})(DynamicFieldSet),
+			warning: Form.create({
+				name: 'alarm_rules_warning'
+			})(DynamicFieldSet)
+		}
 	};
 	listData = () => {
 		let { driverid, normalid } = urlArgs();
@@ -87,15 +101,16 @@ class AlarmRulesBox extends React.PureComponent {
 				<Tabs
 					className="device-tabs-box"
 					onChange={key => {
-						console.log(key);
+						let value = (key || '').split('-')[0];
+						if (value) {
+							let tab = this[`rules_${value}`];
+							tab && tab.getPanelList();
+						}
 					}}
 					type="card"
 				>
 					{tabs_data.map((item, index) => {
-						const Component = Form.create({
-							name: `alarm_rules_${item.value}`
-						})(DynamicFieldSet);
-
+						let Component = this.state.TabComponent[item.value];
 						return (
 							<TabPane
 								forceRender
@@ -106,7 +121,7 @@ class AlarmRulesBox extends React.PureComponent {
 										<sup className="sup" />
 									</div>
 								}
-								key={index}
+								key={`${item.value}-${index}`}
 							>
 								<Component onRef={el => (this[`rules_${item.value}`] = el)} grade={item} listData={listData} selectNorma={selectNorma} />
 								{/* <WrappedDynamicFieldSet name={item.value} /> */}
@@ -119,33 +134,28 @@ class AlarmRulesBox extends React.PureComponent {
 					onClick={() => {
 						let { tabs_data = [] } = this.state;
 						let error = this.state.error || [];
+						let all_data = [];
 						tabs_data.map((item, index) => {
-							let d = this[`rules_${item.value}`];
-							let b = this[`rules_${item.value}_point`];
-							if (d) {
-								d.handleSubmit(data => {
+							let rules_form = this[`rules_${item.value}`];
+							let rules_point = this[`rules_${item.value}_point`];
+							if (rules_form) {
+								rules_form.handleSubmit(data => {
+									// console.log('---pp---', item.value, data);
 									if (data) {
 										error[item.value] = false;
-										b.classList.remove('point');
+										rules_point.classList.remove('point');
+										all_data.push(data);
 									} else {
-										// error.push({
-										// 	...item,
-										// 	info:'参数未填写'
-										// })
 										error[item.value] = true;
-										b.classList.add('point');
+										rules_point.classList.add('point');
 									}
 								});
 							}
 						});
-						// this.setState({
-						// 	error: {
-						// 		...error
-						// 	}
-						// });
+						console.log(_.flattenDepth(all_data, 1));
 					}}
 				>
-					dddddd
+					提交
 				</Button>
 				{/* <Tabs
 					className="device-tabs-box"
@@ -187,52 +197,76 @@ class DynamicFieldSet extends React.Component {
 		this.props.onRef && this.props.onRef(this);
 		this.getPanelList();
 	}
-	remove = k => {
-		const { form } = this.props;
-		// can use data-binding to get
-		const keys = form.getFieldValue('keys');
-		// We need at least one passenger
-		if (keys.length === 1) {
-			return;
+	remove = (k, record = {}) => {
+		if (record.id) {
+			console.log('有grade_id');
+			$.ajax({
+				cache: true,
+				type: 'POST',
+				url: '/iot/driver/grade_remove',
+				data: JSON.stringify({
+					data: record.id
+				}),
+				dataType: 'json',
+				async: false,
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						return;
+					}
+					this.getPanelList();
+				}
+			});
+		} else {
+			console.log('没有grade_id');
+			const { form } = this.props;
+			// can use data-binding to get
+			const keys = form.getFieldValue('keys');
+			// We need at least one passenger
+			if (keys.length === 1) {
+				return;
+			}
+			// can use data-binding to set
+			form.setFieldsValue({
+				keys: keys.filter(key => key !== k)
+			});
 		}
-
-		// can use data-binding to set
-		form.setFieldsValue({
-			keys: keys.filter(key => key !== k)
-		});
 	};
 
 	add = () => {
-		let { form } = this.props;
-		// can use data-binding to get
-		const keys = form.getFieldValue('keys');
-		let id = this.id++;
-		const nextKeys = keys.concat(id);
-		// can use data-binding to set
-		// important! notify form to detect changes
-		this.state.activeKey = [id + ''];
-		form.setFieldsValue({
-			keys: nextKeys
-		});
-	};
-
-	handleSubmit = cb => {
-		this.props.form.validateFields((err, values) => {
-			if (!err) {
-				const { keys, contents, rules } = values;
-				let { grade = {} } = this.props;
-				let data = keys.map(key => contents[key]);
-				if (data.length > 0) {
-					console.log(grade.title, grade.value, data, rules);
-					cb(data);
+		let { grade = {} } = this.props;
+		let { normalid } = urlArgs();
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: '/iot/driver/grade_add',
+			data: JSON.stringify({
+				data: { cnName: '', grade: grade.value, normalid }
+			}),
+			dataType: 'json',
+			async: false,
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误');
+					return;
 				}
-			} else {
-				console.log(err);
-				cb();
+				this.getPanelList();
 			}
 		});
+		// let { form } = this.props;
+		// // can use data-binding to get
+		// const keys = form.getFieldValue('keys');
+		// let id = this.id++;
+		// const nextKeys = keys.concat(id);
+		// // can use data-binding to set
+		// // important! notify form to detect changes
+		// this.state.activeKey = [`${id}`];
+		// form.setFieldsValue({
+		// 	keys: nextKeys
+		// });
 	};
-	getPanelList = cb => {
+
+	getPanelList = () => {
 		let { normalid } = urlArgs();
 		let { grade = {} } = this.props;
 		if (normalid) {
@@ -277,22 +311,48 @@ class DynamicFieldSet extends React.Component {
 					message.error('接口错误');
 					return;
 				}
-				console.log('results', results);
-				// if (results.data) {
-				// 	this.setState(
-				// 		{
-				// 			driver_id: results.data.id
-				// 		},
-				// 		() => {
-				// 			this.next();
-				// 		}
-				// 	);
-				// }
+				this.getPanelList();
+			}
+		});
+	};
+	handleSubmit = cb => {
+		this.props.form.validateFields((err, values) => {
+			if (!err) {
+				const { keys, contents, rules } = values;
+				let data = keys.map(key => contents[key]);
+				if (data.length > 0) {
+					let data_new = [];
+					data.map((item, i) => {
+						let rulers_new = [];
+						let rulers_old = rules[i] || [];
+						rulers_old.map((item2, j) => {
+							rulers_new.push({
+								...item2.data,
+								normalid: item2.normalid,
+								symble: item2.symble,
+								val: item2.val
+							});
+						});
+						data_new.push({
+							...item.data,
+							cnName: item.cnName,
+							rulers: rulers_new
+						});
+					});
+
+					cb(data_new);
+				}
+			} else {
+				console.log(err);
+				cb();
 			}
 		});
 	};
 	render() {
-		const { getFieldDecorator, getFieldValue, getFieldError } = this.props.form;
+		let { activeKey = [], panel_data = [] } = this.state;
+		let { listData = [], selectNorma = {}, grade = {}, form = {} } = this.props;
+		const { getFieldDecorator, getFieldValue, getFieldError } = form;
+		let { normalid } = urlArgs();
 		const formItemLayout = {
 			labelCol: {
 				xs: { span: 24 },
@@ -303,30 +363,26 @@ class DynamicFieldSet extends React.Component {
 				sm: { span: 21 }
 			}
 		};
-		const formItemLayoutWithOutLabel = {
-			wrapperCol: {
-				xs: { span: 24, offset: 0 },
-				sm: { span: 20, offset: 4 }
-			}
-		};
+		// const formItemLayoutWithOutLabel = {
+		// 	wrapperCol: {
+		// 		xs: { span: 24, offset: 0 },
+		// 		sm: { span: 20, offset: 4 }
+		// 	}
+		// };
 		getFieldDecorator('keys', { initialValue: [] });
+
 		const keys = getFieldValue('keys');
-		const contents_error = getFieldError('contents') || [];
-		let { activeKey = [], panel_data = [] } = this.state;
-		let { listData = [], selectNorma = {} } = this.props;
 		const formItems = keys.map((k, index) => {
-			// console.log(rules);
-			let rulers = (panel_data[k] || {}).rulers || [];
-			rulers =
-				rulers.length > 0
-					? rulers
-					: [
-							{
-								symble: '=',
-								enName: undefined,
-								val: undefined
-							}
-					  ];
+			let item_k = panel_data[k] || { rulers: [] };
+			let rulers = item_k.rulers || [];
+			getFieldDecorator(`contents[${k}].data`, {
+				initialValue: {
+					// normalid,
+					// grade: grade.value,
+					...item_k
+				}
+			});
+			const contents_error = getFieldError(`contents[${k}].cnName`) || [];
 			return (
 				<Panel
 					key={k}
@@ -358,14 +414,15 @@ class DynamicFieldSet extends React.Component {
 								type="close"
 								onClick={e => {
 									e.stopPropagation();
-									this.remove(k);
+									this.remove(k, item_k);
 								}}
 							/>
 						) : null
 					}
 				>
 					<Form.Item {...formItemLayout} label={'提示内容'} className="item-li">
-						{getFieldDecorator(`contents[${k}]`, {
+						{getFieldDecorator(`contents[${k}].cnName`, {
+							initialValue: item_k.cnName,
 							validateTrigger: ['onChange', 'onBlur'],
 							rules: [
 								{
@@ -386,143 +443,149 @@ class DynamicFieldSet extends React.Component {
 					</Form.Item>
 					<div className="rules-card-content-box">
 						<div className="rules-card-content-body">
-							{/* <div className="content-top">
-									<label htmlFor="tips">提示内容：</label>
-									<Input id="tips" placeholder="请输入提示内容" defaultValue={data.cnName} />
-								</div> */}
 							<div className="content-bottom">
-								{rulers.map((item, j) => {
-									return (
-										<div key={j}>
-											<div className="content-bottom-li">
-												<div className="li-after">
-													<span className="tip">且</span>
-												</div>
-												{rulers.length > 1 && (
-													<Icon
-														className="close-btn"
-														type="close-circle"
-														onClick={e => {
-															console.log('删除', item.id);
-															this.deleteRules(item.id);
-															// this.removeContentLi(index);
-														}}
-													/>
-												)}
-												<Row
-													style={{
-														width: '100%'
-													}}
-												>
-													<Col span={6}>
-														<Form.Item
-															className="item-li"
-															wrapperCol={{
-																xs: { span: 24 },
-																sm: { span: 24 }
+								{rulers.length > 0 ? (
+									rulers.map((item_j, j) => {
+										let select = [];
+										if (j == 0) {
+											select = listData.filter(it => it.id == item_j.normalid);
+										}
+										getFieldDecorator(`rules[${k}][${j}].data`, { initialValue: { ...item_j } });
+										return (
+											<div key={j}>
+												<div className="content-bottom-li">
+													<div className="li-after">
+														<span className="tip">且</span>
+													</div>
+													{rulers.length > 1 && (
+														<Icon
+															className="close-btn"
+															type="close-circle"
+															onClick={e => {
+																console.log('删除', item_j.id);
+																this.deleteRules(item_j.id);
+																// this.removeContentLi(index);
 															}}
-														>
-															{getFieldDecorator(`rules[${j}].enName`, {
-																initialValue: item.normalid,
-																validateTrigger: ['onChange', 'onBlur'],
-																rules: [
-																	{
-																		required: true,
-																		whitespace: true,
-																		message: '指标项不能为空'
-																	}
-																]
-															})(
-																<Select
-																	className="select-box"
-																	disabled={j == 0}
-																	style={{ width: '100%' }}
-																	// onChange={handleChange}
-																	placeholder="请选择指标项"
-																>
-																	{listData.map((item, index) => {
-																		return (
-																			<Select.Option key={item.id} value={item.id}>
-																				{item['cnName']}
-																			</Select.Option>
-																		);
-																	})}
-																</Select>
-															)}
-														</Form.Item>
-													</Col>
-													<Col span={6}>
-														<Form.Item className="item-li">
-															{getFieldDecorator(`rules[${j}].symble`, {
-																initialValue: item.symble,
-																validateTrigger: ['onChange', 'onBlur'],
-																rules: [
-																	{
-																		required: true,
-																		whitespace: true,
-																		message: '分类不能为空'
-																	}
-																]
-															})(
-																<Select
-																	className="select-box"
-																	defaultValue={item.symble}
-																	style={{ width: '100%' }}
-																	// onChange={handleChange}
-																	placeholder="请选择分类"
-																>
-																	<Select.Option value="=">等于</Select.Option>
-																	<Select.Option value="!=">不等于</Select.Option>
-																	<Select.Option value=">">大于</Select.Option>
-																	<Select.Option value="<">小于</Select.Option>
-																</Select>
-															)}
-														</Form.Item>
-													</Col>
-													<Col span={12}>
-														<Form.Item className="item-li">
-															{getFieldDecorator(`rules[${j}].val`, {
-																initialValue: item.val,
-																validateTrigger: ['onChange', 'onBlur'],
-																rules: [
-																	{
-																		required: true,
-																		whitespace: true
-																		// message: '分类不能为空'
-																	}
-																]
-															})(
-																<Input
-																	// onClick={e => {
-																	// 	e.stopPropagation();
-																	// }}
-																	placeholder="请输入提示内容"
-																	style={{ width: '100%' }}
-																/>
-															)}
-														</Form.Item>
-													</Col>
-												</Row>
+														/>
+													)}
+													<Row
+														style={{
+															width: '100%'
+														}}
+													>
+														<Col span={6}>
+															<Form.Item
+																className="item-li"
+																wrapperCol={{
+																	xs: { span: 24 },
+																	sm: { span: 24 }
+																}}
+															>
+																{getFieldDecorator(`rules[${k}][${j}].normalid`, {
+																	initialValue: item_j.normalid,
+																	validateTrigger: ['onChange', 'onBlur'],
+																	rules: [
+																		{
+																			required: true,
+																			whitespace: true,
+																			message: '指标项不能为空'
+																		}
+																	]
+																})(
+																	<Select className="select-box" disabled={select.length > 0} style={{ width: '100%' }} placeholder="请选择指标项">
+																		{listData.map(item => {
+																			return (
+																				<Select.Option key={item.id} value={item.id}>
+																					{item['cnName']}
+																				</Select.Option>
+																			);
+																		})}
+																	</Select>
+																)}
+															</Form.Item>
+														</Col>
+														<Col span={6}>
+															<Form.Item className="item-li">
+																{getFieldDecorator(`rules[${k}][${j}].symble`, {
+																	initialValue: item_j.symble,
+																	validateTrigger: ['onChange', 'onBlur'],
+																	rules: [
+																		{
+																			required: true,
+																			whitespace: true,
+																			message: '分类不能为空'
+																		}
+																	]
+																})(
+																	<Select className="select-box" style={{ width: '100%' }} placeholder="请选择分类">
+																		<Select.Option value="=">等于</Select.Option>
+																		<Select.Option value="!=">不等于</Select.Option>
+																		<Select.Option value=">">大于</Select.Option>
+																		<Select.Option value="<">小于</Select.Option>
+																	</Select>
+																)}
+															</Form.Item>
+														</Col>
+														<Col span={12}>
+															<Form.Item className="item-li">
+																{getFieldDecorator(`rules[${k}][${j}].val`, {
+																	initialValue: item_j.val,
+																	validateTrigger: ['onChange', 'onBlur'],
+																	rules: [
+																		{
+																			required: true,
+																			whitespace: true
+																			// message: '分类不能为空'
+																		}
+																	]
+																})(
+																	<Input
+																		// onClick={e => {
+																		// 	e.stopPropagation();
+																		// }}
+																		placeholder="请输入提示内容"
+																		style={{ width: '100%' }}
+																	/>
+																)}
+															</Form.Item>
+														</Col>
+													</Row>
+												</div>
+												{j == rulers.length - 1 && (
+													<span
+														className="add-btn"
+														onClick={e => {
+															rulers.push({
+																symble: '=',
+																normalid: undefined,
+																val: undefined
+															});
+															this.setState({});
+														}}
+													>
+														添加
+													</span>
+												)}
 											</div>
-											{j == rulers.length - 1 && (
-												<span
-													className="add-btn"
-													onClick={e => {
-														console.log('---');
-														rulers.push({
-															symble: '=',
-															enName: undefined,
-															val: undefined
-														});
-														this.setState({});
-													}}
-												>
-													添加
-												</span>
-											)}
-										</div>
-									);
-								})}
+										);
+									})
+								) : (
+									<div className="no-children">
+										<span
+											className="add-btn"
+											onClick={e => {
+												rulers.push({
+													symble: '=',
+													normalid: undefined,
+													val: undefined
+												});
+												this.setState({});
+											}}
+										>
+											添加
+										</span>
+									</div>
+								)}
 								{/* <RulesCardContentBottom form={this.props.form} data={(panel_data[k] || {}).rulers} listData={listData} selectNorma={selectNorma} /> */}
 							</div>
 						</div>
