@@ -84,12 +84,5 @@ public class GradeService  extends Service<Grade> {
     }
 
 
-//    Kind info = this.fetch(kind.getParentId());
-//        kind.setAncestors(info.getAncestors() + "," + kind.getParentId());
-//        kind.setLevel( ""+(Lang.str2number(info.getLevel()).intValue()+1));
-//        kind.setUpdateBy(ShiroUtils.getSysUserId());
-//        kind.setUpdateTime(new Date());
-//
-//    Dao forup = Daos.ext(this.dao(), FieldFilter.create(kind.getClass(), true));
-//        return forup.update(kind);
+
 }
