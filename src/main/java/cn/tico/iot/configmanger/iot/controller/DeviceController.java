@@ -199,7 +199,7 @@ public class DeviceController implements AdminKey {
 
 
 	/**
-	 * 新增保存业务
+	 *  个性化查寻
 	 */
 	@At("/person_list")
 	@Ok("json")
@@ -236,27 +236,27 @@ public class DeviceController implements AdminKey {
 			return Result.error("system.error");
 		}
 	}
-//
-//
-//
-//	/**
-//	 * 新增保存业务
-//	 */
-//	@At("/normal_insert_all")
-//	@POST
-//	@AdaptBy(type = JsonAdaptor.class)
-//	@Ok("json")
-//	public Object addNormals(@Param("data") Normal[] normals , @Param("driverid") String driverid, HttpServletRequest req) {
-//		try {
-//			Object obj = normalService.insertAllNormal(Arrays.asList(normals),driverid);
-//			Normal normal = new Normal();
-//			normal.setDriverid(driverid);
-//			return allNormals(normal,req);
-//		} catch (Exception e) {
-//			return Result.error("system.error");
-//		}
-//	}
-//
+
+
+
+	/**
+	 * 新增保存业务
+	 */
+	@At("/person_ruler_insert")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
+	@Ok("json")
+	public Object addNormals(@Param("data") Normal[] normals , @Param("driverid") String driverid, HttpServletRequest req) {
+		try {
+			Object obj = normalService.insertAllNormal(Arrays.asList(normals),driverid);
+			Normal normal = new Normal();
+			normal.setDriverid(driverid);
+			return allNormals(normal,req);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
 //
 //	/**
 //	 * 删除业务
