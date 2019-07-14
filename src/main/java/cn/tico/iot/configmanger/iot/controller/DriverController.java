@@ -380,7 +380,7 @@ public class DriverController implements AdminKey {
     @At("/ruler_remove")
     @Ok("json")
     @POST
-    //@AdaptBy(type = JsonAdaptor.class)
+    @AdaptBy(type = JsonAdaptor.class)
     public Object removeRule(@Param("id")String id, HttpServletRequest req) {
         try {
 
