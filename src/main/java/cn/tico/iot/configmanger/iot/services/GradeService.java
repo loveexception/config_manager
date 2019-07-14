@@ -6,6 +6,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.base.Kind;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Ruler;
+import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
@@ -38,28 +39,27 @@ public class GradeService  extends Service<Grade> {
         return obj;
     }
 
-    public Object gradeAllSave(Grade[] grades) {
+    public List<Grade> gradeAllSave(Grade[] grades) {
         Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
+        List<Grade> result = new ArrayList<Grade>();
         for (int i =0 ; i < grades.length; i++) {
-
             Grade grade = grades[i];
-
-            grade = InsertOrUpdate(grade);
+            grade = InsertOrUpdate(grade,i);
             List<Ruler> rulers = InsertOrUpdateRulers(grade.getRulers());
             grade.setRulers(rulers);
-
-
-
-                forup.updateLinks(grade,"^rulers$");
-
+            result.add(grade);
 
         }
-        return grades;
+        return forup.updateWith(result,"^rulers$");
+
 
     }
 
     private List<Ruler> InsertOrUpdateRulers(List<Ruler> rulers) {
         List<Ruler> result = new ArrayList<Ruler>();
+        if(Lang.isEmpty(rulers)){
+            return Lists.newArrayList();
+        }
         for (int i =0 ; i < rulers.size() ; i ++ ) {
                 Ruler ruler = rulers.get(i);
                 ruler.setOrderNum(i);
@@ -76,17 +76,20 @@ public class GradeService  extends Service<Grade> {
         return result;
     }
 
-    private Grade InsertOrUpdate(Grade grade) {
-
+    private Grade InsertOrUpdate(Grade grade,int index) {
+            grade.setOrderNum(index);
             grade.setCreateTime(new Date());
             grade.setCreateBy(ShiroUtils.getSysUserId());
             grade.setUpdateTime(new Date());
             grade.setUpdateBy(ShiroUtils.getSysUserId());
-
-
         return grade;
     }
-
-
-
+    public int deleteWithRuler(String id) {
+        Grade grade = new Grade();
+        grade.setId(id);
+//        grade = gradeService.fetchLinks(grade,"^rulers$");
+//        int i = gradeService._deleteLinks(grade,"^rulers$");
+//        i+= gradeService.delete(id);
+        return this.dao().deleteWith(grade,"^rules$");
+    }
 }

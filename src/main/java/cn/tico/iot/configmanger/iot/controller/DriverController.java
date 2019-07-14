@@ -316,9 +316,6 @@ public class DriverController implements AdminKey {
 	@Ok("json")
 	public Object gradeAllSave(@Param("data") Grade[] grades, HttpServletRequest req) {
 
-
-
-
 		Object  obj =  gradeService.gradeAllSave(grades);
 		return  Result.success("system.success",   obj );
 
@@ -379,11 +376,7 @@ public class DriverController implements AdminKey {
 	// @AdaptBy(type = JsonAdaptor.class)
 	public Object removeGrade(@Param("id")String id, HttpServletRequest req) {
 		try {
-		    Grade grade = new Grade();
-		    grade.setId(id);
-		    grade = gradeService.fetchLinks(grade,"^rulers$");
-			int i = gradeService._deleteLinks(grade,"^rulers$");
-			 i+= gradeService.delete(id);
+		    int i = gradeService.deleteWithRuler(id);
 			return Result.success("system.success",i );
 		} catch (Exception e) {
 			return Result.error("system.error");
