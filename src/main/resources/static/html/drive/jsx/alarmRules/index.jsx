@@ -101,11 +101,11 @@ class AlarmRulesBox extends React.PureComponent {
 				<Tabs
 					className="device-tabs-box"
 					onChange={key => {
-						let value = (key || '').split('-')[0];
-						if (value) {
-							let tab = this[`rules_${value}`];
-							tab && tab.getPanelList();
-						}
+						// let value = (key || '').split('-')[0];
+						// if (value) {
+						// 	let tab = this[`rules_${value}`];
+						// 	tab && tab.getPanelList();
+						// }
 					}}
 					type="card"
 				>
@@ -197,7 +197,7 @@ class DynamicFieldSet extends React.Component {
 		this.props.onRef && this.props.onRef(this);
 		this.getPanelList();
 	}
-	remove = (k, record = {}) => {
+	remove = (index, record = {}) => {
 		if (record.id) {
 			console.log('有grade_id');
 			$.ajax({
@@ -227,7 +227,7 @@ class DynamicFieldSet extends React.Component {
 			}
 			// can use data-binding to set
 			form.setFieldsValue({
-				keys: keys.filter(key => key !== k)
+				keys: keys.filter(key => key !== index)
 			});
 		}
 	};
@@ -295,24 +295,63 @@ class DynamicFieldSet extends React.Component {
 			});
 		}
 	};
-	deleteRules = id => {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: '/iot/driver/ruler_remove',
-			data: JSON.stringify({
-				id: id
-			}),
-			dataType: 'json',
-			async: false,
-			success: results => {
-				if (results.code != 0) {
-					message.error('接口错误');
-					return;
+	addRules = (index, grade = {}) => {
+		console.log('grade', index, grade);
+		if (grade.id) {
+			console.log('有grade_id');
+			$.ajax({
+				cache: true,
+				type: 'POST',
+				url: '/iot/driver/grade_add',
+				data: JSON.stringify({
+					data: [
+						{
+							symble: '=',
+							normalid: '',
+							val: ''
+						}
+					],
+					gradeid: grade.id
+				}),
+				dataType: 'json',
+				async: false,
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						return;
+					}
+					this.getPanelList();
 				}
-				this.getPanelList();
-			}
-		});
+			});
+		} else {
+			console.log('没有grade_id');
+		}
+	};
+	deleteRules = (index, record = {}, rulers) => {
+		if (record.id) {
+			console.log('有ruler_id');
+			$.ajax({
+				cache: true,
+				type: 'POST',
+				url: '/iot/driver/ruler_remove',
+				data: JSON.stringify({
+					id: id
+				}),
+				dataType: 'json',
+				async: false,
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						return;
+					}
+					this.getPanelList();
+				}
+			});
+		} else {
+			rulers.splice(index, rulers.length);
+			this.setState({});
+			// console.log('没有ruler_id', rulers, index);
+		}
 	};
 	handleSubmit = cb => {
 		this.props.form.validateFields((err, values) => {
@@ -372,7 +411,7 @@ class DynamicFieldSet extends React.Component {
 
 		const keys = getFieldValue('keys');
 		const formItems = keys.map((k, index) => {
-			let item_k = panel_data[k] || { rulers: [] };
+			let item_k = panel_data[k] || {};
 			let rulers = item_k.rulers || [];
 			getFieldDecorator(`contents[${k}].data`, {
 				initialValue: {
@@ -462,7 +501,7 @@ class DynamicFieldSet extends React.Component {
 															type="close-circle"
 															onClick={e => {
 																console.log('删除', item_j.id);
-																this.deleteRules(item_j.id);
+																this.deleteRules(j, item_j, rulers);
 																// this.removeContentLi(index);
 															}}
 														/>
@@ -554,12 +593,13 @@ class DynamicFieldSet extends React.Component {
 													<span
 														className="add-btn"
 														onClick={e => {
-															rulers.push({
-																symble: '=',
-																normalid: undefined,
-																val: undefined
-															});
-															this.setState({});
+															this.addRules(j, item_k);
+															// rulers.push({
+															// 	symble: '=',
+															// 	normalid: undefined,
+															// 	val: undefined
+															// });
+															// this.setState({});
 														}}
 													>
 														添加
@@ -573,12 +613,13 @@ class DynamicFieldSet extends React.Component {
 										<span
 											className="add-btn"
 											onClick={e => {
-												rulers.push({
-													symble: '=',
-													normalid: undefined,
-													val: undefined
-												});
-												this.setState({});
+												this.addRules(0, item_k);
+												// rulers.push({
+												// 	symble: '=',
+												// 	normalid: undefined,
+												// 	val: undefined
+												// });
+												// this.setState({});
 											}}
 										>
 											添加
