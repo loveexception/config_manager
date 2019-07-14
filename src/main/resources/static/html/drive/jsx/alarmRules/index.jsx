@@ -204,10 +204,9 @@ class DynamicFieldSet extends React.Component {
 				cache: true,
 				type: 'POST',
 				url: '/iot/driver/grade_remove',
-				data: JSON.stringify({
-					data: record.id
-				}),
-				dataType: 'json',
+				data: {
+					id: record.id
+				},
 				async: false,
 				success: results => {
 					if (results.code != 0) {
