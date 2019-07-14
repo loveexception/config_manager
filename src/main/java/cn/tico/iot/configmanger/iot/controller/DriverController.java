@@ -383,6 +383,7 @@ public class DriverController implements AdminKey {
 		    grade.setId(id);
 		    grade = gradeService.fetchLinks(grade,"^rulers$");
 			int i = gradeService._deleteLinks(grade,"^rulers$");
+			 i+= gradeService.delete(id);
 			return Result.success("system.success",i );
 		} catch (Exception e) {
 			return Result.error("system.error");
