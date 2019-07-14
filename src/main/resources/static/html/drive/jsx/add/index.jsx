@@ -732,7 +732,7 @@ class AlarmConfiguration extends React.PureComponent {
 		}
 	};
 	componentDidMount() {
-		this.init('e605c13926904b2a8cc040584baff157');
+		// this.init('e605c13926904b2a8cc040584baff157');
 	}
 
 	calibrationMethod = callback => {
@@ -840,8 +840,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 2,
-			driver_id: 'e605c13926904b2a8cc040584baff157'
+			current: 0,
+			driver_id: '' //e605c13926904b2a8cc040584baff157
 		};
 	}
 	indicatorsListInit = (driver_id, cb) => {

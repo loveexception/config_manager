@@ -30,6 +30,7 @@ const { Panel } = Collapse;
 
 class AlarmRulesBox extends React.PureComponent {
 	state = {
+		select_key: 'critical',
 		listData: [],
 		selectNorma: {},
 		tabs_data: [
@@ -101,6 +102,9 @@ class AlarmRulesBox extends React.PureComponent {
 				<Tabs
 					className="device-tabs-box"
 					onChange={key => {
+						this.setState({
+							select_key: key
+						});
 						// let value = (key || '').split('-')[0];
 						// if (value) {
 						// 	let tab = this[`rules_${value}`];
@@ -133,26 +137,53 @@ class AlarmRulesBox extends React.PureComponent {
 				<Button
 					onClick={() => {
 						let { tabs_data = [] } = this.state;
-						let error = this.state.error || [];
 						let all_data = [];
+						let num = 0;
 						tabs_data.map((item, index) => {
 							let rules_form = this[`rules_${item.value}`];
 							let rules_point = this[`rules_${item.value}_point`];
 							if (rules_form) {
 								rules_form.handleSubmit(data => {
-									// console.log('---pp---', item.value, data);
 									if (data) {
-										error[item.value] = false;
 										rules_point.classList.remove('point');
 										all_data.push(data);
+										num++;
 									} else {
-										error[item.value] = true;
 										rules_point.classList.add('point');
 									}
 								});
 							}
 						});
-						console.log(_.flattenDepth(all_data, 1));
+						if (num == 4) {
+							let all_data_new = _.flattenDepth(all_data, 1) || [];
+							if (all_data_new.length > 0) {
+								$.ajax({
+									cache: true,
+									type: 'POST',
+									url: '/iot/driver/grade_all_save',
+									data: JSON.stringify({
+										data: all_data_new
+									}),
+									dataType: 'json',
+									async: false,
+									success: results => {
+										if (results.code != 0) {
+											message.error('接口错误');
+											return;
+										}
+										let value = (this.state.select_key || '').split('-')[0];
+										if (value) {
+											let tab = this[`rules_${value}`];
+											tab && tab.getPanelList();
+											message.success('保存成功', 0.5);
+										}
+										// this.getPanelList();
+									}
+								});
+							}
+						} else {
+							message.error('表单填写错误', 0.5);
+						}
 					}}
 				>
 					提交
@@ -200,6 +231,7 @@ class DynamicFieldSet extends React.Component {
 	remove = (index, record = {}) => {
 		if (record.id) {
 			console.log('有grade_id');
+
 			$.ajax({
 				cache: true,
 				type: 'POST',
@@ -213,21 +245,16 @@ class DynamicFieldSet extends React.Component {
 						message.error('接口错误');
 						return;
 					}
-					this.getPanelList();
+					const { form } = this.props;
+					const keys = form.getFieldValue('keys');
+					if (keys.length === 1) {
+						return;
+					}
+					form.setFieldsValue({
+						keys: keys.filter(key => key !== index)
+					});
+					// this.getPanelList();
 				}
-			});
-		} else {
-			console.log('没有grade_id');
-			const { form } = this.props;
-			// can use data-binding to get
-			const keys = form.getFieldValue('keys');
-			// We need at least one passenger
-			if (keys.length === 1) {
-				return;
-			}
-			// can use data-binding to set
-			form.setFieldsValue({
-				keys: keys.filter(key => key !== index)
 			});
 		}
 	};
@@ -235,34 +262,35 @@ class DynamicFieldSet extends React.Component {
 	add = () => {
 		let { grade = {} } = this.props;
 		let { normalid } = urlArgs();
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: '/iot/driver/grade_add',
-			data: JSON.stringify({
-				data: { cnName: '', grade: grade.value, normalid }
-			}),
-			dataType: 'json',
-			async: false,
-			success: results => {
-				if (results.code != 0) {
-					message.error('接口错误');
-					return;
+		if (normalid) {
+			console.log('有normal_id');
+			$.ajax({
+				cache: true,
+				type: 'POST',
+				url: '/iot/driver/grade_add',
+				data: JSON.stringify({
+					data: { cnName: '', grade: grade.value, normalid }
+				}),
+				dataType: 'json',
+				async: false,
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误');
+						return;
+					}
+					const { form } = this.props;
+					// can use data-binding to get
+					const keys = form.getFieldValue('keys');
+					const nextKeys = keys.concat(this.id++);
+					// can use data-binding to set
+					// important! notify form to detect changes
+					form.setFieldsValue({
+						keys: nextKeys
+					});
+					this.getPanelList();
 				}
-				this.getPanelList();
-			}
-		});
-		// let { form } = this.props;
-		// // can use data-binding to get
-		// const keys = form.getFieldValue('keys');
-		// let id = this.id++;
-		// const nextKeys = keys.concat(id);
-		// // can use data-binding to set
-		// // important! notify form to detect changes
-		// this.state.activeKey = [`${id}`];
-		// form.setFieldsValue({
-		// 	keys: nextKeys
-		// });
+			});
+		}
 	};
 
 	getPanelList = () => {
@@ -289,20 +317,20 @@ class DynamicFieldSet extends React.Component {
 					this.id = data.length;
 					let keys = [...new Array(data.length).keys()];
 					this.state.panel_data = data;
-					this.state.activeKey = [keys[0] + ''];
+					// this.state.activeKey = ['0', '1', '2', '3', '4', '5'];
 					form.setFieldsValue({ keys });
 				}
 			});
 		}
 	};
 	addRules = (index, grade = {}) => {
-		console.log('grade', index, grade);
+		console.log('---pp---', index);
 		if (grade.id) {
 			console.log('有grade_id');
 			$.ajax({
 				cache: true,
 				type: 'POST',
-				url: '/iot/driver/grade_add',
+				url: '/iot/driver/ruler_add',
 				data: JSON.stringify({
 					data: [
 						{
@@ -323,34 +351,31 @@ class DynamicFieldSet extends React.Component {
 					this.getPanelList();
 				}
 			});
-		} else {
-			console.log('没有grade_id');
 		}
 	};
-	deleteRules = (index, record = {}, rulers) => {
+	deleteRules = (k, index, record = {}, rulers) => {
 		if (record.id) {
-			console.log('有ruler_id');
 			$.ajax({
 				cache: true,
 				type: 'POST',
 				url: '/iot/driver/ruler_remove',
-				data: JSON.stringify({
-					id: id
-				}),
-				dataType: 'json',
+				data: {
+					id: record.id
+				},
 				async: false,
 				success: results => {
 					if (results.code != 0) {
 						message.error('接口错误');
 						return;
 					}
+					const { form } = this.props;
+					const rules = form.getFieldValue(`rules[${k}]`);
+					form.setFieldsValue({
+						[`rules[${k}]`]: rules.filter((key, i) => i !== index)
+					});
 					this.getPanelList();
 				}
 			});
-		} else {
-			rulers.splice(index, rulers.length);
-			this.setState({});
-			// console.log('没有ruler_id', rulers, index);
 		}
 	};
 	handleSubmit = cb => {
@@ -381,7 +406,6 @@ class DynamicFieldSet extends React.Component {
 					cb(data_new);
 				}
 			} else {
-				console.log(err);
 				cb();
 			}
 		});
@@ -408,7 +432,6 @@ class DynamicFieldSet extends React.Component {
 		// 	}
 		// };
 		getFieldDecorator('keys', { initialValue: [] });
-
 		const keys = getFieldValue('keys');
 		const formItems = keys.map((k, index) => {
 			let item_k = panel_data[k] || {};
@@ -431,7 +454,7 @@ class DynamicFieldSet extends React.Component {
 						<div className="panel-li-tips">
 							<div className="panel-li-tips-content">
 								<span className="tip">{index == 0 ? '开始' : '或'}</span>
-								<Badge dot={contents_error[index] == '-1'} />
+								<Badge dot={contents_error[0] == '-1'} />
 							</div>
 							{index == keys.length - 1 && (
 								<span
@@ -495,17 +518,17 @@ class DynamicFieldSet extends React.Component {
 													<div className="li-after">
 														<span className="tip">且</span>
 													</div>
-													{rulers.length > 1 && (
-														<Icon
-															className="close-btn"
-															type="close-circle"
-															onClick={e => {
-																console.log('删除', item_j.id);
-																this.deleteRules(j, item_j, rulers);
-																// this.removeContentLi(index);
-															}}
-														/>
-													)}
+													{/* {rulers.length > 1 && ( */}
+													<Icon
+														className="close-btn"
+														type="close-circle"
+														onClick={e => {
+															console.log('删除', item_j.id);
+															this.deleteRules(k, j, item_j, rulers);
+															// this.removeContentLi(index);
+														}}
+													/>
+													{/* )} */}
 													<Row
 														style={{
 															width: '100%'
@@ -613,6 +636,7 @@ class DynamicFieldSet extends React.Component {
 										<span
 											className="add-btn"
 											onClick={e => {
+												console.log('no-children');
 												this.addRules(0, item_k);
 												// rulers.push({
 												// 	symble: '=',
@@ -633,20 +657,19 @@ class DynamicFieldSet extends React.Component {
 				</Panel>
 			);
 		});
-		let { tabs_data = [] } = this.props;
 		return (
 			<Form className="drive-alarm-rules-card-box">
 				<Collapse
 					className="card-collapse"
-					accordion
+					// accordion
 					bordered={false}
-					activeKey={activeKey}
+					defaultActiveKey={['0', '1', '2', '3', '4', '5']}
 					expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
-					onChange={activeKey => {
-						this.setState({
-							activeKey
-						});
-					}}
+					// onChange={activeKey => {
+					// 	this.setState({
+					// 		activeKey
+					// 	});
+					// }}
 				>
 					{formItems}
 				</Collapse>
