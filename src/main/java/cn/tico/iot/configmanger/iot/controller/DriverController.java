@@ -308,6 +308,21 @@ public class DriverController implements AdminKey {
 		return  Result.success("system.success",   obj );
 
 	}
+
+
+	@At("/grade_all_save")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
+	@Ok("json")
+	public Object gradeAllSave(@Param("data") Grade[] grades, HttpServletRequest req) {
+
+
+
+
+		Object  obj =  gradeService.gradeAllSave(grades);
+		return  Result.success("system.success",   obj );
+
+	}
 	@At("/grade_add")
 	@POST
 	@AdaptBy(type = JsonAdaptor.class)
@@ -384,7 +399,6 @@ public class DriverController implements AdminKey {
     public Object removeRule(@Param("id")String id, HttpServletRequest req) {
         try {
 
-            //int i = rulerService._delete(ruler);
             int i = rulerService.delete(id);
             return Result.success("system.success",i);
         } catch (Exception e) {
