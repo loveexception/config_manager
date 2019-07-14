@@ -376,8 +376,8 @@ public class DriverController implements AdminKey {
 	@At("/grade_remove")
 	@Ok("json")
     @POST
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object removeGrade(@Param("data")String id, HttpServletRequest req) {
+	// @AdaptBy(type = JsonAdaptor.class)
+	public Object removeGrade(@Param("id")String id, HttpServletRequest req) {
 		try {
 		    Grade grade = new Grade();
 		    grade.setId(id);
@@ -395,7 +395,7 @@ public class DriverController implements AdminKey {
     @At("/ruler_remove")
     @Ok("json")
     @POST
-    @AdaptBy(type = JsonAdaptor.class)
+    // @AdaptBy(type = JsonAdaptor.class)
     public Object removeRule(@Param("id")String id, HttpServletRequest req) {
         try {
 

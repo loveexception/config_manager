@@ -14,6 +14,7 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class GradeService  extends Service<Grade> {
 
 
     public Object queryGrade(Cnd cnd) {
+
         Object obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
         return obj;
     }
@@ -37,6 +39,7 @@ public class GradeService  extends Service<Grade> {
         for (Grade grade:grades) {
             grade = InsertOrUpdate(grade);
             List<Ruler> rulers = InsertOrUpdateRulers(grade.getRulers());
+            grade.setRulers(rulers);
 
             if(Strings.isNotBlank(grade.getId())){
 
@@ -51,7 +54,23 @@ public class GradeService  extends Service<Grade> {
     }
 
     private List<Ruler> InsertOrUpdateRulers(List<Ruler> rulers) {
-        return null;
+        List<Ruler> result = new ArrayList<Ruler>();
+        for (Ruler ruler:rulers) {
+            if(Strings.isNotBlank(ruler.getId())){
+//                grade.setCreateBy(null);
+//                grade.setCreateTime(null);
+//                grade.setDelFlag(null);
+//                grade.setUpdateBy(ShiroUtils.getSysUserId());
+//                grade.setUpdateTime(new Date());
+
+            }else {
+
+            }
+
+
+        }
+
+        return result;
     }
 
     private Grade InsertOrUpdate(Grade grade) {
