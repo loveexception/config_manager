@@ -327,6 +327,8 @@ public class DriverController implements AdminKey {
 	public Object gradeAdd(@Param("data") Grade grade, HttpServletRequest req) {
 
 		try {
+			int i = Integer.parseInt(""+(new Date().getTime()%1000000000));
+			grade.setOrderNum(i);
 			Object obj =  gradeService.insert(grade);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
@@ -341,7 +343,8 @@ public class DriverController implements AdminKey {
     public Object rulerAdd(@Param("data") Ruler[] ruler, @Param("gradeid") String gradeid,HttpServletRequest req) {
 
         try {
-            Object obj =  rulerService.insertRuler(ruler,gradeid);
+			int index = Integer.parseInt(""+(new Date().getTime()%1000000000));
+            Object obj =  rulerService.insertRuler(ruler,gradeid,index);
             return Result.success("system.success",obj);
         } catch (Exception e) {
             return Result.error("system.error");

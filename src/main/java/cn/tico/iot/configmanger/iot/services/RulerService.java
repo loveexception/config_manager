@@ -18,9 +18,10 @@ public class RulerService extends Service<Ruler> {
     }
 
 
-    public Object insertRuler(Ruler[] rulers,String gradeid) {
+    public Object insertRuler(Ruler[] rulers,String gradeid,int index) {
         List<Ruler> result = new ArrayList();
         for (Ruler ruler:rulers) {
+            ruler.setOrderNum(index);
             ruler.setGradeid(gradeid);
             result.add(ruler);
         }
