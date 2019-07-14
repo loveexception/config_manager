@@ -45,12 +45,10 @@ public class GradeService  extends Service<Grade> {
             List<Ruler> rulers = InsertOrUpdateRulers(grade.getRulers());
             grade.setRulers(rulers);
 
-            if(Strings.isNotBlank(grade.getId())){
+
 
                 forup.updateLinks(grade,"^rulers$");
-            }else {
-                forup.insertLinks(grade,"^rulers$");
-            }
+
 
         }
         return null;
@@ -60,19 +58,12 @@ public class GradeService  extends Service<Grade> {
     private List<Ruler> InsertOrUpdateRulers(List<Ruler> rulers) {
         List<Ruler> result = new ArrayList<Ruler>();
         for (Ruler ruler:rulers) {
-            if(Strings.isNotBlank(ruler.getId())){
-                ruler.setCreateBy(null);
-                ruler.setCreateTime(null);
-                ruler.setDelFlag(null);
-                ruler.setUpdateBy(ShiroUtils.getSysUserId());
-                ruler.setUpdateTime(new Date());
 
-            }else {
                 ruler.setCreateTime(new Date());
                 ruler.setCreateBy(ShiroUtils.getSysUserId());
                 ruler.setUpdateTime(new Date());
                 ruler.setUpdateBy(ShiroUtils.getSysUserId());
-            }
+
             result.add(ruler);
 
 
@@ -82,21 +73,13 @@ public class GradeService  extends Service<Grade> {
     }
 
     private Grade InsertOrUpdate(Grade grade) {
-        if(Strings.isNotBlank(grade.getId())){
-            grade.setCreateBy(null);
-            grade.setCreateTime(null);
-            grade.setDelFlag(null);
-            grade.setUpdateBy(ShiroUtils.getSysUserId());
-            grade.setUpdateTime(new Date());
 
-        }else{
             grade.setCreateTime(new Date());
             grade.setCreateBy(ShiroUtils.getSysUserId());
             grade.setUpdateTime(new Date());
             grade.setUpdateBy(ShiroUtils.getSysUserId());
 
 
-        }
         return grade;
     }
 
