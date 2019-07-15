@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Table("t_iot_grades")
-public class Grade extends I18NModel {
+public class Grade extends I18NModel implements Comparable<Grade> {
 
 
 
@@ -51,6 +51,8 @@ public class Grade extends I18NModel {
     private long  orderNum ;
 
 
-
-
+    @Override
+    public int compareTo(Grade o) {
+        return this.orderNum>o.getOrderNum()?1:-1;
+    }
 }

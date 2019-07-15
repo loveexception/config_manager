@@ -5,9 +5,11 @@ import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
+import java.util.Comparator;
+
 @Data
 @Table("t_iot_rulers")
-public class Ruler extends I18NModel {
+public class Ruler extends I18NModel implements Comparable<Ruler> {
 
     /**
      * 操作码
@@ -78,4 +80,8 @@ public class Ruler extends I18NModel {
 
 
 
+    @Override
+    public int compareTo(Ruler o) {
+        return this.orderNum>o.orderNum?1:-1;
+    }
 }

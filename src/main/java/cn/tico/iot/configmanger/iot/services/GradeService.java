@@ -6,6 +6,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.base.Kind;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Ruler;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
@@ -32,7 +33,7 @@ public class GradeService  extends Service<Grade> {
         List<Grade> obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
         for (Grade grade:obj) {
             List<Ruler> rulers = grade.getRulers();
-            Collections.sort(rulers, Comparator.comparing(Ruler::getOrderNum));
+            Collections.sort(rulers);
             grade.setRulers(rulers);
         }
 
