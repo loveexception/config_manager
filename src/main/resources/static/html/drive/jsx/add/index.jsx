@@ -638,7 +638,6 @@ class EditableTable extends React.PureComponent {
 		fileReader.readAsBinaryString(files[0]);
 	};
 	calibrationMethod = callback => {
-		console.log('获取-----', this.state.dataSource);
 		let _d = document.querySelectorAll('.editable-table-box .has-error');
 		if (this.state.dataSource.length <= 0) {
 			message.error('未添加指标项', 0.5);
@@ -652,6 +651,45 @@ class EditableTable extends React.PureComponent {
 		}
 		callback(this.state.dataSource);
 	};
+	funDownload(src) {
+		let $a = document.createElement('a');
+		$a.setAttribute('href', src);
+		$a.setAttribute('download', '');
+
+		let evObj = document.createEvent('MouseEvents');
+		evObj.initMouseEvent(
+			'click',
+			true,
+			true,
+			window,
+			0,
+			0,
+			0,
+			0,
+			0,
+			false,
+			true, //alt
+			false,
+			false,
+			0,
+			null
+		);
+		$a.dispatchEvent(evObj);
+	}
+	funDownload(content, filename) {
+		// 创建隐藏的可下载链接
+		var eleLink = document.createElement('a');
+		eleLink.download = filename;
+		eleLink.style.display = 'none';
+		// 字符内容转变成blob地址
+		var blob = new Blob([content]);
+		eleLink.href = URL.createObjectURL(blob);
+		// 触发点击
+		document.body.appendChild(eleLink);
+		eleLink.click();
+		// 然后移除
+		document.body.removeChild(eleLink);
+	}
 	render() {
 		const { dataSource = [] } = this.state;
 		// console.log('--------', dataSource);
@@ -709,7 +747,28 @@ class EditableTable extends React.PureComponent {
 						>
 							导出
 						</Button>
-						<Button className="btn-3">模板下载</Button>
+						<Button
+							className="btn-3"
+							onClick={() => {
+								$.ajax({
+									url: `/iot/driver/driver_temple?kind=group550`,
+									// data: {},
+									cache: false,
+									contentType: false,
+									processData: false,
+									type: 'GET',
+									success: results => {
+										if (results.code != 0) {
+											message.error('接口错误', 0.5);
+											return;
+										}
+										this.funDownload(results.data, '指标项模板.xlsx');
+									}
+								});
+							}}
+						>
+							模板下载
+						</Button>
 					</div>
 				</div>
 				<Table
@@ -858,8 +917,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 0,
-			driver_id: '' //'e605c13926904b2a8cc040584baff157'
+			current: 1,
+			driver_id: 'e605c13926904b2a8cc040584baff157'
 		};
 	}
 	indicatorsListInit = (driver_id, cb) => {
