@@ -243,5 +243,25 @@ public class LocationController implements AdminKey {
         return Result.success("system.success",obj);
     }
 
+    @At("tree_parent")
+    @Ok("json")
+    public Object  treeParent(@Param("id") String id) {
+        Cnd cnd = Cnd.NEW();
+
+        if(!isAdmin()){
+            SqlExpressionGroup
+                    group = Cnd
+                    .exps("dept_id", "=", DEPT_ADMIN)
+                    .or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+            cnd.and(group);
+        }
+
+        List<Location> locations =  locationService.query(cnd);
+        Location root = locationService.zip(locations);
+
+        String json = new Gson().toJson(root);
+        Object obj  = Json.fromJson(json);
+        return Result.success("system.success",obj);
+    }
 
 }
