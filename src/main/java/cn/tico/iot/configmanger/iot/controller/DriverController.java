@@ -343,8 +343,7 @@ public class DriverController implements AdminKey {
     public Object rulerAdd(@Param("data") Ruler[] ruler, @Param("gradeid") String gradeid,HttpServletRequest req) {
 
         try {
-			int index = Integer.parseInt(""+(new Date().getTime()%1000000000));
-            Object obj =  rulerService.insertRuler(ruler,gradeid,index);
+            Object obj =  rulerService.insertRuler(ruler,gradeid,new Date().getTime());
             return Result.success("system.success",obj);
         } catch (Exception e) {
             return Result.error("system.error");

@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.iot.models.driver.Ruler;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class RulerService extends Service<Ruler> {
     }
 
 
-    public Object insertRuler(Ruler[] rulers,String gradeid,int index) {
+    public Object insertRuler(Ruler[] rulers,String gradeid,long index) {
         List<Ruler> result = new ArrayList();
         for (Ruler ruler:rulers) {
             ruler.setOrderNum(index);
