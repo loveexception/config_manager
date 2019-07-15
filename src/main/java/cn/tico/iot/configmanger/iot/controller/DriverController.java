@@ -403,7 +403,14 @@ public class DriverController implements AdminKey {
             return Result.error("system.error");
         }
     }
+	@At("/driver_temple")
+	@Ok("json")
+	public Object gradeList(@Param("kind") String kind, HttpServletRequest req) {
+		Object obj = null;
+		obj =  Globals.MyConfig.get(kind);
+		return  Result.success("system.success",   obj );
 
+	}
 
 
 }

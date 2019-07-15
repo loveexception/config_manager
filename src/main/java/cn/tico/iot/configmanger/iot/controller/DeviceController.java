@@ -85,7 +85,9 @@ public class DeviceController implements AdminKey {
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)) {
 			//cnd.and("name", "like", "%" + name +"%");
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
+			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%")
+					.or("en_name", "like", "%" + name + "%")
+					.or("sno","like", "%" + name + "%");
 			cnd.and(group);
 		}
 		if (!isAdmin()) {
