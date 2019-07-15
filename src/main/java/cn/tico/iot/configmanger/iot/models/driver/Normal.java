@@ -65,13 +65,13 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
     @Comment("顺序")
     @ColDefine(type = ColType.INT)
     @GraphQLQuery(name = "order_num", description = "顺序")
-    private int  orderNum ;
+    private long  orderNum ;
 
     private String key ;
 
 
     @Override
-    public int compareTo(Normal o) {
-        return this.orderNum-o.orderNum;
+    public int     compareTo(Normal o) {
+        return this.orderNum > o.orderNum? 1: -1;
     }
 }

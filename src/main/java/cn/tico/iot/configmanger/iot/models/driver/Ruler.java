@@ -73,7 +73,7 @@ public class Ruler extends I18NModel {
     @Comment("排序")
     @ColDefine(type = ColType.INT)
     @GraphQLQuery(name = "order_num", description = "排序")
-    private int  orderNum ;
+    private long  orderNum ;
 
 
 
