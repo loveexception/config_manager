@@ -207,7 +207,7 @@ public class DeptController {
 
     @At("/tree_list")
     @Ok("json")
-    public List<Map<String, Object>> treeList(@Param("parentId") String parentId,
+    public Object  treeList(@Param("parentId") String parentId,
                                                  @Param("deptName") String deptName) {
         User user = ShiroUtils.getSysUser();
 
@@ -216,10 +216,10 @@ public class DeptController {
 
         if(roles.contains("admin")){
             List<Map<String, Object>> tree = deptService.selectFathers("100", null);
-            return tree;
+            return Result.success("system.success",tree);
         }else{
             List<Map<String, Object>> tree = deptService.selectFathers("100" , user.getDept().getDeptName());
-            return tree;
+            return  Result.success("system.success",tree);
         }
 
 
