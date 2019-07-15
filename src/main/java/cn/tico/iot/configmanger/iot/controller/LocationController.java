@@ -245,7 +245,7 @@ public class LocationController implements AdminKey {
 
     @At("tree_parent")
     @Ok("json")
-    public Object  treeParent(@Param("id") String id) {
+    public Object  treeParent(@Param("deptid") String id) {
         Cnd cnd = Cnd.NEW();
 
         if(!isAdmin()){
@@ -254,6 +254,13 @@ public class LocationController implements AdminKey {
                     .exps("dept_id", "=", DEPT_ADMIN)
                     .or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
             cnd.and(group);
+        }else if(Strings.isNotBlank(id)){
+            SqlExpressionGroup
+                    group = Cnd
+                    .exps("dept_id", "=", DEPT_ADMIN)
+                    .or("dept_id", "=", id);
+            cnd.and(group);
+
         }
 
         List<Location> locations =  locationService.query(cnd);
