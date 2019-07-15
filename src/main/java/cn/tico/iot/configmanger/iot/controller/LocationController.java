@@ -243,7 +243,7 @@ public class LocationController implements AdminKey {
         return Result.success("system.success",obj);
     }
 
-    @At("tree_parent")
+    @At("/tree_parent")
     @Ok("json")
     public Object  treeParent(@Param("deptid") String id) {
         Cnd cnd = Cnd.NEW();
