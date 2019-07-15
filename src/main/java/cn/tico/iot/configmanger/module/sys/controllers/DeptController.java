@@ -205,9 +205,9 @@ public class DeptController {
 
     }
 
-    @At("tree_me")
+    @At("/tree_list")
     @Ok("json")
-    public List<Map<String, Object>> treeMe(@Param("parentId") String parentId,
+    public List<Map<String, Object>> treeList(@Param("parentId") String parentId,
                                                  @Param("deptName") String deptName) {
         User user = ShiroUtils.getSysUser();
 
