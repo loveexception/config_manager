@@ -24,7 +24,13 @@ function urlArgs() {
 	}
 	return args;
 }
-let { Button, Input, Tabs, Collapse, Icon, Select, Form, message, Badge, Row, Col } = antd;
+function iframeClose() {
+	if (parent.layer) {
+		var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+		parent.layer.close(index);
+	}
+}
+let { Button, Input, Tabs, Collapse, Icon, Select, Form, message, Badge, Row, Col, Empty } = antd;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
@@ -102,14 +108,19 @@ class AlarmRulesBox extends React.PureComponent {
 				<Tabs
 					className="device-tabs-box"
 					onChange={key => {
-						this.setState({
-							select_key: key
-						});
-						// let value = (key || '').split('-')[0];
-						// if (value) {
-						// 	let tab = this[`rules_${value}`];
-						// 	tab && tab.getPanelList();
-						// }
+						this.setState(
+							{
+								select_key: key
+							},
+							() => {
+								let value = (key || '').split('-')[0];
+								if (value) {
+									let tab = this[`rules_${value}`];
+									console.log(tab);
+									tab && tab.getPanelList();
+								}
+							}
+						);
 					}}
 					type="card"
 				>
@@ -128,88 +139,74 @@ class AlarmRulesBox extends React.PureComponent {
 								key={`${item.value}-${index}`}
 							>
 								<Component onRef={el => (this[`rules_${item.value}`] = el)} grade={item} listData={listData} selectNorma={selectNorma} />
-								{/* <WrappedDynamicFieldSet name={item.value} /> */}
-								{/* <RulesCard grade={item} listData={listData} selectNorma={selectNorma} /> */}
 							</TabPane>
 						);
 					})}
 				</Tabs>
-				<Button
-					onClick={() => {
-						let { tabs_data = [] } = this.state;
-						let all_data = [];
-						let num = 0;
-						tabs_data.map((item, index) => {
-							let rules_form = this[`rules_${item.value}`];
-							let rules_point = this[`rules_${item.value}_point`];
-							if (rules_form) {
-								rules_form.handleSubmit(data => {
-									if (data) {
-										rules_point.classList.remove('point');
-										all_data.push(data);
-										num++;
-									} else {
-										rules_point.classList.add('point');
-									}
-								});
-							}
-						});
-						if (num == 4) {
-							let all_data_new = _.flattenDepth(all_data, 1) || [];
-							if (all_data_new.length > 0) {
-								$.ajax({
-									cache: true,
-									type: 'POST',
-									url: '/iot/driver/grade_all_save',
-									data: JSON.stringify({
-										data: all_data_new
-									}),
-									dataType: 'json',
-									async: false,
-									success: results => {
-										if (results.code != 0) {
-											message.error('接口错误');
-											return;
+				<div className="device-btn-box">
+					<Button
+						type="primary"
+						onClick={() => {
+							let { tabs_data = [] } = this.state;
+							let all_data = [];
+							let num = 0;
+							tabs_data.map((item, index) => {
+								let rules_form = this[`rules_${item.value}`];
+								let rules_point = this[`rules_${item.value}_point`];
+								if (rules_form) {
+									rules_form.handleSubmit(data => {
+										if (data) {
+											rules_point.classList.remove('point');
+											all_data.push(data);
+											num++;
+										} else {
+											rules_point.classList.add('point');
 										}
-										let value = (this.state.select_key || '').split('-')[0];
-										if (value) {
-											let tab = this[`rules_${value}`];
-											tab && tab.getPanelList();
-											message.success('保存成功', 0.5);
+									});
+								}
+							});
+							if (num == 4) {
+								let all_data_new = _.flattenDepth(all_data, 1) || [];
+								if (all_data_new.length > 0) {
+									$.ajax({
+										cache: true,
+										type: 'POST',
+										url: '/iot/driver/grade_all_save',
+										data: JSON.stringify({
+											data: all_data_new
+										}),
+										dataType: 'json',
+										async: false,
+										success: results => {
+											if (results.code != 0) {
+												message.error('接口错误');
+												return;
+											}
+											let value = (this.state.select_key || '').split('-')[0];
+											if (value) {
+												let tab = this[`rules_${value}`];
+												tab && tab.getPanelList();
+												message.success('保存成功', 0.5);
+											}
+											// this.getPanelList();
 										}
-										// this.getPanelList();
-									}
-								});
+									});
+								}
+							} else {
+								message.error('表单填写错误', 0.5);
 							}
-						} else {
-							message.error('表单填写错误', 0.5);
-						}
-					}}
-				>
-					提交
-				</Button>
-				{/* <Tabs
-					className="device-tabs-box"
-					onChange={key => {
-						console.log(key);
-					}}
-					type="card"
-				>
-					{tabs_data.map((item, index) => {
-						return (
-							<TabPane className="device-tabs-pane" tab={item.title} key={index}>
-								<RulesCard grade={item} listData={listData} selectNorma={selectNorma} />
-							</TabPane>
-						);
-					})}
-				</Tabs>
-				<Button
-					onClick={() => {
-						console.log('---');
-					}}
-				>
-					保存
-				</Button> */}
+						}}
+					>
+						保存
+					</Button>
+					<Button
+						onClick={() => {
+							iframeClose();
+						}}
+					>
+						取消
+					</Button>
+				</div>
 			</div>
 		);
 	};
@@ -381,10 +378,11 @@ class DynamicFieldSet extends React.Component {
 	handleSubmit = cb => {
 		this.props.form.validateFields((err, values) => {
 			if (!err) {
-				const { keys, contents, rules } = values;
+				const { keys, contents, rules = [] } = values;
 				let data = keys.map(key => contents[key]);
+				console.log('---', data);
+				let data_new = [];
 				if (data.length > 0) {
-					let data_new = [];
 					data.map((item, i) => {
 						let rulers_new = [];
 						let rulers_old = rules[i] || [];
@@ -402,9 +400,8 @@ class DynamicFieldSet extends React.Component {
 							rulers: rulers_new
 						});
 					});
-
-					cb(data_new);
 				}
+				cb(data_new);
 			} else {
 				cb();
 			}
@@ -659,6 +656,21 @@ class DynamicFieldSet extends React.Component {
 		});
 		return (
 			<Form className="drive-alarm-rules-card-box">
+				{keys.length <= 0 && (
+					<div className="empty-box">
+						<div>
+							<span
+								className="add-btn"
+								onClick={e => {
+									this.add();
+								}}
+							>
+								添加
+							</span>
+						</div>
+						<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ margin: 0 }} />
+					</div>
+				)}
 				<Collapse
 					className="card-collapse"
 					// accordion

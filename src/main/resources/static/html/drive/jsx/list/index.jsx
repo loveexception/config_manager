@@ -123,7 +123,7 @@ class ListBox extends React.PureComponent {
 						<div>
 							<Button
 								onClick={() => {
-									$.modal.openFull('修改驱动', '/html/drive/edit.html');
+									$.modal.openFull('修改驱动', `/html/drive/edit.html?driver_id=${record.id}`);
 								}}
 							>
 								修改

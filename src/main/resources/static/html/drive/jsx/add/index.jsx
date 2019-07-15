@@ -33,7 +33,7 @@ $.modal.open = function(title, url, width, height) {
 		shade: 0.3,
 		title: title,
 		content: url,
-		btn: ['保存', '取消'],
+		// btn: ['保存', '取消'],
 		// 弹层外区域关闭
 		shadeClose: false,
 		yes: function(index, layero) {
@@ -375,7 +375,6 @@ class EditableTableRadio extends React.PureComponent {
 	}
 	render() {
 		let { data = {} } = this.props;
-		console.log(this.state.value);
 		return (
 			<Radio.Group
 				onChange={e => {
@@ -816,14 +815,6 @@ class AlarmConfiguration extends React.PureComponent {
 		// this.init('e605c13926904b2a8cc040584baff157');
 	}
 
-	calibrationMethod = callback => {
-		if (this.state.data.length <= 0) {
-			message.error('未添加指标项', 0.5);
-			callback();
-			return;
-		}
-		callback(this.state.data);
-	};
 	render() {
 		let { show, title, driver_id } = this.props;
 		let { data = [] } = this.state;
@@ -867,7 +858,7 @@ class AlarmConfiguration extends React.PureComponent {
 						<Button
 							className="btn-2"
 							onClick={() => {
-								$.modal.open('告警规则设置', `/html/drive/alarmRules.html?driver_id=${driver_id}&id=${record.id}`);
+								$.modal.open('告警规则设置', `/html/drive/alarmRules.html?driverid=${driver_id}&normalid=${record.id}`);
 							}}
 						>
 							告警配置
@@ -917,8 +908,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 1,
-			driver_id: 'e605c13926904b2a8cc040584baff157'
+			current: 0,
+			driver_id: '' //'e605c13926904b2a8cc040584baff157'
 		};
 	}
 	indicatorsListInit = (driver_id, cb) => {
@@ -1073,60 +1064,59 @@ class AddBox extends React.PureComponent {
 									// this.next();
 									if (this.indicators) {
 										let driverid = this.state.driver_id;
-
 										// normal_update_all
 										this.indicators.calibrationMethod(data => {
 											if (data) {
 												let data_id_list = data.filter(item => item.id);
 												let data_notid_list = data.filter(item => !item.id);
-												if (data_id_list.length > 0) {
-													$.ajax({
-														cache: true,
-														type: 'POST',
-														url: '/iot/driver/normal_change',
-														data: JSON.stringify({
-															driverid,
-															insert: data_notid_list,
-															update: data_id_list
-														}),
-														dataType: 'json',
-														async: false,
-														success: results => {
-															if (results.code != 0) {
-																message.error('接口错误', 0.5);
-																return;
-															}
-															this.indicators.init(results.data);
-															if (this.alarmConfiguration) {
-																this.alarmConfiguration.init(driverid);
-																this.next();
-															}
+												// if (data_id_list.length > 0) {
+												$.ajax({
+													cache: true,
+													type: 'POST',
+													url: '/iot/driver/normal_change',
+													data: JSON.stringify({
+														driverid,
+														insert: data_notid_list,
+														update: data_id_list
+													}),
+													dataType: 'json',
+													async: false,
+													success: results => {
+														if (results.code != 0) {
+															message.error('接口错误', 0.5);
+															return;
 														}
-													});
-												} else {
-													$.ajax({
-														cache: true,
-														type: 'POST',
-														url: '/iot/driver/normal_insert_all',
-														data: JSON.stringify({
-															driverid,
-															data
-														}),
-														dataType: 'json',
-														async: false,
-														success: results => {
-															if (results.code != 0) {
-																message.error('接口错误', 0.5);
-																return;
-															}
-															this.indicators.init(results.data);
-															if (this.alarmConfiguration) {
-																this.alarmConfiguration.init(driverid);
-																this.next();
-															}
+														this.indicators.init(results.data);
+														if (this.alarmConfiguration) {
+															this.alarmConfiguration.init(driverid);
+															this.next();
 														}
-													});
-												}
+													}
+												});
+												// } else {
+												// 	$.ajax({
+												// 		cache: true,
+												// 		type: 'POST',
+												// 		url: '/iot/driver/normal_insert_all',
+												// 		data: JSON.stringify({
+												// 			driverid,
+												// 			data
+												// 		}),
+												// 		dataType: 'json',
+												// 		async: false,
+												// 		success: results => {
+												// 			if (results.code != 0) {
+												// 				message.error('接口错误', 0.5);
+												// 				return;
+												// 			}
+												// 			this.indicators.init(results.data);
+												// 			if (this.alarmConfiguration) {
+												// 				this.alarmConfiguration.init(driverid);
+												// 				this.next();
+												// 			}
+												// 		}
+												// 	});
+												// }
 											}
 										});
 									}
@@ -1141,14 +1131,15 @@ class AddBox extends React.PureComponent {
 							style={{ width: 180, height: 40 }}
 							type="primary"
 							onClick={() => {
-								message.success('操作完成', 0.5);
-								if (this.alarmConfiguration) {
-									this.alarmConfiguration.calibrationMethod(data => {
-										if (data) {
-											// iframeClose();
-										}
-									});
-								}
+								iframeClose();
+								// message.success('操作完成', 0.5);
+								// if (this.alarmConfiguration) {
+								// 	this.alarmConfiguration.calibrationMethod(data => {
+								// 		if (data) {
+
+								// 		}
+								// 	});
+								// }
 							}}
 						>
 							完成
