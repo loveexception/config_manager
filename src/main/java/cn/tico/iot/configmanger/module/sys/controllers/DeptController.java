@@ -205,6 +205,26 @@ public class DeptController {
 
     }
 
+    @At("tree_me")
+    @Ok("json")
+    public List<Map<String, Object>> treeMe(@Param("parentId") String parentId,
+                                                 @Param("deptName") String deptName) {
+        User user = ShiroUtils.getSysUser();
+
+        user =userService.fetchLinks(user,"dept|image");
+        Set roles = userService.getRoleCodeList(user);
+
+        if(roles.contains("admin")){
+            List<Map<String, Object>> tree = deptService.selectFathers("100", null);
+            return tree;
+        }else{
+            List<Map<String, Object>> tree = deptService.selectFathers("100" , user.getDept().getDeptName());
+            return tree;
+        }
+
+
+    }
+
     @At
     @POST
     @Ok("json")
