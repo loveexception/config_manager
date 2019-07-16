@@ -18,6 +18,17 @@ public class TableDataInfo implements Serializable
     /** 消息状态码 */
     private int code;
 
+    public int getPageCount() {
+        return pageCount;
+    }
+
+    public void setPageCount(int pageCount) {
+        this.pageCount = pageCount;
+    }
+
+    private int pageCount;
+
+
     /**
      * 表格数据对象
      */

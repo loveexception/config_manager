@@ -289,6 +289,9 @@ public class Service<T> extends EntityService<T> {
         if (!Strings.isBlank(linkname)) {
             this.dao().fetchLinks(list, linkname);
         }
-        return new TableDataInfo(list, this.dao().count(this.getEntityClass(),cnd));
+        pager.setRecordCount(this.dao().count(this.getEntityClass(),cnd));
+        TableDataInfo info =new TableDataInfo(list,pager.getRecordCount() );
+        info.setPageCount(pager.getPageCount());
+        return info;
     }
 }
