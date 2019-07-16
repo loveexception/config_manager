@@ -12,6 +12,7 @@ import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.iot.services.*;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -79,7 +80,9 @@ public class DeviceController implements AdminKey {
 					   @Param("pageSize")int pageSize,
 					   @Param("name") String name,
 					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
+					 	@Param("isAsc") String isAsc,
+					 	@Param("deptid") String deptid,
+
 					   HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
@@ -90,17 +93,25 @@ public class DeviceController implements AdminKey {
 					.or("sno","like", "%" + name + "%");
 			cnd.and(group);
 		}
+		Dept dept = new Dept();
+		SqlExpressionGroup
+				group = Cnd
+				.exps("dept_id", "=", DEPT_ADMIN);
 		if (!isAdmin()) {
-			SqlExpressionGroup
-					group = Cnd
-					.exps("dept_id", "=", DEPT_ADMIN)
-					.or("dept_id", "=", ShiroUtils.getSysUser().getDeptId());
-			cnd.and(group);
+			group.or("dept_id", "=", ShiroUtils.getSysUser().getDeptId());
+			dept.setId(ShiroUtils.getSysUser().getDeptId());
+		}else if(Strings.isNotBlank(deptid)){
+			group.or("dept_id", "=",deptid);
+		}else {
+			group.or("1","=","1");
 		}
-		cnd.and("delflag", "=", "false");
-		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location$");
 
-		return obj;
+
+		cnd.and(group);
+		cnd.and("delflag", "=", "false");
+		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver$");
+
+		return Result.success("system.success",obj);
 
 	}
 	/**
@@ -337,7 +348,7 @@ public class DeviceController implements AdminKey {
 //
 //
 //		obj =  gradeService.queryGrade(cnd);
-//		return  Result.success("system.success",   obj );
+//		return  Result.success(,   obj );
 //
 //	}
 //	@At("/grade_add")
