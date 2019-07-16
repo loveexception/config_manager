@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.iot.controller;
 
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.iot.models.base.Kind;
 import cn.tico.iot.configmanger.iot.models.base.Location;
 import cn.tico.iot.configmanger.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
@@ -271,4 +272,15 @@ public class LocationController implements AdminKey {
         return Result.success("system.success",obj);
     }
 
+    /**
+     * 选择菜单树
+     */
+    @At("/select_parent")
+    @Ok("json")
+    public Object selectParent(@Param("id") String id, HttpServletRequest req) {
+
+        List<Location> obj = locationService.selectParents(id);
+
+        return Result.success("system.success",obj);
+    }
 }

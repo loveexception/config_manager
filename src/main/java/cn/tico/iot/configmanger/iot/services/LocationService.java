@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.iot.models.base.Kind;
 import cn.tico.iot.configmanger.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import org.nutz.dao.Cnd;
@@ -172,5 +173,17 @@ public class LocationService extends Service<Location> {
 
 
         return root;
+    }
+    public List<Location> selectParents(String id) {
+        Location kind = fetch(id);
+        String fathers = kind.getAncestors();
+        List<Location> result = new ArrayList();
+        for(String parent : fathers.split(",")){
+            Location temp = fetch(parent);
+            if(temp!=null&&Lang.str2number(temp.getLevel()).intValue()>0) {
+                result.add(temp);
+            }
+        }
+        return result;
     }
 }
