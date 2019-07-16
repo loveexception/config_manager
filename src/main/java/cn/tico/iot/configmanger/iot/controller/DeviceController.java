@@ -76,14 +76,15 @@ public class DeviceController implements AdminKey {
 	 */
 	@At("/device_list")
 	@Ok("json")
-	public Object deviceList(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("orderByColumn") String orderByColumn,
-					 	@Param("isAsc") String isAsc,
-					 	@Param("deptid") String deptid,
-
-					   HttpServletRequest req) {
+	public Object deviceList(
+			@Param("pageNum")int pageNum
+			, @Param("pageSize")int pageSize
+			, @Param("name") String name
+			, @Param("orderByColumn") String orderByColumn
+			, @Param("isAsc") String isAsc
+			, @Param("deptid") String deptid
+			, @Param("locationid") String locationid,
+			HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)) {
@@ -105,11 +106,14 @@ public class DeviceController implements AdminKey {
 		}else {
 			group.or("1","=","1");
 		}
+		if(Strings.isNotBlank(locationid)){
+			cnd.and("location_id","=",locationid);
+		}
 
 
 		cnd.and(group);
 		cnd.and("delflag", "=", "false");
-		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver$");
+		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver|gateway$");
 
 		return Result.success("system.success",obj);
 
