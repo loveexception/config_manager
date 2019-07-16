@@ -55,14 +55,14 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("资产状态")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "asset_status", description = "资产状态")
-    private String assetStatus;
+    private String assetStatus ="0";
 
 
     @Column("alert_status")
     @Comment("告警状态")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "alert_status", description = "告警状态")
-    private String alertStatus;
+    private String alertStatus="normal";
 
     /**
      * 网关
