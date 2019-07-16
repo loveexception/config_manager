@@ -251,14 +251,17 @@ public class KindController  implements AdminKey {
     }
 
 
-//    /**
-//     * 选择菜单树
-//     */
-//    @At("/selectTree/?")
-//    @Ok("th:/sys/dept/tree.html")
-//    public void selectTree(String id, HttpServletRequest req) {
-//        req.setAttribute("dept", deptService.fetch(id));
-//    }
+    /**
+     * 选择菜单树
+     */
+    @At("/select_parent")
+    @Ok("json")
+    public Object selectParent(@Param("id") String id, HttpServletRequest req) {
+
+        List<Kind> obj = kindService.selectParents(id);
+
+       return Result.success("system.success",obj);
+    }
 
 //    @At
 //    @Ok("json")

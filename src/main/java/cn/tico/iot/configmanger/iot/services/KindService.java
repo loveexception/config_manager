@@ -178,4 +178,17 @@ public class KindService extends Service<Kind> {
         }
         return root;
     }
+
+    public List<Kind> selectParents(String id) {
+        Kind kind = fetch(id);
+        String fathers = kind.getAncestors();
+        List<Kind> result = new ArrayList<Kind>();
+        for(String parent : fathers.split(",")){
+            Kind temp = fetch(parent);
+            if(temp!=null&&Lang.str2number(temp.getLevel()).intValue()>0) {
+                result.add(temp);
+            }
+        }
+        return result;
+    }
 }

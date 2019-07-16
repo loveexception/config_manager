@@ -26,7 +26,7 @@ public class Device extends DeviceEnvModel implements Serializable {
 
     @Column("price")
     @Comment("价格")
-    @ColDefine(type = ColType.FLOAT ,width = 20 ,precision = 2 )
+    @ColDefine(type = ColType.FLOAT  )
     @GraphQLQuery(name = "price", description = "价格")
     private Double price;
 
