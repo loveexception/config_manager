@@ -32,7 +32,8 @@ public class DeviceService extends Service<Device> {
             Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
 
             device =  extAttr(device);
-            return  forup.update(device);
+            forup.update(device);
+            return  device;
 
         }
         device = creatAttr(device);
