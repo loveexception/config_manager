@@ -74,4 +74,19 @@ public abstract class CommonModel {
     public Date now() {
         return new Date();
     }
+
+//    public long getCreateSecond(){
+//        return createTime.getTime();
+//    }
+//    public void setCreateSecond(long second){
+//
+//        this.createTime = new Date(second);
+//    }
+//    public long getUpdateSecond(){
+//        return updateTime.getTime();
+//    }
+//    public void setUpdateSecond(long second){
+//
+//        this.updateTime = new Date(second);
+//    }
 }

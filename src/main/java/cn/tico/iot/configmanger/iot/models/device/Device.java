@@ -33,9 +33,9 @@ public class Device extends DeviceEnvModel implements Serializable {
 
     @Column("order_time")
     @Comment("购买日期")
-    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "order_time", description = "购买日期")
-    private String orderTime;
+    private Long orderTime;
 
 
 
@@ -47,10 +47,22 @@ public class Device extends DeviceEnvModel implements Serializable {
 
     @Column("discard_time")
     @Comment("报废时间")
-    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "discard_time", description = "报废时间")
-    private String discardTime;
+    private Long discardTime;
 
+    @Column("asset_status")
+    @Comment("资产状态")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "asset_status", description = "资产状态")
+    private String assetStatus;
+
+
+    @Column("alert_status")
+    @Comment("告警状态")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "alert_status", description = "告警状态")
+    private String alertStatus;
 
     /**
      * 网关
