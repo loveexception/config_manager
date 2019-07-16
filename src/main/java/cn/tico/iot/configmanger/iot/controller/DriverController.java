@@ -69,6 +69,17 @@ public class DriverController implements AdminKey {
 		return driverService.tableList(0,1000,cnd,"updateTime","desc","^kind|normals$");
 	}
 
+	/**
+	 * 包起来
+	 * @param req
+	 * @return
+	 */
+	@At("/drivers")
+	@Ok("json")
+	public Object drivers(HttpServletRequest req) {
+
+		return Result.success("system.success" ,driverList(req));
+	}
 
 	/**
 	 * 查寻业务

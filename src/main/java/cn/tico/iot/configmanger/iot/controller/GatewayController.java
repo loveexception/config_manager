@@ -97,7 +97,7 @@ public class GatewayController implements AdminKey {
 	@At("/gateway_list")
 	@Ok("json")
 	public Object gatewayList( HttpServletRequest req){
-		return list(0,1000,null,null,null,req);
+		return Result.success("system.success" ,list(0,1000,null,null,null,req));
 	}
 
 
