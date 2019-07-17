@@ -62,8 +62,7 @@
 							top: 5px;
 							border-radius: 14px;
 							background-color: #cccccc;
-							box-shadow: inset 0px 5px 6px 0px
-								rgba(0, 0, 0, 0.34);
+							box-shadow: inset 0px 5px 6px 0px rgba(0, 0, 0, 0.34);
 						}
 						.ant-steps-icon {
 							font-size: 24px;
@@ -141,6 +140,16 @@
 			}
 		}
 		.device-add-indicators-box {
+			.descriptions {
+				box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
+				.ant-descriptions-view .ant-descriptions-item-label {
+					width: 170px;
+					text-align: right;
+				}
+				.ant-descriptions-item-content {
+					background: #fff;
+				}
+			}
 			.title {
 				color: #ffffff;
 				font-size: 20px;
@@ -149,114 +158,25 @@
 				text-align: center;
 				background-color: #1875f0;
 			}
-
-			.editable-table-box {
-				.ant-form-explain {
-					font-size: 12px;
-					position: absolute;
-					bottom: -8px;
-				}
-				.has-error {
-					.ant-form-item-children {
-						.ant-input {
-							margin-bottom: 16px;
-						}
-					}
-				}
-				.ant-form-item-children {
-					.ant-input {
-						height: 24px;
-					}
-				}
-				.editable-cell {
-					position: relative;
-				}
-
-				.editable-cell-value-wrap {
-					padding: 5px 12px;
-					min-height: 31px;
-					cursor: pointer;
-				}
-
-				.editable-row {
-					&:hover {
-						.editable-cell-value-wrap {
-							border: 1px solid #d9d9d9;
-							border-radius: 4px;
-							padding: 4px 11px;
-						}
-					}
-				}
-				.editable-table-content {
-					.right-btn-box {
-						.upload-wrap {
-							display: inline-block;
-							position: relative;
-							// width: 124px;
-							// padding: 3px 5px;
-							overflow: hidden;
-							.file-uploader {
-								cursor: pointer;
-								font-size: 0;
-								position: absolute;
-								width: 100%;
-								height: 100%;
-								top: 0;
-								left: 0;
-								outline: none;
-								opacity: 0;
-								background-color: transparent;
-							}
-
-							.upload-text {
-								display: inline-block;
-								margin-left: 5px;
-							}
-						}
-					}
-				}
-			}
-			.ant-table {
-				box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
-				.ant-table-thead > tr > th {
-					background-color: #e3e3e3;
-				}
-				.ant-table-tbody > tr > td,
-				.ant-table-thead > tr > th {
-					padding: 8px;
-				}
-				.ant-table-tbody {
-					background-color: #fff;
-				}
-
-				// .ant-table-body > table {
-				// 	border-color: #8f8f8f;
-				// }
-			}
-			.ant-table-bordered {
-				.ant-table-placeholder,
-				.ant-table-body > table,
-				.ant-table-tbody > tr > td,
-				.ant-table-thead > tr > th {
-					border-color: #8f8f8f;
-				}
-			}
-			.ant-pagination {
-				margin: 20px 0 0;
-				.ant-pagination-item-link {
-					width: 24px;
-					height: 24px;
-					background-color: #cccccc;
+			.radio-box {
+				width: 100%;
+				.radio-li {
+					width: 20%;
+					max-width: 220px;
+					height: 39px;
+					line-height: 39px;
+					font-size: 14px;
+					border: none;
+					text-align: center;
+					color: #404040;
 					border-radius: 0;
-					i {
-						color: #fff;
+					&:before {
+						display: none;
 					}
 				}
-				.ant-pagination-simple-pager {
-					input {
-						border: solid 1px #cccccc;
-						border-radius: 0;
-					}
+				.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+					background-color: #1875f0;
+					color: #fff;
 				}
 			}
 		}

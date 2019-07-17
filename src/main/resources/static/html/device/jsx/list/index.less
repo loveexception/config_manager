@@ -41,10 +41,15 @@
 					font-size: 14px;
 					min-width: 114px;
 					border-radius: 15px;
-					background-color: #1875f0;
-					border: none;
+					border: solid 1px #8f8f8f;
 					cursor: pointer;
+					margin-right: 20px;
 				}
+				.btn {
+					border: none;
+					background-color: #1875f0;
+				}
+
 				.ant-select-selection--single {
 					height: 30px;
 					border-radius: 15px;
@@ -61,7 +66,7 @@
 					padding: 0 11px;
 					color: #8f8f8f;
 					font-size: 14px;
-					margin-left: 20px;
+
 					cursor: pointer;
 				}
 			}
@@ -117,6 +122,38 @@
 					border-radius: 0;
 				}
 			}
+		}
+	}
+}
+.device-upload-modal {
+	.device-upload-modal-content {
+		display: flex;
+		.upload-wrap {
+			display: inline-block;
+			position: relative;
+			// width: 124px;
+			// padding: 3px 5px;
+			overflow: hidden;
+			.file-uploader {
+				cursor: pointer;
+				font-size: 0;
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				outline: none;
+				opacity: 0;
+				background-color: transparent;
+			}
+
+			.upload-text {
+				display: inline-block;
+				margin-left: 5px;
+			}
+		}
+		.ant-input {
+			flex-grow: 1;
 		}
 	}
 }
