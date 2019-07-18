@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.module.sys.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
+import io.leangen.graphql.annotations.GraphQLQuery;
 import org.nutz.dao.entity.annotation.*;
 
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public class Dept extends BaseModel implements Serializable {
     @Comment("ID")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @Prev(els = {@EL("uuid()")})
+    @GraphQLQuery(name = "id", description = "主键")
     private String id;
 
     /**
@@ -26,6 +28,7 @@ public class Dept extends BaseModel implements Serializable {
      */
     @Column("parent_id")
     @Comment("父部门ID")
+    @GraphQLQuery(name = "parent_id", description = "父部门ID")
     private String parentId;
 
     /**
@@ -33,6 +36,8 @@ public class Dept extends BaseModel implements Serializable {
      */
     @Column("ancestors")
     @Comment("祖级列表")
+    @GraphQLQuery(name = "ancestors", description = "祖级列表")
+
     private String ancestors;
 
     /**
@@ -40,6 +45,7 @@ public class Dept extends BaseModel implements Serializable {
      */
     @Column("dept_name")
     @Comment("部门名称")
+    @GraphQLQuery(name = "dept_name", description = "部门名称")
     private String deptName;
 
     /**
@@ -47,6 +53,8 @@ public class Dept extends BaseModel implements Serializable {
      */
     @Column("order_num")
     @Comment("显示顺序")
+    @GraphQLQuery(name = "order_num", description = "显示顺序")
+
     private int orderNum;
 
     /**
@@ -54,6 +62,8 @@ public class Dept extends BaseModel implements Serializable {
      */
     @Column("leader")
     @Comment("负责人")
+    @GraphQLQuery(name = "leader", description = "负责人")
+
     private String leader;
 
     /**
@@ -61,12 +71,16 @@ public class Dept extends BaseModel implements Serializable {
      */
     @Column("phone")
     @Comment("联系电话")
+    @GraphQLQuery(name = "phone", description = "联系电话")
+
     private String phone;
     /**
      * 邮箱
      */
     @Column("email")
     @Comment("邮箱")
+    @GraphQLQuery(name = "email", description = "邮箱")
+
     private String email;
 
     /**

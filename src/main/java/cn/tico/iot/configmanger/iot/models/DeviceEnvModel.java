@@ -34,7 +34,9 @@ public class DeviceEnvModel extends I18NModel {
     private String kindmap;
 
     @One(field = "kindid",key = "id")
+    @GraphQLQuery(name = "kind", description = "类型")
     private Kind kind;
+
 
     private List<Kind> kinds;
 
@@ -92,7 +94,9 @@ public class DeviceEnvModel extends I18NModel {
     @ColDefine(type = ColType.VARCHAR, width = 32)
     private String deptid;
 
+
     @One(field = "deptid",key = "id")
+    @GraphQLQuery(name = "dept", description = "所属公司")
     private Dept dept;
 
     /**
@@ -137,6 +141,7 @@ public class DeviceEnvModel extends I18NModel {
 
 
     @One(field = "locationid",key="id")
+    @GraphQLQuery(name = "location", description = "地理位置")
     private Location location;
 
 

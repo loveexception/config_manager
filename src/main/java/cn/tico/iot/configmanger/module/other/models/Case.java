@@ -9,12 +9,13 @@ import org.nutz.dao.entity.annotation.Table;
 import java.io.Serializable;
 
 /**
- * 字典表 sys_dict
+ * 运维表 sys_dict
  *
  * @author haiming
  * @date 2019-04-16
  */
 @Table("other_case")
+@Comment("运维表")
 public class Case extends CommonModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -23,8 +24,8 @@ public class Case extends CommonModel implements Serializable {
     /**
      * 标签名
      */
-    @Column("no")
-    @Comment("序号")
+    @Column("sno")
+    @Comment("设备序号")
     private String no;
 
 

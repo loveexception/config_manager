@@ -28,7 +28,8 @@ public class Driver extends DriverModel implements Serializable {
     private String  path ;
 
 
-    @Many(field = "driverid")
+    @Many(field = "driverid" ,key = "id")
+    @GraphQLQuery(name = "normals", description = "项目")
     private List<Normal> normals;
 
 

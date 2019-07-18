@@ -36,6 +36,7 @@ public class Grade extends I18NModel implements Comparable<Grade> {
 
 
     @Many(field = "gradeid")
+    @GraphQLQuery(name = "rulers", description = "规则")
     private List<Ruler> rulers;
 
 

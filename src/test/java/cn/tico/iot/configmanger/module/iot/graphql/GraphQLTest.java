@@ -1,4 +1,4 @@
-package cn.tico.iot.configmanger.module.iot.models;
+package cn.tico.iot.configmanger.module.iot.graphql;
 
 import cn.tico.iot.configmanger.iot.models.base.Kind;
 import cn.tico.iot.configmanger.iot.models.base.Location;
@@ -83,7 +83,7 @@ public class GraphQLTest {
         String schema = "type Query { " +
                 " hello(what:String = \"World\"): String " +
                 " }";
-
+        System.out.println(schema);
         SchemaParser schemaParser = new SchemaParser();
         TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schema);
 

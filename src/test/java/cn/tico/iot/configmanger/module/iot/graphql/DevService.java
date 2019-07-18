@@ -1,8 +1,9 @@
-package cn.tico.iot.configmanger.module.iot.models;
+package cn.tico.iot.configmanger.module.iot.graphql;
 
 import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.module.iot.graphql.GraphQLTest;
 import io.leangen.graphql.annotations.*;
 
 import java.util.*;

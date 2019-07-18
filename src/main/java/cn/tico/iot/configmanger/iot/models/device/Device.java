@@ -79,6 +79,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     private String gatewayExtsno;
 
     @One(field = "gatewayid",key="id")
+    @GraphQLQuery(name = "gateway", description = "网关")
     private Gateway gateway;
 
     /**
@@ -90,6 +91,7 @@ public class Device extends DeviceEnvModel implements Serializable {
 
 
     @One(field = "driverid",key="id")
+    @GraphQLQuery(name = "driver", description = "驱动")
     private Driver driver;
 
 
