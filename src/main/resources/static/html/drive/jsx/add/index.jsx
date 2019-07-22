@@ -255,6 +255,9 @@ class BasicInformation extends React.PureComponent {
 									style={{
 										width: '100%'
 									}}
+									onChange={(value, selectedOptions = []) => {
+										getFieldDecorator('采集设备信息id', { initialValue: selectedOptions[selectedOptions.length - 1].id });
+									}}
 								/>
 							)}
 						</Form.Item>
@@ -1019,6 +1022,7 @@ class AddBox extends React.PureComponent {
 											if (data) {
 												let _file = (data['驱动文件'] || [])[0] || {};
 												let _info = data['采集设备信息'] || [];
+												let _info_id = data['采集设备信息id'] || [];
 												let file_response = _file.response || {};
 												let params = {
 													id: driverid,
@@ -1029,6 +1033,7 @@ class AddBox extends React.PureComponent {
 													kindKind: _info[0],
 													kindSubkind: _info[1],
 													kindType: _info[3],
+													kindid: _info_id,
 													path: (file_response.data || {}).url
 												};
 												$.ajax({

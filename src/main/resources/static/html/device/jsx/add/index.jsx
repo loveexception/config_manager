@@ -296,94 +296,7 @@ const LISTDATA = [
 		key: 35
 	}
 ];
-const LISTDATA2 = [
-	{
-		value: '0.7686050876320942',
-		label: '分类一',
-		children: [
-			{
-				value: 'hangzhou',
-				label: '子类一',
-				children: [
-					{
-						value: '0.6497000345160961',
-						label: '品牌一',
-						children: [
-							{
-								value: '0.12439953739115461',
-								label: '型号一'
-							},
-							{
-								value: '0.1911278735970452',
-								label: '型号二'
-							}
-						]
-					}
-				]
-			}
-		]
-	},
-	{
-		value: '0.5416814158011563',
-		label: '分类二',
-		children: [
-			{
-				value: '0.9090047796735239',
-				label: '子类一',
-				children: [
-					{
-						value: '0.7937843230672577',
-						label: '品牌一',
-						children: [
-							{
-								value: '0.7971342102079821',
-								label: '型号三'
-							},
-							{
-								value: '0.06762476699147046',
-								label: '型号四'
-							}
-						]
-					},
-					{
-						value: '0.5549236152120482',
-						label: '品牌二',
-						children: [
-							{
-								value: '0.9267693982102065',
-								label: '型号五'
-							},
-							{
-								value: '0.8490652019739944',
-								label: '型号六'
-							}
-						]
-					}
-				]
-			},
-			{
-				value: '0.4772728975306575',
-				label: '子类二',
-				children: [
-					{
-						value: '0.7045117916921957',
-						label: '品牌一',
-						children: [
-							{
-								value: '0.061172155525954786',
-								label: '型号七'
-							},
-							{
-								value: '0.7963683741000656',
-								label: '型号八'
-							}
-						]
-					}
-				]
-			}
-		]
-	}
-];
+const LISTDATA2 = [];
 let LISTDATA3 = [
 	{
 		value: '国网',
@@ -479,25 +392,7 @@ $.modal.open = function(title, url, width, height) {
 		}
 	});
 };
-let {
-	Steps,
-	Button,
-	message,
-	Input,
-	Descriptions,
-	Upload,
-	Icon,
-	Cascader,
-	Table,
-	Popconfirm,
-	Form,
-	Radio,
-	Modal,
-	Row,
-	Col,
-	DatePicker,
-	InputNumber
-} = antd;
+let { Steps, Button, message, Input, Descriptions, Upload, Icon, Cascader, Table, Popconfirm, Form, Radio, Modal, Row, Col, DatePicker, InputNumber, Select } = antd;
 const { Step } = Steps;
 const { confirm } = Modal;
 
@@ -505,6 +400,25 @@ var _list_data = {};
 
 function submitHandler() {
 	console.log('--点击确定--');
+}
+function urlArgs() {
+	let args = {};
+	let query = location.search.substring(1);
+	let pairs = query.split('&');
+	for (let i = 0; i < pairs.length; i++) {
+		let pos = pairs[i].indexOf('=');
+		if (pos == -1) continue;
+		let name = pairs[i].substring(0, pos);
+		let value = pairs[i].substring(pos + 1);
+		value = decodeURIComponent(value);
+		if (name.endsWith('[]')) {
+			args[name.split('[]')[0]] = args[name.split('[]')[0]] || [];
+			args[name.split('[]')[0]].push(value);
+		} else {
+			args[name] = value;
+		}
+	}
+	return args;
 }
 var add_confirm = void 0;
 function cancelHandler() {
@@ -544,11 +458,18 @@ function iframeClose() {
 }
 
 class BasicInformation extends React.PureComponent {
+	state = {
+		device_type_cascader_list: [],
+		location_cascader_list: [],
+		select_list: [],
+		select_location: []
+	};
 	calibrationMethod = callback => {
 		this.props.form.validateFields((err, values) => {
 			if (!err) {
 				console.log('基本信息校验成功');
 				callback(values);
+				return;
 			}
 			message.error('基本信息填写错误', 0.5);
 			callback();
@@ -561,11 +482,97 @@ class BasicInformation extends React.PureComponent {
 	};
 	componentDidMount() {
 		this.props.onRef && this.props.onRef(this);
+		this.getCascaderData();
+		this.getSelectList();
+		let { select_dept, select_cascader } = urlArgs();
+
+		$.ajax({
+			url: `/iot/location/select_parent?id=${select_cascader}`,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误', 0.5);
+					return;
+				}
+				let data = results.data || [];
+				let select_location = [];
+				data.map(item => select_location.push(item.cnName));
+
+				this.setState({
+					select_location
+				});
+			}
+		});
+		this.getLocationData(select_dept);
+
+		// /iot/location/select_parent?id=7d81a1a70bdd4d669b644106b1c5d14f
 	}
+	getCascaderData = () => {
+		$.ajax({
+			url: `/iot/kind/treeObject?level=${4}`,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误', 0.5);
+					return;
+				}
+				let device_type_cascader_list = (results.data && results.data.children) || [];
+				this.setState({
+					device_type_cascader_list
+				});
+			}
+		});
+	};
+	getSelectList = () => {
+		$.ajax({
+			url: `/sys/dept/tree_list`,
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误', 0.5);
+					return;
+				}
+				let data = results.data || [];
+				this.setState({
+					select_list: data.filter(item => item.pId != '0')
+				});
+			}
+		});
+	};
+	getLocationData = deptid => {
+		$.ajax({
+			url: `/iot/location/tree_parent?deptid=${deptid}`,
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误', 0.5);
+					return;
+				}
+				let data = results.data || [];
+				this.setState({
+					location_cascader_list: [data]
+				});
+			}
+		});
+	};
 
 	render() {
 		let { show, title } = this.props;
-		const { getFieldDecorator } = this.props.form;
+		const { getFieldDecorator, setFieldsValue } = this.props.form;
 		const formItemLayout = [
 			{
 				labelCol: {
@@ -588,6 +595,9 @@ class BasicInformation extends React.PureComponent {
 				}
 			}
 		];
+		let { select_dept, select_cascader } = urlArgs();
+		getFieldDecorator('locationid', { initialValue: select_cascader });
+		getFieldDecorator('kindid', { initialValue: undefined });
 		return (
 			<div
 				className="device-add-basic-information-box"
@@ -599,7 +609,7 @@ class BasicInformation extends React.PureComponent {
 				<Form {...formItemLayout[0]} className="login-form">
 					{this._getLi([
 						<Form.Item label="SN编号">
-							{getFieldDecorator('SN编号', {
+							{getFieldDecorator('sno', {
 								rules: [
 									{
 										required: true,
@@ -609,7 +619,7 @@ class BasicInformation extends React.PureComponent {
 							})(<Input />)}
 						</Form.Item>,
 						<Form.Item label="设备名称">
-							{getFieldDecorator('设备名称', {
+							{getFieldDecorator('cnName', {
 								rules: [
 									{
 										required: true,
@@ -621,18 +631,39 @@ class BasicInformation extends React.PureComponent {
 					])}
 					{this._getLi([
 						<Form.Item label="所属组织">
-							{getFieldDecorator('所属组织', {
-								initialValue: '组织一',
+							{getFieldDecorator('deptid', {
+								initialValue: select_dept,
 								rules: [
 									{
 										required: true,
 										message: '所属组织不为空'
 									}
 								]
-							})(<Input disabled />)}
+							})(
+								<Select
+									disabled
+									style={{ width: '100%' }}
+									placeholder="请选择组织"
+									// value={this.state.select_dept}
+									onSelect={value => {
+										this.getLocationData(value);
+									}}
+								>
+									{this.state.select_list.map((item, index) => {
+										return (
+											<Select.Option key={index} value={item.id}>
+												{item.name}
+											</Select.Option>
+										);
+									})}
+								</Select>
+								// <Select disabled style={{ width: '100%' }} showArrow={false}>
+								// 	<Select.Option value={select_dept[1]}>{select_dept[0]}</Select.Option>
+								// </Select>
+							)}
 						</Form.Item>,
 						<Form.Item label="IP地址">
-							{getFieldDecorator('IP地址', {
+							{getFieldDecorator('ip', {
 								rules: [
 									{
 										required: true,
@@ -644,14 +675,8 @@ class BasicInformation extends React.PureComponent {
 					])}
 					{this._getLi([
 						<Form.Item {...formItemLayout[1]} label="地理位置">
-							{getFieldDecorator('地理位置', {
-								initialValue: [
-									'国网',
-									'北京市',
-									'东城区',
-									'公司一',
-									'会议室一'
-								],
+							{getFieldDecorator('locations', {
+								initialValue: this.state.select_location,
 								rules: [
 									{
 										required: true,
@@ -661,10 +686,19 @@ class BasicInformation extends React.PureComponent {
 							})(
 								<Cascader
 									disabled
-									options={LISTDATA3}
-									placeholder="请选择"
-									style={{
-										width: '100%'
+									placeholder="请选择地理位置"
+									fieldNames={{
+										label: 'cnName',
+										value: 'cnName',
+										children: 'children'
+									}}
+									options={this.state.location_cascader_list}
+									onChange={(value, selectedOptions = []) => {
+										if (selectedOptions.length > 0) {
+											setFieldsValue({
+												kindid: (selectedOptions[selectedOptions.length - 1] || {}).id
+											});
+										}
 									}}
 								/>
 							)}
@@ -672,7 +706,7 @@ class BasicInformation extends React.PureComponent {
 					])}
 					{this._getLi([
 						<Form.Item {...formItemLayout[1]} label="设备类型">
-							{getFieldDecorator('设备类型', {
+							{getFieldDecorator('kinds', {
 								rules: [
 									// {
 									// 	required: true,
@@ -681,10 +715,22 @@ class BasicInformation extends React.PureComponent {
 								]
 							})(
 								<Cascader
-									options={LISTDATA2}
+									fieldNames={{
+										label: 'cnName',
+										value: 'cnName',
+										children: 'children'
+									}}
+									options={this.state.device_type_cascader_list}
 									placeholder="请选择"
 									style={{
 										width: '100%'
+									}}
+									onChange={(value, selectedOptions = []) => {
+										if (selectedOptions.length > 0) {
+											setFieldsValue({
+												kindid: (selectedOptions[selectedOptions.length - 1] || {}).id
+											});
+										}
 									}}
 								/>
 							)}
@@ -692,7 +738,7 @@ class BasicInformation extends React.PureComponent {
 					])}
 					{this._getLi([
 						<Form.Item {...formItemLayout[1]} label="采集用户名">
-							{getFieldDecorator('采集用户名', {
+							{getFieldDecorator('username', {
 								rules: [
 									// {
 									// 	required: true,
@@ -704,7 +750,7 @@ class BasicInformation extends React.PureComponent {
 					])}
 					{this._getLi([
 						<Form.Item label="采集密码">
-							{getFieldDecorator('采集密码', {
+							{getFieldDecorator('password', {
 								rules: [
 									// {
 									// 	required: true,
@@ -714,7 +760,7 @@ class BasicInformation extends React.PureComponent {
 							})(<Input />)}
 						</Form.Item>,
 						<Form.Item label="确认采集密码">
-							{getFieldDecorator('确认采集密码', {
+							{getFieldDecorator('password_confirm', {
 								rules: [
 									// {
 									// 	required: true,
@@ -725,24 +771,32 @@ class BasicInformation extends React.PureComponent {
 						</Form.Item>
 					])}
 					{this._getLi([
-						<Form.Item
-							{...formItemLayout[1]}
-							label="采集频率(毫秒)"
-						>
-							{getFieldDecorator('采集频率', {
+						<Form.Item {...formItemLayout[1]} label="采集频率(毫秒)">
+							{getFieldDecorator('cycle', {
+								initialValue: 15000,
 								rules: [
 									// {
 									// 	required: true,
 									// 	message: '采集频率不为空'
 									// }
 								]
-							})(<Input />)}
+							})(
+								<InputNumber
+									min={15000}
+									max={600000}
+									formatter={value => `${value} ms`}
+									// parser={value =>
+									// 	value.replace(/\$\s?|(,*)/g, '')
+									// }
+									style={{ width: '100%' }}
+								/>
+							)}
 						</Form.Item>
 					])}
 					{this._getLi([
-						<Form.Item {...formItemLayout[1]} label="状态">
-							{getFieldDecorator('状态', {
-								initialValue: '激活',
+						<Form.Item {...formItemLayout[1]} label="激活状态">
+							{getFieldDecorator('status', {
+								initialValue: 'true',
 								rules: [
 									{
 										required: true,
@@ -751,15 +805,15 @@ class BasicInformation extends React.PureComponent {
 								]
 							})(
 								<Radio.Group>
-									<Radio value="激活">激活</Radio>
-									<Radio value="停用">停用</Radio>
+									<Radio value="true">激活</Radio>
+									<Radio value="false">停用</Radio>
 								</Radio.Group>
 							)}
 						</Form.Item>
 					])}
 					{this._getLi([
 						<Form.Item label="价格">
-							{getFieldDecorator('价格', {
+							{getFieldDecorator('price', {
 								initialValue: 1000,
 								rules: [
 									// {
@@ -767,41 +821,23 @@ class BasicInformation extends React.PureComponent {
 									// 	message: '价格不为空'
 									// }
 								]
-							})(
-								<InputNumber
-									formatter={value =>
-										`$ ${value}`.replace(
-											/\B(?=(\d{3})+(?!\d))/g,
-											','
-										)
-									}
-									parser={value =>
-										value.replace(/\$\s?|(,*)/g, '')
-									}
-									style={{ width: '100%' }}
-								/>
-							)}
+							})(<InputNumber formatter={value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} style={{ width: '100%' }} />)}
 						</Form.Item>,
 						<Form.Item label="购入日期">
-							{getFieldDecorator('购入日期', {
+							{getFieldDecorator('orderTime', {
 								rules: [
 									// {
 									// 	required: true,
 									// 	message: '购入日期不为空'
 									// }
 								]
-							})(
-								<DatePicker
-									placeholder="选择日期"
-									showToday={false}
-									style={{ width: '100%' }}
-								/>
-							)}
+							})(<DatePicker placeholder="选择日期" showToday={false} style={{ width: '100%' }} />)}
 						</Form.Item>
 					])}
 					{this._getLi([
 						<Form.Item label="使用年限">
-							{getFieldDecorator('使用年限', {
+							{getFieldDecorator('quality', {
+								initialValue: 1,
 								rules: [
 									// {
 									// 	required: true,
@@ -809,28 +845,26 @@ class BasicInformation extends React.PureComponent {
 									// }
 								]
 							})(
-								<DatePicker
-									placeholder="选择日期"
-									showToday={false}
+								<InputNumber
+									min={1}
+									max={30}
+									formatter={value => `${value} 年`}
+									// parser={value =>
+									// 	value.replace(/\$\s?|(,*)/g, '')
+									// }
 									style={{ width: '100%' }}
 								/>
 							)}
 						</Form.Item>,
-						<Form.Item label="报废时间">
-							{getFieldDecorator('报废时间', {
+						<Form.Item label="报废日期">
+							{getFieldDecorator('discardTime', {
 								rules: [
 									// {
 									// 	required: true,
 									// 	message: '报废时间不为空'
 									// }
 								]
-							})(
-								<DatePicker
-									placeholder="选择日期"
-									showToday={false}
-									style={{ width: '100%' }}
-								/>
-							)}
+							})(<DatePicker placeholder="选择日期" showToday={false} style={{ width: '100%' }} />)}
 						</Form.Item>
 					])}
 				</Form>
@@ -852,131 +886,90 @@ class BasicInformation extends React.PureComponent {
 		);
 	}
 }
-const BasicInformationForm = Form.create({ name: 'device_basic_info' })(
-	BasicInformation
-);
-const EditableContext = React.createContext();
+const BasicInformationForm = Form.create({ name: 'device_basic_info' })(BasicInformation);
+// const EditableContext = React.createContext();
 
-const EditableRow = ({ form, index, ...props }) => (
-	<EditableContext.Provider value={form}>
-		<tr {...props} />
-	</EditableContext.Provider>
-);
+// const EditableRow = ({ form, index, ...props }) => (
+// 	<EditableContext.Provider value={form}>
+// 		<tr {...props} />
+// 	</EditableContext.Provider>
+// );
 
-const EditableFormRow = Form.create()(EditableRow);
+// const EditableFormRow = Form.create()(EditableRow);
 
-class EditableCell extends React.PureComponent {
-	state = {
-		editing: false
-	};
+// class EditableCell extends React.PureComponent {
+// 	state = {
+// 		editing: false
+// 	};
 
-	toggleEdit = () => {
-		const editing = !this.state.editing;
-		this.setState({ editing }, () => {
-			if (editing) {
-				this.input.focus();
-			}
-		});
-	};
+// 	toggleEdit = () => {
+// 		const editing = !this.state.editing;
+// 		this.setState({ editing }, () => {
+// 			if (editing) {
+// 				this.input.focus();
+// 			}
+// 		});
+// 	};
 
-	save = e => {
-		const { record, handleSave, dataIndex } = this.props;
-		this.form.validateFields((error, values) => {
-			if (error && error[e.currentTarget.id]) {
-				return;
-			}
-			this.toggleEdit();
-			handleSave({ ...record, ...values });
-		});
-	};
+// 	save = e => {
+// 		const { record, handleSave, dataIndex } = this.props;
+// 		this.form.validateFields((error, values) => {
+// 			if (error && error[e.currentTarget.id]) {
+// 				return;
+// 			}
+// 			this.toggleEdit();
+// 			handleSave({ ...record, ...values });
+// 		});
+// 	};
 
-	renderCell = form => {
-		this.form = form;
-		const {
-			children,
-			dataIndex,
-			record,
-			title,
-			parentdata = []
-		} = this.props;
-		const { editing } = this.state;
-		let bool = dataIndex == '指标项英文简称';
-		return editing ? (
-			<Form.Item style={{ margin: 0 }}>
-				{form.getFieldDecorator(dataIndex, {
-					rules: [
-						bool
-							? {
-									required: true,
-									// message: `${title} 不能为空.`,
-									validator: (rule, value, cb) => {
-										if (value.trim() == '') {
-											cb(`${title} 不能为空.`);
-										}
+// 	renderCell = form => {
+// 		this.form = form;
+// 		const { children, dataIndex, record, title, parentdata = [] } = this.props;
+// 		const { editing } = this.state;
+// 		let bool = dataIndex == '指标项英文简称';
+// 		return editing ? (
+// 			<Form.Item style={{ margin: 0 }}>
+// 				{form.getFieldDecorator(dataIndex, {
+// 					rules: [
+// 						bool
+// 							? {
+// 									required: true,
+// 									// message: `${title} 不能为空.`,
+// 									validator: (rule, value, cb) => {
+// 										if (value.trim() == '') {
+// 											cb(`${title} 不能为空.`);
+// 										}
 
-										let arr = [];
-										arr = parentdata.filter(
-											item => item[dataIndex] === value
-										);
+// 										let arr = [];
+// 										arr = parentdata.filter(item => item[dataIndex] === value);
 
-										arr = arr.filter(
-											item => item.key != record.key
-										);
-										if (arr.length > 0) {
-											cb(`${title} 重复了`);
-										}
-										cb();
-									}
-							  }
-							: {
-									required: true,
-									message: `${title} 不能为空.`
-							  }
-					],
-					initialValue: record[dataIndex]
-				})(
-					<Input
-						ref={node => (this.input = node)}
-						onPressEnter={this.save}
-						onBlur={this.save}
-					/>
-				)}
-			</Form.Item>
-		) : (
-			<div
-				className="editable-cell-value-wrap"
-				style={{ paddingRight: 24 }}
-				onClick={this.toggleEdit}
-			>
-				{children}
-			</div>
-		);
-	};
+// 										arr = arr.filter(item => item.key != record.key);
+// 										if (arr.length > 0) {
+// 											cb(`${title} 重复了`);
+// 										}
+// 										cb();
+// 									}
+// 							  }
+// 							: {
+// 									required: true,
+// 									message: `${title} 不能为空.`
+// 							  }
+// 					],
+// 					initialValue: record[dataIndex]
+// 				})(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save} />)}
+// 			</Form.Item>
+// 		) : (
+// 			<div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={this.toggleEdit}>
+// 				{children}
+// 			</div>
+// 		);
+// 	};
 
-	render() {
-		const {
-			editable,
-			dataIndex,
-			title,
-			record,
-			index,
-			handleSave,
-			children,
-			...restProps
-		} = this.props;
-		return (
-			<td {...restProps}>
-				{editable ? (
-					<EditableContext.Consumer>
-						{this.renderCell}
-					</EditableContext.Consumer>
-				) : (
-					children
-				)}
-			</td>
-		);
-	}
-}
+// 	render() {
+// 		const { editable, dataIndex, title, record, index, handleSave, children, ...restProps } = this.props;
+// 		return <td {...restProps}>{editable ? <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer> : children}</td>;
+// 	}
+// }
 class EditableTableRadio extends React.PureComponent {
 	state = {
 		value: '否'
@@ -1014,312 +1007,284 @@ class EditableTableRadio extends React.PureComponent {
 	}
 }
 
-class EditableTable extends React.PureComponent {
-	constructor(props) {
-		super(props);
-		this.columns = [
-			{
-				title: '指标项中文简称',
-				dataIndex: '指标项中文简称',
-				width: '30%',
-				editable: true
-			},
-			{
-				title: '指标项英文简称',
-				width: '30%',
-				dataIndex: '指标项英文简称',
-				editable: true
-			},
-			{
-				title: '操作码',
-				dataIndex: '操作码',
-				width: '10%',
-				editable: true
-			},
-			{
-				title: '单位',
-				dataIndex: '单位',
-				width: '10%',
-				editable: true
-			},
-			{
-				title: '告警使能',
-				width: '10%',
-				dataIndex: '告警使能'
-				// render: (text, record) => {
-				// 	return <EditableTableRadio data={record} />;
-				// }
-			},
-			{
-				title: '操作',
-				width: '10%',
-				dataIndex: 'operation',
-				render: (text, record) =>
-					this.state.dataSource.length >= 1 ? (
-						<Popconfirm
-							cancelText="取消"
-							okText="确定"
-							title="确定删除?"
-							onConfirm={() => this.handleDelete(record.key)}
-						>
-							<Button className="btn-2">删除</Button>
-						</Popconfirm>
-					) : null
-			}
-		];
+// class EditableTable extends React.PureComponent {
+// 	constructor(props) {
+// 		super(props);
+// 		this.columns = [
+// 			{
+// 				title: '指标项中文简称',
+// 				dataIndex: '指标项中文简称',
+// 				width: '30%',
+// 				editable: true
+// 			},
+// 			{
+// 				title: '指标项英文简称',
+// 				width: '30%',
+// 				dataIndex: '指标项英文简称',
+// 				editable: true
+// 			},
+// 			{
+// 				title: '操作码',
+// 				dataIndex: '操作码',
+// 				width: '10%',
+// 				editable: true
+// 			},
+// 			{
+// 				title: '单位',
+// 				dataIndex: '单位',
+// 				width: '10%',
+// 				editable: true
+// 			},
+// 			{
+// 				title: '告警使能',
+// 				width: '10%',
+// 				dataIndex: '告警使能'
+// 				// render: (text, record) => {
+// 				// 	return <EditableTableRadio data={record} />;
+// 				// }
+// 			},
+// 			{
+// 				title: '操作',
+// 				width: '10%',
+// 				dataIndex: 'operation',
+// 				render: (text, record) =>
+// 					this.state.dataSource.length >= 1 ? (
+// 						<Popconfirm cancelText="取消" okText="确定" title="确定删除?" onConfirm={() => this.handleDelete(record.key)}>
+// 							<Button className="btn-2">删除</Button>
+// 						</Popconfirm>
+// 					) : null
+// 			}
+// 		];
 
-		this.state = {
-			dataSource: LISTDATA
-		};
-	}
+// 		this.state = {
+// 			dataSource: LISTDATA
+// 		};
+// 	}
 
-	handleDelete = key => {
-		const dataSource = [...this.state.dataSource];
-		this.setState({
-			dataSource: dataSource.filter(item => item.key !== key)
-		});
-	};
+// 	handleDelete = key => {
+// 		const dataSource = [...this.state.dataSource];
+// 		this.setState({
+// 			dataSource: dataSource.filter(item => item.key !== key)
+// 		});
+// 	};
 
-	handleAdd = () => {
-		const { dataSource } = this.state;
-		let key = Math.random();
-		const newData = {
-			key,
-			指标项中文简称: '',
-			指标项英文简称: Math.random()
-				.toString()
-				.slice('10'),
-			操作码: '',
-			单位: '',
-			告警使能: '否'
-		};
-		this.setState({
-			dataSource: [newData, ...dataSource]
-		});
-	};
+// 	handleAdd = () => {
+// 		const { dataSource } = this.state;
+// 		let key = Math.random();
+// 		const newData = {
+// 			key,
+// 			指标项中文简称: '',
+// 			指标项英文简称: Math.random()
+// 				.toString()
+// 				.slice('10'),
+// 			操作码: '',
+// 			单位: '',
+// 			告警使能: '否'
+// 		};
+// 		this.setState({
+// 			dataSource: [newData, ...dataSource]
+// 		});
+// 	};
 
-	handleSave = row => {
-		const newData = [...this.state.dataSource];
-		const index = newData.findIndex(item => row.key === item.key);
-		const item = newData[index];
-		newData.splice(index, 1, {
-			...item,
-			...row
-		});
-		this.setState({ dataSource: newData });
-	};
-	onExportExcel(headers, data, fileName = '指标项.xlsx') {
-		const _headers = headers
-			.map((item, i) =>
-				Object.assign(
-					{},
-					{
-						key: item.dataIndex,
-						title: item.title,
-						position: String.fromCharCode(65 + i) + 1
-					}
-				)
-			)
-			.reduce(
-				(prev, next) =>
-					Object.assign({}, prev, {
-						[next.position]: { key: next.key, v: next.title }
-					}),
-				{}
-			);
+// 	handleSave = row => {
+// 		const newData = [...this.state.dataSource];
+// 		const index = newData.findIndex(item => row.key === item.key);
+// 		const item = newData[index];
+// 		newData.splice(index, 1, {
+// 			...item,
+// 			...row
+// 		});
+// 		this.setState({ dataSource: newData });
+// 	};
+// 	onExportExcel(headers, data, fileName = '指标项.xlsx') {
+// 		const _headers = headers
+// 			.map((item, i) =>
+// 				Object.assign(
+// 					{},
+// 					{
+// 						key: item.dataIndex,
+// 						title: item.title,
+// 						position: String.fromCharCode(65 + i) + 1
+// 					}
+// 				)
+// 			)
+// 			.reduce(
+// 				(prev, next) =>
+// 					Object.assign({}, prev, {
+// 						[next.position]: { key: next.key, v: next.title }
+// 					}),
+// 				{}
+// 			);
 
-		const _data = data
-			.map((item, i) =>
-				headers.map((item2, j) =>
-					Object.assign(
-						{},
-						{
-							content: item[item2.dataIndex],
-							position: String.fromCharCode(65 + j) + (i + 2)
-						}
-					)
-				)
-			)
-			// 对刚才的结果进行降维处理（二维数组变成一维数组）
-			.reduce((prev, next) => prev.concat(next))
-			// 转换成 worksheet 需要的结构
-			.reduce(
-				(prev, next) =>
-					Object.assign({}, prev, {
-						[next.position]: { v: next.content }
-					}),
-				{}
-			);
-		// 合并 headers 和 data
-		const output = Object.assign({}, _headers, _data);
-		// 获取所有单元格的位置
-		const outputPos = Object.keys(output);
-		// 计算出范围 ,["A1",..., "H2"]
-		const ref = `${outputPos[0]}:${outputPos[outputPos.length - 1]}`;
+// 		const _data = data
+// 			.map((item, i) =>
+// 				headers.map((item2, j) =>
+// 					Object.assign(
+// 						{},
+// 						{
+// 							content: item[item2.dataIndex],
+// 							position: String.fromCharCode(65 + j) + (i + 2)
+// 						}
+// 					)
+// 				)
+// 			)
+// 			// 对刚才的结果进行降维处理（二维数组变成一维数组）
+// 			.reduce((prev, next) => prev.concat(next))
+// 			// 转换成 worksheet 需要的结构
+// 			.reduce(
+// 				(prev, next) =>
+// 					Object.assign({}, prev, {
+// 						[next.position]: { v: next.content }
+// 					}),
+// 				{}
+// 			);
+// 		// 合并 headers 和 data
+// 		const output = Object.assign({}, _headers, _data);
+// 		// 获取所有单元格的位置
+// 		const outputPos = Object.keys(output);
+// 		// 计算出范围 ,["A1",..., "H2"]
+// 		const ref = `${outputPos[0]}:${outputPos[outputPos.length - 1]}`;
 
-		// 构建 workbook 对象
-		const wb = {
-			SheetNames: ['Sheet1'],
-			Sheets: {
-				Sheet1: Object.assign({}, output, {
-					'!ref': ref,
-					'!cols': [
-						{ wpx: 200 },
-						{ wpx: 300 },
-						{ wpx: 300 },
-						{ wpx: 200 },
-						{ wpx: 150 }
-					]
-				})
-			}
-		};
+// 		// 构建 workbook 对象
+// 		const wb = {
+// 			SheetNames: ['Sheet1'],
+// 			Sheets: {
+// 				Sheet1: Object.assign({}, output, {
+// 					'!ref': ref,
+// 					'!cols': [{ wpx: 200 }, { wpx: 300 }, { wpx: 300 }, { wpx: 200 }, { wpx: 150 }]
+// 				})
+// 			}
+// 		};
 
-		// 导出 Excel
-		XLSX.writeFile(wb, fileName);
-	}
+// 		// 导出 Excel
+// 		XLSX.writeFile(wb, fileName);
+// 	}
 
-	onImportExcel = file => {
-		// 获取上传的文件对象
-		const { files } = file.target;
-		// 通过FileReader对象读取文件
-		const fileReader = new FileReader();
-		fileReader.onload = event => {
-			try {
-				const { result } = event.target;
-				// 以二进制流方式读取得到整份excel表格对象
-				const workbook = XLSX.read(result, { type: 'binary' });
-				// 存储获取到的数据
-				let data = [];
-				// 遍历每张工作表进行读取（这里默认只读取第一张表）
-				for (const sheet in workbook.Sheets) {
-					// esline-disable-next-line
-					if (workbook.Sheets.hasOwnProperty(sheet)) {
-						// 利用 sheet_to_json 方法将 excel 转成 json 数据
-						data = data.concat(
-							XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
-						);
-						// break; // 如果只取第一张表，就取消注释这行
-					}
-				}
-				// 最终获取到并且格式化后的 json 数据
-				message.success('导入成功！', 0.5);
-				let dataSource = [];
-				data.map((item, index) => {
-					dataSource.push({ ...item, key: index });
-				});
-				this.setState({
-					dataSource
-				});
-				// console.log(data);
-			} catch (e) {
-				// 这里可以抛出文件类型错误不正确的相关提示
-				message.error('文件类型不正确！', 0.5);
-			}
-		};
-		// 以二进制方式打开文件
-		fileReader.readAsBinaryString(files[0]);
-	};
-	calibrationMethod = () => {
-		let _d = document.querySelectorAll('.editable-table-box .has-error');
-		if (this.state.dataSource.length <= 0) {
-			message.error('未添加指标项', 0.5);
-			return;
-		}
-		if (_d.length != 0) {
-			message.error('添加指标项错误', 0.5);
-			return;
-		}
-		return this.state.dataSource;
-	};
-	render() {
-		const { dataSource = [] } = this.state;
-		// console.log('--------', dataSource);
-		const components = {
-			body: {
-				row: EditableFormRow,
-				cell: EditableCell
-			}
-		};
-		const columns = this.columns.map(col => {
-			if (!col.editable) {
-				return col;
-			}
+// 	onImportExcel = file => {
+// 		// 获取上传的文件对象
+// 		const { files } = file.target;
+// 		// 通过FileReader对象读取文件
+// 		const fileReader = new FileReader();
+// 		fileReader.onload = event => {
+// 			try {
+// 				const { result } = event.target;
+// 				// 以二进制流方式读取得到整份excel表格对象
+// 				const workbook = XLSX.read(result, { type: 'binary' });
+// 				// 存储获取到的数据
+// 				let data = [];
+// 				// 遍历每张工作表进行读取（这里默认只读取第一张表）
+// 				for (const sheet in workbook.Sheets) {
+// 					// esline-disable-next-line
+// 					if (workbook.Sheets.hasOwnProperty(sheet)) {
+// 						// 利用 sheet_to_json 方法将 excel 转成 json 数据
+// 						data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
+// 						// break; // 如果只取第一张表，就取消注释这行
+// 					}
+// 				}
+// 				// 最终获取到并且格式化后的 json 数据
+// 				message.success('导入成功！', 0.5);
+// 				let dataSource = [];
+// 				data.map((item, index) => {
+// 					dataSource.push({ ...item, key: index });
+// 				});
+// 				this.setState({
+// 					dataSource
+// 				});
+// 				// console.log(data);
+// 			} catch (e) {
+// 				// 这里可以抛出文件类型错误不正确的相关提示
+// 				message.error('文件类型不正确！', 0.5);
+// 			}
+// 		};
+// 		// 以二进制方式打开文件
+// 		fileReader.readAsBinaryString(files[0]);
+// 	};
+// 	calibrationMethod = () => {
+// 		let _d = document.querySelectorAll('.editable-table-box .has-error');
+// 		if (this.state.dataSource.length <= 0) {
+// 			message.error('未添加指标项', 0.5);
+// 			return;
+// 		}
+// 		if (_d.length != 0) {
+// 			message.error('添加指标项错误', 0.5);
+// 			return;
+// 		}
+// 		return this.state.dataSource;
+// 	};
+// 	render() {
+// 		const { dataSource = [] } = this.state;
+// 		// console.log('--------', dataSource);
+// 		const components = {
+// 			body: {
+// 				row: EditableFormRow,
+// 				cell: EditableCell
+// 			}
+// 		};
+// 		const columns = this.columns.map(col => {
+// 			if (!col.editable) {
+// 				return col;
+// 			}
 
-			return {
-				...col,
-				onCell: record => ({
-					record,
-					editable: col.editable,
-					dataIndex: col.dataIndex,
-					title: col.title,
-					handleSave: this.handleSave,
-					parentdata: dataSource
-				})
-			};
-		});
-		return (
-			<div className="editable-table-box">
-				<div
-					className="editable-table-content"
-					style={{
-						margin: '16px 0',
-						display: 'flex',
-						justifyContent: 'space-between'
-					}}
-				>
-					<Button
-						className="btn-1"
-						onClick={this.handleAdd}
-						type="primary"
-					>
-						新增
-					</Button>
-					<div className="right-btn-box">
-						<Button className="upload-wrap btn-3">
-							<input
-								className={'file-uploader'}
-								type="file"
-								accept=".xlsx, .xls"
-								onChange={this.onImportExcel}
-							/>
-							<span className={'upload-text'}>导入</span>
-						</Button>
-						<Button
-							className="btn-3"
-							onClick={() => {
-								if (dataSource.length < 1) {
-									message.info('未选择下载数据', 0.5);
-									return;
-								}
-								let columns_new = columns.filter(
-									(item, index, _d) => index != _d.length - 1
-								);
-								this.onExportExcel(
-									columns_new,
-									dataSource,
-									'测试指标项.xlsx'
-								);
-							}}
-						>
-							导出
-						</Button>
-						<Button className="btn-3">模板下载</Button>
-					</div>
-				</div>
-				<Table
-					components={components}
-					rowClassName={() => 'editable-row'}
-					bordered
-					dataSource={dataSource}
-					columns={columns}
-					pagination={{
-						simple: true
-					}}
-				/>
-			</div>
-		);
-	}
-}
+// 			return {
+// 				...col,
+// 				onCell: record => ({
+// 					record,
+// 					editable: col.editable,
+// 					dataIndex: col.dataIndex,
+// 					title: col.title,
+// 					handleSave: this.handleSave,
+// 					parentdata: dataSource
+// 				})
+// 			};
+// 		});
+// 		return (
+// 			<div className="editable-table-box">
+// 				<div
+// 					className="editable-table-content"
+// 					style={{
+// 						margin: '16px 0',
+// 						display: 'flex',
+// 						justifyContent: 'space-between'
+// 					}}
+// 				>
+// 					<Button className="btn-1" onClick={this.handleAdd} type="primary">
+// 						新增
+// 					</Button>
+// 					<div className="right-btn-box">
+// 						<Button className="upload-wrap btn-3">
+// 							<input className={'file-uploader'} type="file" accept=".xlsx, .xls" onChange={this.onImportExcel} />
+// 							<span className={'upload-text'}>导入</span>
+// 						</Button>
+// 						<Button
+// 							className="btn-3"
+// 							onClick={() => {
+// 								if (dataSource.length < 1) {
+// 									message.info('未选择下载数据', 0.5);
+// 									return;
+// 								}
+// 								let columns_new = columns.filter((item, index, _d) => index != _d.length - 1);
+// 								this.onExportExcel(columns_new, dataSource, '测试指标项.xlsx');
+// 							}}
+// 						>
+// 							导出
+// 						</Button>
+// 						<Button className="btn-3">模板下载</Button>
+// 					</div>
+// 				</div>
+// 				<Table
+// 					components={components}
+// 					rowClassName={() => 'editable-row'}
+// 					bordered
+// 					dataSource={dataSource}
+// 					columns={columns}
+// 					pagination={{
+// 						simple: true
+// 					}}
+// 				/>
+// 			</div>
+// 		);
+// 	}
+// }
 
 class AlarmConfiguration extends React.PureComponent {
 	state = {
@@ -1384,10 +1349,7 @@ class AlarmConfiguration extends React.PureComponent {
 									record: record,
 									list: data
 								};
-								$.modal.open(
-									'告警规则设置',
-									'/html/device/alarmRules.html'
-								);
+								$.modal.open('告警规则设置', '/html/device/alarmRules.html');
 							}}
 						>
 							告警配置
@@ -1416,9 +1378,72 @@ class AlarmConfiguration extends React.PureComponent {
 		);
 	}
 }
-class Indicators extends React.PureComponent {
+class DriverCustom extends React.PureComponent {
+	state = {
+		driver_list: [],
+		get_way_list: []
+	};
+	calibrationMethod = callback => {
+		this.props.form.validateFields((err, values) => {
+			if (!err) {
+				console.log('基本信息校验成功');
+				callback(values);
+				return;
+			}
+			message.error('基本信息填写错误', 0.5);
+			callback();
+		});
+	};
+	componentDidMount() {
+		this.props.onRef && this.props.onRef(this);
+		this.getDriver();
+		this.getGetWay();
+	}
+	getDriver = () => {
+		$.ajax({
+			url: `/iot/driver/drivers`,
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误', 0.5);
+					return;
+				}
+				let { rows = [] } = results.data || {};
+				this.setState({
+					driver_list: rows
+				});
+			}
+		});
+	};
+	getGetWay = () => {
+		$.ajax({
+			url: `/iot/gateway/gateway_list`,
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误', 0.5);
+					return;
+				}
+				let { rows = [] } = results.data || {};
+				this.setState({
+					get_way_list: rows
+				});
+			}
+		});
+	};
 	render() {
 		let { show, title, onRef } = this.props;
+		let { driver_list = [], get_way_list = [] } = this.state;
+		const { getFieldDecorator } = this.props.form;
+
 		return (
 			<div
 				className="device-add-indicators-box"
@@ -1427,17 +1452,62 @@ class Indicators extends React.PureComponent {
 				}}
 			>
 				<div className="title">{title}</div>
-
-				<EditableTable ref={el => onRef(el)} />
+				<Form onSubmit={this.handleSubmit}>
+					<Descriptions
+						column={1}
+						// title="User Info"
+						bordered
+						className="descriptions"
+					>
+						<Descriptions.Item label="驱动文件">
+							<Form.Item>
+								{getFieldDecorator('driverid', {
+									// initialValue:
+									rules: [{ required: true, message: '请选中驱动文件' }]
+								})(
+									<Radio.Group className="radio-box" buttonStyle="solid">
+										{driver_list.map((item, index) => {
+											return (
+												<Radio.Button className="radio-li" key={index} value={item.id}>
+													{item.cnName}
+												</Radio.Button>
+											);
+										})}
+									</Radio.Group>
+								)}
+							</Form.Item>
+						</Descriptions.Item>
+						<Descriptions.Item label="采集网关">
+							<Form.Item>
+								{getFieldDecorator('gatewayid', {
+									// initialValue:
+									rules: [{ required: true, message: '请选中采集网关' }]
+								})(
+									<Radio.Group className="radio-box" buttonStyle="solid">
+										{get_way_list.map((item, index) => {
+											return (
+												<Radio.Button className="radio-li" key={index} value={item.id}>
+													{item.cnName}
+												</Radio.Button>
+											);
+										})}
+									</Radio.Group>
+								)}
+							</Form.Item>
+						</Descriptions.Item>
+					</Descriptions>
+				</Form>
 			</div>
 		);
 	}
 }
+const DriverCustomForm = Form.create({ name: 'device_driver_custom' })(DriverCustom);
 class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 0
+			current: 2,
+			basic_id: 'd8a070635b35431e99ae3002b9b4d0c3' //''
 		};
 	}
 	next() {
@@ -1456,10 +1526,10 @@ class AddBox extends React.PureComponent {
 				title: '基本信息'
 			},
 			{
-				title: '添加指标项'
+				title: '添加驱动'
 			},
 			{
-				title: '告警配置'
+				title: '监控指标项'
 			}
 		];
 		const { current } = this.state;
@@ -1468,31 +1538,13 @@ class AddBox extends React.PureComponent {
 				<div className="steps-content">
 					<Steps current={current}>
 						{steps.map((item, index) => (
-							<Step
-								key={item.title}
-								title={item.title}
-								icon={<span>{index + 1}</span>}
-							/>
+							<Step key={item.title} title={item.title} icon={<span>{index + 1}</span>} />
 						))}
 					</Steps>
 					<div className="steps-content-body">
-						<BasicInformationForm
-							onRef={el => (this.basicInformation = el)}
-							title={steps[current].title}
-							show={steps[current].title == '基本信息'}
-						/>
-						<Indicators
-							onRef={el => (this.indicators = el)}
-							title={steps[current].title}
-							show={steps[current].title == '添加指标项'}
-						/>
-						{this.indicators && (
-							<AlarmConfiguration
-								ref={el => (this.alarmConfiguration = el)}
-								title={steps[current].title}
-								show={steps[current].title == '告警配置'}
-							/>
-						)}
+						<BasicInformationForm onRef={el => (this.basicInformation = el)} title={steps[current].title} show={steps[current].title == '基本信息'} />
+						<DriverCustomForm onRef={el => (this.driverCustomForm = el)} title={'驱动和网关选择'} show={steps[current].title == '添加驱动'} />
+						<AlarmConfiguration ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '监控指标项'} />
 					</div>
 				</div>
 				<div className="steps-action">
@@ -1516,26 +1568,81 @@ class AddBox extends React.PureComponent {
 								if (steps[current].title == '基本信息') {
 									// this.next();
 									if (this.basicInformation) {
-										this.basicInformation.calibrationMethod(
-											data => {
-												if (data) {
-													console.log(data);
-													this.next();
+										this.basicInformation.calibrationMethod(data => {
+											if (data) {
+												let { locations, kinds, discardTime, orderTime, password_confirm, ...other } = data;
+												let params = {
+													...other,
+													discardTime: discardTime && discardTime.valueOf(),
+													orderTime: orderTime && orderTime.valueOf()
+												};
+												$.ajax({
+													cache: true,
+													type: 'POST',
+													url: '/iot/device/device_insert_update',
+													data: JSON.stringify({
+														data: {
+															id: this.state.basic_id,
+															...params
+														}
+													}),
+													dataType: 'json',
+													async: false,
+													success: results => {
+														if (results.code != 0) {
+															message.error('接口错误', 0.5);
+															return;
+														}
+														this.setState(
+															{
+																basic_id: (results.data || {}).id
+															},
+															() => {
+																this.next();
+															}
+														);
+													}
+												});
+											}
+										});
+									}
+								} else if (steps[current].title == '添加驱动') {
+									// this.next();
+									if (this.driverCustomForm) {
+										this.driverCustomForm.calibrationMethod(data => {
+											if (data) {
+												if (this.state.basic_id) {
+													$.ajax({
+														cache: true,
+														type: 'POST',
+														url: '/iot/device/device_insert_update',
+														data: JSON.stringify({
+															data: {
+																id: this.state.basic_id,
+																...data
+															}
+														}),
+														dataType: 'json',
+														async: false,
+														success: results => {
+															if (results.code != 0) {
+																message.error('接口错误', 0.5);
+																return;
+															}
+															this.setState(
+																{
+																	basic_id: (results.data || {}).id
+																},
+																() => {
+																	this.next();
+																}
+															);
+														}
+													});
 												}
 											}
-										);
+										});
 									}
-								} else if (
-									steps[current].title == '添加指标项'
-								) {
-									this.next();
-									// if (this.indicators) {
-									// 	let data = this.indicators.calibrationMethod();
-									// 	if (data) {
-									// 		console.log(data);
-									// 		this.next();
-									// 	}
-									// }
 								}
 							}}
 						>
@@ -1547,13 +1654,13 @@ class AddBox extends React.PureComponent {
 							style={{ width: 180, height: 40 }}
 							type="primary"
 							onClick={() => {
-								message.success('操作完成', 0.5);
-								if (this.alarmConfiguration) {
-									let data = this.alarmConfiguration.calibrationMethod();
-									if (data) {
-										iframeClose();
-									}
-								}
+								// message.success('操作完成', 0.5);
+								// if (this.alarmConfiguration) {
+								// 	let data = this.alarmConfiguration.calibrationMethod();
+								// 	if (data) {
+								// 		iframeClose();
+								// 	}
+								// }
 							}}
 						>
 							完成

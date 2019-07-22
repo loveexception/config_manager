@@ -67,48 +67,69 @@
 					}
 				}
 			}
-			.edit-indicators {
-				.editable-table-box {
-					.ant-form-explain {
-						font-size: 12px;
-						position: absolute;
-						bottom: -8px;
-					}
-					.has-error {
-						.ant-form-item-children {
-							.ant-input {
-								margin-bottom: 16px;
-							}
-						}
-					}
+			.editable-table-box {
+				.ant-form-explain {
+					font-size: 12px;
+					position: absolute;
+					bottom: -8px;
+				}
+				.has-error {
 					.ant-form-item-children {
 						.ant-input {
-							height: 24px;
+							margin-bottom: 16px;
 						}
 					}
-					.editable-cell {
-						position: relative;
+				}
+				.ant-form-item-children {
+					.ant-input {
+						height: 24px;
 					}
+				}
+				.editable-cell {
+					position: relative;
+				}
 
-					.editable-cell-value-wrap {
-						padding: 5px 12px;
-						min-height: 31px;
-						cursor: pointer;
+				.editable-cell-value-wrap {
+					padding: 5px 12px;
+					min-height: 31px;
+					cursor: pointer;
+				}
+
+				.editable-row {
+					&:hover {
+						.editable-cell-value-wrap {
+							border: 1px solid #d9d9d9;
+							border-radius: 4px;
+							padding: 4px 11px;
+						}
 					}
+				}
+				.editable-table-content {
+					.right-btn-box {
+						.upload-wrap {
+							display: inline-block;
+							position: relative;
+							// width: 124px;
+							// padding: 3px 5px;
+							overflow: hidden;
+							.file-uploader {
+								cursor: pointer;
+								font-size: 0;
+								position: absolute;
+								width: 100%;
+								height: 100%;
+								top: 0;
+								left: 0;
+								outline: none;
+								opacity: 0;
+								background-color: transparent;
+							}
 
-					.editable-row {
-						&:hover {
-							.editable-cell-value-wrap {
-								border: 1px solid #d9d9d9;
-								border-radius: 4px;
-								padding: 4px 11px;
+							.upload-text {
+								display: inline-block;
+								margin-left: 5px;
 							}
 						}
-					}
-					.editable-table-content {
-						display: flex;
-						justify-content: space-between;
-						margin-bottom: 20px;
 					}
 				}
 			}

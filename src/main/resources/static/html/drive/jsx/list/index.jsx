@@ -50,37 +50,12 @@ $.modal.openFull = function(title, url, width, height) {
 };
 let { Table, Select, Button, Input, Icon, message } = antd;
 class ListBox extends React.PureComponent {
-	state = { data: [], loading: false };
-	componentDidMount() {
-		this.init();
-	}
-	init = () => {
-		this.setState({ loading: true });
-		$.ajax({
-			url: '/iot/driver/driver_list',
-			// data: {},
-			cache: false,
-			contentType: false,
-			processData: false,
-			type: 'GET',
-			success: results => {
-				if (results.code != 0) {
-					message.error('接口错误');
-					this.setState({ loading: false });
-					return;
-				}
-				this.setState({
-					data: results.rows,
-					loading: false
-				});
-			},
-			error: () => {
-				this.setState({ loading: false });
-			}
-		});
-	};
-	render = () => {
-		const columns = [
+	state = {
+		old_data: [],
+		data: [],
+		loading: false,
+		column: '-1',
+		search_data: [
 			{
 				title: '驱动名称',
 				dataIndex: 'cnName'
@@ -112,7 +87,41 @@ class ListBox extends React.PureComponent {
 			{
 				title: '更新时间',
 				dataIndex: 'updateTime'
+			}
+		]
+	};
+	componentDidMount() {
+		this.init();
+	}
+	init = () => {
+		this.setState({ loading: true });
+		$.ajax({
+			url: '/iot/driver/driver_list',
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误');
+					this.setState({ loading: false });
+					return;
+				}
+				this.setState({
+					old_data: results.rows,
+					data: results.rows,
+					loading: false
+				});
 			},
+			error: () => {
+				this.setState({ loading: false });
+			}
+		});
+	};
+	render = () => {
+		const columns = [
+			...this.state.search_data,
 			{
 				title: '操作',
 				key: 'operation',
@@ -164,19 +173,49 @@ class ListBox extends React.PureComponent {
 					<div className="drive-list-content-li">
 						<Select
 							className="select-box"
-							// defaultValue="请选择分类"
+							value={this.state.column}
 							style={{ width: 114 }}
-							// onChange={handleChange}
+							onChange={column => {
+								this.setState({
+									column
+								});
+							}}
 							placeholder="请选择分类"
 						>
-							{/* <Select.Option value="">请选择分类</Select.Option> */}
-							<Select.Option value="a">驱动名称</Select.Option>
-							<Select.Option value="b">设备分类</Select.Option>
-							<Select.Option value="c">设备子类</Select.Option>
-							<Select.Option value="d">设备品牌</Select.Option>
-							<Select.Option value="e">设备型号</Select.Option>
+							<Select.Option value="-1">全部</Select.Option>
+							{this.state.search_data.map((item, index) => {
+								return (
+									<Select.Option key={index} value={item.dataIndex}>
+										{item.title}
+									</Select.Option>
+								);
+							})}
 						</Select>
-						<Input.Search className="input-box" placeholder="请输入关键字" onSearch={value => console.log('点击搜索', value)} style={{ width: 254 }} />
+						<Input.Search
+							className="input-box"
+							placeholder="请输入关键字"
+							onSearch={value => {
+								let _data = this.state.old_data;
+								if (this.state.column != '-1') {
+									this.setState({ loading: true });
+									if (value) {
+										let data_new = _.filter(_data, { [this.state.column]: value });
+										_data = data_new;
+									}
+									this.setState(
+										{
+											data: _data
+										},
+										() => {
+											this.setState({ loading: false });
+										}
+									);
+								} else {
+									message.info('请选择分类');
+								}
+							}}
+							style={{ width: 254 }}
+						/>
 					</div>
 					<div className="drive-list-content-li">
 						<Button

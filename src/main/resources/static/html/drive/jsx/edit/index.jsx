@@ -544,7 +544,7 @@ class EditableTable extends React.PureComponent {
 }
 
 class BasicInformation extends React.PureComponent {
-	state = { data: {} };
+	state = { data: {}, kind_list: [] };
 	componentDidMount() {
 		let { driver_id } = urlArgs();
 		if (driver_id) {
@@ -560,37 +560,41 @@ class BasicInformation extends React.PureComponent {
 						message.error('接口错误');
 						return;
 					}
+					let data = results.data || {};
+					if (data.kindid) {
+						$.ajax({
+							url: `/iot/kind/select_parent?id=${data.kindid}`,
+							// data: {},
+							cache: false,
+							contentType: false,
+							processData: false,
+							type: 'GET',
+							success: results => {
+								if (results.code != 0) {
+									message.error('接口错误');
+									return;
+								}
+								let kind_list = results.data || [];
+								this.setState({
+									kind_list
+								});
+							}
+						});
+					}
 					this.setState({
-						data: results.data
+						data
 					});
 				}
 			});
 		}
 	}
-	getDriverInfo = () => {
-		let { data = {} } = this.state;
-		let { kindKind, kindSubkind, kindCompany, kindType } = data;
-		let result_list = [];
-		let result = '';
-		if (!_.isEmpty(kindKind)) {
-			result_list.push(kindKind);
-		}
-		if (!_.isEmpty(kindSubkind)) {
-			result_list.push(kindSubkind);
-		}
-		if (!_.isEmpty(kindCompany)) {
-			result_list.push(kindCompany);
-		}
-		if (!_.isEmpty(kindType)) {
-			result_list.push(kindType);
-		}
-		result_list.map((item, index) => {
-			result += item;
-			if (index != result_list.length - 1) {
-				result += '/';
-			}
+	getInfoComponent = () => {
+		let { kind_list = [] } = this.state;
+		let result = [];
+		kind_list.map(item => {
+			result.push(item.cnName);
 		});
-		return <div>{result}</div>;
+		return <Input disabled value={result} />;
 	};
 	render() {
 		let { data = {} } = this.state;
@@ -605,7 +609,7 @@ class BasicInformation extends React.PureComponent {
 				<Descriptions.Item label="*驱动名称：">{data.cnName}</Descriptions.Item>
 				<Descriptions.Item label="*版本号：">{data.driverVer}</Descriptions.Item>
 				{/* 视频 / 视频会议终端 / 宝丽通 / hdx7000 */}
-				<Descriptions.Item label="*采集设备信息：">{this.getDriverInfo()}</Descriptions.Item>
+				<Descriptions.Item label="*采集设备信息：">{this.getInfoComponent()}</Descriptions.Item>
 			</Descriptions>
 		);
 	}
