@@ -1,7 +1,12 @@
 package cn.tico.iot.configmanger.iot.graphql;
 
 import cn.tico.iot.configmanger.common.base.Service;
+import cn.tico.iot.configmanger.iot.models.base.Kind;
+import cn.tico.iot.configmanger.iot.models.base.Location;
 import cn.tico.iot.configmanger.iot.models.device.Device;
+import cn.tico.iot.configmanger.iot.models.device.Person;
+import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
+import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
@@ -67,4 +72,42 @@ public class ApiService {
         return result;
     }
 
+
+    @GraphQLQuery(name="persons")
+    public List<Person> getPersons(@GraphQLContext Device device) {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("deviceid","=",device.getId());
+        List<Person> result =dao.queryByJoin(Person.class,"^personGrades|device|normal$",cnd);
+        return result;
+    }
+    @GraphQLQuery(name="personRulers")
+    public List<PersonRuler> getPersonRulers(@GraphQLContext PersonGrade grade) {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("gradeid","=",grade.getId());
+        List<PersonRuler> result =dao.query(PersonRuler.class,cnd);
+        return result;
+    }
+
+    @GraphQLQuery(name="kinds")
+    public List<Kind> getKinds(@GraphQLContext Device device) {
+        Kind kind = dao.fetch(Kind.class,device.getKindid());
+        String ids[] = kind.getAncestors().split(",");
+        Cnd cnd = Cnd.NEW();
+        cnd.and("id","in",ids);
+        cnd.orderBy("level","asc");
+        List<Kind> result =dao.query(Kind.class,cnd);
+        result.add(kind);
+        return result;
+    }
+    @GraphQLQuery(name="locations")
+    public List<Location> getlocations(@GraphQLContext Device device) {
+        Location location = dao.fetch(Location.class,device.getLocationid());
+        String ids[] = location.getAncestors().split(",");
+        Cnd cnd = Cnd.NEW();
+        cnd.and("id","in",ids);
+        cnd.orderBy("level","asc");
+        List<Location> result =dao.query(Location.class,cnd);
+        result.add(location);
+        return result;
+    }
 }

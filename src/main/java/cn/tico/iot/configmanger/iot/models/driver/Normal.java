@@ -58,10 +58,8 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
 
 
 
-
-//    @Many(field = "normalid")
-//
-//    private List<Person> personals;
+    @GraphQLQuery(name = "personals", description = "个人设置")
+    private Person person;
 
 
     @Column("order_num")

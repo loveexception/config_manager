@@ -18,14 +18,7 @@ public class Gateway extends DeviceEnvModel {
     @GraphQLQuery(name = "sno", description = "机器码")
     private String sno;
 
-    /**
-     * SNO 机器码
-     */
-    @Column("ext_ip")
-    @Comment("机器码")
-    @ColDefine(type = ColType.VARCHAR, width = 32)
-    @GraphQLQuery(name = "ext_ip", description = "机器码")
-    private String extIP;
+
 
 
     /**

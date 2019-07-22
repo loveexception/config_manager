@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.iot.models.device;
 
 import cn.tico.iot.configmanger.iot.bean.I18NModel;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
+import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
@@ -26,11 +27,16 @@ public class PersonRuler extends I18NModel {
     /**
      * 操作码
      */
-    @Column("operate_key")
-    @Comment("操作码")
-    @ColDefine(type = ColType.VARCHAR, width = 255)
-    @GraphQLQuery(name = "operate_key", description = "驱动")
-    private String  operateKey ;
+    @Column("normal_id")
+    @Comment("列名")
+    @ColDefine(type = ColType.VARCHAR, width = 64)
+    @GraphQLQuery(name = "normal_id", description = "列")
+    private String  normalid ;
+
+    @One(field = "normalid",key="id")
+    @GraphQLQuery(name = "normal", description = "列名")
+    private Normal normal;
+
 
 
     /**

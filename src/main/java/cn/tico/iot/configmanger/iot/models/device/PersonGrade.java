@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @Data
-@Table("t_iot_personal_grade")
+@Table("t_iot_person_grade")
 @Comment("个性化等级")
 public class PersonGrade extends I18NModel {
 

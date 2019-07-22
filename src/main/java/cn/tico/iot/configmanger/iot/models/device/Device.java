@@ -7,6 +7,7 @@ import lombok.*;
 import org.nutz.dao.entity.annotation.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 @Data
@@ -93,6 +94,13 @@ public class Device extends DeviceEnvModel implements Serializable {
     @One(field = "driverid",key="id")
     @GraphQLQuery(name = "driver", description = "驱动")
     private Driver driver;
+
+
+    @Many(field = "deviceid")
+    @GraphQLQuery(name = "persons", description = "个性化规则")
+    private List<Person> persons;
+
+
 
 
 

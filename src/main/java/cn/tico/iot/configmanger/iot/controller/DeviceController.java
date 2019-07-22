@@ -221,7 +221,7 @@ public class DeviceController implements AdminKey {
 	 */
 	@At("/person_list")
 	@Ok("json")
-	public Object personList(@Param("..") Person person, HttpServletRequest req) {
+	public Object personList(@Param("..") Person person , HttpServletRequest req) {
 		try {
 
 			Cnd cnd = Cnd.NEW();

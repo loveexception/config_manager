@@ -25,6 +25,26 @@ public class SubGateway  {
     @GraphQLQuery(name = "sno", description = "机器码")
     private String sno;
 
+    /**
+     * SNO  外网IP
+     */
+    @Column("ext_ip")
+    @Comment("机器码")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "ext_ip", description = "机器码")
+    private String extip;
+
+    /**
+     * SNO  内网IP
+     */
+    @Column("ip")
+    @Comment("机器码")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "ip", description = "机器码")
+    private String ip;
+
+
+
 
     /**
      * SNO 生成机器码

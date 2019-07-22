@@ -23,7 +23,10 @@ public class Person extends I18NModel {
     private String  normalid ;
 
     @One(field = "normalid",key = "id")
+    @GraphQLQuery(name = "normal", description = "属性")
     private Normal normal;
+
+
 
     /**
      * sno
@@ -44,12 +47,15 @@ public class Person extends I18NModel {
     @GraphQLQuery(name = "device_id", description = "驱动")
     private String  deviceid ;
 
+
     @One(field = "deviceid",key = "id")
+    @GraphQLQuery(name = "device", description = "设备")
     private Device device;
 
 
 
     @Many(field = "personid",key = "id")
+    @GraphQLQuery(name = "personGrades", description = "规则")
     private List<PersonGrade> personGrades;
 
 

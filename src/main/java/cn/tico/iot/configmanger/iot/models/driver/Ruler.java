@@ -29,10 +29,11 @@ public class Ruler extends I18NModel implements Comparable<Ruler> {
     @Column("normal_id")
     @Comment("列名")
     @ColDefine(type = ColType.VARCHAR, width = 64)
-    @GraphQLQuery(name = "normal_id", description = "列名")
+    @GraphQLQuery(name = "normal_id", description = "列")
     private String  normalid ;
 
     @One(field = "normalid",key="id")
+    @GraphQLQuery(name = "normal", description = "列名")
     private Normal normal;
 
 
