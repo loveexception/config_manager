@@ -87,7 +87,7 @@ public class ApiController implements AdminKey {
 		seg.set("sno",sno);
 		String sql =seg.toString();
 
-		return Result.success("system.success",graphql( sql,req ) );
+		return graphql( sql,req ) ;
 
 	}
 	/**
@@ -105,11 +105,9 @@ public class ApiController implements AdminKey {
 
         ExecutionResult result = graphQL.execute(sql);
 
-		System.out.println(Json.toJson(sql));
 
-		System.out.println(Json.toJson(result));
 
-		return Result.success("system.success",result);
+		return result;
 
 	}
 	/**
