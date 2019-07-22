@@ -51,7 +51,6 @@ public class ApiService {
         Iterator<Device> it = devices.iterator();
         if(it.hasNext()){
             Device device =  it.next();
-            System.out.println(Json.toJson(device));
             return devices.get(0);
         }
         return null;
@@ -94,7 +93,9 @@ public class ApiService {
         String ids[] = kind.getAncestors().split(",");
         Cnd cnd = Cnd.NEW();
         cnd.and("id","in",ids);
+        cnd.and("level",">","0");
         cnd.orderBy("level","asc");
+
         List<Kind> result =dao.query(Kind.class,cnd);
         result.add(kind);
         return result;
@@ -105,6 +106,8 @@ public class ApiService {
         String ids[] = location.getAncestors().split(",");
         Cnd cnd = Cnd.NEW();
         cnd.and("id","in",ids);
+        cnd.and("level",">","0");
+
         cnd.orderBy("level","asc");
         List<Location> result =dao.query(Location.class,cnd);
         result.add(location);
