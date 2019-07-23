@@ -68,7 +68,7 @@ public class ApiService {
     public List<Ruler> getDriver(@GraphQLContext Grade grade) {
         Cnd cnd = Cnd.NEW();
         cnd.and("gradeid","=",grade.getId());
-        List<Ruler> result =dao.queryByJoin(Ruler.class,"^grade$",cnd);
+        List<Ruler> result =dao.queryByJoin(Ruler.class,"^grade|normal$",cnd);
         return result;
     }
 
