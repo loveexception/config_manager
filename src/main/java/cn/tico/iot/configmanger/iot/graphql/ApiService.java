@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.iot.graphql;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.iot.models.base.Kind;
 import cn.tico.iot.configmanger.iot.models.base.Location;
+import cn.tico.iot.configmanger.iot.models.base.Tag;
 import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
@@ -47,7 +48,7 @@ public class ApiService {
         }
         Cnd cnd = Cnd.NEW();
         cnd.and("t_iot_devices.sno","=",sno);
-        List<Device> devices = dao.queryByJoin(Device.class,"^dept|kind|location|driver|gateway$",cnd);
+        List<Device> devices = dao.queryByJoin(Device.class,"^dept|kind|location|driver|gateway|tags$",cnd);
         Iterator<Device> it = devices.iterator();
         if(it.hasNext()){
             Device device =  it.next();
@@ -113,4 +114,5 @@ public class ApiService {
         result.add(location);
         return result;
     }
+
 }
