@@ -331,6 +331,7 @@ class DynamicFieldSet extends React.Component {
 				data: JSON.stringify({
 					data: [
 						{
+							logic: 'and',
 							symble: '=',
 							normalid: '',
 							val: ''
