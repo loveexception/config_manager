@@ -56,6 +56,8 @@ public class ApiService {
         }
         return null;
     }
+
+
     @GraphQLQuery(name="normals")
     public List<Normal> getDriver(@GraphQLContext Driver driver) {
         Cnd cnd = Cnd.NEW();

@@ -377,7 +377,7 @@
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
-            <!-- --><plugin>
+            <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.3</version>
@@ -385,8 +385,8 @@
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
-            <!-- -->
-			<!-- 修改之后版本
+             -->
+			<!-- 修改之后版本-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -395,7 +395,7 @@
 				<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
-			 修改之后版本 -->
+			 <!-- 修改之后版本 -->
             <plugin>
                 <groupId>org.nutz.boot</groupId>
                 <artifactId>nutzboot-maven-plugin</artifactId>

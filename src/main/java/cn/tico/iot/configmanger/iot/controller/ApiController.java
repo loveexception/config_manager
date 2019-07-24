@@ -7,6 +7,7 @@ import cn.tico.iot.configmanger.iot.graphql.ApiService;
 import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
+import cn.tico.iot.configmanger.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.iot.services.DeviceService;
 import cn.tico.iot.configmanger.iot.services.PersonGradeService;
@@ -21,6 +22,8 @@ import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.Dao;
+import org.nutz.dao.pager.Pager;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -61,7 +64,12 @@ public class ApiController implements AdminKey {
 	private UserService userService;
 
 	@Inject
+	private DeviceService deviceService;
+
+	@Inject
 	private ApiService apiService;
+	@Inject
+	private Dao dao;
 
 	static GraphQLSchema schema = null;
 
@@ -90,6 +98,23 @@ public class ApiController implements AdminKey {
 		return graphql( sql,req ) ;
 
 	}
+
+	/**
+	 * 查询业务列表
+	 */
+	@At("/gateway")
+	@Ok("json")
+	public Object gateway(
+			@Param("extsno") String extsno,
+			HttpServletRequest req) {
+		Cnd cnd = Cnd.NEW();
+		cnd.and("ext_sno","=",extsno);
+		List<SubGateway> list = this.dao.queryByJoin(SubGateway.class , "^gateway$",cnd);
+
+
+		return  Result.success("system.success",list);
+
+	}
 	/**
 	 * 查询业务列表
 	 */
@@ -110,26 +135,25 @@ public class ApiController implements AdminKey {
 		return result;
 
 	}
+
+
+
 	/**
 	 * 查询业务列表
 	 */
 	@At("/all_sno")
 	@Ok("json")
-	public Object allSNO(HttpServletRequest req) throws IOException, ServletException {
+	public Object allSNO(
+			@Param("pageNum")int pageNum
+			, @Param("pageSize")int pageSize
 
-		String url = req.getRequestURL().toString();
-		Map map = req.getParameterMap();
-		url += "?";
+			,HttpServletRequest req)  {
+		Cnd cnd = Cnd.NEW();
+		Pager pager = new Pager(pageNum,pageSize);
 
-	    url += req.getQueryString();
+		List<Device> devices = deviceService.query(cnd,pager);
 
-		System.out.println(url);
-
-		String[] md5 =url.split("&md5");
-
-		System.out.println(md5[0]);
-
-		return Result.success("system.success",null);
+		return Result.success("system.success",devices);
 	}
 
 	static final String GRAPH_DEVICE="query{device(sno:\"${sno}\") {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},persons{id,i18n,cn_name,en_name},driver{id,i18n,cn_name,en_name,path,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,grades{id,i18n,cn_name,en_name,grade,order_num,rules{id，i18n,cn_name,en_name,logic,normal_id,normal{id,i18n,cn_name,en_name,operate_key,unit},symble,val}}}}}}";
