@@ -292,17 +292,14 @@ class EditableCell extends React.PureComponent {
 	}
 }
 class EditableTableRadio extends React.PureComponent {
-	state = {
-		value: 'false'
-	};
-	componentWillMount() {
-		let { data = {} } = this.props;
-		this.setState({
-			value: data['status']
-		});
-	}
+	// state = {
+	// 	value: 'false'
+	// };
+	// componentWillMount() {
+	// }
 	render() {
 		let { data = {} } = this.props;
+		let value = data['status'];
 		return (
 			<Radio.Group
 				onChange={e => {
@@ -332,7 +329,7 @@ class EditableTableRadio extends React.PureComponent {
 					});
 				}}
 				// defaultValue={data['告警使能']}
-				value={this.state.value}
+				value={value}
 				style={{
 					display: 'flex'
 				}}
@@ -445,7 +442,10 @@ class EditableTable extends React.PureComponent {
 
 	handleSave = row => {
 		const newData = [...this.state.dataSource];
-		const index = newData.findIndex(item => row.key === item.key);
+		let index = newData.findIndex(item => row.key === item.key);
+		if (row.id) {
+			index = newData.findIndex(item => row.id === item.id);
+		}
 		const item = newData[index];
 		newData.splice(index, 1, {
 			...item,
