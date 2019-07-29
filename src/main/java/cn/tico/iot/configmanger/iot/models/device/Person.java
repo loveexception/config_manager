@@ -27,7 +27,6 @@ public class Person extends I18NModel {
     private Normal normal;
 
 
-
     /**
      * sno
      */
@@ -57,7 +56,6 @@ public class Person extends I18NModel {
     @Many(field = "personid",key = "id")
     @GraphQLQuery(name = "personGrades", description = "规则")
     private List<PersonGrade> personGrades;
-
 
 
 

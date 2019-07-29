@@ -6,11 +6,12 @@ import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.nutz.dao.entity.annotation.*;
 
 @Data
 @Table("t_iot_person_rulers")
-public class PersonRuler extends I18NModel {
+public class PersonRuler extends I18NModel{
     /**
      * sno
      */
@@ -76,10 +77,11 @@ public class PersonRuler extends I18NModel {
      */
     @Column("order_num")
     @Comment("排序")
-    @ColDefine(type = ColType.VARCHAR, width = 255)
+    @ColDefine(type = ColType.INT, width = 255)
     @GraphQLQuery(name = "order_num", description = "排序")
 
-    private String  orderNum ;
+    private int  orderNum ;
+
 
 
 }

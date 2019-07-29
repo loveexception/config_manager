@@ -1,15 +1,14 @@
 package cn.tico.iot.configmanger.iot.controller;
 
-import cn.tico.iot.configmanger.common.base.Globals;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
-import cn.tico.iot.configmanger.common.utils.UpLoadUtil;
+import cn.tico.iot.configmanger.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Person;
+import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
 import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
-import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
@@ -20,15 +19,12 @@ import org.nutz.dao.Cnd;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
-import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
-import org.nutz.mvc.impl.AdaptorErrorContext;
-import org.nutz.mvc.upload.TempFile;
-import org.nutz.mvc.upload.UploadAdaptor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -63,6 +59,8 @@ public class DeviceController implements AdminKey {
 	@Inject
 	private PersonRulerService personRulerService;
 
+	@Inject
+    private KafkaBlock kafkaBlock;
 
 	@RequiresPermissions("iot:device:view")
 	@At("")
@@ -227,9 +225,26 @@ public class DeviceController implements AdminKey {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("normal_id","=",person.getNormalid());
-			cnd.orderBy("order_num","asc");
 			Object obj = personService.query(cnd);
 			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+
+	/**
+	 *  个性化查寻
+	 */
+	@At("/person_add_update")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object personAdd(@Param("data") Person person , HttpServletRequest req) {
+		try {
+
+			person = personService.insertPerson(person);
+			return Result.success("system.success",person);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -253,6 +268,74 @@ public class DeviceController implements AdminKey {
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
+	}
+
+	/**
+	 * 新增变更业务
+	 */
+	@At("/person_add_all")
+	@Ok("json")
+	public Object personAddAll(@Param("..") Person person,HttpServletRequest req) {
+		try {
+			Cnd cnd = Cnd.NEW();
+			cnd.and("deviceid","=",person.getDeviceid())
+					.and("normalid","=",person.getNormalid());
+			List<Person> result = personService.dao().queryByJoin(Person.class,"^normal|device|personGrades$",cnd);
+			if(Lang.isNotEmpty(result)){
+                for (Person p:result) {
+                    for (PersonGrade grade:p.getPersonGrades()) {
+                        personService.dao().fetchLinks(grade,"^personRulers$");
+                    }
+                }
+                return Result.success("system.success",result);
+
+			}else{
+			    cnd = Cnd.NEW();
+			    cnd.and("normalid","=",person.getNormalid());
+			    List<Grade> grades = personService.dao().queryByJoin(Grade.class,"^rulers$",cnd);
+			    List<PersonGrade> personGrades = new ArrayList<PersonGrade>();
+                for (Grade grade:grades
+                     ) {
+                    PersonGrade personGrade = new PersonGrade();
+                    personGrade.setGrade(grade.getGrade());
+                    personGrade.setCnName(grade.getCnName());
+                    personGrade.setEnName(grade.getEnName());
+                    List<PersonRuler> personRulers = new ArrayList<PersonRuler>();
+                    for(Ruler ruler:grade.getRulers()){
+
+                    }
+                    personGrade.setPersonRulers(personRulers);
+
+                }
+
+			    person.setPersonGrades(personGrades);
+                result = new ArrayList<Person>();
+
+                result.add(person);
+
+            }
+
+			return Result.success("system.success",result);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+
+	@At("/person_grades")
+	@Ok("json")
+	public Object personGrades(@Param("..") PersonGrade grade, HttpServletRequest req) {
+		Object obj = null;
+
+		Cnd cnd = Cnd.NEW();
+		cnd.and("personid","=",grade.getPersonid());
+		if(Strings.isNotBlank(grade.getGrade())){
+			cnd.and("grade","=",grade.getGrade());
+		}
+
+
+		obj =  personGradeService.queryPersonGrade(cnd);
+		return  Result.success("system.success",   obj );
 	}
 
 
@@ -340,22 +423,7 @@ public class DeviceController implements AdminKey {
 //	}
 //
 //
-//	@At("/grade_list")
-//	@Ok("json")
-//	public Object gradeList(@Param("..") Grade grade, HttpServletRequest req) {
-//		Object obj = null;
-//
-//		Cnd cnd = Cnd.NEW();
-//		cnd.and("normal_id","=",grade.getNormalid());
-//		if(Strings.isNotBlank(grade.getGrade())){
-//			cnd.and("grade","=",grade.getGrade());
-//		}
-//
-//
-//		obj =  gradeService.queryGrade(cnd);
-//		return  Result.success(,   obj );
-//
-//	}
+
 //	@At("/grade_add")
 //	@POST
 //	@AdaptBy(type = JsonAdaptor.class)

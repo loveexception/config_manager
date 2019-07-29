@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.common.adaptor.GraphQLAdaptor;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.graphql.ApiService;
+import cn.tico.iot.configmanger.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
@@ -69,6 +70,9 @@ public class ApiController implements AdminKey {
 	@Inject
 	private ApiService apiService;
 	@Inject
+	private KafkaBlock kafkaBlock;
+
+	@Inject
 	private Dao dao;
 
 	static GraphQLSchema schema = null;
@@ -88,17 +92,28 @@ public class ApiController implements AdminKey {
 	 */
 	@At("/device")
 	@Ok("json")
-	public Object deviceList(
+	public Object device(
 			@Param("sno") String sno,
 			HttpServletRequest req) {
 		Segment seg = new CharSegment(this.GRAPH_DEVICE);
 		seg.set("sno",sno);
 		String sql =seg.toString();
-
 		return graphql( sql,req ) ;
 
 	}
+	/**
+	 * 查询业务列表
+	 */
+	@At("/devices")
+	@Ok("json")
+	public Object deviceList(
+			@Param("sno") String[] sno,
+			HttpServletRequest req) {
 
+
+		return Result.success("system.success",sno);
+
+	}
 	/**
 	 * 查询业务列表
 	 */
@@ -110,10 +125,7 @@ public class ApiController implements AdminKey {
 		Cnd cnd = Cnd.NEW();
 		cnd.and("ext_sno","=",extsno);
 		List<SubGateway> list = this.dao.queryByJoin(SubGateway.class , "^gateway$",cnd);
-
-
 		return  Result.success("system.success",list);
-
 	}
 	/**
 	 * 查询业务列表
@@ -129,8 +141,6 @@ public class ApiController implements AdminKey {
 		GraphQL graphQL = new GraphQL.Builder(schema).build();
 
         ExecutionResult result = graphQL.execute(sql);
-
-
 
 		return result;
 
@@ -154,6 +164,18 @@ public class ApiController implements AdminKey {
 		List<Device> devices = deviceService.query(cnd,pager);
 
 		return Result.success("system.success",devices);
+	}
+
+	@At("/kafka")
+	@Ok("json")
+	public Object kafka(@Param("sno") String sno,@Param("extsno") String extsno, HttpServletRequest req) {
+		if(Strings.isNotBlank(sno)){
+			kafkaBlock.produce("config","sno",sno);
+			return  Result.success("system.success",sno );
+		}
+		kafkaBlock.produce("config","extsno",extsno);
+		return  Result.success("system.success",extsno );
+
 	}
 
 	static final String GRAPH_DEVICE="query{device(sno:\"${sno}\") {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},persons{id,i18n,cn_name,en_name},driver{id,i18n,cn_name,en_name,path,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,grades{id,i18n,cn_name,en_name,grade,order_num,rules{id，i18n,cn_name,en_name,logic,normal_id,normal{id,i18n,cn_name,en_name,operate_key,unit},symble,val}}}}}}";

@@ -18,7 +18,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
-@IocBean
+@IocBean(create = "init", depose = "depose")
+
 public  class KafkaBlock  {
 
     @Inject
@@ -73,6 +74,10 @@ public  class KafkaBlock  {
 
     public void produce(String topic ,String key , String value ) {
             producer.send(new ProducerRecord<>(topic, key,value));
+
+    }
+
+    public void depose(){
 
     }
 

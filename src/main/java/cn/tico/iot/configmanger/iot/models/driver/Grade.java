@@ -39,7 +39,14 @@ public class Grade extends I18NModel implements Comparable<Grade> {
     @GraphQLQuery(name = "rulers", description = "规则")
     private List<Ruler> rulers;
 
-
+    /**
+     * 排序
+     */
+    @Column("logic")
+    @Comment("逻辑")
+    @ColDefine(type = ColType.VARCHAR)
+    @GraphQLQuery(name = "logic", description = "逻辑")
+    private String  logic ;
 
 
     /**
