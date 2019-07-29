@@ -295,11 +295,11 @@ public class DeviceController implements AdminKey {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("deviceid","=",person.getDeviceid())
 					.and("normalid","=",person.getNormalid());
-			List<Person> result = personService.dao().queryByJoin(Person.class,"^normal|device|personGrades$",cnd);
+			List<Person> result = personService.dao().queryByJoin(Person.class,"^normal|device|grades$",cnd);
 			if(Lang.isNotEmpty(result)){
                 for (Person p:result) {
                     for (PersonGrade grade:p.getGrades()) {
-                        personService.dao().fetchLinks(grade,"^personRulers$");
+                        personService.dao().fetchLinks(grade,"^rulers$");
                     }
                 }
                 return Result.success("system.success",result);
@@ -324,8 +324,12 @@ public class DeviceController implements AdminKey {
                     	personRuler.setSymble(ruler.getSymble());
                     	personRuler.setOrderNum(ruler.getOrderNum());
 
+                    	personRulers.add(personRuler);
+
                     }
                     personGrade.setRulers(personRulers);
+
+                    personGrades.add(personGrade);
 
                 }
 
