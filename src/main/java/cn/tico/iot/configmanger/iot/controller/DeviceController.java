@@ -137,7 +137,7 @@ public class DeviceController implements AdminKey {
 	public Object deviceOne(@Param("id") String id, HttpServletRequest req) {
 		try {
 			Device obj =  deviceService.fetch(id);
-			deviceService.fetchLinks(obj,"^normals|kind$");
+			obj  = deviceService.fetchLinks(obj,"^dept|kind|location|driver|gateway|tags$");
 
 			return Result.success("system.success" ,obj);
 		} catch (Exception e) {
