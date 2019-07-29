@@ -21,10 +21,11 @@ public class PersonGrade extends I18NModel {
     @Column("person_id")
     @Comment("属性")
     @ColDefine(type = ColType.VARCHAR, width = 255)
-    @GraphQLQuery(name = "person_id", description = "属性")
+    @GraphQLQuery(name = "person_id", description = "个性化")
     private String  personid ;
 
     @One(field = "personid",key = "id")
+    @GraphQLQuery(name = "person", description = "个性化")
     private Person person;
 
     /**
@@ -38,6 +39,7 @@ public class PersonGrade extends I18NModel {
 
 
     @Many(field = "gradeid" ,key = "id")
-    private List<PersonRuler> personRulers;
+    @GraphQLQuery(name = "rulers", description = "规则")
+    private List<PersonRuler> rulers;
 
 }

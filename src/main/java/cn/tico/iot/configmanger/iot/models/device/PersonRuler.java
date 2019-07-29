@@ -77,10 +77,10 @@ public class PersonRuler extends I18NModel{
      */
     @Column("order_num")
     @Comment("排序")
-    @ColDefine(type = ColType.INT, width = 255)
+    @ColDefine(type = ColType.INT ,width = 20 )
     @GraphQLQuery(name = "order_num", description = "排序")
 
-    private int  orderNum ;
+    private long  orderNum ;
 
 
 

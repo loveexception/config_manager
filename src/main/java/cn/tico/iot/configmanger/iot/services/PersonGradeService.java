@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
@@ -12,11 +13,9 @@ import org.apache.commons.collections.comparators.ComparatorChain;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 业务标签 服务层实现
@@ -34,8 +33,10 @@ public class PersonGradeService extends Service<PersonGrade> {
 
         List<PersonGrade> obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
         for (PersonGrade grade:obj) {
-            List<PersonRuler> rulers = grade.getPersonRulers();
-
+            List<PersonRuler> rulers = grade.getRulers();
+            if(Lang.isEmpty(rulers)){
+                continue;
+            }
 
             Comparator compare = ComparableComparator.getInstance ();
             compare = ComparatorUtils. nullHighComparator(compare);
@@ -47,9 +48,16 @@ public class PersonGradeService extends Service<PersonGrade> {
 
 
             Collections.sort(rulers,multiSort);
-            grade.setPersonRulers(rulers);
+            grade.setRulers(rulers);
         }
 
         return obj;
+    }
+
+    public PersonGrade insertPersonGrade(PersonGrade personGrade) {
+
+        personGrade.setCreateBy(ShiroUtils.getSysUserId());
+        personGrade.setCreateTime(new Date());
+        return this.dao().insert(personGrade);
     }
 }

@@ -249,6 +249,21 @@ public class DeviceController implements AdminKey {
 			return Result.error("system.error");
 		}
 	}
+	/**
+	 *  个性化查寻
+	 */
+	@At("/person_add_update")
+	@POST
+	@Ok("json")
+	public Object personAdd(@Param("id") String id , HttpServletRequest req) {
+		try {
+
+			int index = personService.vDelete(id);
+			return Result.success("system.success",index);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 
 	/**
 	 * 新增变更业务
@@ -283,7 +298,7 @@ public class DeviceController implements AdminKey {
 			List<Person> result = personService.dao().queryByJoin(Person.class,"^normal|device|personGrades$",cnd);
 			if(Lang.isNotEmpty(result)){
                 for (Person p:result) {
-                    for (PersonGrade grade:p.getPersonGrades()) {
+                    for (PersonGrade grade:p.getGrades()) {
                         personService.dao().fetchLinks(grade,"^personRulers$");
                     }
                 }
@@ -302,13 +317,19 @@ public class DeviceController implements AdminKey {
                     personGrade.setEnName(grade.getEnName());
                     List<PersonRuler> personRulers = new ArrayList<PersonRuler>();
                     for(Ruler ruler:grade.getRulers()){
+                    	PersonRuler personRuler = new PersonRuler();
+                    	personRuler.setNormalid(ruler.getNormalid());
+                    	personRuler.setLogic(ruler.getLogic());
+                    	personRuler.setVal(ruler.getVal());
+                    	personRuler.setSymble(ruler.getSymble());
+                    	personRuler.setOrderNum(ruler.getOrderNum());
 
                     }
-                    personGrade.setPersonRulers(personRulers);
+                    personGrade.setRulers(personRulers);
 
                 }
 
-			    person.setPersonGrades(personGrades);
+			    person.setGrades(personGrades);
                 result = new ArrayList<Person>();
 
                 result.add(person);
@@ -328,16 +349,32 @@ public class DeviceController implements AdminKey {
 		Object obj = null;
 
 		Cnd cnd = Cnd.NEW();
+		if(Strings.isBlank(grade.getPersonid())){
+			return Result.success("system.success",null);
+		}
 		cnd.and("personid","=",grade.getPersonid());
 		if(Strings.isNotBlank(grade.getGrade())){
 			cnd.and("grade","=",grade.getGrade());
 		}
-
-
 		obj =  personGradeService.queryPersonGrade(cnd);
 		return  Result.success("system.success",   obj );
 	}
+	/**
+	 *  个性化查寻
+	 */
+	@At("/person_grade_add")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object personGradeAdd(@Param("data") PersonGrade personGrade , HttpServletRequest req) {
+		try {
 
+			personGrade = personGradeService.insertPersonGrade(personGrade);
+			return Result.success("system.success",personGrade);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 
 
 	/**
