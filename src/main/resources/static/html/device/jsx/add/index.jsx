@@ -1506,8 +1506,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 2,
-			basic_id: 'd8a070635b35431e99ae3002b9b4d0c3' //''
+			current: 0,
+			basic_id: '' //'d8a070635b35431e99ae3002b9b4d0c3' //''
 		};
 	}
 	next() {

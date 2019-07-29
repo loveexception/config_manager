@@ -243,45 +243,7 @@ class ListBox extends React.PureComponent {
 			upload_visible: upload_visible
 		});
 	};
-	onImportExcel = file => {
-		// 获取上传的文件对象
-		const { files } = file.target;
-		// 通过FileReader对象读取文件
-		const fileReader = new FileReader();
-		fileReader.onload = event => {
-			try {
-				const { result } = event.target;
-				// 以二进制流方式读取得到整份excel表格对象
-				const workbook = XLSX.read(result, { type: 'binary' });
-				// 存储获取到的数据
-				let data = [];
-				// 遍历每张工作表进行读取（这里默认只读取第一张表）
-				for (const sheet in workbook.Sheets) {
-					// esline-disable-next-line
-					if (workbook.Sheets.hasOwnProperty(sheet)) {
-						// 利用 sheet_to_json 方法将 excel 转成 json 数据
-						data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
-						// break; // 如果只取第一张表，就取消注释这行
-					}
-				}
-				// 最终获取到并且格式化后的 json 数据
-				message.success('导入成功！', 0.5);
-				// let dataSource = [];
-				// data.map((item, index) => {
-				// 	dataSource.push({ ...item, key: index });
-				// });
-				// this.setState({
-				// 	dataSource
-				// });
-				console.log(data);
-			} catch (e) {
-				// 这里可以抛出文件类型错误不正确的相关提示
-				message.error('文件类型不正确！', 0.5);
-			}
-		};
-		// 以二进制方式打开文件
-		fileReader.readAsBinaryString(files[0]);
-	};
+
 	render = () => {
 		let { data = [], columns = [], select_list = [], cascader_list = [], table_search = {} } = this.state;
 		const rowSelection = {
@@ -474,20 +436,99 @@ class ListBox extends React.PureComponent {
 					onOk={() => {
 						this.toggleModal(false);
 					}}
+					footer={null}
 					onCancel={() => {
 						this.toggleModal(false);
 					}}
+					destroyOnClose={true}
 				>
-					<div className="device-upload-modal-content">
-						<Button className="upload-wrap">
-							<input className={'file-uploader'} type="file" accept=".xlsx, .xls" onChange={this.onImportExcel} />
-							<span className={'upload-text'}>导入</span>
-						</Button>
-						<Input />
-					</div>
+					<ImportFile toggleModal={this.toggleModal} />
 				</Modal>
 			</div>
 		);
 	};
 }
+class ImportFile extends React.PureComponent {
+	state = {
+		file: {}
+	};
+	onImportExcel = file => {
+		// 获取上传的文件对象
+
+		const { files = [] } = file.target;
+		let _file = files[0] || {};
+		// this.setState({
+		// 	file: _file
+		// });
+		// 通过FileReader对象读取文件
+		const fileReader = new FileReader();
+		fileReader.onload = event => {
+			try {
+				const { result } = event.target;
+				// 以二进制流方式读取得到整份excel表格对象
+				const workbook = XLSX.read(result, { type: 'binary' });
+				// 存储获取到的数据
+				let data = [];
+				// 遍历每张工作表进行读取（这里默认只读取第一张表）
+				for (const sheet in workbook.Sheets) {
+					// esline-disable-next-line
+					if (workbook.Sheets.hasOwnProperty(sheet)) {
+						// 利用 sheet_to_json 方法将 excel 转成 json 数据
+						data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
+						// break; // 如果只取第一张表，就取消注释这行
+					}
+				}
+				// 最终获取到并且格式化后的 json 数据
+				message.success('导入成功！', 0.5);
+				// let dataSource = [];
+				// data.map((item, index) => {
+				// 	dataSource.push({ ...item, key: index });
+				// });
+				// this.setState({
+				// 	dataSource
+				// });
+				console.log(data);
+			} catch (e) {
+				// 这里可以抛出文件类型错误不正确的相关提示
+				message.error('文件类型不正确！', 0.5);
+			}
+		};
+		// 以二进制方式打开文件
+		fileReader.readAsBinaryString(files[0]);
+	};
+	render() {
+		return (
+			<div className="modal-box">
+				<div className="device-upload-modal-content">
+					<Button className="upload-wrap">
+						<input className={'file-uploader'} type="file" accept=".xlsx, .xls" onChange={this.onImportExcel} />
+						<span className={'upload-text'}>导入</span>
+					</Button>
+					<Input disabled value={this.state.file.name} />
+				</div>
+				<div className="btn-footer">
+					<Button
+						onClick={() => {
+							this.props.toggleModal && this.props.toggleModal(false);
+						}}
+					>
+						取消
+					</Button>
+					<Button
+						onClick={() => {
+							console.log(this.state.file);
+						}}
+						type="primary"
+						style={{
+							marginLeft: '10px'
+						}}
+					>
+						确定
+					</Button>
+				</div>
+			</div>
+		);
+	}
+}
+
 ReactDOM.render(<ListBox />, document.getElementById(domId));
