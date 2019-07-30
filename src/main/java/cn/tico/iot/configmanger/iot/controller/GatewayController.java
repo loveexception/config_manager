@@ -148,7 +148,7 @@ public class GatewayController implements AdminKey {
 	@Slog(tag="网关", after="新增保存网关id=${args[0].id}")
 	public Object addDo(@Param("..") Gateway gateway, HttpServletRequest req) {
 		try {
-			gatewayService.insertGateway(gateway);
+			gatewayService.insertEntity(gateway);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -178,7 +178,7 @@ public class GatewayController implements AdminKey {
 		try {
 			if(Lang.isNotEmpty(gateway)){
 
-				gatewayService.updateGateway(gateway);
+				gatewayService.updateEntity(gateway);
 			}
 			return Result.success("system.success");
 		} catch (Exception e) {

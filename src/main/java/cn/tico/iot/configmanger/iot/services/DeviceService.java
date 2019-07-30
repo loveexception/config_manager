@@ -69,12 +69,13 @@ public class DeviceService extends Service<Device> {
         return Strings.isNotBlank(device.getId());
     }
 
-    public Object insertAll(List<Driver> asList) {
+    public Object insertAll(List<Driver> drivers) {
 
-        return this.dao().insert(asList);
+        return this.dao().insert(drivers);
     }
 
-    public Object updateAll(List<Driver> asList) {
-        return this.dao().update(asList);
+    public Object updateAll(List<Driver> drivers) {
+
+        return this.dao().update(drivers);
     }
 }

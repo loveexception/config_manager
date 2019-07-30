@@ -24,7 +24,7 @@ public class DriverService extends Service<Driver> {
 		super(dao);
 	}
 
-	public Driver insertDriver(Driver driver) {
+	public Driver insertEntity(Driver driver) {
 
 
 		driver.setCreateBy(ShiroUtils.getSysUserId());
@@ -32,32 +32,32 @@ public class DriverService extends Service<Driver> {
 		return this.dao().insert(driver);
 	}
 
-	public int updateDriver(Driver driver) {
+	public int updateEntity(Driver driver) {
 		driver.setUpdateBy(ShiroUtils.getSysUserId());
 		driver.setUpdateTime(new Date());
 		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
 		return forup.update(driver);
 	}
 
-	public List<Driver> insertDrivers(List<Driver> drivers) {
+	public List<Driver> insertEntitys(List<Driver> drivers) {
 		List<Driver> list = new ArrayList<Driver>();
 		for (Driver driver:drivers) {
-			Driver temp =  insertDriver(driver);
+			Driver temp =  insertEntity(driver);
 			list.add(temp);
 		}
 		return list;
 	}
 
-	public List<Driver> updateDrivers(List<Driver> drivers) {
+	public List<Driver> updateEntitys(List<Driver> drivers) {
 
 		for (Driver driver:drivers){
 
-			updateDriver(driver);
+			updateEntity(driver);
 		}
 		return drivers;
 	}
 
-	public Object insertNormal(Driver driver) {
+	public Object insertSubs(Driver driver) {
 		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
 
 		return forup.insertOrUpdate(driver);

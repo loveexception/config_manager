@@ -14,7 +14,6 @@ import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
-import org.nutz.lang.random.R;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -121,7 +120,7 @@ public class DriverController implements AdminKey {
 	@Ok("json")
 	public Object addDriverupdate(@Param("data") Driver driver, HttpServletRequest req) {
 		try {
-			Object obj = driverService.insertNormal(driver);
+			Object obj = driverService.insertSubs(driver);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -141,7 +140,7 @@ public class DriverController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object addAllDriver(@Param("data") Driver[] driver,HttpServletRequest req) {
 		try {
-			Object obj =  driverService.insertDrivers(Arrays.asList(driver));
+			Object obj =  driverService.insertEntitys(Arrays.asList(driver));
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -156,7 +155,7 @@ public class DriverController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object editAllDriver(@Param("data") Driver[] driver,HttpServletRequest req) {
 		try {
-			Object obj =  	 driverService.updateDrivers(Arrays.asList(driver));
+			Object obj =  	 driverService.updateEntitys(Arrays.asList(driver));
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -315,7 +314,7 @@ public class DriverController implements AdminKey {
 		}
 		cnd.orderBy("order_num","asc");
 
-		obj =  gradeService.queryGrade(cnd);
+		obj =  gradeService.queryEntity(cnd);
 		return  Result.success("system.success",   obj );
 
 	}
@@ -327,7 +326,7 @@ public class DriverController implements AdminKey {
 	@Ok("json")
 	public Object gradeAllSave(@Param("data") Grade[] grades, HttpServletRequest req) {
 
-		Object  obj =  gradeService.gradeAllSave(grades);
+		Object  obj =  gradeService.saveEntitys(grades);
 		return  Result.success("system.success",   obj );
 
 	}
@@ -389,7 +388,7 @@ public class DriverController implements AdminKey {
 	// @AdaptBy(type = JsonAdaptor.class)
 	public Object removeGrade(@Param("id")String id, HttpServletRequest req) {
 		try {
-		    int i = gradeService.deleteWithRuler(id);
+		    int i = gradeService.deleteEntityAndSub(id);
 			return Result.success("system.success",i );
 		} catch (Exception e) {
 			return Result.error("system.error");

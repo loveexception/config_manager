@@ -33,7 +33,7 @@ public class GatewayService extends Service<Gateway> {
 
 
 
-	public Gateway insertGateway(Gateway gateway) {
+	public Gateway insertEntity(Gateway gateway) {
 
 
 		gateway.setCreateBy(ShiroUtils.getSysUserId());
@@ -41,7 +41,7 @@ public class GatewayService extends Service<Gateway> {
 		return this.dao().insert(gateway);
 	}
 
-	public int updateGateway(Gateway gateway) {
+	public int updateEntity(Gateway gateway) {
 		gateway.setUpdateBy(ShiroUtils.getSysUserId());
 		gateway.setUpdateTime(new Date());
 		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));

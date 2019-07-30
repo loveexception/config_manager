@@ -5,10 +5,12 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.iot.models.device.Person;
+import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
 import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 
 import java.util.Date;
 
@@ -26,7 +28,7 @@ public class PersonService extends Service<Person> {
 
 
 
-        public Person insertPerson(Person person) {
+        public Person insertEntity(Person person) {
 
 
             person.setCreateBy(ShiroUtils.getSysUserId());
@@ -41,4 +43,18 @@ public class PersonService extends Service<Person> {
             return forup.update(person);
         }
 
+    public int deleteEntity(String id) {
+        Person person = fetch(id);
+        if(person==null){
+            return 0;
+        }
+        if(Lang.isEmpty(person.getGrades())){
+            return delete(id);
+        }
+        for (PersonGrade grade: person.getGrades()) {
+            this.dao().deleteWith(grade,"^rulers$");
+        }
+
+        return delete(id);
+    }
 }

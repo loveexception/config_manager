@@ -1,22 +1,18 @@
 package cn.tico.iot.configmanger.iot.controller;
 
 import cn.tico.iot.configmanger.common.base.Result;
-import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.graphql.KafkaBlock;
-import cn.tico.iot.configmanger.iot.models.device.Device;
 import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
-import cn.tico.iot.configmanger.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Ruler;
-import cn.tico.iot.configmanger.iot.services.*;
-import cn.tico.iot.configmanger.module.sys.models.Dept;
-import cn.tico.iot.configmanger.module.sys.models.User;
+import cn.tico.iot.configmanger.iot.services.DeviceService;
+import cn.tico.iot.configmanger.iot.services.PersonGradeService;
+import cn.tico.iot.configmanger.iot.services.PersonRulerService;
+import cn.tico.iot.configmanger.iot.services.PersonService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
-import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -27,7 +23,9 @@ import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 业务 信息操作处理
@@ -36,8 +34,8 @@ import java.util.*;
  * @date 2019-04-16
  */
 @IocBean
-@At("/iot/device")
-public class DeviceController implements AdminKey {
+@At("/iot/person")
+public class PersonController implements AdminKey {
 	private static final Log log = Logs.get();
 
 
@@ -61,157 +59,6 @@ public class DeviceController implements AdminKey {
 
 	@Inject
     private KafkaBlock kafkaBlock;
-
-	@RequiresPermissions("iot:device:view")
-	@At("")
-	@Ok("th:/iot/device/list.html")
-	public void index(HttpServletRequest req) {
-
-	}
-
-	/**
-	 * 查询业务列表
-	 */
-	@At("/device_list")
-	@Ok("json")
-	public Object deviceList(
-			@Param("pageNum")int pageNum
-			, @Param("pageSize")int pageSize
-			, @Param("name") String name
-			, @Param("orderByColumn") String orderByColumn
-			, @Param("isAsc") String isAsc
-			, @Param("deptid") String deptid
-			, @Param("locationid") String locationid,
-			HttpServletRequest req) {
-
-		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)) {
-			//cnd.and("name", "like", "%" + name +"%");
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%")
-					.or("en_name", "like", "%" + name + "%")
-					.or("sno","like", "%" + name + "%");
-			cnd.and(group);
-		}
-		Dept dept = new Dept();
-		SqlExpressionGroup
-				group = Cnd
-				.exps("dept_id", "=", DEPT_ADMIN);
-		if (!isAdmin()) {
-			group.or("dept_id", "=", ShiroUtils.getSysUser().getDeptId());
-			dept.setId(ShiroUtils.getSysUser().getDeptId());
-		}else if(Strings.isNotBlank(deptid)){
-			group.or("dept_id", "=",deptid);
-		}else {
-			group.or("1","=","1");
-		}
-		if(Strings.isNotBlank(locationid)){
-			cnd.and("location_id","=",locationid);
-		}
-
-
-		cnd.and(group);
-		cnd.and("delflag", "=", "false");
-		cnd.and("asset_status","=","0");
-		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver|gateway|tags$");
-
-		return Result.success("system.success",obj);
-
-	}
-	/**
-	 * 用户权限
-	 * @return
-	 */
-	private boolean isAdmin() {
-
-		User user = ShiroUtils.getSysUser();
-
-		Set roles = userService.getRoleCodeList(user);
-
-		return roles.contains(ROLE_ADMIN);
-	}
-	/**
-	 * 查寻业务
-	 */
-	@At("/device_one")
-	@Ok("json")
-	public Object deviceOne(@Param("id") String id, HttpServletRequest req) {
-		try {
-			Device obj =  deviceService.fetch(id);
-			obj  = deviceService.fetchLinks(obj,"^dept|kind|location|driver|gateway|tags$");
-
-			return Result.success("system.success" ,obj);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-	/**
-	 * 删除业务
-	 */
-	@At("/device_remove")
-	@Ok("json")
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object deviceRemove(@Param("..")Device device, HttpServletRequest req) {
-		try {
-			int  i = deviceService.vDelete(device.getId());
-			return Result.success("system.success",i);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-	/**
-	 * 新增保存业务
-	 */
-	@At("/device_insert_update")
-	@POST
-	@AdaptBy(type = JsonAdaptor.class)
-	@Ok("json")
-	public Object deviceInsertUpdate(@Param("data") Device device, HttpServletRequest req) {
-		try {
-			Object obj = deviceService.insertUpdate(device);
-			return Result.success("system.success",obj);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-
-
-
-
-	/**
-	 * 新增保存业务
-	 */
-	@At("/device_insert_all")
-	@POST
-	@Ok("json")
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object deviceInsertAll(@Param("data") Driver[] driver,HttpServletRequest req) {
-		try {
-			Object obj =  deviceService.insertAll(Arrays.asList(driver));
-			return Result.success("system.success",obj);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-	/**
-	 * 新增变更业务
-	 */
-	@At("/device_update_all")
-	@POST
-	@Ok("json")
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object editAllDriver(@Param("data") Driver[] driver,HttpServletRequest req) {
-		try {
-			Object obj =  	 deviceService.updateAll(Arrays.asList(driver));
-			return Result.success("system.success",obj);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
 
 
 	/**
@@ -252,13 +99,13 @@ public class DeviceController implements AdminKey {
 	/**
 	 *  个性化查寻
 	 */
-	@At("/person_add_update")
+	@At("/person_remove")
 	@POST
 	@Ok("json")
-	public Object personAdd(@Param("id") String id , HttpServletRequest req) {
+	public Object personDel(@Param("id") String id , HttpServletRequest req) {
 		try {
 
-			int index = personService.vDelete(id);
+			int index = personService.deleteEntity(id);
 			return Result.success("system.success",index);
 		} catch (Exception e) {
 			return Result.error("system.error");
