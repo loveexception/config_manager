@@ -58,7 +58,7 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
 
 
 
-    @GraphQLQuery(name = "personals", description = "个人设置")
+    @GraphQLQuery(name = "person", description = "个人设置")
     private Person person;
 
 
@@ -73,6 +73,7 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
 
     @Override
     public int     compareTo(Normal o) {
+
         return this.orderNum > o.orderNum? 1: -1;
     }
 }

@@ -4,6 +4,8 @@ import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
+import cn.tico.iot.configmanger.iot.models.driver.Normal;
+import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
@@ -11,10 +13,10 @@ import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.lang.util.NutMap;
+import org.nutz.mapl.Mapl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 业务标签 服务层实现
@@ -110,5 +112,26 @@ public class PersonService extends Service<Person> {
 
 
 
+    }
+
+    public List<Normal> checkStatus(List<Normal> normals ,String deviceid) {
+        if(Lang.isEmpty(normals)){
+            return Lists.newArrayList();
+        }
+        Cnd cnd = Cnd.NEW();
+        cnd.and("device_id","=",deviceid);
+        List<Person> persons = query(cnd);
+        Map<String,Person> map = new HashMap<String,Person>();
+        for(Person person:persons){
+
+            map.put(person.getNormalid(),person);
+        }
+        for(Normal normal :normals){
+            Person temp = map.get(normal.getId());
+            normal.setPerson(temp);
+        }
+
+
+        return normals ;
     }
 }

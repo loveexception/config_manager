@@ -6,6 +6,7 @@ import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
+import cn.tico.iot.configmanger.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import com.google.common.collect.Lists;
@@ -221,10 +222,27 @@ public class PersonController implements AdminKey {
 		}
 
 	}
-
 	/**
-	 * 新增保存业务
+	 * 个性化驱动配置
 	 */
+	@At("/normal_list")
+	@Ok("json")
+	public Object allNormals(@Param("deviceid") String deviceid,@Param("driverid")String driverid, HttpServletRequest req) {
+		try {
+
+			Cnd cnd = Cnd.NEW();
+			cnd.and("delflag","=","false");
+			cnd.and("driver_id","=",driverid);
+			cnd.orderBy("order_num","asc");
+
+			List<Normal> normals = normalService.query(cnd);
+			 normals = personService.checkStatus(normals,deviceid);
+
+			return Result.success("system.success",normals);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 //	@At("/person_ruler_insert")
 //	@POST
 //	@AdaptBy(type = JsonAdaptor.class)
