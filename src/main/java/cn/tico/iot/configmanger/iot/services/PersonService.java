@@ -28,12 +28,22 @@ public class PersonService extends Service<Person> {
         super(dao);
     }
 
-    public Person insertEntity(Person person) {
+    public Person insertEntity(Person person,String deep) {
+
 
 
         person.setCreateBy(ShiroUtils.getSysUserId());
         person.setCreateTime(new Date());
-        return this.dao().insert(person);
+        person =  insert(person);
+        if(Lang.isEmpty(person.getGrades())){
+            return person;
+        }
+        for(PersonGrade personGrade:person.getGrades()){
+            personGrade.setPersonid(person.getId());
+            this.dao().insertWith(personGrade,deep);
+        }
+
+        return person;
     }
 
     public int updateEntity(Person person) {
@@ -47,7 +57,7 @@ public class PersonService extends Service<Person> {
             return null;
         }
         if(Strings.isEmpty(person.getId())){
-            return insertEntity(person);
+            return insertEntity(person,"");
         }
         int result = updateEntity(person);
         if(result==1){

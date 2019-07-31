@@ -131,14 +131,13 @@ public class PersonController implements AdminKey {
                 return Result.success("system.success",result);
 
 			}else{
-			    Cnd cnd = Cnd.NEW();
-			    cnd.and("normalid","=",person.getNormalid());
+
 			    List<Grade> grades = normalService.querySubs(person.getNormalid());
 
                 List<PersonGrade> personGrades = personGradeService.changeFromGrade(grades) ;
 
 				person.setGrades(personGrades);
-				personService.saveEntity(person);
+				person = personService.insertEntity(person,"^grades|rulers$");
 
             }
 

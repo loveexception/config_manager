@@ -243,7 +243,7 @@ public class DeviceController implements AdminKey {
 	public Object personAdd(@Param("data") Person person , HttpServletRequest req) {
 		try {
 
-			person = personService.insertEntity(person);
+			person = personService.insertEntity(person,"^grades$");
 			return Result.success("system.success",person);
 		} catch (Exception e) {
 			return Result.error("system.error");
