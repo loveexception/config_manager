@@ -6,12 +6,9 @@ import cn.tico.iot.configmanger.iot.models.device.Person;
 import cn.tico.iot.configmanger.iot.models.device.PersonGrade;
 import cn.tico.iot.configmanger.iot.models.device.PersonRuler;
 import cn.tico.iot.configmanger.iot.models.driver.Grade;
-import cn.tico.iot.configmanger.iot.models.driver.Ruler;
-import cn.tico.iot.configmanger.iot.services.DeviceService;
-import cn.tico.iot.configmanger.iot.services.PersonGradeService;
-import cn.tico.iot.configmanger.iot.services.PersonRulerService;
-import cn.tico.iot.configmanger.iot.services.PersonService;
+import cn.tico.iot.configmanger.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
+import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -23,7 +20,6 @@ import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,20 +54,29 @@ public class PersonController implements AdminKey {
 	private PersonRulerService personRulerService;
 
 	@Inject
+	private NormalService normalService;
+
+	@Inject
     private KafkaBlock kafkaBlock;
 
 
 	/**
 	 *  个性化查寻
 	 */
-	@At("/person_list")
+	@At("/person")
 	@Ok("json")
 	public Object personList(@Param("..") Person person , HttpServletRequest req) {
 		try {
-
+			if(Strings.isEmpty(person.getNormalid())){
+				return Result.success("system.success", Lists.newArrayList());
+			}
+			if(Strings.isEmpty(person.getDeviceid())){
+				return Result.success("system.success", Lists.newArrayList());
+			}
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("normal_id","=",person.getNormalid());
+			cnd.and("device_id","=",person.getDeviceid());
 			Object obj = personService.query(cnd);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
@@ -81,23 +86,7 @@ public class PersonController implements AdminKey {
 
 
 	/**
-	 *  个性化查寻
-	 */
-	@At("/person_add_update")
-	@POST
-	@Ok("json")
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object personAdd(@Param("data") Person person , HttpServletRequest req) {
-		try {
-
-			person = personService.insertEntity(person);
-			return Result.success("system.success",person);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-	/**
-	 *  个性化查寻
+	 *  个性化删除
 	 */
 	@At("/person_remove")
 	@POST
@@ -112,92 +101,57 @@ public class PersonController implements AdminKey {
 		}
 	}
 
+
+
 	/**
-	 * 新增变更业务
+	 * 新增个性化标签
 	 */
-	@At("/person_ruler_change")
+	@At("/find_add_one")
 	@POST
-	@Ok("json")
-	@AdaptBy(type = JsonAdaptor.class)
-	public Object personRulerChange(@Param("insert") PersonRuler[] addruler,@Param("update") PersonRuler[] editruler, @Param("normalid") String driverid,HttpServletRequest req) {
-		try {
-			List obj1 = personRulerService.insertAllRuler(Arrays.asList(addruler),driverid);
-
-			int obj2 = personRulerService.updateAllRuler(Arrays.asList(editruler));
-            Person normal = new Person();
-            normal.setNormalid(driverid);
-            return personList(normal,req);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-	/**
-	 * 新增变更业务
-	 */
-	@At("/person_add_all")
 	@Ok("json")
 	public Object personAddAll(@Param("..") Person person,HttpServletRequest req) {
 		try {
-			Cnd cnd = Cnd.NEW();
-			cnd.and("deviceid","=",person.getDeviceid())
-					.and("normalid","=",person.getNormalid());
-			List<Person> result = personService.dao().queryByJoin(Person.class,"^normal|device|grades$",cnd);
+			if(Lang.isEmpty(person)){
+				return Result.success("system.success",new Object());
+			}
+
+			if(Strings.isEmpty(person.getNormalid())){
+				return Result.success("system.success",new Object());
+			}
+			if(Strings.isEmpty(person.getDeviceid())){
+				return Result.success("system.success",new Object());
+
+			}
+
+
+			Person result = personService.queryEntityDeep(person);
+
+
 			if(Lang.isNotEmpty(result)){
-                for (Person p:result) {
-                    for (PersonGrade grade:p.getGrades()) {
-                        personService.dao().fetchLinks(grade,"^rulers$");
-                    }
-                }
                 return Result.success("system.success",result);
 
 			}else{
-			    cnd = Cnd.NEW();
+			    Cnd cnd = Cnd.NEW();
 			    cnd.and("normalid","=",person.getNormalid());
-			    List<Grade> grades = personService.dao().queryByJoin(Grade.class,"^rulers$",cnd);
-			    List<PersonGrade> personGrades = new ArrayList<PersonGrade>();
-                for (Grade grade:grades
-                     ) {
-                    PersonGrade personGrade = new PersonGrade();
-                    personGrade.setGrade(grade.getGrade());
-                    personGrade.setCnName(grade.getCnName());
-                    personGrade.setEnName(grade.getEnName());
-                    List<PersonRuler> personRulers = new ArrayList<PersonRuler>();
-                    for(Ruler ruler:grade.getRulers()){
-                    	PersonRuler personRuler = new PersonRuler();
-                    	personRuler.setNormalid(ruler.getNormalid());
-                    	personRuler.setLogic(ruler.getLogic());
-                    	personRuler.setVal(ruler.getVal());
-                    	personRuler.setSymble(ruler.getSymble());
-                    	personRuler.setOrderNum(ruler.getOrderNum());
+			    List<Grade> grades = normalService.querySubs(person.getNormalid());
 
-                    	personRulers.add(personRuler);
+                List<PersonGrade> personGrades = personGradeService.changeFromGrade(grades) ;
 
-                    }
-                    personGrade.setRulers(personRulers);
-
-                    personGrades.add(personGrade);
-
-                }
-
-			    person.setGrades(personGrades);
-                result = new ArrayList<Person>();
-
-                result.add(person);
+				person.setGrades(personGrades);
+				personService.saveEntity(person);
 
             }
 
-			return Result.success("system.success",result);
+			return Result.success("system.success",person);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
 
 
-	@At("/person_grades")
+	@At("/grade_list")
 	@Ok("json")
-	public Object personGrades(@Param("..") PersonGrade grade, HttpServletRequest req) {
-		Object obj = null;
+	public Object  personGrades(@Param("..") PersonGrade grade, HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
 		if(Strings.isBlank(grade.getPersonid())){
@@ -207,26 +161,67 @@ public class PersonController implements AdminKey {
 		if(Strings.isNotBlank(grade.getGrade())){
 			cnd.and("grade","=",grade.getGrade());
 		}
-		obj =  personGradeService.queryPersonGrade(cnd);
+		Object obj =  personGradeService.queryEntity(cnd);
 		return  Result.success("system.success",   obj );
 	}
 	/**
 	 *  个性化查寻
 	 */
-	@At("/person_grade_add")
+	@At("/grade_add")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object personGradeAdd(@Param("data") PersonGrade personGrade , HttpServletRequest req) {
 		try {
 
-			personGrade = personGradeService.insertPersonGrade(personGrade);
+			personGrade = personGradeService.insertEntity(personGrade);
 			return Result.success("system.success",personGrade);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
+	@At("/grade_remove")
+	@POST
+	@Ok("json")
+	public Object gradeRemove(@Param("id") String id, HttpServletRequest req) {
 
+		try {
+			int obj =  personGradeService.deleteEntity(id);
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+
+	}
+
+    @At("/ruler_add")
+    @POST
+    @AdaptBy(type = JsonAdaptor.class)
+    @Ok("json")
+    public Object rulerAdd(@Param("data") PersonRuler[] rulers, @Param("gradeid") String gradeid,HttpServletRequest req) {
+
+        try {
+            Object obj =  personRulerService.insertEntitys(Arrays.asList(rulers),gradeid);
+            return Result.success("system.success",obj);
+        } catch (Exception e) {
+            return Result.error("system.error");
+        }
+
+    }
+
+	@At("/ruler_remove")
+	@POST
+	@Ok("json")
+	public Object remove(@Param("id") String id, HttpServletRequest req) {
+
+		try {
+			int obj =  personRulerService.delete(id);
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+
+	}
 
 	/**
 	 * 新增保存业务
@@ -326,20 +321,7 @@ public class PersonController implements AdminKey {
 //		}
 //
 //	}
-//    @At("/ruler_add")
-//    @POST
-//    @AdaptBy(type = JsonAdaptor.class)
-//    @Ok("json")
-//    public Object rulerAdd(@Param("data") Ruler[] ruler, @Param("gradeid") String gradeid,HttpServletRequest req) {
-//
-//        try {
-//            Object obj =  rulerService.insertRuler(ruler,gradeid);
-//            return Result.success("system.success",obj);
-//        } catch (Exception e) {
-//            return Result.error("system.error");
-//        }
-//
-//    }
+
 //
 //	/**
 //	 * 删除业务

@@ -1,7 +1,10 @@
 package cn.tico.iot.configmanger.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
+import cn.tico.iot.configmanger.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.iot.models.driver.Normal;
+import com.google.common.collect.Lists;
+import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
 import org.nutz.dao.util.Daos;
@@ -40,5 +43,19 @@ public class NormalService extends Service<Normal> {
          forup.update(normals);
 
          return normals;
+    }
+
+    public List<Grade> querySubs(String id) {
+        List<Grade> grades = this.dao().queryByJoin(Grade.class,"^grades$", Cnd.NEW().and("normal_id","=",id));
+        if(Lang.isEmpty(grades)){
+            return Lists.newArrayList();
+        }
+        List<Grade> result = new ArrayList<Grade>();
+        for (Grade grade : grades){
+            Grade temp = this.dao().fetchLinks(grade,"^rulers$");
+            result.add(temp);
+        }
+
+        return result;
     }
 }

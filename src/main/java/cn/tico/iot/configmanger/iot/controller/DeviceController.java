@@ -274,9 +274,9 @@ public class DeviceController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object personRulerChange(@Param("insert") PersonRuler[] addruler,@Param("update") PersonRuler[] editruler, @Param("normalid") String driverid,HttpServletRequest req) {
 		try {
-			List obj1 = personRulerService.insertAllRuler(Arrays.asList(addruler),driverid);
+			List obj1 = personRulerService.insertEntitys(Arrays.asList(addruler),driverid);
 
-			int obj2 = personRulerService.updateAllRuler(Arrays.asList(editruler));
+			int obj2 = personRulerService.updateEntitys(Arrays.asList(editruler));
             Person normal = new Person();
             normal.setNormalid(driverid);
             return personList(normal,req);
@@ -360,7 +360,7 @@ public class DeviceController implements AdminKey {
 		if(Strings.isNotBlank(grade.getGrade())){
 			cnd.and("grade","=",grade.getGrade());
 		}
-		obj =  personGradeService.queryPersonGrade(cnd);
+		obj =  personGradeService.queryEntity(cnd);
 		return  Result.success("system.success",   obj );
 	}
 	/**
@@ -373,7 +373,7 @@ public class DeviceController implements AdminKey {
 	public Object personGradeAdd(@Param("data") PersonGrade personGrade , HttpServletRequest req) {
 		try {
 
-			personGrade = personGradeService.insertPersonGrade(personGrade);
+			personGrade = personGradeService.insertEntity(personGrade);
 			return Result.success("system.success",personGrade);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -381,154 +381,6 @@ public class DeviceController implements AdminKey {
 	}
 
 
-	/**
-	 * 新增保存业务
-	 */
-//	@At("/person_ruler_insert")
-//	@POST
-//	@AdaptBy(type = JsonAdaptor.class)
-//	@Ok("json")
-//	public Object addNormals(@Param("data") Normal[] normals , @Param("driverid") String driverid, HttpServletRequest req) {
-//		try {
-//			Object obj = normalService.insertAllNormal(Arrays.asList(normals),driverid);
-//			Normal normal = new Normal();
-//			normal.setDriverid(driverid);
-//			return allNormals(normal,req);
-//		} catch (Exception e) {
-//			return Result.error("system.error");
-//		}
-//	}
 
-//
-//	/**
-//	 * 删除业务
-//	 */
-//	@At("/normal_remove")
-//	@Ok("json")
-//	@POST
-//	@AdaptBy(type = JsonAdaptor.class)
-//	public Object removeNormal(@Param("data")String[] ids, HttpServletRequest req) {
-//		try {
-//			int  i = normalService.vDelete(ids);
-//			return Result.success("system.success",i);
-//		} catch (Exception e) {
-//			return Result.error("system.error");
-//		}
-//	}
-//
-//
-//
-//	@At("/dorp_types")
-//	@Ok("json")
-//	public Object dorpTypes(HttpServletRequest req) {
-//		NutMap map =NutMap.NEW();
-//		map.addv("deptName","所属组织");
-//		map.addv("locationName","所属地区");
-//		return Result.success("system.success" ,map);
-//	}
-//
-//	@At("/driver_upload")
-//	@Ok("json")
-//	@POST
-//	@AdaptBy(type = UploadAdaptor.class)
-//	public Object upload(@Param("Filedata") TempFile tf, HttpServletRequest req, AdaptorErrorContext err) {
-//		try {
-//			if (err != null && err.getAdaptorErr() != null) {
-//				return NutMap.NEW().addv("code", 1).addv("msg", "文件不合法");
-//			} else if (tf == null) {
-//				return Result.error("空文件");
-//			} else {
-//				Map map = new HashMap<String,String>();
-//				String name = tf.getName();
-//				String url = UpLoadUtil.upLoadFileSysConfigPath(tf,"driver");
-//				String u = req.getServletContext().getContextPath();
-//				map.put("name",tf.getSubmittedFileName());
-//				map.put("url",url);
-//				map.put("file",tf.getFile().getName());
-//				return Result.success("上传成功",  map );
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return Result.error("系统错误");
-//		} catch (Throwable e) {
-//			return Result.error("格式错误");
-//		}
-//	}
-//	@At("/normal_csv_path")
-//	@Ok("json")
-//	public Object csvPath( HttpServletRequest req) {
-//
-//				String url = Globals.AppUploadPath+"/csv/"+"normal.csv";
-//				return Result.success("下载地址",   url );
-//
-//	}
-//
-//
-
-//	@At("/grade_add")
-//	@POST
-//	@AdaptBy(type = JsonAdaptor.class)
-//	@Ok("json")
-//	public Object gradeAdd(@Param("data") Grade grade, HttpServletRequest req) {
-//
-//		try {
-//			Object obj =  gradeService.insert(grade);
-//			return Result.success("system.success",obj);
-//		} catch (Exception e) {
-//			return Result.error("system.error");
-//		}
-//
-//	}
-//    @At("/ruler_add")
-//    @POST
-//    @AdaptBy(type = JsonAdaptor.class)
-//    @Ok("json")
-//    public Object rulerAdd(@Param("data") Ruler[] ruler, @Param("gradeid") String gradeid,HttpServletRequest req) {
-//
-//        try {
-//            Object obj =  rulerService.insertRuler(ruler,gradeid);
-//            return Result.success("system.success",obj);
-//        } catch (Exception e) {
-//            return Result.error("system.error");
-//        }
-//
-//    }
-//
-//	/**
-//	 * 删除业务
-//	 */
-//	@At("/grade_remove")
-//	@Ok("json")
-//    @POST
-//	@AdaptBy(type = JsonAdaptor.class)
-//	public Object removeGrade(@Param("data")String id, HttpServletRequest req) {
-//		try {
-//		    Grade grade = new Grade();
-//		    grade.setId(id);
-//		    grade = gradeService.fetchLinks(grade,"^rulers$");
-//			int i = gradeService._deleteLinks(grade,"^rulers$");
-//			return Result.success("system.success",i );
-//		} catch (Exception e) {
-//			return Result.error("system.error");
-//		}
-//	}
-//
-//    /**
-//     * 删除业务
-//     */
-//    @At("/ruler_remove")
-//    @Ok("json")
-//    @POST
-//    @AdaptBy(type = JsonAdaptor.class)
-//    public Object removeRule(@Param("data")String ids, HttpServletRequest req) {
-//        try {
-//            int i = rulerService.delete(ids);
-//            return Result.success("system.success",i);
-//        } catch (Exception e) {
-//            return Result.error("system.error");
-//        }
-//    }
-//
-//
 
 }
