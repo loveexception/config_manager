@@ -243,14 +243,14 @@ public class PersonController implements AdminKey {
 	 */
 	@At("/normal_list")
 	@Ok("json")
-	public Object allNormals(@Param("deviceid") String deviceid, @Param("driverid")String driverid, @Param("pagenum")int pagenum , HttpServletRequest req) {
+	public Object allNormals(@Param("deviceid") String deviceid, @Param("driverid")String driverid,  HttpServletRequest req) {
 		try {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("driver_id","=",driverid);
 			cnd.orderBy("order_num","asc");
 
-			List<Normal> normals = normalService.query(cnd,new Pager(pagenum,Pager.DEFAULT_PAGE_SIZE ));
+			List<Normal> normals = normalService.query(cnd);
 			normals = personService.checkStatus(normals,deviceid);
 			return Result.success("system.success",normals);
 		} catch (Exception e) {
