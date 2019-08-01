@@ -99,6 +99,14 @@ public class PersonGradeService extends Service<PersonGrade> {
         return Json.fromJsonAsList(PersonGrade.class,json);
     }
 
+    public List<PersonGrade> saveEntitys(PersonGrade[] grades) {
+
+        for (PersonGrade persongrade:grades) {
+            saveEntity(persongrade);
+        }
+        return Arrays.asList(grades);
+    }
+
 //    List<PersonGrade> personGrades = new ArrayList<PersonGrade>();
 //                for (Grade grade:grades
 //                     ) {

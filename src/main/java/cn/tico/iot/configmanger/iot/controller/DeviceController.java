@@ -379,6 +379,15 @@ public class DeviceController implements AdminKey {
 		}
 	}
 
+	@At("/grade_all_save")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
+	@Ok("json")
+	public Object gradeAllSave(@Param("data") PersonGrade[] grades, HttpServletRequest req) {
+		List<PersonGrade>  obj =  personGradeService.saveEntitys(grades);
+		return  Result.success("system.success",   obj );
+
+	}
 
 
 
