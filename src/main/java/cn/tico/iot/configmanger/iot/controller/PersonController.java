@@ -12,6 +12,7 @@ import cn.tico.iot.configmanger.module.sys.services.UserService;
 import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -242,15 +243,14 @@ public class PersonController implements AdminKey {
 	 */
 	@At("/normal_list")
 	@Ok("json")
-	public Object allNormals(@Param("deviceid") String deviceid,@Param("driverid")String driverid, HttpServletRequest req) {
+	public Object allNormals(@Param("deviceid") String deviceid, @Param("driverid")String driverid, @Param("pagenum")int pagenum , HttpServletRequest req) {
 		try {
-
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("driver_id","=",driverid);
 			cnd.orderBy("order_num","asc");
 
-			List<Normal> normals = normalService.query(cnd);
+			List<Normal> normals = normalService.query(cnd,new Pager(pagenum,Pager.DEFAULT_PAGE_SIZE ));
 			normals = personService.checkStatus(normals,deviceid);
 			return Result.success("system.success",normals);
 		} catch (Exception e) {
