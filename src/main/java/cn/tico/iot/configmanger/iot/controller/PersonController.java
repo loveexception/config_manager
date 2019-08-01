@@ -84,7 +84,22 @@ public class PersonController implements AdminKey {
 			return Result.error("system.error");
 		}
 	}
+	/**
+	 *  个性化查寻
+	 */
+	@At("/person_update")
+	@Ok("json")
+	public Object personUpdate(@Param("..") Person person , HttpServletRequest req) {
+		try {
+			Person obj = personService.fetch(person.getId());
+			obj.setStatus(person.getStatus());
+			personService.update(obj);
 
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 
 	/**
 	 *  个性化删除
