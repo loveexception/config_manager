@@ -104,7 +104,7 @@ public class PersonService extends Service<Person> {
         List<PersonGrade> grades = person.getGrades();
         List<PersonGrade> result = new ArrayList<>();
         for(PersonGrade grade : grades){
-            PersonGrade personGrade = this.dao().fetchLinks(grade,"^rules$");
+            PersonGrade personGrade = this.dao().fetchLinks(grade,"^rulers$");
             result.add(personGrade);
         }
         person.setGrades(result);
