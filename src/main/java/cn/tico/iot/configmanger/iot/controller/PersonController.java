@@ -11,6 +11,7 @@ import cn.tico.iot.configmanger.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -88,14 +89,16 @@ public class PersonController implements AdminKey {
 	 *  个性化查寻
 	 */
 	@At("/person_update")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
 	@Ok("json")
-	public Object personUpdate(@Param("..") Person person , HttpServletRequest req) {
+	public Object personUpdate(@Param("data") Person person , HttpServletRequest req) {
 		try {
-			Person obj = personService.fetch(person.getId());
-			obj.setStatus(person.getStatus());
-			personService.update(obj);
+			//Person obj = personService.fetch(person.getId());
+			//obj.setStatus(person.getStatus());
+			personService.updateEntity(person);
 
-			return Result.success("system.success",obj);
+			return Result.success("system.success",person);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
