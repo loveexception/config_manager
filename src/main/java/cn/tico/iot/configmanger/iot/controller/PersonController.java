@@ -68,7 +68,7 @@ public class PersonController implements AdminKey {
 	 */
 	@At("/person")
 	@Ok("json")
-	public Object personList(@Param("..") Person person , HttpServletRequest req) {
+	public Object person(@Param("..") Person person , HttpServletRequest req) {
 		try {
 			if(Strings.isEmpty(person.getNormalid())){
 				return Result.success("system.success", Lists.newArrayList());
@@ -86,6 +86,24 @@ public class PersonController implements AdminKey {
 			}
 			Object	obj = personService.queryEntityDeep(persons.get(0));
 			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+
+	@At("/person_id")
+	@Ok("json")
+	public Object personID(@Param("..") Person person , HttpServletRequest req) {
+		try {
+			if(Strings.isEmpty(person.getId())){
+				return Result.success("system.success", Lists.newArrayList());
+			}
+			person =  personService.fetch(person.getId());
+			person = personService.queryEntityDeep(person);
+			Normal normal = personService.dao().fetchLinks(person.getNormal(),"^driver$");
+			person.setNormal(normal);
+			return Result.success("system.success",person);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
