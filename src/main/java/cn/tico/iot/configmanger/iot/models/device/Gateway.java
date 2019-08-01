@@ -19,8 +19,6 @@ public class Gateway extends DeviceEnvModel {
     private String sno;
 
 
-
-
     /**
      *
      *  GIT 地址

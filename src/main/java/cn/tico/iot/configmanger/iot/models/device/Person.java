@@ -54,7 +54,7 @@ public class Person extends I18NModel {
 
 
     @Many(field = "personid",key = "id")
-    @GraphQLQuery(name = "grades", description = "规则")
+    @GraphQLQuery(name = "grades", description = "个性化级别")
     private List<PersonGrade> grades;
 
 

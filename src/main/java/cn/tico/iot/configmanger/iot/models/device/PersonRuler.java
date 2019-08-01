@@ -22,7 +22,7 @@ public class PersonRuler extends I18NModel{
     private String  gradeid ;
 
     @One(field = "gradeid",key="id")
-    private Grade grade;
+    private PersonGrade grade;
 
 
     /**
@@ -79,7 +79,6 @@ public class PersonRuler extends I18NModel{
     @Comment("排序")
     @ColDefine(type = ColType.INT ,width = 20 )
     @GraphQLQuery(name = "order_num", description = "排序")
-
     private long  orderNum ;
 
 

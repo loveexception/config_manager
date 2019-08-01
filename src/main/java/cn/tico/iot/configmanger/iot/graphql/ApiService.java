@@ -22,6 +22,7 @@ import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class ApiService {
         List<Device> devices = dao.queryByJoin(Device.class,"^dept|kind|location|driver|gateway|tags$",cnd);
         Iterator<Device> it = devices.iterator();
         if(it.hasNext()){
-            Device device =  it.next();
+            // Device device =  it.next();
             return devices.get(0);
         }
         return null;
@@ -116,5 +117,27 @@ public class ApiService {
         result.add(location);
         return result;
     }
+    @GraphQLQuery(name="person")
+    public Person onePerson(@GraphQLContext Normal normal,@GraphQLArgument(name = "sno") String sno) {
+        List<Device> devices =dao .query(Device.class,Cnd.NEW().and("sno","=",sno));
+        if(Lang.isEmpty(devices)){
+            return null;
+        }
+        Device device = devices.get(0);
 
+        Cnd cnd = Cnd.NEW();
+        cnd.and("normalid","=",normal.getId());
+        cnd.and("deviceid","=",device.getId());
+        List<Person> persons = dao.query(Person.class,cnd);
+        if(Lang.isEmpty(persons)){
+            return null;
+        }
+        return persons.get(0);
+    }
+    @GraphQLQuery(name="grades")
+    public List<PersonGrade> gradesByPerson(@GraphQLContext Person person){
+        Cnd cnd = Cnd.NEW();
+        cnd.and("person_id","=",person.getId());
+        return dao.queryByJoin(PersonGrade.class,"^rulers$",cnd);
+    }
 }

@@ -53,7 +53,6 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
 
     @Many(field = "normalid")
     @GraphQLQuery(name = "grades", description = "级别")
-
     private List<Grade> grades;
 
 
@@ -67,6 +66,7 @@ public class Normal extends I18NModel implements  Comparable<Normal>{
     @ColDefine(type = ColType.INT)
     @GraphQLQuery(name = "order_num", description = "顺序")
     private long  orderNum ;
+
 
     private String key ;
 

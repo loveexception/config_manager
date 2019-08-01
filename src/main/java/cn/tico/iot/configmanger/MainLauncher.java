@@ -3,7 +3,6 @@ package cn.tico.iot.configmanger;
 import cn.tico.iot.configmanger.common.base.Globals;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.TreeUtils;
-import cn.tico.iot.configmanger.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.iot.models.device.Gateway;
 import com.alibaba.fastjson.JSON;
@@ -61,8 +60,6 @@ public class MainLauncher {
     @Inject
     private MenuService menuService;
 
-    @Inject
-    private GatewayBlock gatewayBlock;
 
     @At({"/", "/index"})
     @Ok("re")

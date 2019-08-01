@@ -29,6 +29,15 @@ public class PersonGrade extends I18NModel {
     private Person person;
 
     /**
+     * 排序
+     */
+    @Column("order_num")
+    @Comment("排序")
+    @ColDefine(type = ColType.INT ,width = 20 )
+    @GraphQLQuery(name = "order_num", description = "排序")
+    private long  orderNum ;
+
+    /**
      * 级别
      */
     @Column("grade")

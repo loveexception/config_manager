@@ -80,7 +80,11 @@ public class PersonController implements AdminKey {
 			cnd.and("delflag","=","false");
 			cnd.and("normal_id","=",person.getNormalid());
 			cnd.and("device_id","=",person.getDeviceid());
-			Object obj = personService.query(cnd);
+			List<Person> persons = personService.query(cnd);
+			if(Lang.isEmpty(persons)){
+				return Result.success("system.success",null);
+			}
+			Object	obj = personService.queryEntityDeep(persons.get(0));
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -129,7 +133,7 @@ public class PersonController implements AdminKey {
 	@At("/find_add_one")
 	@POST
 	@Ok("json")
-	public Object personAddAll(@Param("..") Person person,HttpServletRequest req) {
+	public Object  personAddOne(@Param("..") Person person,HttpServletRequest req) {
 		try {
 			if(Lang.isEmpty(person)){
 				return Result.success("system.success",new Object());
