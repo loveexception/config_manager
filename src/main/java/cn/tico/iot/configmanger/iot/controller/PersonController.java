@@ -199,7 +199,6 @@ public class PersonController implements AdminKey {
     @AdaptBy(type = JsonAdaptor.class)
     @Ok("json")
     public Object rulerAdd(@Param("data") PersonRuler[] rulers, @Param("gradeid") String gradeid,HttpServletRequest req) {
-
         try {
             Object obj =  personRulerService.insertEntitys(Arrays.asList(rulers),gradeid);
             return Result.success("system.success",obj);
@@ -213,14 +212,12 @@ public class PersonController implements AdminKey {
 	@POST
 	@Ok("json")
 	public Object remove(@Param("id") String id, HttpServletRequest req) {
-
 		try {
 			int obj =  personRulerService.delete(id);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
-
 	}
 	/**
 	 * 个性化驱动配置
@@ -236,8 +233,7 @@ public class PersonController implements AdminKey {
 			cnd.orderBy("order_num","asc");
 
 			List<Normal> normals = normalService.query(cnd);
-			 normals = personService.checkStatus(normals,deviceid);
-
+			normals = personService.checkStatus(normals,deviceid);
 			return Result.success("system.success",normals);
 		} catch (Exception e) {
 			return Result.error("system.error");
