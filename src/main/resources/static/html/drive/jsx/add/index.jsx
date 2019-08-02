@@ -376,6 +376,13 @@ class EditableTableRadio extends React.PureComponent {
 			value: data['status']
 		});
 	}
+	componentDidUpdate(prevProps, prevState) {
+		if (prevProps.data.status != this.props.data.status) {
+			this.setState({
+				value: this.props.data.status
+			});
+		}
+	}
 	render() {
 		let { data = {} } = this.props;
 		return (

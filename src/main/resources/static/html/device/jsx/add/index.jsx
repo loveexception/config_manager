@@ -392,7 +392,7 @@ $.modal.open = function(title, url, width, height) {
 		}
 	});
 };
-let { Steps, Button, message, Input, Descriptions, Upload, Icon, Cascader, Table, Popconfirm, Form, Radio, Modal, Row, Col, DatePicker, InputNumber, Select } = antd;
+let { Steps, Button, message, Input, Descriptions, Upload, Icon, Cascader, Table, Popconfirm, Form, Radio, Modal, Row, Col, DatePicker, InputNumber, Select, Switch, Checkbox } = antd;
 const { Step } = Steps;
 const { confirm } = Modal;
 
@@ -972,27 +972,36 @@ const BasicInformationForm = Form.create({ name: 'device_basic_info' })(BasicInf
 // }
 class EditableTableRadio extends React.PureComponent {
 	state = {
-		value: '否'
+		value: 'false'
 	};
 	componentWillMount() {
-		let { data = {} } = this.props;
+		let { value } = this.props;
 		this.setState({
-			value: data['告警使能']
+			value
 		});
 	}
+	componentDidUpdate(prevProps, prevState) {
+		if (prevProps.record.status != this.props.record.status) {
+			this.setState({
+				value: this.props.record.status
+			});
+		}
+	}
 	render() {
-		let { data = {} } = this.props;
 		return (
 			<Radio.Group
+				disabled={this.props.disabled}
 				onChange={e => {
-					this.setState(
-						{
-							value: e.target.value
-						},
-						() => {
-							data['告警使能'] = e.target.value;
-						}
-					);
+					this.props.onChange &&
+						this.props.onChange(e.target.value, results => {
+							if (results.code != 0) {
+								message.error('接口错误', 0.5);
+								return;
+							}
+							this.setState({
+								value: e.target.value
+							});
+						});
 				}}
 				// defaultValue={data['告警使能']}
 				value={this.state.value}
@@ -1000,364 +1009,241 @@ class EditableTableRadio extends React.PureComponent {
 					display: 'flex'
 				}}
 			>
-				<Radio value={'是'}>是</Radio>
-				<Radio value={'否'}>否</Radio>
+				<Radio value={'true'}>是</Radio>
+				<Radio value={'false'}>否</Radio>
 			</Radio.Group>
 		);
 	}
 }
 
-// class EditableTable extends React.PureComponent {
-// 	constructor(props) {
-// 		super(props);
-// 		this.columns = [
-// 			{
-// 				title: '指标项中文简称',
-// 				dataIndex: '指标项中文简称',
-// 				width: '30%',
-// 				editable: true
-// 			},
-// 			{
-// 				title: '指标项英文简称',
-// 				width: '30%',
-// 				dataIndex: '指标项英文简称',
-// 				editable: true
-// 			},
-// 			{
-// 				title: '操作码',
-// 				dataIndex: '操作码',
-// 				width: '10%',
-// 				editable: true
-// 			},
-// 			{
-// 				title: '单位',
-// 				dataIndex: '单位',
-// 				width: '10%',
-// 				editable: true
-// 			},
-// 			{
-// 				title: '告警使能',
-// 				width: '10%',
-// 				dataIndex: '告警使能'
-// 				// render: (text, record) => {
-// 				// 	return <EditableTableRadio data={record} />;
-// 				// }
-// 			},
-// 			{
-// 				title: '操作',
-// 				width: '10%',
-// 				dataIndex: 'operation',
-// 				render: (text, record) =>
-// 					this.state.dataSource.length >= 1 ? (
-// 						<Popconfirm cancelText="取消" okText="确定" title="确定删除?" onConfirm={() => this.handleDelete(record.key)}>
-// 							<Button className="btn-2">删除</Button>
-// 						</Popconfirm>
-// 					) : null
-// 			}
-// 		];
-
-// 		this.state = {
-// 			dataSource: LISTDATA
-// 		};
-// 	}
-
-// 	handleDelete = key => {
-// 		const dataSource = [...this.state.dataSource];
-// 		this.setState({
-// 			dataSource: dataSource.filter(item => item.key !== key)
-// 		});
-// 	};
-
-// 	handleAdd = () => {
-// 		const { dataSource } = this.state;
-// 		let key = Math.random();
-// 		const newData = {
-// 			key,
-// 			指标项中文简称: '',
-// 			指标项英文简称: Math.random()
-// 				.toString()
-// 				.slice('10'),
-// 			操作码: '',
-// 			单位: '',
-// 			告警使能: '否'
-// 		};
-// 		this.setState({
-// 			dataSource: [newData, ...dataSource]
-// 		});
-// 	};
-
-// 	handleSave = row => {
-// 		const newData = [...this.state.dataSource];
-// 		const index = newData.findIndex(item => row.key === item.key);
-// 		const item = newData[index];
-// 		newData.splice(index, 1, {
-// 			...item,
-// 			...row
-// 		});
-// 		this.setState({ dataSource: newData });
-// 	};
-// 	onExportExcel(headers, data, fileName = '指标项.xlsx') {
-// 		const _headers = headers
-// 			.map((item, i) =>
-// 				Object.assign(
-// 					{},
-// 					{
-// 						key: item.dataIndex,
-// 						title: item.title,
-// 						position: String.fromCharCode(65 + i) + 1
-// 					}
-// 				)
-// 			)
-// 			.reduce(
-// 				(prev, next) =>
-// 					Object.assign({}, prev, {
-// 						[next.position]: { key: next.key, v: next.title }
-// 					}),
-// 				{}
-// 			);
-
-// 		const _data = data
-// 			.map((item, i) =>
-// 				headers.map((item2, j) =>
-// 					Object.assign(
-// 						{},
-// 						{
-// 							content: item[item2.dataIndex],
-// 							position: String.fromCharCode(65 + j) + (i + 2)
-// 						}
-// 					)
-// 				)
-// 			)
-// 			// 对刚才的结果进行降维处理（二维数组变成一维数组）
-// 			.reduce((prev, next) => prev.concat(next))
-// 			// 转换成 worksheet 需要的结构
-// 			.reduce(
-// 				(prev, next) =>
-// 					Object.assign({}, prev, {
-// 						[next.position]: { v: next.content }
-// 					}),
-// 				{}
-// 			);
-// 		// 合并 headers 和 data
-// 		const output = Object.assign({}, _headers, _data);
-// 		// 获取所有单元格的位置
-// 		const outputPos = Object.keys(output);
-// 		// 计算出范围 ,["A1",..., "H2"]
-// 		const ref = `${outputPos[0]}:${outputPos[outputPos.length - 1]}`;
-
-// 		// 构建 workbook 对象
-// 		const wb = {
-// 			SheetNames: ['Sheet1'],
-// 			Sheets: {
-// 				Sheet1: Object.assign({}, output, {
-// 					'!ref': ref,
-// 					'!cols': [{ wpx: 200 }, { wpx: 300 }, { wpx: 300 }, { wpx: 200 }, { wpx: 150 }]
-// 				})
-// 			}
-// 		};
-
-// 		// 导出 Excel
-// 		XLSX.writeFile(wb, fileName);
-// 	}
-
-// 	onImportExcel = file => {
-// 		// 获取上传的文件对象
-// 		const { files } = file.target;
-// 		// 通过FileReader对象读取文件
-// 		const fileReader = new FileReader();
-// 		fileReader.onload = event => {
-// 			try {
-// 				const { result } = event.target;
-// 				// 以二进制流方式读取得到整份excel表格对象
-// 				const workbook = XLSX.read(result, { type: 'binary' });
-// 				// 存储获取到的数据
-// 				let data = [];
-// 				// 遍历每张工作表进行读取（这里默认只读取第一张表）
-// 				for (const sheet in workbook.Sheets) {
-// 					// esline-disable-next-line
-// 					if (workbook.Sheets.hasOwnProperty(sheet)) {
-// 						// 利用 sheet_to_json 方法将 excel 转成 json 数据
-// 						data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
-// 						// break; // 如果只取第一张表，就取消注释这行
-// 					}
-// 				}
-// 				// 最终获取到并且格式化后的 json 数据
-// 				message.success('导入成功！', 0.5);
-// 				let dataSource = [];
-// 				data.map((item, index) => {
-// 					dataSource.push({ ...item, key: index });
-// 				});
-// 				this.setState({
-// 					dataSource
-// 				});
-// 				// console.log(data);
-// 			} catch (e) {
-// 				// 这里可以抛出文件类型错误不正确的相关提示
-// 				message.error('文件类型不正确！', 0.5);
-// 			}
-// 		};
-// 		// 以二进制方式打开文件
-// 		fileReader.readAsBinaryString(files[0]);
-// 	};
-// 	calibrationMethod = () => {
-// 		let _d = document.querySelectorAll('.editable-table-box .has-error');
-// 		if (this.state.dataSource.length <= 0) {
-// 			message.error('未添加指标项', 0.5);
-// 			return;
-// 		}
-// 		if (_d.length != 0) {
-// 			message.error('添加指标项错误', 0.5);
-// 			return;
-// 		}
-// 		return this.state.dataSource;
-// 	};
-// 	render() {
-// 		const { dataSource = [] } = this.state;
-// 		// console.log('--------', dataSource);
-// 		const components = {
-// 			body: {
-// 				row: EditableFormRow,
-// 				cell: EditableCell
-// 			}
-// 		};
-// 		const columns = this.columns.map(col => {
-// 			if (!col.editable) {
-// 				return col;
-// 			}
-
-// 			return {
-// 				...col,
-// 				onCell: record => ({
-// 					record,
-// 					editable: col.editable,
-// 					dataIndex: col.dataIndex,
-// 					title: col.title,
-// 					handleSave: this.handleSave,
-// 					parentdata: dataSource
-// 				})
-// 			};
-// 		});
-// 		return (
-// 			<div className="editable-table-box">
-// 				<div
-// 					className="editable-table-content"
-// 					style={{
-// 						margin: '16px 0',
-// 						display: 'flex',
-// 						justifyContent: 'space-between'
-// 					}}
-// 				>
-// 					<Button className="btn-1" onClick={this.handleAdd} type="primary">
-// 						新增
-// 					</Button>
-// 					<div className="right-btn-box">
-// 						<Button className="upload-wrap btn-3">
-// 							<input className={'file-uploader'} type="file" accept=".xlsx, .xls" onChange={this.onImportExcel} />
-// 							<span className={'upload-text'}>导入</span>
-// 						</Button>
-// 						<Button
-// 							className="btn-3"
-// 							onClick={() => {
-// 								if (dataSource.length < 1) {
-// 									message.info('未选择下载数据', 0.5);
-// 									return;
-// 								}
-// 								let columns_new = columns.filter((item, index, _d) => index != _d.length - 1);
-// 								this.onExportExcel(columns_new, dataSource, '测试指标项.xlsx');
-// 							}}
-// 						>
-// 							导出
-// 						</Button>
-// 						<Button className="btn-3">模板下载</Button>
-// 					</div>
-// 				</div>
-// 				<Table
-// 					components={components}
-// 					rowClassName={() => 'editable-row'}
-// 					bordered
-// 					dataSource={dataSource}
-// 					columns={columns}
-// 					pagination={{
-// 						simple: true
-// 					}}
-// 				/>
-// 			</div>
-// 		);
-// 	}
-// }
-
 class AlarmConfiguration extends React.PureComponent {
 	state = {
 		data: []
 	};
-	componentDidMount() {
-		this.setState({
-			data: LISTDATA
-		});
-	}
-	calibrationMethod = () => {
-		if (this.state.data.length <= 0) {
-			message.error('未添加指标项', 0.5);
-			return;
+	init = device_id => {
+		if (device_id) {
+			$.ajax({
+				url: `/iot/device/device_one?id=${device_id}`,
+				// data: {},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'GET',
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误', 0.5);
+						return;
+					}
+					let driver_id = (results.data || {}).driverid;
+					if (driver_id) {
+						$.ajax({
+							url: `/iot/person/normal_list?deviceid=03a188c952dc40dd980008646dacd8e2&driverid=e17a84a3444942f0b9a19389f013584f`,
+							// data: {},
+							cache: false,
+							contentType: false,
+							processData: false,
+							type: 'GET',
+							success: results => {
+								if (results.code != 0) {
+									message.error('接口错误', 0.5);
+									return;
+								}
+								this.setState({
+									data: results.data
+								});
+							}
+						});
+					}
+				}
+			});
 		}
-		return this.state.data;
+	};
+	componentDidMount() {
+		this.init('03a188c952dc40dd980008646dacd8e2');
+	}
+	addDataRowPerson = (id, data) => {
+		let _data = [];
+		this.state.data.map(item => {
+			let _item = {};
+			if (item.id == id) {
+				_item = {
+					...item,
+					person: data
+				};
+			} else {
+				_item = item;
+			}
+			_data.push(_item);
+		});
+		this.setState({
+			data: _data
+		});
+	};
+	deleteDataRowPerson = id => {
+		let _data = [];
+		this.state.data.map(item => {
+			let _item = {};
+			if (item.id == id) {
+				let { person, ...other } = item;
+				_item = {
+					...other
+				};
+			} else {
+				_item = item;
+			}
+			_data.push(_item);
+		});
+		this.setState({
+			data: _data
+		});
 	};
 	render() {
-		let { show, title } = this.props;
+		let { show, title, device_id } = this.props;
 		let { data = [] } = this.state;
+		console.log('---ooo---');
 		let columns = [
 			{
 				title: '指标项中文简称',
-				dataIndex: '指标项中文简称',
-				width: '30%',
+				dataIndex: 'cnName',
+				width: '25%',
 				editable: true
 			},
 			{
 				title: '指标项英文简称',
-				width: '30%',
-				dataIndex: '指标项英文简称',
+				width: '25%',
+				dataIndex: 'enName',
 				editable: true
 			},
 			{
 				title: '操作码',
-				dataIndex: '操作码',
+				dataIndex: 'operateKey',
 				width: '10%',
 				editable: true
 			},
 			{
 				title: '单位',
-				dataIndex: '单位',
+				dataIndex: 'unit',
 				width: '10%',
 				editable: true
 			},
 			{
 				title: '告警使能',
 				width: '10%',
-				dataIndex: '告警使能',
-				render: (text, record) => <EditableTableRadio data={record} />
+				dataIndex: 'person.status',
+				render: (text, record) => (
+					<EditableTableRadio
+						disabled={!record.person}
+						value={text || record.status}
+						record={record}
+						onChange={(value, callback) => {
+							$.ajax({
+								cache: true,
+								type: 'POST',
+								url: '/iot/person/person_update',
+								data: JSON.stringify({
+									data: {
+										id: record.person.id,
+										status: value
+									}
+								}),
+								dataType: 'json',
+								async: false,
+								success: results => {
+									callback(results);
+								}
+							});
+						}}
+					/>
+				)
+			},
+			// {
+			// 	title: '告警使能2',
+			// 	width: '10%',
+			// 	dataIndex: 'person'
+			// 	render: (text, record) => {
+			// 		return (
+			// 			<EditableTableRadio
+			// 				value={`${!!text}`}
+			// 				record={record}
+			// 				onChange={(value, callback) => {
+			// 					console.log(value);
+			// 					if (value == 'true') {
+			// 						$.ajax({
+			// 							cache: true,
+			// 							type: 'POST',
+			// 							url: '/iot/person/find_add_one',
+			// 							data: {
+			// 								normalid: record.id,
+			// 								deviceid: device_id
+			// 							},
+			// 							// dataType: 'json',
+			// 							async: false,
+			// 							success: results => {
+			// 								callback(results);
+			// 							}
+			// 						});
+			// 					} else {
+			// 						$.ajax({
+			// 							cache: true,
+			// 							type: 'POST',
+			// 							url: '/iot/person/person_remove',
+			// 							data: {
+			// 								id: text.id
+			// 							},
+			// 							// dataType: 'json',
+			// 							async: false,
+			// 							success: results => {
+			// 								callback(results);
+			// 							}
+			// 						});
+			// 					}
+			// 					// $.ajax({
+			// 					// 	cache: true,
+			// 					// 	type: 'POST',
+			// 					// 	url: '/iot/person/person_update',
+			// 					// 	data: JSON.stringify({
+			// 					// 		data: {
+			// 					// 			id: record.id,
+			// 					// 			status: value
+			// 					// 		}
+			// 					// 	}),
+			// 					// 	dataType: 'json',
+			// 					// 	async: false,
+			// 					// 	success: results => {
+			// 					// 		callback(results);
+			// 					// 	}
+			// 					// });
+			// 				}}
+			// 			/>
+			// 		);
+			// 	}
+			// },
+			{
+				title: '告警配置',
+				width: '10%',
+				dataIndex: 'btn',
+				render: (text, record) => (
+					<Button
+						disabled={!record.person}
+						className="btn-2"
+						onClick={() => {
+							$.modal.open('告警规则设置', `/html/device/alarmRules.html?personid=${record.person.id}`);
+						}}
+					>
+						个性化
+					</Button>
+				)
 			},
 			{
 				title: '操作',
 				width: '10%',
 				dataIndex: 'operation',
-				render: (text, record) => {
-					return (
-						<Button
-							className="btn-2"
-							onClick={() => {
-								_list_data = {
-									record: record,
-									list: data
-								};
-								$.modal.open('告警规则设置', '/html/device/alarmRules.html');
-							}}
-						>
-							告警配置
-						</Button>
-					);
+				render: (text, record, index) => {
+					return <SwitchCustom key={record.id} checked={!!record.person} record={record} device_id={device_id} addDataRowPerson={this.addDataRowPerson} deleteDataRowPerson={this.deleteDataRowPerson} />;
 				}
 			}
 		];
+
 		return (
 			<div
 				className="device-add-indicators-box"
@@ -1375,6 +1261,148 @@ class AlarmConfiguration extends React.PureComponent {
 					}}
 				/>
 			</div>
+		);
+	}
+}
+class SwitchCustom extends React.PureComponent {
+	state = {
+		checked: false
+	};
+	componentDidMount() {
+		this.setState({
+			checked: this.props.checked
+		});
+	}
+	// componentDidUpdate(prevProps, prevState) {
+	// 	if (prevProps.record.person != this.props.record.person) {
+	// 		this.setState({
+	// 			value: this.props.record.person
+	// 		});
+	// 	}
+	// }
+	onChange = () => {
+		let { record = {}, device_id } = this.props;
+		let { person = {} } = record;
+		if (this.state.checked) {
+			console.log('删除');
+			if (person.id) {
+				$.ajax({
+					cache: true,
+					type: 'POST',
+					url: '/iot/person/person_remove',
+					data: {
+						id: person.id
+					},
+					// dataType: 'json',
+					async: false,
+					success: results => {
+						if (results.code != 0) {
+							message.error('接口错误', 0.5);
+							return;
+						}
+						this.setState({
+							checked: false
+						});
+						this.props.deleteDataRowPerson && this.props.deleteDataRowPerson(record.id);
+						// callback(results);
+					}
+				});
+			}
+		} else {
+			console.log('添加');
+			$.ajax({
+				cache: true,
+				type: 'POST',
+				url: '/iot/person/find_add_one',
+				data: {
+					normalid: record.id,
+					deviceid: device_id
+				},
+				// dataType: 'json',
+				async: false,
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误', 0.5);
+						return;
+					}
+					this.setState({
+						checked: true
+					});
+					// this.props.record = {
+					// 	...this.props.record,
+					// 	person: results.data
+					// };
+					this.props.addDataRowPerson && this.props.addDataRowPerson(record.id, results.data);
+					// callback(results);
+				}
+			});
+		}
+	};
+	render() {
+		return (
+			<Checkbox checked={this.state.checked} onChange={this.onChange}>
+				{!this.state.checked ? '添加' : '删除'}
+			</Checkbox>
+			// <Switch
+			// 	checkedChildren="开"
+			// 	unCheckedChildren="关"
+			// 	loading={this.state.loading}
+			// 	checked={this.state.checked}
+			// 	onClick={() => {
+			// 		let { person } = this.props.record;
+			// 		this.setState({
+			// 			loading: true
+			// 		});
+			// 		if (this.state.checked) {
+			// 			console.log('删除');
+			// 			$.ajax({
+			// 				cache: true,
+			// 				type: 'POST',
+			// 				url: '/iot/person/person_remove',
+			// 				data: {
+			// 					id: person.id
+			// 				},
+			// 				// dataType: 'json',
+			// 				async: false,
+			// 				success: results => {
+			// 					if (results.code != 0) {
+			// 						message.error('接口错误', 0.5);
+			// 						return;
+			// 					}
+			// 					this.setState({
+			// 						checked: false,
+			// 						loading: false
+			// 					});
+			// 					// callback(results);
+			// 				}
+			// 			});
+			// 		} else {
+			// 			console.log('添加');
+			// 			$.ajax({
+			// 				cache: true,
+			// 				type: 'POST',
+			// 				url: '/iot/person/find_add_one',
+			// 				data: {
+			// 					normalid: this.props.record.id,
+			// 					deviceid: this.props.device_id
+			// 				},
+			// 				// dataType: 'json',
+			// 				async: false,
+			// 				success: results => {
+			// 					if (results.code != 0) {
+			// 						message.error('接口错误', 0.5);
+			// 						return;
+			// 					}
+			// 					this.setState({
+			// 						checked: true,
+			// 						loading: false
+			// 					});
+			// 					// callback(results);
+			// 				}
+			// 			});
+			// 		}
+			// 	}}
+			// />
 		);
 	}
 }
@@ -1506,8 +1534,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 0,
-			basic_id: '' //'d8a070635b35431e99ae3002b9b4d0c3' //''
+			current: 2,
+			device_id: '03a188c952dc40dd980008646dacd8e2' //''
 		};
 	}
 	next() {
@@ -1544,7 +1572,7 @@ class AddBox extends React.PureComponent {
 					<div className="steps-content-body">
 						<BasicInformationForm onRef={el => (this.basicInformation = el)} title={steps[current].title} show={steps[current].title == '基本信息'} />
 						<DriverCustomForm onRef={el => (this.driverCustomForm = el)} title={'驱动和网关选择'} show={steps[current].title == '添加驱动'} />
-						<AlarmConfiguration ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '监控指标项'} />
+						<AlarmConfiguration device_id={this.state.device_id} ref={el => (this.alarmConfiguration = el)} title={steps[current].title} show={steps[current].title == '监控指标项'} />
 					</div>
 				</div>
 				<div className="steps-action">
@@ -1582,7 +1610,7 @@ class AddBox extends React.PureComponent {
 													url: '/iot/device/device_insert_update',
 													data: JSON.stringify({
 														data: {
-															id: this.state.basic_id,
+															id: this.state.device_id,
 															...params
 														}
 													}),
@@ -1595,7 +1623,7 @@ class AddBox extends React.PureComponent {
 														}
 														this.setState(
 															{
-																basic_id: (results.data || {}).id
+																device_id: (results.data || {}).id
 															},
 															() => {
 																this.next();
@@ -1611,14 +1639,14 @@ class AddBox extends React.PureComponent {
 									if (this.driverCustomForm) {
 										this.driverCustomForm.calibrationMethod(data => {
 											if (data) {
-												if (this.state.basic_id) {
+												if (this.state.device_id) {
 													$.ajax({
 														cache: true,
 														type: 'POST',
 														url: '/iot/device/device_insert_update',
 														data: JSON.stringify({
 															data: {
-																id: this.state.basic_id,
+																id: this.state.device_id,
 																...data
 															}
 														}),
@@ -1631,10 +1659,14 @@ class AddBox extends React.PureComponent {
 															}
 															this.setState(
 																{
-																	basic_id: (results.data || {}).id
+																	device_id: (results.data || {}).id
 																},
 																() => {
-																	this.next();
+																	if (this.alarmConfiguration) {
+																		this.alarmConfiguration.init(this.state.device_id);
+																		this.next();
+																	}
+																	// this.next();
 																}
 															);
 														}
