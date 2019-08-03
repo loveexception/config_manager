@@ -63,17 +63,17 @@ public class PersonGradeService extends Service<PersonGrade> {
 
         personGrade.setCreateBy(ShiroUtils.getSysUserId());
         personGrade.setCreateTime(new Date());
-        return this.dao().insert(personGrade);
+        return this.dao().insertWith(personGrade,"^rulers$");
     }
 
 
 
 
-    public int updateEntity(PersonGrade person) {
+    public PersonGrade  updateEntity(PersonGrade person) {
         person.setUpdateBy(ShiroUtils.getSysUserId());
         person.setUpdateTime(new Date());
         Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
-        return forup.update(person);
+        return forup.updateWith(person,"^rulers$");
     }
     public PersonGrade saveEntity(PersonGrade grade) {
         if(Lang.isEmpty(grade)){
@@ -82,12 +82,8 @@ public class PersonGradeService extends Service<PersonGrade> {
         if(Strings.isEmpty(grade.getId())){
             return insertEntity(grade);
         }
-        int result = updateEntity(grade);
-        if(result==1){
-            return grade;
-        }
+         return  updateEntity(grade);
 
-        return null;
     }
     public int deleteEntity(String id) {
         PersonGrade grade = fetch(id);
@@ -100,11 +96,12 @@ public class PersonGradeService extends Service<PersonGrade> {
     }
 
     public List<PersonGrade> saveEntitys(PersonGrade[] grades) {
-
+        List<PersonGrade> result = new ArrayList<>();
         for (PersonGrade persongrade:grades) {
-            saveEntity(persongrade);
+            PersonGrade obj = saveEntity(persongrade);
+            result.add(obj);
         }
-        return Arrays.asList(grades);
+        return result;
     }
 
 //    List<PersonGrade> personGrades = new ArrayList<PersonGrade>();

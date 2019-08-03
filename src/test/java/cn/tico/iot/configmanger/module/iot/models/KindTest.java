@@ -94,9 +94,11 @@ public class KindTest {
     @Test
     public void allTable(){
 
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.iot.models",true );
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.other.models",true );
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
+       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.iot.models",true );
+       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.other.models",true );
+       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
+
+        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.realui.models",true);
     }
 
 }

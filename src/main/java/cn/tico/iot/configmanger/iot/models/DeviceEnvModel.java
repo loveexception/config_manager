@@ -44,7 +44,7 @@ public class DeviceEnvModel extends I18NModel {
     /**
      * 业务标签
      */
-    @ManyMany(relation ="t_iot_tag_dev",from = "dev_id",to="tag_id")
+    @ManyMany(relation ="t_tag_dev",from = "dev_id",to="tag_id")
     @GraphQLQuery(name = "tags", description = "全业务")
     private List<Tag> tags ;
 

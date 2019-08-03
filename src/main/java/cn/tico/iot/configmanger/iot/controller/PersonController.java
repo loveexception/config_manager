@@ -279,6 +279,16 @@ public class PersonController implements AdminKey {
 			return Result.error("system.error");
 		}
 	}
+
+    @At("/grade_all_save")
+    @POST
+    @AdaptBy(type = JsonAdaptor.class)
+    @Ok("json")
+    public Object gradeAllSave(@Param("data") PersonGrade[] grades, HttpServletRequest req) {
+        List<PersonGrade>  obj =  personGradeService.saveEntitys(grades);
+        return  Result.success("system.success",   obj );
+
+    }
 //	@At("/person_ruler_insert")
 //	@POST
 //	@AdaptBy(type = JsonAdaptor.class)

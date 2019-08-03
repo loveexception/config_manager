@@ -11,7 +11,6 @@ public class MysqlTestDao {
 		//dataSource.setUrl("jdbc:mysql://172.16.16.10/nutztest");
          dataSource.setUrl("jdbc:mysql://localhost/nutztest");
         String mysqldriver ="com.mysql.cj.jdbc.Driver";
-       // dataSource.setDriverClassName(mysqldriver);
         try {
             dataSource.setDriverClassName(mysqldriver);
         } catch (ClassNotFoundException e) {
