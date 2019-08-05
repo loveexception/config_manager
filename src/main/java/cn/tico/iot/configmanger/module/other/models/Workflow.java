@@ -1,15 +1,9 @@
 package cn.tico.iot.configmanger.module.other.models;
 
-import cn.tico.iot.configmanger.common.base.BaseModel;
-import cn.tico.iot.configmanger.iot.bean.CommonModel;
-import cn.tico.iot.configmanger.iot.bean.I18NModel;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import cn.tico.iot.configmanger.module.iot.bean.CommonModel;
 import org.nutz.dao.entity.annotation.*;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 字典表 sys_dict
@@ -18,6 +12,7 @@ import java.util.Date;
  * @date 2019-04-16
  */
 @Table("other_workflow")
+@Comment("运维表")
 public class Workflow extends CommonModel implements Serializable {
     private static final long serialVersionUID = 1L;
 

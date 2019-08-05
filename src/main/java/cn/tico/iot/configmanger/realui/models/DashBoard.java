@@ -1,7 +1,7 @@
 package cn.tico.iot.configmanger.realui.models;
 
 
-import cn.tico.iot.configmanger.iot.bean.I18NModel;
+import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.Column;

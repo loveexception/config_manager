@@ -1,9 +1,9 @@
 package cn.tico.iot.configmanger.iot.graphql;
 
+import cn.tico.iot.configmanger.module.iot.graphql.Block;
+import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import org.junit.Test;
 import org.nutz.ioc.impl.PropertiesProxy;
-
-import static org.junit.Assert.*;
 
 public class KafkaBlockTest {
     @Test

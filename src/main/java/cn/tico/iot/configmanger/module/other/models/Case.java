@@ -1,7 +1,6 @@
 package cn.tico.iot.configmanger.module.other.models;
 
-import cn.tico.iot.configmanger.iot.bean.CommonModel;
-import cn.tico.iot.configmanger.iot.bean.I18NModel;
+import cn.tico.iot.configmanger.module.iot.bean.CommonModel;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Comment;
 import org.nutz.dao.entity.annotation.Table;

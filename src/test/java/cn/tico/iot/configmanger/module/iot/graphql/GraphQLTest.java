@@ -1,10 +1,10 @@
 package cn.tico.iot.configmanger.module.iot.graphql;
 
-import cn.tico.iot.configmanger.iot.models.base.Kind;
-import cn.tico.iot.configmanger.iot.models.base.Location;
-import cn.tico.iot.configmanger.iot.models.base.Tag;
-import cn.tico.iot.configmanger.iot.models.device.Device;
-import cn.tico.iot.configmanger.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
+import cn.tico.iot.configmanger.module.iot.models.base.Tag;
+import cn.tico.iot.configmanger.module.iot.models.device.Device;
+import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import graphql.ExecutionResult;
 import graphql.GraphQL;

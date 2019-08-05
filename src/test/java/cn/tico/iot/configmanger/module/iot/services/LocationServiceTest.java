@@ -1,7 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.services;
 
-import cn.tico.iot.configmanger.iot.models.base.Location;
-import cn.tico.iot.configmanger.iot.services.LocationService;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

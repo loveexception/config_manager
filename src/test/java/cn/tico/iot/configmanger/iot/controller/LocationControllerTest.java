@@ -1,15 +1,12 @@
 package cn.tico.iot.configmanger.iot.controller;
 
-import cn.tico.iot.configmanger.iot.models.base.Location;
-import cn.tico.iot.configmanger.iot.services.LocationService;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import com.google.gson.Gson;
 import org.junit.Test;
 import org.nutz.json.Json;
 
 import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class LocationControllerTest {
 
