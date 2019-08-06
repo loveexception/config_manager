@@ -59,6 +59,7 @@ public class ApiService {
     public List<Normal> getDriver(@GraphQLContext Driver driver) {
         Cnd cnd = Cnd.NEW();
         cnd.and("driverid","=",driver.getId());
+        cnd.orderBy("order_num","asc");
         List<Normal> result =dao.queryByJoin(Normal.class,"^grades|driver$",cnd);
         return result;
     }

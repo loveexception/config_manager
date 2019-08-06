@@ -374,7 +374,6 @@ public class DeviceController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object personGradeAdd(@Param("data") PersonGrade personGrade , HttpServletRequest req) {
 		try {
-
 			personGrade = personGradeService.insertEntity(personGrade);
 			return Result.success("system.success",personGrade);
 		} catch (Exception e) {
@@ -382,8 +381,11 @@ public class DeviceController implements AdminKey {
 		}
 	}
 
-
-
-
-
+	@At("/over")
+	@Ok("json")
+	public Object kafka(@Param("data")Device device ,HttpServletRequest req ){
+		device = deviceService.fetch(device.getId());
+		kafkaBlock.produce("config","sno",device.getSno());
+		return device;
+	}
 }
