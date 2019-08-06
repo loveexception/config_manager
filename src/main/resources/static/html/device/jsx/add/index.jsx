@@ -1534,8 +1534,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 2,
-			device_id:''  //'03a188c952dc40dd980008646dacd8e2'
+			current: 0,
+			device_id: '' //'03a188c952dc40dd980008646dacd8e2'
 		};
 	}
 	next() {
