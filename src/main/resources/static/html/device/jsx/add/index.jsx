@@ -1037,7 +1037,7 @@ class AlarmConfiguration extends React.PureComponent {
 					let driver_id = (results.data || {}).driverid;
 					if (driver_id) {
 						$.ajax({
-							url: `/iot/person/normal_list?deviceid=03a188c952dc40dd980008646dacd8e2&driverid=e17a84a3444942f0b9a19389f013584f`,
+							url: `/iot/person/normal_list?deviceid=${device_id}&driverid=${driver_id}`,
 							// data: {},
 							cache: false,
 							contentType: false,
@@ -1059,7 +1059,7 @@ class AlarmConfiguration extends React.PureComponent {
 		}
 	};
 	componentDidMount() {
-		this.init('03a188c952dc40dd980008646dacd8e2');
+		// this.init('03a188c952dc40dd980008646dacd8e2');
 	}
 	addDataRowPerson = (id, data) => {
 		let _data = [];
@@ -1534,8 +1534,8 @@ class AddBox extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			current: 2,
-			device_id: '03a188c952dc40dd980008646dacd8e2' //''
+			current: 0,
+			device_id: '' //'03a188c952dc40dd980008646dacd8e2'
 		};
 	}
 	next() {
