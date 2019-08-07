@@ -577,7 +577,7 @@ class DynamicFieldSet extends React.Component {
 																	]
 																})(
 																	<Select className="select-box" style={{ width: '100%' }} placeholder="请选择分类">
-																		<Select.Option value="=">等于</Select.Option>
+																		<Select.Option value="==">等于</Select.Option>
 																		<Select.Option value="!=">不等于</Select.Option>
 																		<Select.Option value=">">大于</Select.Option>
 																		<Select.Option value="<">小于</Select.Option>
