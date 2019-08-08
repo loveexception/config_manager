@@ -194,7 +194,7 @@ public class DriverController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object editAllNormal(@Param("data") Normal[] normals,HttpServletRequest req) {
 		try {
-			Object obj = normalService.updateAllNormal(Arrays.asList(normals));
+			Object obj = normalService.updateAllNormal(Arrays.asList(normals),0);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -211,7 +211,7 @@ public class DriverController implements AdminKey {
 		try {
 			List obj1 = normalService.insertAllNormal(Arrays.asList(innormals),driverid);
 
-			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals));
+			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals),obj1.size());
             Normal normal = new Normal();
             normal.setDriverid(driverid);
             return allNormals(normal,req);
@@ -374,7 +374,7 @@ public class DriverController implements AdminKey {
 		try {
 			List obj1 = normalService.insertAllNormal(Arrays.asList(innormals),driverid);
 
-			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals));
+			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals),obj1.size());
 			Normal normal = new Normal();
 			normal.setDriverid(driverid);
 			return allNormals(normal,req);

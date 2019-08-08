@@ -21,10 +21,10 @@ public class NormalService extends Service<Normal> {
     }
 
     public List<Normal> insertAllNormal(List<Normal> normals,String driverid) {
-        for (Normal normal : normals) {
-            String order =normal.getKey();
+        for (int i = 0 ; i < normals.size();i++) {
+            Normal normal = normals.get(i);
             normal.setKey(null);
-            normal.setOrderNum(Lang.str2number(order).longValue());
+            normal.setOrderNum(i);
             normal.setDriverid(driverid);
         }
         this.dao().insert(normals);
@@ -32,11 +32,11 @@ public class NormalService extends Service<Normal> {
         return normals;
     }
 
-    public List<Normal> updateAllNormal(List<Normal> normals) {
-        for (Normal normal : normals) {
-            String order = normal.getKey();
+    public List<Normal> updateAllNormal(List<Normal> normals,int start) {
+        for (int i = 0 ; i < normals.size();i++ ) {
+            Normal normal = normals.get(i);
             normal.setKey(null);
-            normal.setOrderNum(Lang.str2number(order).longValue());
+            normal.setOrderNum(start + i );
         }
         Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
 
