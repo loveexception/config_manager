@@ -45,6 +45,7 @@ public class ApiService {
         }
         Cnd cnd = Cnd.NEW();
         cnd.and("t_iot_devices.sno", "=", sno);
+        cnd.and("t_iot_devices.delflag","=","false");
         List<Device> devices = dao.queryByJoin(Device.class, "^dept|kind|location|driver|gateway|tags$", cnd);
         Iterator<Device> it = devices.iterator();
         if (it.hasNext()) {
@@ -58,8 +59,11 @@ public class ApiService {
     @GraphQLQuery(name = "normals")
     public List<Normal> getNormals(@GraphQLContext Driver driver) {
         Cnd cnd = Cnd.NEW();
-        cnd.and("driverid", "=", driver.getId());
+        cnd.and("driver_id", "=", driver.getId());
+        cnd.and("delflag","=","false");
+
         cnd.orderBy("order_num", "asc");
+
         List<Normal> result = dao.query(Normal.class, cnd);
         return result;
     }
@@ -73,6 +77,8 @@ public class ApiService {
         Cnd cnd = Cnd.NEW();
         cnd.and("id", "in", ids);
         cnd.and("level", ">", "0");
+        cnd.and("delflag","=","false");
+
         cnd.orderBy("level", "asc");
 
         List<Kind> result = dao.query(Kind.class, cnd);
@@ -87,6 +93,7 @@ public class ApiService {
         Cnd cnd = Cnd.NEW();
         cnd.and("id", "in", ids);
         cnd.and("level", ">", "0");
+        cnd.and("delflag","=","false");
 
         cnd.orderBy("level", "asc");
         List<Location> result = dao.query(Location.class, cnd);
@@ -97,7 +104,9 @@ public class ApiService {
     @GraphQLQuery(name = "persons")
     public List<Person> getPersons(@GraphQLContext Device device) {
         Cnd cnd = Cnd.NEW();
-        cnd.and("deviceid", "=", device.getId());
+        cnd.and("t_iot_persons.device_id", "=", device.getId());
+        cnd.and("t_iot_persons.delflag","=","false");
+
         List<Person> result = dao.queryByJoin(Person.class, "^person|grades|device|normal$", cnd);
         return result;
     }
@@ -111,8 +120,10 @@ public class ApiService {
         Device device = devices.get(0);
 
         Cnd cnd = Cnd.NEW();
-        cnd.and("normalid", "=", normal.getId());
-        cnd.and("deviceid", "=", device.getId());
+        cnd.and("normal_id", "=", normal.getId());
+        cnd.and("device_id", "=", device.getId());
+        cnd.and("delflag","=","false");
+
         List<Person> persons = dao.query(Person.class, cnd);
         if (Lang.isEmpty(persons)) {
             return null;
@@ -124,7 +135,8 @@ public class ApiService {
     public List<PersonGrade> gradesByPerson(@GraphQLContext Person person) {
         Cnd cnd = Cnd.NEW();
         cnd.and("person_id", "=", person.getId());
-//        return dao.queryByJoin(PersonGrade.class, "^rulers$", cnd);
+        cnd.and("delflag","=","false");
+
         List<PersonGrade> result = dao.query(PersonGrade.class, cnd);
         return result;
 
@@ -134,6 +146,8 @@ public class ApiService {
     public List<Grade> getGrades(@GraphQLContext Normal normal) {
         Cnd cnd = Cnd.NEW();
         cnd.and("normal_id", "=", normal.getId());
+        cnd.and("delflag","=","false");
+
         List<Grade> result = dao.query(Grade.class, cnd);
         return result;
     }
@@ -141,7 +155,9 @@ public class ApiService {
     @GraphQLQuery(name = "rulers")
     public List<Ruler> getDriver(@GraphQLContext Grade grade) {
         Cnd cnd = Cnd.NEW();
-        cnd.and("gradeid", "=", grade.getId());
+        cnd.and("t_iot_rulers.grade_id", "=", grade.getId());
+        cnd.and("t_iot_rulers.delflag","=","false");
+
         List<Ruler> result = dao.queryByJoin(Ruler.class, "^normal$", cnd);
         return result;
     }
@@ -150,7 +166,9 @@ public class ApiService {
     @GraphQLQuery(name = "rulers")
     public List<PersonRuler> getPersonRulers(@GraphQLContext PersonGrade grade) {
         Cnd cnd = Cnd.NEW();
-        cnd.and("gradeid", "=", grade.getId());
+        cnd.and("t_iot_person_rulers.grade_id", "=", grade.getId());
+        cnd.and("t_iot_person_rulers.delflag","=","false");
+
         List<PersonRuler> result = dao.queryByJoin(PersonRuler.class,"^normal$", cnd);
         return result;
     }
