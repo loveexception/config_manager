@@ -107,7 +107,7 @@ public class MainLauncher {
             }
         });
         // 创建数据库
-        Daos.createTablesInPackage(dao, "io.nutz.nutzsite", false);
+        Daos.createTablesInPackage(dao, "cn.tico.iot", false);
 //        block.init();
 //        block.consume("register", gatewayBlock);
     }
