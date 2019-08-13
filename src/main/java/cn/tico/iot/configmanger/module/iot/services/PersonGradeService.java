@@ -58,6 +58,17 @@ public class PersonGradeService extends Service<PersonGrade> {
     }
 
     public PersonGrade insertEntity(PersonGrade personGrade) {
+        List<PersonRuler> rulers = personGrade.getRulers();
+        if(Lang.isEmpty(rulers)){
+
+        }else {
+            for (int i = 0; i < rulers.size(); i++) {
+                PersonRuler  temp =  rulers.get(i);
+                temp.setOrderNum(i);
+                temp.setCreateBy(ShiroUtils.getSysUserId());
+                temp.setCreateTime(new Date());
+            }
+        }
 
         personGrade.setCreateBy(ShiroUtils.getSysUserId());
         personGrade.setCreateTime(new Date());
@@ -67,11 +78,23 @@ public class PersonGradeService extends Service<PersonGrade> {
 
 
 
-    public PersonGrade  updateEntity(PersonGrade person) {
-        person.setUpdateBy(ShiroUtils.getSysUserId());
-        person.setUpdateTime(new Date());
+    public PersonGrade  updateEntity(PersonGrade personGrade) {
+        List<PersonRuler> rulers = personGrade.getRulers();
+        if(Lang.isEmpty(rulers)){
+
+        }else {
+            for (int i = 0; i < rulers.size(); i++) {
+                PersonRuler  temp =  rulers.get(i);
+                temp.setOrderNum(i);
+                temp.setUpdateBy(ShiroUtils.getSysUserId());
+                temp.setUpdateTime(new Date());
+            }
+        }
+
+        personGrade.setUpdateBy(ShiroUtils.getSysUserId());
+        personGrade.setUpdateTime(new Date());
         Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
-        return forup.updateWith(person,"^rulers$");
+        return forup.updateWith(personGrade,"^rulers$");
     }
     public PersonGrade saveEntity(PersonGrade grade) {
         if(Lang.isEmpty(grade)){
@@ -95,7 +118,10 @@ public class PersonGradeService extends Service<PersonGrade> {
 
     public List<PersonGrade> saveEntitys(PersonGrade[] grades) {
         List<PersonGrade> result = new ArrayList<>();
+        int i = 0;
         for (PersonGrade persongrade:grades) {
+
+            persongrade.setOrderNum(i++);
             PersonGrade obj = saveEntity(persongrade);
             result.add(obj);
         }
