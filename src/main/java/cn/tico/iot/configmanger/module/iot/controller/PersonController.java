@@ -200,6 +200,7 @@ public class PersonController implements AdminKey {
 		if(Strings.isNotBlank(grade.getGrade())){
 			cnd.and("grade","=",grade.getGrade());
 		}
+		cnd.orderBy("order_num","asc");
 		Object obj =  personGradeService.queryEntity(cnd);
 		return  Result.success("system.success",   obj );
 	}
