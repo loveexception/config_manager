@@ -380,6 +380,20 @@ public class DeviceController implements AdminKey {
 			return Result.error("system.error");
 		}
 	}
+	/**
+	 *  个性化查寻
+	 */
+	@At("/person_grade_remove")
+	@POST
+	@Ok("json")
+	public Object personGradeRemove(@Param("id") String id , HttpServletRequest req) {
+		try {
+			int del = personGradeService.deleteEntity(id);
+			return Result.success("system.success",del);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 
 	@At("/over")
 	@Ok("json")
