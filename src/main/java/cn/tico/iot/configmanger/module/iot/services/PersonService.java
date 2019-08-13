@@ -97,7 +97,7 @@ public class PersonService extends Service<Person> {
         person = this.dao().fetchLinks(person,"^grades|normal|device$");
         if(Lang.isEmpty(person.getGrades())){
            // delete(person.getId());
-            return null;
+            return person;
         }
         List<PersonGrade> grades = person.getGrades();
         List<PersonGrade> result = new ArrayList<>();
