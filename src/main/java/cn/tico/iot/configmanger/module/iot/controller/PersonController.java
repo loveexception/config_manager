@@ -22,6 +22,7 @@ import org.nutz.mvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -213,7 +214,7 @@ public class PersonController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object personGradeAdd(@Param("data") PersonGrade personGrade , HttpServletRequest req) {
 		try {
-
+			personGrade.setOrderNum(new Date().getTime());
 			personGrade = personGradeService.insertEntity(personGrade);
 			return Result.success("system.success",personGrade);
 		} catch (Exception e) {
@@ -224,7 +225,6 @@ public class PersonController implements AdminKey {
 	@POST
 	@Ok("json")
 	public Object gradeRemove(@Param("id") String id, HttpServletRequest req) {
-
 		try {
 			int obj =  personGradeService.deleteEntity(id);
 			return Result.success("system.success",obj);
@@ -240,7 +240,10 @@ public class PersonController implements AdminKey {
     @Ok("json")
     public Object rulerAdd(@Param("data") PersonRuler[] rulers, @Param("gradeid") String gradeid, HttpServletRequest req) {
         try {
-            Object obj =  personRulerService.insertEntitys(Arrays.asList(rulers),gradeid);
+			for (int i = 0; i < rulers.length; i++) {
+				rulers[i].setOrderNum(new Date().getTime());
+			}
+			Object obj =  personRulerService.insertEntitys(Arrays.asList(rulers),gradeid);
             return Result.success("system.success",obj);
         } catch (Exception e) {
             return Result.error("system.error");
@@ -288,6 +291,9 @@ public class PersonController implements AdminKey {
         return  Result.success("system.success",   obj );
 
     }
+
+
+
 //	@At("/person_ruler_insert")
 //	@POST
 //	@AdaptBy(type = JsonAdaptor.class)
