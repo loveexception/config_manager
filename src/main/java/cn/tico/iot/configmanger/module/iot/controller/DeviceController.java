@@ -395,6 +395,23 @@ public class DeviceController implements AdminKey {
 		}
 	}
 
+
+	/**
+	 *  个性化查寻
+	 */
+	@At("/person_grade_add_all")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object personGradeAddAll(@Param("data") PersonGrade[] grades , HttpServletRequest req) {
+		try {
+			List<PersonGrade> result = personGradeService.saveEntitys(grades);
+			return Result.success("system.success",result);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
 	@At("/over")
 	@Ok("json")
 	public Object kafka(@Param("data")Device device ,HttpServletRequest req ){
