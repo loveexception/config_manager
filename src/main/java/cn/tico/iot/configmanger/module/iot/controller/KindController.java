@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
@@ -260,6 +261,19 @@ public class KindController  implements AdminKey {
         List<Kind> obj = kindService.selectParents(id,level);
 
        return Result.success("system.success",obj);
+    }
+    /**
+     * 选择菜单树
+     */
+    @At("/select_parent_self")
+    @Ok("json")
+    public Object selectParentself(@Param("id") String id  , HttpServletRequest req) {
+
+        List<Kind> obj = kindService.selectParents(id,-1);
+        Kind location = kindService.fetch(id);
+        obj.add(location);
+
+        return Result.success("system.success",obj);
     }
 
 //    @At
