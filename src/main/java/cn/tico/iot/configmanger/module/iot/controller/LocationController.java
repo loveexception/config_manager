@@ -276,9 +276,9 @@ public class LocationController implements AdminKey {
      */
     @At("/select_parent")
     @Ok("json")
-    public Object selectParent(@Param("id") String id, HttpServletRequest req) {
+    public Object selectParent(@Param("id") String id ,@Param("level") int level , HttpServletRequest req) {
 
-        List<Location> obj = locationService.selectParents(id);
+        List<Location> obj = locationService.selectParents(id,level);
 
         return Result.success("system.success",obj);
     }

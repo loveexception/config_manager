@@ -172,13 +172,13 @@ public class LocationService extends Service<Location> {
 
         return root;
     }
-    public List<Location> selectParents(String id) {
-        Location kind = fetch(id);
-        String fathers = kind.getAncestors();
+    public List<Location> selectParents(String id,int level) {
+        Location location = fetch(id);
+        String fathers = location.getAncestors();
         List<Location> result = new ArrayList();
         for(String parent : fathers.split(",")){
             Location temp = fetch(parent);
-            if(temp!=null&&Lang.str2number(temp.getLevel()).intValue()>0) {
+            if(temp!=null&&Lang.str2number(temp.getLevel()).intValue()>level) {
                 result.add(temp);
             }
         }
