@@ -255,9 +255,9 @@ public class KindController  implements AdminKey {
      */
     @At("/select_parent")
     @Ok("json")
-    public Object selectParent(@Param("id") String id, HttpServletRequest req) {
+    public Object selectParent(@Param("id") String id,@Param("level") int level , HttpServletRequest req) {
 
-        List<Kind> obj = kindService.selectParents(id);
+        List<Kind> obj = kindService.selectParents(id,level);
 
        return Result.success("system.success",obj);
     }

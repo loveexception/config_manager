@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.sys.models.User;
+import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
@@ -174,6 +175,9 @@ public class LocationService extends Service<Location> {
     }
     public List<Location> selectParents(String id,int level) {
         Location location = fetch(id);
+        if(Lang.isEmpty(location)){
+            return Lists.newArrayList();
+        }
         String fathers = location.getAncestors();
         List<Location> result = new ArrayList();
         for(String parent : fathers.split(",")){

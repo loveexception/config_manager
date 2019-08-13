@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.sys.models.User;
+import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
@@ -178,13 +179,16 @@ public class KindService extends Service<Kind> {
         return root;
     }
 
-    public List<Kind> selectParents(String id) {
+    public List<Kind> selectParents(String id ,int level) {
         Kind kind = fetch(id);
+        if(Lang.isEmpty(kind)){
+            return Lists.newArrayList();
+        }
         String fathers = kind.getAncestors();
         List<Kind> result = new ArrayList<Kind>();
         for(String parent : fathers.split(",")){
             Kind temp = fetch(parent);
-            if(temp!=null&&Lang.str2number(temp.getLevel()).intValue()>0) {
+            if(temp!=null&&Lang.str2number(temp.getLevel()).intValue()>level) {
                 result.add(temp);
             }
         }
