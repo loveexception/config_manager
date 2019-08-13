@@ -141,7 +141,7 @@ class BasicInformation extends React.PureComponent {
 		let { select_dept, select_cascader } = urlArgs();
 
 		$.ajax({
-			url: `/iot/location/select_parent?id=${select_cascader}`,
+			url: `/iot/location/select_parent?id=${select_cascader}&level=-1`,
 			cache: false,
 			contentType: false,
 			processData: false,
@@ -154,7 +154,6 @@ class BasicInformation extends React.PureComponent {
 				let data = results.data || [];
 				let select_location = [];
 				data.map(item => select_location.push(item.cnName));
-
 				this.setState({
 					select_location
 				});
@@ -994,69 +993,9 @@ class SwitchCustom extends React.PureComponent {
 	};
 	render() {
 		return (
-			<Checkbox checked={this.state.checked} onChange={this.onChange}>
-				{!this.state.checked ? '添加' : '删除'}
+			<Checkbox checked={this.state.checked} onChange={this.onChange} className="switch-custom-box">
+				<span className="text">{!this.state.checked ? '开启' : '关闭'}</span>
 			</Checkbox>
-			// <Switch
-			// 	checkedChildren="开"
-			// 	unCheckedChildren="关"
-			// 	loading={this.state.loading}
-			// 	checked={this.state.checked}
-			// 	onClick={() => {
-			// 		let { person } = this.props.record;
-			// 		this.setState({
-			// 			loading: true
-			// 		});
-			// 		if (this.state.checked) {
-			// 			console.log('删除');
-			// 			$.ajax({
-			// 				cache: true,
-			// 				type: 'POST',
-			// 				url: '/iot/person/person_remove',
-			// 				data: {
-			// 					id: person.id
-			// 				},
-			// 				// dataType: 'json',
-			// 				async: false,
-			// 				success: results => {
-			// 					if (results.code != 0) {
-			// 						message.error('接口错误', 0.5);
-			// 						return;
-			// 					}
-			// 					this.setState({
-			// 						checked: false,
-			// 						loading: false
-			// 					});
-			// 					// callback(results);
-			// 				}
-			// 			});
-			// 		} else {
-			// 			console.log('添加');
-			// 			$.ajax({
-			// 				cache: true,
-			// 				type: 'POST',
-			// 				url: '/iot/person/find_add_one',
-			// 				data: {
-			// 					normalid: this.props.record.id,
-			// 					deviceid: this.props.device_id
-			// 				},
-			// 				// dataType: 'json',
-			// 				async: false,
-			// 				success: results => {
-			// 					if (results.code != 0) {
-			// 						message.error('接口错误', 0.5);
-			// 						return;
-			// 					}
-			// 					this.setState({
-			// 						checked: true,
-			// 						loading: false
-			// 					});
-			// 					// callback(results);
-			// 				}
-			// 			});
-			// 		}
-			// 	}}
-			// />
 		);
 	}
 }

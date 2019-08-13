@@ -119,10 +119,7 @@ class ListBox extends React.PureComponent {
 						<div>
 							<Button
 								onClick={() => {
-									// $.modal.openFull(
-									// 	'修改驱动',
-									// 	'/html/device/edit.html'
-									// );
+									$.modal.openFull('修改设备', `/html/device/edit.html?device_id=${record.id}`);
 								}}
 							>
 								修改
