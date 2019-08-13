@@ -77,7 +77,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("username")
     @Comment("用户名")
     @ColDefine(type = ColType.VARCHAR, width = 255)
-    private String username="";
+    private String username;
 
     /**
      * 密码
@@ -85,7 +85,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("password")
     @Comment("密码")
     @ColDefine(type = ColType.VARCHAR, width = 64)
-    private String password="";
+    private String password;
     /**
      * 组织
      */

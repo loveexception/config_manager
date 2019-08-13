@@ -28,9 +28,12 @@ public class DeviceService extends Service<Device> {
     public Object insertUpdate(Device device) {
 
         if(isOld(device)){
-            Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
+           // Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
 
             device =  extAttr(device);
+
+            Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
+
             forup.update(device);
             return  device;
 
