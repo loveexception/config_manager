@@ -30,8 +30,14 @@ public class GradeService  extends Service<Grade> {
         List<Grade> obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
         for (Grade grade:obj) {
             List<Ruler> rulers = grade.getRulers();
-            Collections.sort(rulers);
-            grade.setRulers(rulers);
+            List<Ruler> mylist = new ArrayList<>();
+            for (int i = 0; i < rulers.size(); i++) {
+                Ruler temp = rulers.get(i);
+                temp = this.dao().fetchLinks(temp,"^normal$");
+                mylist.add(temp);
+            }
+            Collections.sort(mylist);
+            grade.setRulers(mylist);
         }
 
         return obj;

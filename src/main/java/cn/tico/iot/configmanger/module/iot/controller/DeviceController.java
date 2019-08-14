@@ -4,17 +4,11 @@ import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
-import cn.tico.iot.configmanger.module.iot.models.device.Device;
-import cn.tico.iot.configmanger.module.iot.models.device.Person;
-import cn.tico.iot.configmanger.module.iot.models.device.PersonGrade;
-import cn.tico.iot.configmanger.module.iot.models.device.PersonRuler;
+import cn.tico.iot.configmanger.module.iot.models.device.*;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.module.iot.models.driver.Ruler;
-import cn.tico.iot.configmanger.module.iot.services.DeviceService;
-import cn.tico.iot.configmanger.module.iot.services.PersonGradeService;
-import cn.tico.iot.configmanger.module.iot.services.PersonRulerService;
-import cn.tico.iot.configmanger.module.iot.services.PersonService;
+import cn.tico.iot.configmanger.module.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
@@ -52,6 +46,12 @@ public class DeviceController implements AdminKey {
 
 	@Inject
 	private DeviceService deviceService;
+
+	@Inject
+	private DriverService driverService;
+
+	@Inject
+	private GatewayService gatewayService;
 
 
 	@Inject
@@ -189,8 +189,24 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	public Object deviceChecked(@Param("data") Device device, HttpServletRequest req) {
 		try {
-			//List<Kind> kinds = ;
-			//TODO:2019
+			if(Lang.isEmpty(device.getKindid())){
+				return Result.error(5,"not choose kind ");
+			}
+			Cnd cnd = Cnd.NEW();
+			cnd.where("kind_id","=",device.getKindid());
+
+			List<Driver> drivers = driverService.query(cnd);
+
+			if(Lang.isEmpty(drivers)){
+				return Result.error(10,"not find driver");
+			}
+			cnd = Cnd.NEW();
+
+			List<Gateway> gateways = gatewayService.query(cnd);
+
+			if(Lang.isEmpty(gateways)){
+				return Result.error(11,"not find gate way ");
+			}
 
 			Object obj = deviceInsertUpdate(device,req);
 			return Result.success("system.success",obj);

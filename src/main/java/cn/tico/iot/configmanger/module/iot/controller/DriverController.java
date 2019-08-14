@@ -201,6 +201,7 @@ public class DriverController implements AdminKey {
 			}
 			cnd.and("delflag","=","false");
 			cnd.and("driver_id","=",driverid);
+			cnd.limit(1,50);
 			cnd.orderBy("order_num","asc");
 			Object obj = normalService.query(cnd);
 			return Result.success("system.success",obj);
@@ -339,6 +340,7 @@ public class DriverController implements AdminKey {
 		if(Strings.isNotBlank(grade.getGrade())){
 			cnd.and("grade","=",grade.getGrade());
 		}
+
 		cnd.orderBy("order_num","asc");
 
 		obj =  gradeService.queryEntity(cnd);
