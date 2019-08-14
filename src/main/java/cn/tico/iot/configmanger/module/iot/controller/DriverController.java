@@ -16,6 +16,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
@@ -178,6 +179,28 @@ public class DriverController implements AdminKey {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("delflag","=","false");
 			cnd.and("driver_id","=",normal.getDriverid());
+			cnd.orderBy("order_num","asc");
+			Object obj = normalService.query(cnd);
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+	/**
+	 * 新增保存业务
+	 */
+	@At("/normal_names")
+	@Ok("json")
+	public Object allNormalByNames(@Param("cn_name") String name ,@Param("driverid") String driverid, HttpServletRequest req) {
+		try {
+			Cnd cnd = Cnd.NEW();
+
+			if(Lang.isNotEmpty(name)){
+				cnd.and("cn_name","like","%"+name+"%");
+			}
+			cnd.and("delflag","=","false");
+			cnd.and("driver_id","=",driverid);
 			cnd.orderBy("order_num","asc");
 			Object obj = normalService.query(cnd);
 			return Result.success("system.success",obj);
@@ -423,6 +446,17 @@ public class DriverController implements AdminKey {
 		return  Result.success("system.success",   obj );
 
 	}
+	@At("/driver_kind")
+	@Ok("json")
+	public Object driverKind(@Param("kindid") String kindid, HttpServletRequest req) {
+    	Cnd cnd = Cnd.NEW();
+    	if(Lang.isEmpty(kindid)){
 
+		}
+
+    	List<Driver> drivers = driverService.query(cnd);
+		return  Result.success("system.success",  drivers );
+
+	}
 
 }

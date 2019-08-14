@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Person;
 import cn.tico.iot.configmanger.module.iot.models.device.PersonGrade;
@@ -173,6 +174,25 @@ public class DeviceController implements AdminKey {
 	public Object deviceInsertUpdate(@Param("data") Device device, HttpServletRequest req) {
 		try {
 			Object obj = deviceService.insertUpdate(device);
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+	/**
+	 * 新增保存业务
+	 */
+	@At("/device_check")
+	@POST
+	@AdaptBy(type = JsonAdaptor.class)
+	@Ok("json")
+	public Object deviceChecked(@Param("data") Device device, HttpServletRequest req) {
+		try {
+			//List<Kind> kinds = ;
+			//TODO:2019
+
+			Object obj = deviceInsertUpdate(device,req);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
