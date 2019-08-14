@@ -210,8 +210,8 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	public Object deviceChecked(@Param("data") Device device, HttpServletRequest req) {
 		try {
-			if(Lang.isEmpty(device.getKindid())){
-				return Result.error(5,"not choose kind ");
+			if(Lang.isEmpty(device.getKindid())||device.getKindid().length()==0){
+				return Result.error(9,"not choose kind ");
 			}
 			Cnd cnd = Cnd.NEW();
 			cnd.where("kind_id","=",device.getKindid());
