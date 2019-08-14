@@ -23,8 +23,11 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
+import org.nutz.mvc.upload.UploadAdaptor;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -180,8 +183,26 @@ public class DeviceController implements AdminKey {
 		}
 	}
 
+
 	/**
 	 * 新增保存业务
+	 */
+	@At("/device_upload")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = UploadAdaptor.class, args = { "${app.root}/WEB-INF/tmp" })
+	public Object deviceUpload(@Param("photo") File f, HttpServletRequest req) {
+		try {
+			Object obj = null;
+			InputStream is = req.getInputStream();
+			return Result.success("system.success",obj);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+	/**
+	 *
 	 */
 	@At("/device_check")
 	@POST
@@ -455,4 +476,7 @@ public class DeviceController implements AdminKey {
 		kafkaBlock.produce("config","sno",device.getSno());
 		return device;
 	}
+
+
+
 }
