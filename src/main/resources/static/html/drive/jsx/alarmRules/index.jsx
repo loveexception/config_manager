@@ -244,9 +244,9 @@ class DynamicFieldSet extends React.Component {
 					}
 					const { form } = this.props;
 					const keys = form.getFieldValue('keys');
-					if (keys.length === 1) {
-						return;
-					}
+					// if (keys.length === 1) {
+					// 	return;
+					// }
 					form.setFieldsValue({
 						keys: keys.filter(key => key !== index)
 					});
@@ -468,15 +468,15 @@ class DynamicFieldSet extends React.Component {
 						</div>
 					}
 					extra={
-						keys.length > 1 ? (
-							<Icon
-								type="close"
-								onClick={e => {
-									e.stopPropagation();
-									this.remove(k, item_k);
-								}}
-							/>
-						) : null
+						// keys.length > 1 ? (
+						<Icon
+							type="close"
+							onClick={e => {
+								e.stopPropagation();
+								this.remove(k, item_k);
+							}}
+						/>
+						// ) : null
 					}
 				>
 					<Form.Item {...formItemLayout} label={'提示内容'} className="item-li">

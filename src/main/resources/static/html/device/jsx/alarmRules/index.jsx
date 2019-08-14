@@ -193,11 +193,12 @@ class AlarmRulesBox extends React.PureComponent {
 							});
 							if (num == 4) {
 								let all_data_new = _.flattenDepth(all_data, 1) || [];
+								console.log(all_data_new);
 								if (all_data_new.length > 0) {
 									$.ajax({
 										cache: true,
 										type: 'POST',
-										url: '/iot/person/grade_all_save',
+										url: '/iot/device/person_grade_add_all', //'/iot/person/grade_all_save',
 										data: JSON.stringify({
 											data: all_data_new
 										}),
@@ -259,12 +260,10 @@ class DynamicFieldSet extends React.Component {
 
 	remove = (index, record = {}) => {
 		if (record.id) {
-			console.log('有grade_id');
-
 			$.ajax({
 				cache: true,
 				type: 'POST',
-				url: '/iot/driver/grade_remove',
+				url: '/iot/device/person_grade_remove',
 				data: {
 					id: record.id
 				},
@@ -276,13 +275,13 @@ class DynamicFieldSet extends React.Component {
 					}
 					const { form } = this.props;
 					const keys = form.getFieldValue('keys');
-					if (keys.length === 1) {
-						return;
-					}
+					// if (keys.length === 1) {
+					// 	return;
+					// }
 					form.setFieldsValue({
 						keys: keys.filter(key => key !== index)
 					});
-					// this.getPanelList();
+					this.getPanelList();
 				}
 			});
 		}
@@ -290,15 +289,15 @@ class DynamicFieldSet extends React.Component {
 
 	add = () => {
 		let { grade = {} } = this.props;
-		let { normalid } = urlArgs();
-		if (normalid) {
-			console.log('有normal_id');
+		let { personid } = urlArgs();
+		if (personid) {
+			console.log('personid');
 			$.ajax({
 				cache: true,
 				type: 'POST',
-				url: '/iot/driver/grade_add',
+				url: '/iot/person/grade_add', //'/iot/device/person_grade_add',
 				data: JSON.stringify({
-					data: { cnName: '', grade: grade.value, normalid }
+					data: { cnName: '', grade: grade.value, personid }
 				}),
 				dataType: 'json',
 				async: false,
@@ -310,6 +309,7 @@ class DynamicFieldSet extends React.Component {
 					const { form } = this.props;
 					// can use data-binding to get
 					const keys = form.getFieldValue('keys');
+					console.log(keys);
 					const nextKeys = keys.concat(this.id++);
 					// can use data-binding to set
 					// important! notify form to detect changes
@@ -323,7 +323,7 @@ class DynamicFieldSet extends React.Component {
 	};
 
 	getPanelList = () => {
-		let { personid } = this.props._ids;
+		let { personid } = this.props._ids || {};
 		let { grade = {} } = this.props;
 		if (personid) {
 			//"grade": "normal",
@@ -365,7 +365,7 @@ class DynamicFieldSet extends React.Component {
 					data: [
 						{
 							logic: 'and',
-							symble: '=',
+							symble: '==',
 							normalid: '',
 							val: ''
 						}
@@ -501,15 +501,15 @@ class DynamicFieldSet extends React.Component {
 						</div>
 					}
 					extra={
-						keys.length > 1 ? (
-							<Icon
-								type="close"
-								onClick={e => {
-									e.stopPropagation();
-									this.remove(k, item_k);
-								}}
-							/>
-						) : null
+						// keys.length > 1 ? (
+						<Icon
+							type="close"
+							onClick={e => {
+								e.stopPropagation();
+								this.remove(k, item_k);
+							}}
+						/>
+						// ) : null
 					}
 				>
 					<Form.Item {...formItemLayout} label={'提示内容'} className="item-li">
