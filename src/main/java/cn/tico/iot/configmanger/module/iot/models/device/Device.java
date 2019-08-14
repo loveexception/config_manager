@@ -53,7 +53,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     private Long discardTime;
 
     @Column("asset_status")
-    @Comment("资产状态")
+    @Comment("资产状态,0,1,2")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "asset_status", description = "资产状态")
     private String assetStatus ="0";

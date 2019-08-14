@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.common.utils.excel.ImportExcel;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.device.*;
@@ -12,12 +13,17 @@ import cn.tico.iot.configmanger.module.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -191,11 +197,17 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = UploadAdaptor.class, args = { "${app.root}/WEB-INF/tmp" })
-	public Object deviceUpload(@Param("photo") File f, HttpServletRequest req) {
+	public Object deviceUpload(@Param("devices") File f, HttpServletRequest req) {
 		try {
 			Object obj = null;
-			InputStream is = req.getInputStream();
-			return Result.success("system.success",obj);
+
+			ImportExcel excel =new ImportExcel(f,1);
+			List<Device > devices =  excel.getDataList(Device.class,1,2,3);
+			for (int i = 0; i < devices.size(); i++) {
+				deviceService.insertUpdate(devices.get(i));
+			}
+
+			return Result.success("system.success",devices);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -469,9 +481,12 @@ public class DeviceController implements AdminKey {
 	}
 
 	@At("/over")
+	@POST
 	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
 	public Object kafka(@Param("data")Device device ,HttpServletRequest req ){
-		device = deviceService.fetch(device.getId());
+
+		deviceService.insertUpdate(device);
 		kafkaBlock.produce("config","sno",device.getSno());
 		return device;
 	}
