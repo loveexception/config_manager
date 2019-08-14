@@ -229,8 +229,7 @@ public class DeviceController implements AdminKey {
 				return Result.error(11,"not find gate way ");
 			}
 
-			Object obj = deviceInsertUpdate(device,req);
-			return Result.success("system.success",obj);
+			return deviceInsertUpdate(device,req);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
