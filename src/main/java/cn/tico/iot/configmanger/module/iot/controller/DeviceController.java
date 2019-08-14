@@ -487,8 +487,11 @@ public class DeviceController implements AdminKey {
 	public Object kafka(@Param("data")Device device ,HttpServletRequest req ){
 
 		deviceService.insertUpdate(device);
+		device = deviceService._fetch(device);
+		System.out.println(device);
 		kafkaBlock.produce("config","sno",device.getSno());
-		return device;
+
+		return  Result.success("system.success",device);
 	}
 
 
