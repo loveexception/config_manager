@@ -2,18 +2,31 @@
 	.device-list-body {
 		padding: 20px 40px 20px 30px;
 		.device-list-content {
-			height: 124px;
 			background-color: #fff;
 			box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
 			border-radius: 2px;
 			padding: 20px;
 			margin-bottom: 20px;
-			.device-list-content-li-2 {
+			.search-box {
 				display: flex;
-				.ant-cascader-picker {
+				justify-content: space-between;
+				align-items: center;
+				.search-content {
 					flex-grow: 1;
+					margin-right: 40px;
+					.content-li {
+						display: flex;
+						.ant-select {
+							width: 150px;
+							margin-right: 20px;
+						}
+						.ant-cascader-picker,
+						.ant-input-search {
+							flex-grow: 1;
+						}
+					}
 				}
-				.ant-btn {
+				.search-btn {
 					min-width: 194px;
 					width: 194px;
 					height: 33px;
@@ -21,12 +34,10 @@
 					background-color: #1875f0;
 					color: #fff;
 					font-size: 14px;
-					margin-left: 15px;
-					margin-right: 150px;
 				}
 			}
+
 			.device-list-content-li {
-				margin-bottom: 10px;
 				.select-box {
 					.ant-select-selection {
 						border-radius: 15px;

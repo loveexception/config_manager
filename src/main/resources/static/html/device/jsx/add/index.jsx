@@ -141,7 +141,7 @@ class BasicInformation extends React.PureComponent {
 		let { select_dept, select_cascader } = urlArgs();
 
 		$.ajax({
-			url: `/iot/location/select_parent?id=${select_cascader}&level=-1`,
+			url: `/iot/location/select_parent_self?id=${select_cascader}`,
 			cache: false,
 			contentType: false,
 			processData: false,
@@ -259,7 +259,7 @@ class BasicInformation extends React.PureComponent {
 				}}
 			>
 				<div className="title">{title}</div>
-				<Form {...formItemLayout[0]} className="login-form">
+				<Form {...formItemLayout[0]} className="add-form">
 					{this._getLi([
 						<Form.Item label="SN编号">
 							{getFieldDecorator('sno', {
@@ -269,7 +269,7 @@ class BasicInformation extends React.PureComponent {
 										message: 'SN编号不为空'
 									}
 								]
-							})(<Input />)}
+							})(<Input placeholder="请输入SN编号" />)}
 						</Form.Item>,
 						<Form.Item label="设备名称">
 							{getFieldDecorator('cnName', {
@@ -279,7 +279,7 @@ class BasicInformation extends React.PureComponent {
 										message: '设备名称不为空'
 									}
 								]
-							})(<Input />)}
+							})(<Input placeholder="请输入设备名称" />)}
 						</Form.Item>
 					])}
 					{this._getLi([
@@ -297,7 +297,6 @@ class BasicInformation extends React.PureComponent {
 									disabled
 									style={{ width: '100%' }}
 									placeholder="请选择组织"
-									// value={this.state.select_dept}
 									onSelect={value => {
 										this.getLocationData(value);
 									}}
@@ -310,9 +309,6 @@ class BasicInformation extends React.PureComponent {
 										);
 									})}
 								</Select>
-								// <Select disabled style={{ width: '100%' }} showArrow={false}>
-								// 	<Select.Option value={select_dept[1]}>{select_dept[0]}</Select.Option>
-								// </Select>
 							)}
 						</Form.Item>,
 						<Form.Item label="IP地址">
@@ -323,7 +319,7 @@ class BasicInformation extends React.PureComponent {
 										message: 'IP地址不为空'
 									}
 								]
-							})(<Input />)}
+							})(<Input placeholder="请输入IP地址" />)}
 						</Form.Item>
 					])}
 					{this._getLi([
@@ -361,10 +357,10 @@ class BasicInformation extends React.PureComponent {
 						<Form.Item {...formItemLayout[1]} label="设备类型">
 							{getFieldDecorator('kinds', {
 								rules: [
-									// {
-									// 	required: true,
-									// 	message: '设备类型不为空'
-									// }
+									{
+										required: true,
+										message: '设备类型不为空'
+									}
 								]
 							})(
 								<Cascader
@@ -374,7 +370,7 @@ class BasicInformation extends React.PureComponent {
 										children: 'children'
 									}}
 									options={this.state.device_type_cascader_list}
-									placeholder="请选择"
+									placeholder="请选择设备类型"
 									style={{
 										width: '100%'
 									}}
@@ -390,7 +386,7 @@ class BasicInformation extends React.PureComponent {
 						</Form.Item>
 					])}
 					{this._getLi([
-						<Form.Item {...formItemLayout[1]} label="采集用户名">
+						<Form.Item {...formItemLayout[0]} label="采集用户名">
 							{getFieldDecorator('username', {
 								rules: [
 									// {
@@ -399,6 +395,17 @@ class BasicInformation extends React.PureComponent {
 									// }
 								]
 							})(<Input />)}
+						</Form.Item>,
+						<Form.Item {...formItemLayout[0]} label="采集频率(毫秒)">
+							{getFieldDecorator('cycle', {
+								initialValue: 15000,
+								rules: [
+									// {
+									// 	required: true,
+									// 	message: '采集频率不为空'
+									// }
+								]
+							})(<InputNumber min={15000} max={600000} step={1000} style={{ width: '100%' }} />)}
 						</Form.Item>
 					])}
 					{this._getLi([
@@ -421,29 +428,6 @@ class BasicInformation extends React.PureComponent {
 									// }
 								]
 							})(<Input />)}
-						</Form.Item>
-					])}
-					{this._getLi([
-						<Form.Item {...formItemLayout[1]} label="采集频率(毫秒)">
-							{getFieldDecorator('cycle', {
-								initialValue: 15000,
-								rules: [
-									// {
-									// 	required: true,
-									// 	message: '采集频率不为空'
-									// }
-								]
-							})(
-								<InputNumber
-									min={15000}
-									max={600000}
-									formatter={value => `${value} ms`}
-									// parser={value =>
-									// 	value.replace(/\$\s?|(,*)/g, '')
-									// }
-									style={{ width: '100%' }}
-								/>
-							)}
 						</Form.Item>
 					])}
 					{this._getLi([
@@ -474,7 +458,7 @@ class BasicInformation extends React.PureComponent {
 									// 	message: '价格不为空'
 									// }
 								]
-							})(<InputNumber formatter={value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} style={{ width: '100%' }} />)}
+							})(<InputNumber step={1000} formatter={value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\¥\s?|(,*)/g, '')} style={{ width: '100%' }} />)}
 						</Form.Item>,
 						<Form.Item label="购入日期">
 							{getFieldDecorator('orderTime', {
@@ -497,17 +481,7 @@ class BasicInformation extends React.PureComponent {
 									// 	message: '使用年限不为空'
 									// }
 								]
-							})(
-								<InputNumber
-									min={1}
-									max={30}
-									formatter={value => `${value} 年`}
-									// parser={value =>
-									// 	value.replace(/\$\s?|(,*)/g, '')
-									// }
-									style={{ width: '100%' }}
-								/>
-							)}
+							})(<InputNumber min={1} max={30} formatter={value => `${value} 年`} parser={value => value.replace('年', '')} style={{ width: '100%' }} />)}
 						</Form.Item>,
 						<Form.Item label="报废日期">
 							{getFieldDecorator('discardTime', {
@@ -540,89 +514,7 @@ class BasicInformation extends React.PureComponent {
 	}
 }
 const BasicInformationForm = Form.create({ name: 'device_basic_info' })(BasicInformation);
-// const EditableContext = React.createContext();
 
-// const EditableRow = ({ form, index, ...props }) => (
-// 	<EditableContext.Provider value={form}>
-// 		<tr {...props} />
-// 	</EditableContext.Provider>
-// );
-
-// const EditableFormRow = Form.create()(EditableRow);
-
-// class EditableCell extends React.PureComponent {
-// 	state = {
-// 		editing: false
-// 	};
-
-// 	toggleEdit = () => {
-// 		const editing = !this.state.editing;
-// 		this.setState({ editing }, () => {
-// 			if (editing) {
-// 				this.input.focus();
-// 			}
-// 		});
-// 	};
-
-// 	save = e => {
-// 		const { record, handleSave, dataIndex } = this.props;
-// 		this.form.validateFields((error, values) => {
-// 			if (error && error[e.currentTarget.id]) {
-// 				return;
-// 			}
-// 			this.toggleEdit();
-// 			handleSave({ ...record, ...values });
-// 		});
-// 	};
-
-// 	renderCell = form => {
-// 		this.form = form;
-// 		const { children, dataIndex, record, title, parentdata = [] } = this.props;
-// 		const { editing } = this.state;
-// 		let bool = dataIndex == '指标项英文简称';
-// 		return editing ? (
-// 			<Form.Item style={{ margin: 0 }}>
-// 				{form.getFieldDecorator(dataIndex, {
-// 					rules: [
-// 						bool
-// 							? {
-// 									required: true,
-// 									// message: `${title} 不能为空.`,
-// 									validator: (rule, value, cb) => {
-// 										if (value.trim() == '') {
-// 											cb(`${title} 不能为空.`);
-// 										}
-
-// 										let arr = [];
-// 										arr = parentdata.filter(item => item[dataIndex] === value);
-
-// 										arr = arr.filter(item => item.key != record.key);
-// 										if (arr.length > 0) {
-// 											cb(`${title} 重复了`);
-// 										}
-// 										cb();
-// 									}
-// 							  }
-// 							: {
-// 									required: true,
-// 									message: `${title} 不能为空.`
-// 							  }
-// 					],
-// 					initialValue: record[dataIndex]
-// 				})(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save} />)}
-// 			</Form.Item>
-// 		) : (
-// 			<div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={this.toggleEdit}>
-// 				{children}
-// 			</div>
-// 		);
-// 	};
-
-// 	render() {
-// 		const { editable, dataIndex, title, record, index, handleSave, children, ...restProps } = this.props;
-// 		return <td {...restProps}>{editable ? <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer> : children}</td>;
-// 	}
-// }
 class EditableTableRadio extends React.PureComponent {
 	state = {
 		value: 'false'
@@ -712,7 +604,7 @@ class AlarmConfiguration extends React.PureComponent {
 		}
 	};
 	componentDidMount() {
-		// this.init('03a188c952dc40dd980008646dacd8e2');
+		// this.init('4dad66abccfd4d89a06aa2801ddf7750');
 	}
 	addDataRowPerson = (id, data) => {
 		let _data = [];
@@ -753,7 +645,6 @@ class AlarmConfiguration extends React.PureComponent {
 	render() {
 		let { show, title, device_id } = this.props;
 		let { data = [] } = this.state;
-		console.log('---ooo---');
 		let columns = [
 			{
 				title: '指标项中文简称',
@@ -809,68 +700,7 @@ class AlarmConfiguration extends React.PureComponent {
 					/>
 				)
 			},
-			// {
-			// 	title: '告警使能2',
-			// 	width: '10%',
-			// 	dataIndex: 'person'
-			// 	render: (text, record) => {
-			// 		return (
-			// 			<EditableTableRadio
-			// 				value={`${!!text}`}
-			// 				record={record}
-			// 				onChange={(value, callback) => {
-			// 					console.log(value);
-			// 					if (value == 'true') {
-			// 						$.ajax({
-			// 							cache: true,
-			// 							type: 'POST',
-			// 							url: '/iot/person/find_add_one',
-			// 							data: {
-			// 								normalid: record.id,
-			// 								deviceid: device_id
-			// 							},
-			// 							// dataType: 'json',
-			// 							async: false,
-			// 							success: results => {
-			// 								callback(results);
-			// 							}
-			// 						});
-			// 					} else {
-			// 						$.ajax({
-			// 							cache: true,
-			// 							type: 'POST',
-			// 							url: '/iot/person/person_remove',
-			// 							data: {
-			// 								id: text.id
-			// 							},
-			// 							// dataType: 'json',
-			// 							async: false,
-			// 							success: results => {
-			// 								callback(results);
-			// 							}
-			// 						});
-			// 					}
-			// 					// $.ajax({
-			// 					// 	cache: true,
-			// 					// 	type: 'POST',
-			// 					// 	url: '/iot/person/person_update',
-			// 					// 	data: JSON.stringify({
-			// 					// 		data: {
-			// 					// 			id: record.id,
-			// 					// 			status: value
-			// 					// 		}
-			// 					// 	}),
-			// 					// 	dataType: 'json',
-			// 					// 	async: false,
-			// 					// 	success: results => {
-			// 					// 		callback(results);
-			// 					// 	}
-			// 					// });
-			// 				}}
-			// 			/>
-			// 		);
-			// 	}
-			// },
+
 			{
 				title: '告警配置',
 				width: '10%',
@@ -994,7 +824,7 @@ class SwitchCustom extends React.PureComponent {
 	render() {
 		return (
 			<Checkbox checked={this.state.checked} onChange={this.onChange} className="switch-custom-box">
-				<span className="text">{!this.state.checked ? '开启' : '关闭'}</span>
+				<span className={`text ${this.state.checked ? '' : 'text-checked'}`}>{!this.state.checked ? '开启' : '关闭'}</span>
 			</Checkbox>
 		);
 	}
@@ -1128,7 +958,7 @@ class AddBox extends React.PureComponent {
 		super(props);
 		this.state = {
 			current: 0,
-			device_id: '' //'03a188c952dc40dd980008646dacd8e2'
+			device_id: '' //'4dad66abccfd4d89a06aa2801ddf7750'
 		};
 	}
 	next() {
@@ -1169,21 +999,9 @@ class AddBox extends React.PureComponent {
 					</div>
 				</div>
 				<div className="steps-action">
-					{current > 0 && (
-						<Button
-							style={{
-								width: 180,
-								height: 40,
-								marginRight: 20
-							}}
-							onClick={() => this.prev()}
-						>
-							上一步
-						</Button>
-					)}
+					{current > 0 && <Button onClick={() => this.prev()}>上一步</Button>}
 					{current < steps.length - 1 && (
 						<Button
-							style={{ width: 180, height: 40 }}
 							type="primary"
 							onClick={() => {
 								if (steps[current].title == '基本信息') {
@@ -1200,7 +1018,7 @@ class AddBox extends React.PureComponent {
 												$.ajax({
 													cache: true,
 													type: 'POST',
-													url: '/iot/device/device_insert_update',
+													url: '/iot/device/device_check',
 													data: JSON.stringify({
 														data: {
 															id: this.state.device_id,
@@ -1211,7 +1029,20 @@ class AddBox extends React.PureComponent {
 													async: false,
 													success: results => {
 														if (results.code != 0) {
-															message.error('接口错误', 0.5);
+															if (results.code == 9 || results.code == 10 || results.code == 11) {
+																Modal.confirm({
+																	title: '异常提示',
+																	content: results.msg,
+																	okText: '确认',
+																	cancelText: '取消',
+																	onOk: close => {
+																		close();
+																		iframeClose();
+																	}
+																});
+															} else {
+																message.error('接口错误', 0.5);
+															}
 															return;
 														}
 														this.setState(
@@ -1274,21 +1105,52 @@ class AddBox extends React.PureComponent {
 							下一步
 						</Button>
 					)}
-					{current === steps.length - 1 && (
+					{steps[current].title == '添加驱动' && (
 						<Button
-							style={{ width: 180, height: 40 }}
+							onClick={() => {
+								iframeClose();
+							}}
+						>
+							跳过
+						</Button>
+					)}
+					{current === steps.length - 1 ? (
+						<Button
 							type="primary"
 							onClick={() => {
-								// message.success('操作完成', 0.5);
-								// if (this.alarmConfiguration) {
-								// 	let data = this.alarmConfiguration.calibrationMethod();
-								// 	if (data) {
-								// 		iframeClose();
-								// 	}
-								// }
+								if (this.state.device_id) {
+									$.ajax({
+										cache: true,
+										type: 'POST',
+										url: '/iot/device/over',
+										data: JSON.stringify({
+											data: {
+												id: this.state.device_id,
+												assetStatus: 2
+											}
+										}),
+										dataType: 'json',
+										async: false,
+										success: results => {
+											if (results.code != 0) {
+												message.error('接口错误', 0.5);
+												return;
+											}
+											iframeClose();
+										}
+									});
+								}
 							}}
 						>
 							完成
+						</Button>
+					) : (
+						<Button
+							onClick={() => {
+								iframeClose();
+							}}
+						>
+							取消
 						</Button>
 					)}
 				</div>
