@@ -48,6 +48,23 @@ $.modal.openFull = function(title, url, width, height) {
 	});
 	layer.full(index);
 };
+
+var xhrOnProgress = function(fun) {
+	xhrOnProgress.onprogress = fun; //绑定监听
+	//使用闭包实现监听绑
+	return function() {
+		//通过$.ajaxSettings.xhr();获得XMLHttpRequest对象
+		var xhr = $.ajaxSettings.xhr();
+		//判断监听函数是否为函数
+		if (typeof xhrOnProgress.onprogress !== 'function') return xhr;
+		//如果有监听函数并且xhr对象支持绑定时就把监听函数绑定上去
+		if (xhrOnProgress.onprogress && xhr.upload) {
+			xhr.upload.onprogress = xhrOnProgress.onprogress;
+		}
+		return xhr;
+	};
+};
+
 let { Table, Select, Button, Input, Icon, Cascader, Dropdown, Menu, message, Modal } = antd;
 class ListBox extends React.PureComponent {
 	state = {
@@ -454,7 +471,7 @@ class ListBox extends React.PureComponent {
 					}}
 					destroyOnClose={true}
 				>
-					<ImportFile toggleModal={this.toggleModal} />
+					<ImportFile toggleModal={this.toggleModal} updateList={this.getTable} />
 				</Modal>
 			</div>
 		);
@@ -469,44 +486,44 @@ class ImportFile extends React.PureComponent {
 
 		const { files = [] } = file.target;
 		let _file = files[0] || {};
-		// this.setState({
-		// 	file: _file
-		// });
-		// 通过FileReader对象读取文件
-		const fileReader = new FileReader();
-		fileReader.onload = event => {
-			try {
-				const { result } = event.target;
-				// 以二进制流方式读取得到整份excel表格对象
-				const workbook = XLSX.read(result, { type: 'binary' });
-				// 存储获取到的数据
-				let data = [];
-				// 遍历每张工作表进行读取（这里默认只读取第一张表）
-				for (const sheet in workbook.Sheets) {
-					// esline-disable-next-line
-					if (workbook.Sheets.hasOwnProperty(sheet)) {
-						// 利用 sheet_to_json 方法将 excel 转成 json 数据
-						data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
-						// break; // 如果只取第一张表，就取消注释这行
-					}
-				}
-				// 最终获取到并且格式化后的 json 数据
-				message.success('导入成功！', 0.5);
-				// let dataSource = [];
-				// data.map((item, index) => {
-				// 	dataSource.push({ ...item, key: index });
-				// });
-				// this.setState({
-				// 	dataSource
-				// });
-				console.log(data);
-			} catch (e) {
-				// 这里可以抛出文件类型错误不正确的相关提示
-				message.error('文件类型不正确！', 0.5);
-			}
-		};
-		// 以二进制方式打开文件
-		fileReader.readAsBinaryString(files[0]);
+		this.setState({
+			file: _file
+		});
+		// // 通过FileReader对象读取文件
+		// const fileReader = new FileReader();
+		// fileReader.onload = event => {
+		// 	try {
+		// 		const { result } = event.target;
+		// 		// 以二进制流方式读取得到整份excel表格对象
+		// 		const workbook = XLSX.read(result, { type: 'binary' });
+		// 		// 存储获取到的数据
+		// 		let data = [];
+		// 		// 遍历每张工作表进行读取（这里默认只读取第一张表）
+		// 		for (const sheet in workbook.Sheets) {
+		// 			// esline-disable-next-line
+		// 			if (workbook.Sheets.hasOwnProperty(sheet)) {
+		// 				// 利用 sheet_to_json 方法将 excel 转成 json 数据
+		// 				data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
+		// 				// break; // 如果只取第一张表，就取消注释这行
+		// 			}
+		// 		}
+		// 		// 最终获取到并且格式化后的 json 数据
+		// 		message.success('导入成功！', 0.5);
+		// 		// let dataSource = [];
+		// 		// data.map((item, index) => {
+		// 		// 	dataSource.push({ ...item, key: index });
+		// 		// });
+		// 		// this.setState({
+		// 		// 	dataSource
+		// 		// });
+		// 		console.log(data);
+		// 	} catch (e) {
+		// 		// 这里可以抛出文件类型错误不正确的相关提示
+		// 		message.error('文件类型不正确！', 0.5);
+		// 	}
+		// };
+		// // 以二进制方式打开文件
+		// fileReader.readAsBinaryString(files[0]);
 	};
 	render() {
 		return (
@@ -529,6 +546,36 @@ class ImportFile extends React.PureComponent {
 					<Button
 						onClick={() => {
 							console.log(this.state.file);
+							if (this.state.file) {
+								var formData = new FormData();
+								formData.append('devices', this.state.file);
+								$.ajax({
+									url: `/iot/device/device_upload`,
+									data: formData,
+									cache: false,
+									dataType: 'json',
+									contentType: false,
+									// contentType: 'multipart/form-data',
+									processData: false,
+									type: 'POST',
+									xhr: xhrOnProgress(function(evt) {
+										var percent = Math.floor((evt.loaded / evt.total) * 100); //计算百分比
+										console.log('上传进度：', percent);
+									}),
+									success: results => {
+										if (results.code != 0) {
+											message.error('接口错误', 0.5);
+											return;
+										}
+										console.log(this.props);
+										this.props.toggleModal && this.props.toggleModal(false);
+										this.props.updateList && this.props.updateList();
+										// this.setState({
+										// 	data: results.data || []
+										// });
+									}
+								});
+							}
 						}}
 						type="primary"
 						style={{
