@@ -79,7 +79,7 @@ public class Device extends DeviceEnvModel implements Serializable {
      */
     @Column("gateway_id")
     @Comment("网关")
-    @ExcelField(title="网关")
+    @ExcelField(title="所属网关")
     private String gatewayid;
 
     /**
@@ -98,6 +98,7 @@ public class Device extends DeviceEnvModel implements Serializable {
      */
     @Column("driver_id")
     @Comment("驱动")
+    @ExcelField(title = "驱动名称")
     private String driverid;
 
 

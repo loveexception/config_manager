@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.bean;
 
+import cn.tico.iot.configmanger.common.utils.excel.annotation.ExcelField;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.Column;
@@ -16,6 +17,7 @@ public  class I18NModel extends CommonModel {
     @Column("cn_name")
     @Comment("名称")
     @GraphQLQuery(name = "cn_name", description = "中文名")
+    @ExcelField(title = "名称")
     private String cnName;
     /**
      * 编码

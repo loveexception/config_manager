@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.models;
 
+import cn.tico.iot.configmanger.common.utils.excel.annotation.ExcelField;
 import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
@@ -25,6 +26,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("kind_id")
     @Comment("类型")
     @ColDefine(type = ColType.VARCHAR, width = 32)
+    @ExcelField(title = "型号")
     private String kindid;
 
     @Column("kind_map")
@@ -54,6 +56,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("ip")
     @Comment("ip ")
     @ColDefine(type = ColType.VARCHAR, width = 32)
+    @ExcelField(title = "IP地址")
     private String ip;
 
     /**
@@ -92,6 +95,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("dept_id")
     @Comment("组织")
     @ColDefine(type = ColType.VARCHAR, width = 32)
+    @ExcelField(title = "所属组织")
     private String deptid;
 
 
@@ -105,6 +109,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("location_id")
     @Comment("地域")
     @ColDefine(type = ColType.VARCHAR, width = 32)
+    @ExcelField(title = "位置信息")
     private String locationid;
 
     @Column("location_country")
