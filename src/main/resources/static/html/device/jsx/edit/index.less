@@ -1,32 +1,91 @@
-.device-add-basic-information-box {
-	.title {
-		color: #ffffff;
-		font-size: 20px;
-		height: 55px;
-		line-height: 55px;
-		text-align: center;
-		background-color: #1875f0;
-	}
-	.descriptions {
-		box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
-		.upload {
-			display: flex;
-			.ant-upload-list {
-				flex-grow: 1;
+#device-edit-box {
+	.device-edit-body {
+		.footer-box {
+			text-align: right;
+			margin-top: 40px;
+			margin-right: 20px;
+			.btn-1 {
+				width: 179px;
+				height: 40px;
+				background-color: #1875f0;
+				color: #fff;
+				font-size: 21px;
+			}
+			.btn-2 {
+				width: 179px;
+				height: 40px;
+				font-size: 21px;
+				margin-left: 18px;
 			}
 		}
-		.ant-descriptions-view .ant-descriptions-item-label {
-			width: 180px;
-			text-align: right;
-		}
 	}
-	.check-error {
-		border-color: red;
-		input {
-			border-color: red;
+	.device-edit-basic-information-box {
+		.edit-form {
+			.item-li-1 {
+				display: flex;
+				justify-content: space-between;
+				.ant-select {
+					width: 70%;
+				}
+				.ant-btn {
+					width: 25%;
+				}
+			}
+			.ant-row {
+				border: 1px solid #8f8f8f;
+				border-top: 0;
+				// border-left: 0;
+				border-right: 0;
+				margin: 0;
+				height: 48px;
+				display: flex;
+				align-items: center;
+			}
+			.ant-form-item {
+				border-left: 0;
+				border-right: 1px solid #8f8f8f;
+				.ant-form-item-label {
+					border-right: 1px solid #8f8f8f;
+					height: 100%;
+					line-height: 48px;
+				}
+				.ant-form-item-control-wrapper {
+					padding: 0 18px;
+				}
+			}
+			.ant-form-explain {
+				display: none;
+			}
 		}
-		button {
+		.title {
+			color: #ffffff;
+			font-size: 20px;
+			height: 55px;
+			line-height: 55px;
+			text-align: center;
+			background-color: #1875f0;
+		}
+		.descriptions {
+			box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
+			.upload {
+				display: flex;
+				.ant-upload-list {
+					flex-grow: 1;
+				}
+			}
+			.ant-descriptions-view .ant-descriptions-item-label {
+				width: 180px;
+				text-align: right;
+			}
+		}
+		.check-error {
 			border-color: red;
+			input {
+				border-color: red;
+			}
+			button {
+				border-color: red;
+			}
 		}
 	}
 }

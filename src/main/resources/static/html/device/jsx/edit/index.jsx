@@ -6,9 +6,44 @@ for (var i = 0; i < scripts.length; i++) {
 		domId = script.getAttribute('domId');
 	}
 }
-let { Button, Input, Tabs, Collapse, Icon, Select, Form, message, Badge, Row, Col, Empty, Cascader, InputNumber, Radio, DatePicker } = antd;
+let { Button, Input, Tabs, Collapse, Icon, Select, Form, message, Badge, Row, Col, Empty, Cascader, InputNumber, Radio, DatePicker, Modal } = antd;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
+const { confirm } = Modal;
+
+function submitHandler() {
+	console.log('--点击确定--');
+}
+var edit_confirm = void 0;
+function cancelHandler() {
+	// console.log('--点击取消--', edit_confirm);
+	if (!edit_confirm) {
+		edit_confirm = confirm({
+			title: '确认关闭吗?',
+			content: '关闭后会丢失添加数据',
+			cancelText: '取消',
+			okText: '确认',
+			onOk() {
+				iframeClose();
+			},
+			onCancel() {}
+		});
+	} else {
+		edit_confirm.destroy();
+		edit_confirm = confirm({
+			title: '确认关闭吗?',
+			content: '关闭后会丢失添加数据',
+			cancelText: '取消',
+			okText: '确认',
+			onOk() {
+				iframeClose();
+			},
+			onCancel() {}
+		});
+	}
+
+	return false;
+}
 
 function urlArgs() {
 	let args = {};
@@ -20,16 +55,56 @@ function urlArgs() {
 		let name = pairs[i].substring(0, pos);
 		let value = pairs[i].substring(pos + 1);
 		value = decodeURIComponent(value);
-		if (name.endsWith('[]')) {
-			args[name.split('[]')[0]] = args[name.split('[]')[0]] || [];
-			args[name.split('[]')[0]].push(value);
-		} else {
-			args[name] = value;
-		}
+		args[name] = value;
 	}
 	return args;
 }
 
+function iframeClose() {
+	if (parent.layer) {
+		var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+		parent.layer.close(index);
+	}
+}
+$.modal.open = function(title, url, width, height) {
+	//如果是移动端，就使用自适应大小弹窗
+	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+		width = 'auto';
+		height = 'auto';
+	}
+	if ($.common.isEmpty(title)) {
+		title = false;
+	}
+	if ($.common.isEmpty(url)) {
+		url = '/404.html';
+	}
+	if ($.common.isEmpty(width)) {
+		width = 800;
+	}
+	if ($.common.isEmpty(height)) {
+		height = $(window).height() - 50;
+	}
+	layer.open({
+		type: 2,
+		area: [width + 'px', height + 'px'],
+		fix: false,
+		//不固定
+		maxmin: true,
+		shade: 0.3,
+		title: title,
+		content: url,
+		// btn: ['保存', '取消'],
+		// 弹层外区域关闭
+		shadeClose: false,
+		yes: function(index, layero) {
+			var iframeWin = layero.find('iframe')[0];
+			iframeWin.contentWindow.submitHandler();
+		},
+		cancel: function(index) {
+			return true;
+		}
+	});
+};
 class EditBox extends React.PureComponent {
 	state = {};
 
@@ -38,8 +113,9 @@ class EditBox extends React.PureComponent {
 		return (
 			<div className="device-edit-body">
 				<BasicInformationForm onRef={el => (this.basicInformation = el)} title={'编辑'} show={true} />
-				<div>
+				<div className="footer-box">
 					<Button
+						className="btn-1"
 						onClick={() => {
 							if (this.basicInformation) {
 								this.basicInformation.calibrationMethod(data => {
@@ -51,7 +127,6 @@ class EditBox extends React.PureComponent {
 											orderTime: orderTime && orderTime.valueOf()
 										};
 										let { device_id } = urlArgs();
-										console.log(params);
 										if (device_id) {
 											$.ajax({
 												cache: true,
@@ -70,7 +145,26 @@ class EditBox extends React.PureComponent {
 														message.error('接口错误', 0.5);
 														return;
 													}
-													message.info('保存成功');
+													$.ajax({
+														cache: true,
+														type: 'POST',
+														url: '/iot/device/over',
+														data: JSON.stringify({
+															data: {
+																id: device_id,
+																assetStatus: params.assetStatus||'0'
+															}
+														}),
+														dataType: 'json',
+														async: false,
+														success: results => {
+															if (results.code != 0) {
+																message.error('接口错误', 0.5);
+																return;
+															}
+															iframeClose();
+														}
+													});
 												}
 											});
 										}
@@ -80,6 +174,14 @@ class EditBox extends React.PureComponent {
 						}}
 					>
 						保存
+					</Button>
+					<Button
+						className="btn-2"
+						onClick={() => {
+							iframeClose();
+						}}
+					>
+						取消
 					</Button>
 				</div>
 			</div>
@@ -322,15 +424,16 @@ class BasicInformation extends React.PureComponent {
 		let { _device = {} } = this.state;
 		getFieldDecorator('locationid', { initialValue: _device.locationid });
 		getFieldDecorator('kindid', { initialValue: _device.kindid });
+		let { device_id } = urlArgs();
 		return (
 			<div
-				className="device-add-basic-information-box"
+				className="device-edit-basic-information-box"
 				style={{
 					display: show ? 'block' : 'none'
 				}}
 			>
 				<div className="title">{title}</div>
-				<Form {...formItemLayout[0]} className="login-form">
+				<Form {...formItemLayout[0]} className="edit-form">
 					{this._getLi([
 						<Form.Item label="SN编号">
 							{getFieldDecorator('sno', {
@@ -367,7 +470,7 @@ class BasicInformation extends React.PureComponent {
 								]
 							})(
 								<Select
-									// disabled
+									disabled
 									style={{ width: '100%' }}
 									placeholder="请选择组织"
 									// value={this.state.select_dept}
@@ -423,25 +526,35 @@ class BasicInformation extends React.PureComponent {
 							)}
 						</Form.Item>,
 						<Form.Item label="设备驱动">
-							{getFieldDecorator('driverid', {
-								initialValue: _device.driverid,
-								rules: [
-									{
-										required: true,
-										message: '驱动不为空'
-									}
-								]
-							})(
-								<Select style={{ width: '100%' }} placeholder="请选择驱动">
-									{this.state.driver_list.map((item, index) => {
-										return (
-											<Select.Option key={index} value={item.id}>
-												{item.cnName}
-											</Select.Option>
-										);
-									})}
-								</Select>
-							)}
+							<div className="item-li-1">
+								{getFieldDecorator('driverid', {
+									initialValue: _device.driverid,
+									rules: [
+										{
+											required: true,
+											message: '驱动不为空'
+										}
+									]
+								})(
+									<Select placeholder="请选择驱动">
+										{this.state.driver_list.map((item, index) => {
+											return (
+												<Select.Option key={index} value={item.id}>
+													{item.cnName}
+												</Select.Option>
+											);
+										})}
+									</Select>
+								)}
+								<Button
+									type="primary"
+									onClick={() => {
+										$.modal.open('驱动详情', `/html/device/alarmModal.html?deviceid=${device_id}`);
+									}}
+								>
+									驱动详情
+								</Button>
+							</div>
 						</Form.Item>
 					])}
 					{this._getLi([
@@ -477,7 +590,13 @@ class BasicInformation extends React.PureComponent {
 					{this._getLi([
 						<Form.Item {...formItemLayout[1]} label="设备类型">
 							{getFieldDecorator('kinds', {
-								initialValue: this.state.kinds
+								initialValue: this.state.kinds,
+								rules: [
+									{
+										required: true,
+										message: '设备类型不为空'
+									}
+								]
 							})(
 								<Cascader
 									fieldNames={{
@@ -502,10 +621,15 @@ class BasicInformation extends React.PureComponent {
 						</Form.Item>
 					])}
 					{this._getLi([
-						<Form.Item {...formItemLayout[1]} label="采集用户名">
+						<Form.Item {...formItemLayout[0]} label="采集用户名">
 							{getFieldDecorator('username', {
 								initialValue: _device.username
 							})(<Input />)}
+						</Form.Item>,
+						<Form.Item {...formItemLayout[0]} label="采集频率(毫秒)">
+							{getFieldDecorator('cycle', {
+								initialValue: _device.cycle
+							})(<InputNumber min={15000} max={600000} style={{ width: '100%' }} />)}
 						</Form.Item>
 					])}
 					{this._getLi([
@@ -520,26 +644,9 @@ class BasicInformation extends React.PureComponent {
 							})(<Input />)}
 						</Form.Item>
 					])}
-					{this._getLi([
-						<Form.Item {...formItemLayout[1]} label="采集频率(毫秒)">
-							{getFieldDecorator('cycle', {
-								initialValue: _device.cycle
-							})(
-								<InputNumber
-									min={15000}
-									max={600000}
-									formatter={value => `${value} ms`}
-									// parser={value =>
-									// 	value.replace(/\$\s?|(,*)/g, '')
-									// }
-									style={{ width: '100%' }}
-								/>
-							)}
-						</Form.Item>
-					])}
 
 					{this._getLi([
-						<Form.Item {...formItemLayout[1]} label="激活状态">
+						<Form.Item {...formItemLayout[0]} label="激活状态">
 							{getFieldDecorator('status', {
 								initialValue: `${_device.status}`,
 								rules: [
@@ -554,13 +661,30 @@ class BasicInformation extends React.PureComponent {
 									<Radio value="false">停用</Radio>
 								</Radio.Group>
 							)}
+						</Form.Item>,
+						<Form.Item label="资产状态">
+							{getFieldDecorator('assetStatus', {
+								initialValue: _device.assetStatus,
+								rules: [
+									{
+										required: true,
+										message: '资产状态不为空'
+									}
+								]
+							})(
+								<Select style={{ width: '100%' }} placeholder="请选择资产状态">
+									<Select.Option value={'0'}>闲置</Select.Option>
+									<Select.Option value={'1'}>使用中</Select.Option>
+									<Select.Option value={'2'}>报废</Select.Option>
+								</Select>
+							)}
 						</Form.Item>
 					])}
 					{this._getLi([
 						<Form.Item label="价格">
 							{getFieldDecorator('price', {
 								initialValue: _device.price
-							})(<InputNumber formatter={value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\$\s?|(,*)/g, '')} style={{ width: '100%' }} />)}
+							})(<InputNumber step={1000} formatter={value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} parser={value => value.replace(/\¥\s?|(,*)/g, '')} style={{ width: '100%' }} />)}
 						</Form.Item>,
 						<Form.Item label="购入日期">
 							{getFieldDecorator('orderTime', {
@@ -572,17 +696,7 @@ class BasicInformation extends React.PureComponent {
 						<Form.Item label="使用年限">
 							{getFieldDecorator('quality', {
 								initialValue: _device.quality
-							})(
-								<InputNumber
-									min={1}
-									max={30}
-									formatter={value => `${value} 年`}
-									// parser={value =>
-									// 	value.replace(/\$\s?|(,*)/g, '')
-									// }
-									style={{ width: '100%' }}
-								/>
-							)}
+							})(<InputNumber min={1} max={30} formatter={value => `${value}年`} parser={value => value.replace('年', '')} style={{ width: '100%' }} />)}
 						</Form.Item>,
 						<Form.Item label="报废日期">
 							{getFieldDecorator('discardTime', {
@@ -610,4 +724,5 @@ class BasicInformation extends React.PureComponent {
 	}
 }
 const BasicInformationForm = Form.create({ name: 'device_basic_info' })(BasicInformation);
+
 ReactDOM.render(<EditBox />, document.getElementById(domId));

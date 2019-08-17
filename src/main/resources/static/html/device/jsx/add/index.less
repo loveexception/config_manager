@@ -106,8 +106,43 @@
 		.steps-action {
 			text-align: right;
 			margin-top: 40px;
+			.ant-btn {
+				width: 180px;
+				height: 40px;
+				margin-right: 20px;
+				&:last-child {
+					margin-right: 0;
+				}
+			}
 		}
 		.device-add-basic-information-box {
+			.add-form {
+				.ant-row {
+					border: 1px solid #8f8f8f;
+					border-top: 0;
+					// border-left: 0;
+					border-right: 0;
+					margin: 0;
+					height: 48px;
+					display: flex;
+					align-items: center;
+				}
+				.ant-form-item {
+					border-left: 0;
+					border-right: 1px solid #8f8f8f;
+					.ant-form-item-label {
+						border-right: 1px solid #8f8f8f;
+						height: 100%;
+						line-height: 48px;
+					}
+					.ant-form-item-control-wrapper {
+						padding: 0 18px;
+					}
+				}
+				.ant-form-explain {
+					display: none;
+				}
+			}
 			.title {
 				color: #ffffff;
 				font-size: 20px;
@@ -156,6 +191,10 @@
 					line-height: 29px;
 					background-color: #fff;
 				}
+				.text-checked {
+					background-color: #1875f0;
+					color: #fff;
+				}
 			}
 			.descriptions {
 				box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.08);
@@ -165,6 +204,9 @@
 				}
 				.ant-descriptions-item-content {
 					background: #fff;
+					.ant-row {
+						margin: 0;
+					}
 				}
 			}
 			.title {
@@ -177,24 +219,30 @@
 			}
 			.radio-box {
 				width: 100%;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				height: 100%;
 				.radio-li {
-					width: 20%;
-					max-width: 220px;
+					min-width: 20%;
 					height: 39px;
 					line-height: 39px;
 					font-size: 14px;
-					border: none;
+					border: 1px solid #e2e2e2;
 					text-align: center;
 					color: #404040;
 					border-radius: 0;
+					margin: 5px;
+					box-shadow: none;
+
 					&:before {
 						display: none;
 					}
 				}
-				.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
-					background-color: #1875f0;
-					color: #fff !important;
-				}
+			}
+			.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+				background-color: #1875f0;
+				color: #fff !important;
 			}
 		}
 	}

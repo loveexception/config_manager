@@ -162,16 +162,18 @@ class ListBox extends React.PureComponent {
 			pageSize: 10,
 			pageNum: 1
 		},
-		upload_visible: false
+		upload_visible: false,
+		loading: false
 	};
 	componentDidMount() {
 		this.getSelectList();
 		this.getTable();
 	}
-	getTable = () => {
+	getTable = (locationid = '', deptid = '') => {
 		let { pageNum, pageSize } = this.state.table_search || {};
+		this.setState({ loading: true });
 		$.ajax({
-			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}`,
+			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}`,
 			// data: {},
 			cache: false,
 			contentType: false,
@@ -180,11 +182,13 @@ class ListBox extends React.PureComponent {
 			success: results => {
 				if (results.code != 0) {
 					message.error('接口错误', 0.5);
+					this.setState({ loading: false });
 					return;
 				}
 				let data = results.data || [];
 				let { total } = data;
 				this.setState({
+					loading: false,
 					data: data.rows || [],
 					table_search: {
 						...this.state.table_search,
@@ -276,72 +280,82 @@ class ListBox extends React.PureComponent {
 		);
 		return (
 			<div className="device-list-body">
-				<div
-					className="device-list-content"
-					style={{
-						height: '90px'
-					}}
-				>
-					<div className="device-list-content-li-2">
-						<Select
-							style={{ width: 120 }}
-							placeholder="请选择组织"
-							value={this.state.select_dept}
-							onSelect={value => {
-								this.setState(
-									{
-										select_dept: value
-									},
-									() => {
-										this.getCascaderList(value);
-									}
-								);
+				<div className="device-list-content">
+					<div className="device-list-content-li-2 search-box">
+						<div className="search-content">
+							<div
+								className="content-li"
+								// style={{
+								// 	marginBottom: 20
+								// }}
+							>
+								<Select
+									placeholder="请选择组织"
+									value={this.state.select_dept}
+									onSelect={value => {
+										this.setState(
+											{
+												select_dept: value
+											},
+											() => {
+												this.getCascaderList(value);
+											}
+										);
+									}}
+								>
+									{select_list.map((item, index) => {
+										return (
+											<Select.Option key={index} value={item.id}>
+												{item.name}
+											</Select.Option>
+										);
+									})}
+								</Select>
+								<Cascader
+									placeholder="请选择地理位置"
+									fieldNames={{
+										label: 'cnName',
+										value: 'id',
+										children: 'children'
+									}}
+									value={this.state.select_cascader}
+									options={cascader_list}
+									onChange={(value, selectedOptions) => {
+										this.setState({
+											select_cascader: value
+										});
+									}}
+								/>
+							</div>
+							{/* <div className="content-li">
+								<Select
+									className="select-box"
+									// defaultValue="请选择分类"
+									// onChange={handleChange}
+									placeholder="请选择分类"
+								>
+									<Select.Option value="a">驱动名称</Select.Option>
+									<Select.Option value="b">设备分类</Select.Option>
+									<Select.Option value="c">设备子类</Select.Option>
+									<Select.Option value="d">设备品牌</Select.Option>
+									<Select.Option value="e">设备型号</Select.Option>
+								</Select>
+								<Input.Search className="input-box" placeholder="请输入关键字" onSearch={value => console.log('点击搜索', value)} style={{ width: 254 }} />
+							</div> */}
+						</div>
+						<Button
+							className="search-btn"
+							type="parimay"
+							onClick={() => {
+								let { select_dept, select_cascader = [] } = this.state;
+								this.getTable(select_cascader.length > 0 ? select_cascader[select_cascader.length - 1] : '', select_dept);
 							}}
 						>
-							{select_list.map((item, index) => {
-								return (
-									<Select.Option key={index} value={item.id}>
-										{item.name}
-									</Select.Option>
-								);
-							})}
-						</Select>
-						<Cascader
-							placeholder="请选择地理位置"
-							fieldNames={{
-								label: 'cnName',
-								value: 'id',
-								children: 'children'
-							}}
-							value={this.state.select_cascader}
-							options={cascader_list}
-							onChange={(value, selectedOptions) => {
-								this.setState({
-									select_cascader: value
-								});
-							}}
-						/>
-						<Button type="parimay">确认选择</Button>
+							确认选择
+						</Button>
 					</div>
 				</div>
 				<div className="device-list-content">
-					<div className="device-list-content-li">
-						<Select
-							className="select-box"
-							// defaultValue="请选择分类"
-							style={{ width: 114 }}
-							// onChange={handleChange}
-							placeholder="请选择分类"
-						>
-							{/* <Select.Option value="">请选择分类</Select.Option> */}
-							<Select.Option value="a">驱动名称</Select.Option>
-							<Select.Option value="b">设备分类</Select.Option>
-							<Select.Option value="c">设备子类</Select.Option>
-							<Select.Option value="d">设备品牌</Select.Option>
-							<Select.Option value="e">设备型号</Select.Option>
-						</Select>
-						<Input.Search className="input-box" placeholder="请输入关键字" onSearch={value => console.log('点击搜索', value)} style={{ width: 254 }} />
-					</div>
 					<div
 						className="device-list-content-li"
 						style={{
@@ -388,6 +402,7 @@ class ListBox extends React.PureComponent {
 					</div>
 				</div>
 				<Table
+					loading={this.state.loading}
 					bordered
 					rowSelection={rowSelection}
 					columns={columns}
