@@ -128,7 +128,7 @@ class AlarmRulesBox extends React.PureComponent {
 		this.listData();
 	}
 	render = () => {
-		let { tabs_data = [], listData = [], selectNorma = {} } = this.state;
+		let { tabs_data = [], selectNorma = {} } = this.state;
 		return (
 			<div className="device-alarm-rules-body">
 				<div className="title">{selectNorma['cnName']}</div>
@@ -164,7 +164,7 @@ class AlarmRulesBox extends React.PureComponent {
 								}
 								key={`${item.value}-${index}`}
 							>
-								<Component onRef={el => (this[`rules_${item.value}`] = el)} _ids={this.state._ids} grade={item} listData={listData} selectNorma={selectNorma} />
+								<Component onRef={el => (this[`rules_${item.value}`] = el)} _ids={this.state._ids} grade={item} selectNorma={selectNorma} />
 							</TabPane>
 						);
 					})}
@@ -443,7 +443,7 @@ class DynamicFieldSet extends React.Component {
 	};
 	render() {
 		let { activeKey = [], panel_data = [] } = this.state;
-		let { listData = [], selectNorma = {}, grade = {}, form = {} } = this.props;
+		let { selectNorma = {}, grade = {}, form = {} } = this.props;
 		const { getFieldDecorator, getFieldValue, getFieldError } = form;
 		let { normalid } = urlArgs();
 		const formItemLayout = {
@@ -538,11 +538,11 @@ class DynamicFieldSet extends React.Component {
 							<div className="content-bottom">
 								{rulers.length > 0 ? (
 									rulers.map((item_j, j) => {
-										console.log(item_j);
-										let select = [];
-										if (j == 0) {
-											select = listData.filter(it => it.id == item_j.normalid);
-										}
+										// console.log(item_j);
+										// let select = [];
+										// if (j == 0) {
+										// 	select = listData.filter(it => it.id == item_j.normalid);
+										// }
 										getFieldDecorator(`rules[${k}][${j}].data`, { initialValue: { ...item_j } });
 										return (
 											<div key={j}>
@@ -584,17 +584,7 @@ class DynamicFieldSet extends React.Component {
 																			message: '指标项不能为空'
 																		}
 																	]
-																})(
-																	<Select className="select-box" disabled={select.length > 0} style={{ width: '100%' }} placeholder="请选择指标项">
-																		{listData.map(item => {
-																			return (
-																				<Select.Option key={item.id} value={item.id}>
-																					{item['cnName']}
-																				</Select.Option>
-																			);
-																		})}
-																	</Select>
-																)}
+																})(<SearchInput _ids={this.props._ids} children={<Select.Option value={item_j.normalid}>{(item_j.normal || {}).cnName}</Select.Option>} className="select-box" placeholder="请选择指标项" style={{ width: '100%' }} />)}
 															</Form.Item>
 														</Col>
 														<Col span={6}>
@@ -732,6 +722,43 @@ class DynamicFieldSet extends React.Component {
 					</Button>
 				</Form.Item> */}
 			</Form>
+		);
+	}
+}
+class SearchInput extends React.PureComponent {
+	state = {
+		data: []
+	};
+
+	handleSearch = value => {
+		let { driverid } = this.props._ids || {};
+		if (driverid) {
+			$.ajax({
+				url: `/iot/driver/normal_names?driverid=${driverid}&cn_name=${value}`,
+				// data: {},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'GET',
+				success: results => {
+					if (results.code != 0) {
+						message.error('接口错误', 0.5);
+						return;
+					}
+					this.setState({
+						data: results.data || []
+					});
+				}
+			});
+		}
+	};
+
+	render() {
+		const options = this.state.data.map(d => <Select.Option key={d.id}>{d.cnName}</Select.Option>);
+		return (
+			<Select {...this.props} showSearch defaultActiveFirstOption={false} showArrow={false} filterOption={false} onSearch={this.handleSearch} notFoundContent={null}>
+				{options.length > 0 ? options : this.props.children}
+			</Select>
 		);
 	}
 }
