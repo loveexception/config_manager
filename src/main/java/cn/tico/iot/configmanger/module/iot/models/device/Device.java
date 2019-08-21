@@ -24,14 +24,14 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("机器码")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "sno", description = "机器码")
-    @ExcelField(title="sno")
+    @ExcelField(title="sno",value="sno")
     private String sno;
 
     @Column("price")
     @Comment("价格")
     @ColDefine(type = ColType.FLOAT  )
     @GraphQLQuery(name = "price", description = "价格")
-    @ExcelField(title="价格")
+    @ExcelField(title="价格",value = "")
 
     private Double price;
 

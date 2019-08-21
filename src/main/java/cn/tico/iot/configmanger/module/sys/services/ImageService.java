@@ -36,7 +36,7 @@ public class ImageService extends Service<Image> {
 			}else if("Qiniu".equals(img.getPhotoType())){
 				return img.getUrl();
 			}
-			return "/open/file/get/" + img.getLocalPath();
+			return  img.getLocalPath();
 		}
 		return null;
 	}
@@ -48,7 +48,7 @@ public class ImageService extends Service<Image> {
 	 * @param userId
 	 * @return
 	 */
-	public String save(TempFile tempFile, ImageType type , String userId, String id){
+	public Object save(TempFile tempFile, ImageType type , String userId, String id){
 		if(Strings.isNotBlank(id)){
 			this.delete(id);
 		}
@@ -72,7 +72,7 @@ public class ImageService extends Service<Image> {
 				break;
 		}
 		image = this.insert(image);
-		return image.getId();
+		return image;
 	}
 
 }

@@ -202,7 +202,7 @@ public class DeviceController implements AdminKey {
 			Object obj = null;
 
 			ImportExcel excel =new ImportExcel(f,1);
-			List<Device > devices =  excel.getDataList(Device.class,1,2,3);
+			List<Device > devices =  excel.getDataList(Device.class);
 			for (int i = 0; i < devices.size(); i++) {
 				deviceService.insertUpdate(devices.get(i));
 			}

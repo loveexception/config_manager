@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.module.open.file;
 
 import cn.tico.iot.configmanger.common.base.Result;
+import cn.tico.iot.configmanger.common.enums.ImageType;
 import cn.tico.iot.configmanger.common.utils.UpLoadUtil;
 import cn.tico.iot.configmanger.module.sys.services.ImageService;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -71,9 +72,10 @@ public class UploadController {
             } else if (tf == null) {
                 return Result.error("空文件");
             } else {
-                String url = UpLoadUtil.upLoadFileSysConfigPath(tf,"tmp");
-                String u = req.getServletContext().getContextPath();
-                return Result.success("上传成功",  u + url );
+//                String url = UpLoadUtil.upLoadFileSysConfigPath(tf,"tmp");
+//                String u = req.getServletContext().getContextPath();
+                Object obj = imageService.save(tf, ImageType.Local,"tmp",null);
+                return Result.success("上传成功",  obj );
             }
         } catch (Exception e) {
             e.printStackTrace();

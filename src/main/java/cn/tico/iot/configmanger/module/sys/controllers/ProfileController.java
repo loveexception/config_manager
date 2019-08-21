@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.sys.controllers;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.enums.ImageType;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.sys.models.Image;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.ImageService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
@@ -121,8 +122,8 @@ public class ProfileController {
     @AdaptBy(type = UploadAdaptor.class)
     public Object updateAvatar(@Param("avatarfile") TempFile avatarfile){
         User user = userService.fetch(ShiroUtils.getUserId());
-        String id = imageService.save(avatarfile, ImageType.Base64 ,ShiroUtils.getUserId(),user.getAvatar());
-        user.setAvatar(id);
+        Image image = (Image) imageService.save(avatarfile, ImageType.Base64 ,ShiroUtils.getUserId(),user.getAvatar());
+        user.setAvatar(image.getId());
         userService.updateIgnoreNull(user);
         ShiroUtils.setSysUser(userService.fetch(user.getId()));
         return Result.success("system.success");

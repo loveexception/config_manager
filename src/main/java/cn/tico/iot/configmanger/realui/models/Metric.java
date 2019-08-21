@@ -9,6 +9,7 @@ import org.nutz.dao.entity.annotation.Comment;
 import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_ui_metrics")
+@Comment("一键寻检数据")
 @Data
 public class Metric extends I18NModel {
 
