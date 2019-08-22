@@ -1,6 +1,10 @@
 package cn.tico.iot.configmanger.module.wx.controller;
 
 import cn.tico.iot.configmanger.common.page.TableDataInfo;
+import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
+import cn.tico.iot.configmanger.module.iot.services.DriverService;
+import com.google.common.collect.Lists;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.TUiMetrics;
 import cn.tico.iot.configmanger.module.wx.services.TUiMetricsService;
@@ -42,7 +46,10 @@ public class TUiMetricsController {
 
 	@Inject
 	private TUiMetricsService tUiMetricsService;
-	
+
+	@Inject
+	private DriverService driverService;
+
 	@RequiresPermissions("wx:tUiMetrics:view")
 	@At("")
 	@Ok("th:/wx/tUiMetrics/tUiMetrics.html")
@@ -178,6 +185,48 @@ public class TUiMetricsController {
 				mirror.setValue(tUiMetrics, mirror.getField(name), "true");
 			}
 			tUiMetricsService.update(tUiMetrics);
+			return Result.success("system.success",tUiMetrics);
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+
+	/**
+	 * 导入 一键寻检数据
+	 */
+	@At("/export")
+	@Ok("json")
+	public Object export(@Param("kindid")String id, HttpServletRequest req) {
+		try {
+			if(Lang.isEmpty(id)){
+				return Result.error(101,"system.error");
+			}
+			Cnd cnd = Cnd.where("kind_id","=",id);
+			List<Driver> drivers = driverService.query(cnd);
+			if(Lang.isEmpty(drivers)){
+				return Result.error(201,"system.error");
+			}
+			Driver driver = driverService.fetchLinks(drivers.get(0),"normals");
+			List<Normal> normals = driver.getNormals();
+			List<TUiMetrics> tUiMetrics = Lists.newArrayList();
+			for (int i = 0; i < normals.size(); i++) {
+				TUiMetrics temp = new TUiMetrics();
+				Normal normal =normals.get(i);
+				temp.setKindTypeId(id);
+				temp.setOrderNum(new Long(i));
+				temp.setCnName(normal.getCnName());
+				temp.setEnName(normal.getOperateKey());
+				temp.setViewMetrics("false");
+				temp.setViewTable("false");
+				temp.setViewGraph("false");
+				temp.setStatus("true");
+				temp.setDelFlag("false");
+
+
+				tUiMetricsService.insert(temp);
+				tUiMetrics.add(temp);
+
+			}
 			return Result.success("system.success",tUiMetrics);
 		} catch (Exception e) {
 			return Result.error("system.error");
