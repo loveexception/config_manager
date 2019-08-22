@@ -72,7 +72,7 @@ public class TUiMetricsController {
 		if (!Strings.isBlank(kindTypeId)){
 			cnd.and("kind_type_id", "like", "%" + kindTypeId +"%");
 		}
-
+		cnd.orderBy("order_num","asc");
 		Pager pager =new Pager(pageNum,pageSize);
 		List<TUiMetrics> list =tUiMetricsService.dao().queryByJoin (TUiMetrics.class,"",cnd,pager);
 
