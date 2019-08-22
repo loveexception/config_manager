@@ -280,27 +280,21 @@ public class KindController  implements AdminKey {
 //    @Ok("json")
 //    public List<Map<String, Object>> treeData(@Param("parentId") String parentId,
 //                                              @Param("deptName") String deptName) {
-//        List<Map<String, Object>> tree = deptService.selectTree(parentId, deptName);
+//        List<Map<String, Object>> tree = kindService.selectTree(parentId, deptName);
 //        return tree;
 //    }
-//    @At
-//    @Ok("json")
-//    public List<Map<String, Object>> treeDataOrg(@Param("parentId") String parentId,
-//                                                 @Param("deptName") String deptName) {
-//        User user = ShiroUtils.getSysUser();
-//
-//        user =userService.fetchLinks(user,"dept|image");
-//        Set roles = userService.getRoleCodeList(user);
-//
-//        if(roles.contains("admin")){
-//            List<Map<String, Object>> tree = deptService.selectFathers("100", null);
-//            return tree;
-//        }else{
-//            List<Map<String, Object>> tree = deptService.selectFathers("100" , user.getDept().getDeptName());
-//            return tree;
-//        }
-//
-//
-//    }
+    @At
+    @Ok("json")
+    public List<Map<String, Object>> treeDataOrg(@Param("parentId") String parentId,
+                                                 @Param("deptName") String deptName) {
+
+
+
+            List<Map<String, Object>> tree = kindService.selectFathers(null, null);
+            return tree;
+
+
+
+    }
 
 }

@@ -1,6 +1,10 @@
 package cn.tico.iot.configmanger.module.wx.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
+import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import com.sun.imageio.plugins.common.I18N;
+import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.nutz.dao.entity.annotation.*;
@@ -15,24 +19,22 @@ import java.util.Date;
  * @date 2019-08-21
  */
 @Table("t_ui_metrics")
-public class TUiMetrics extends BaseModel implements Serializable {
+@Data
+public class TUiMetrics extends I18NModel implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-		@Name
-	@Column("id")
-	@Comment("id")
-	@ColDefine(type = ColType.VARCHAR, width = 64)
-	@Prev(els = {@EL("uuid()")})
-	private String id;
+
 
 			/** 指标所属设备类型id */
 	@Column("kind_type_id")
 	@Comment("指标所属设备类型id")
 	private String kindTypeId;
 
+	@One(field ="kindTypeId",key = "id")
+	private Kind kind;
+
 			/** 指标所属设备类型 */
 	@Column("kind_type")
-	@Comment("指标所属设备类型")
+	@Comment("指标名")
 	private String kindType;
 
 			/** 指标展示顺序 */
@@ -47,278 +49,41 @@ public class TUiMetrics extends BaseModel implements Serializable {
 
 			/** 展示数据 */
 	@Column("enum_true")
-	@Comment("展示数据")
+	@Comment("正常显示")
 	private String enumTrue;
 
 			/** 展示数据 */
 	@Column("enum_false")
-	@Comment("展示数据")
+	@Comment("异常显示")
 	private String enumFalse;
 
 			/** 指标最大值 */
 	@Column("max_value")
-	@Comment("指标最大值")
+	@Comment("最大值")
 	private String maxValue;
 
 			/** 指标最小值 */
 	@Column("min_value")
-	@Comment("指标最小值")
+	@Comment("最小值")
 	private String minValue;
 
 			/**  */
 	@Column("view_metrics")
-	@Comment("")
+	@Comment("一键寻检")
 	private String viewMetrics;
 
 			/**  */
 	@Column("view_table")
-	@Comment("")
+	@Comment("开关指标")
 	private String viewTable;
 
 			/**  */
 	@Column("view_graph")
-	@Comment("")
+	@Comment("图表")
 	private String viewGraph;
 
-			/** 名称 */
-	@Column("cn_name")
-	@Comment("名称")
-	private String cnName;
 
-			/** 编码 */
-	@Column("en_name")
-	@Comment("编码")
-	private String enName;
 
-			/** 状态 */
-	@Column("status")
-	@Comment("状态")
-	private String status;
-
-			/** 删除 */
-	@Column("delflag")
-	@Comment("删除")
-	private String delflag;
-
-			/** 创建者 */
-	@Column("create_by")
-	@Comment("创建者")
-	private String createBy;
-
-			/** 建立时间 */
-	@Column("create_time")
-	@Comment("建立时间")
-	private Date createTime;
-
-			/** 更新者 */
-	@Column("update_by")
-	@Comment("更新者")
-	private String updateBy;
-
-			/** 更新时间 */
-	@Column("update_time")
-	@Comment("更新时间")
-	private Date updateTime;
-
-	public String getId()
-	{
-		return id;
-	}
-
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-
-	public String getKindTypeId()
-	{
-		return kindTypeId;
-	}
-
-	public void setKindTypeId(String kindTypeId)
-	{
-		this.kindTypeId = kindTypeId;
-	}
-
-	public String getKindType()
-	{
-		return kindType;
-	}
-
-	public void setKindType(String kindType)
-	{
-		this.kindType = kindType;
-	}
-
-	public Long getOrderNum()
-	{
-		return orderNum;
-	}
-
-	public void setOrderNum(Long orderNum)
-	{
-		this.orderNum = orderNum;
-	}
-
-	public Long getUnit()
-	{
-		return unit;
-	}
-
-	public void setUnit(Long unit)
-	{
-		this.unit = unit;
-	}
-
-	public String getEnumTrue()
-	{
-		return enumTrue;
-	}
-
-	public void setEnumTrue(String enumTrue)
-	{
-		this.enumTrue = enumTrue;
-	}
-
-	public String getEnumFalse()
-	{
-		return enumFalse;
-	}
-
-	public void setEnumFalse(String enumFalse)
-	{
-		this.enumFalse = enumFalse;
-	}
-
-	public String getMaxValue()
-	{
-		return maxValue;
-	}
-
-	public void setMaxValue(String maxValue)
-	{
-		this.maxValue = maxValue;
-	}
-
-	public String getMinValue()
-	{
-		return minValue;
-	}
-
-	public void setMinValue(String minValue)
-	{
-		this.minValue = minValue;
-	}
-
-	public String getViewMetrics()
-	{
-		return viewMetrics;
-	}
-
-	public void setViewMetrics(String viewMetrics)
-	{
-		this.viewMetrics = viewMetrics;
-	}
-
-	public String getViewTable()
-	{
-		return viewTable;
-	}
-
-	public void setViewTable(String viewTable)
-	{
-		this.viewTable = viewTable;
-	}
-
-	public String getViewGraph()
-	{
-		return viewGraph;
-	}
-
-	public void setViewGraph(String viewGraph)
-	{
-		this.viewGraph = viewGraph;
-	}
-
-	public String getCnName()
-	{
-		return cnName;
-	}
-
-	public void setCnName(String cnName)
-	{
-		this.cnName = cnName;
-	}
-
-	public String getEnName()
-	{
-		return enName;
-	}
-
-	public void setEnName(String enName)
-	{
-		this.enName = enName;
-	}
-
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
-
-	public String getDelflag()
-	{
-		return delflag;
-	}
-
-	public void setDelflag(String delflag)
-	{
-		this.delflag = delflag;
-	}
-
-	public String getCreateBy()
-	{
-		return createBy;
-	}
-
-	public void setCreateBy(String createBy)
-	{
-		this.createBy = createBy;
-	}
-
-	public Date getCreateTime()
-	{
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime)
-	{
-		this.createTime = createTime;
-	}
-
-	public String getUpdateBy()
-	{
-		return updateBy;
-	}
-
-	public void setUpdateBy(String updateBy)
-	{
-		this.updateBy = updateBy;
-	}
-
-	public Date getUpdateTime()
-	{
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime)
-	{
-		this.updateTime = updateTime;
-	}
 
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -337,7 +102,7 @@ public class TUiMetrics extends BaseModel implements Serializable {
             .append("cnName", getCnName())
             .append("enName", getEnName())
             .append("status", getStatus())
-            .append("delflag", getDelflag())
+            .append("delflag", getDelFlag())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

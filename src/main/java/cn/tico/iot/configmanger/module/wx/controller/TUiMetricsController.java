@@ -1,16 +1,21 @@
 package cn.tico.iot.configmanger.module.wx.controller;
 
+import cn.tico.iot.configmanger.common.page.TableDataInfo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.TUiMetrics;
 import cn.tico.iot.configmanger.module.wx.services.TUiMetricsService;
 import cn.tico.iot.configmanger.common.base.Result;;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.json.Json;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Lang;
+import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mapl.Mapl;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.POST;
@@ -20,6 +25,9 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 一键寻检数据 信息操作处理
  * 
@@ -50,6 +58,7 @@ public class TUiMetricsController {
 	public Object list(@Param("pageNum")int pageNum,
 					   @Param("pageSize")int pageSize,
 					   @Param("name") String name,
+					   @Param("kindTypeId") String kindTypeId,
 					   @Param("beginTime") Date beginTime,
 					   @Param("endTime") Date endTime,
 					   @Param("orderByColumn") String orderByColumn,
@@ -57,15 +66,20 @@ public class TUiMetricsController {
 					   HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
+			cnd.and("cn_name", "like", "%" + name +"%");
 		}
-		if(Lang.isNotEmpty(beginTime)){
-			cnd.and("create_time",">=", beginTime);
+		if (!Strings.isBlank(kindTypeId)){
+			cnd.and("kind_type_id", "like", "%" + kindTypeId +"%");
 		}
-		if(Lang.isNotEmpty(endTime)){
-			cnd.and("create_time","<=", endTime);
-		}
-		return tUiMetricsService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+
+		Pager pager =new Pager(pageNum,pageSize);
+		List<TUiMetrics> list =tUiMetricsService.dao().queryByJoin (TUiMetrics.class,"",cnd,pager);
+
+		pager.setRecordCount(tUiMetricsService.dao().count(TUiMetrics.class,cnd));
+		TableDataInfo info =new TableDataInfo(list,pager.getRecordCount() );
+		info.setPageCount(pager.getPageCount());
+		return info;
+		 //return tUiMetricsService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
 
 	/**
@@ -141,4 +155,30 @@ public class TUiMetricsController {
 		}
 	}
 
+	/**
+	 * 变更 一键寻检数据
+	 */
+	@At("/change")
+	@Ok("json")
+	public Object change(@Param("id")String id,@Param("name")String name, HttpServletRequest req) {
+		try {
+			 TUiMetrics tUiMetrics=tUiMetricsService.fetch(id);
+			 NutMap map =Json.fromJson(NutMap.class,Json.toJson(tUiMetrics));
+			 Object is = Mapl.cell(Json.toJson(tUiMetrics),name);
+			 if(Lang.isEmpty(is)){
+			 	return Result.success("system.error");
+			 }
+			 if(Strings.equalsIgnoreCase(is.toString(),"true")){
+			 	 Mapl.put(map,name,"false");
+			 }
+			if(Strings.equalsIgnoreCase(is.toString(),"false")){
+				Mapl.put(map,name,"true");
+			}
+			tUiMetrics = Json.fromJson(TUiMetrics.class,Json.toJson(map));
+			tUiMetricsService.update(tUiMetrics);
+			return Result.success("system.success");
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
 }

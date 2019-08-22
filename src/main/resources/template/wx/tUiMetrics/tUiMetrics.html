@@ -2,248 +2,221 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" lang="zh">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
+<link th:href="@{/assets/plugins/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<link th:href="@{/assets/plugins/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+
 <body class="gray-bg">
-    
-     <div class="container-div">
-		<div class="row">
-			<div class="col-sm-12 search-collapse">
-				<form id="formId">
-					<div class="select-list">
-						<ul>
-							<li>
-								指标所属设备类型id：<input type="text" name="kindTypeId"/>
-							</li>
-
-							<li>
-								指标所属设备类型：<input type="text" name="kindType"/>
-							</li>
-
-							<li>
-								指标展示顺序：<input type="text" name="orderNum"/>
-							</li>
-
-							<li>
-								指标单位：<input type="text" name="unit"/>
-							</li>
-
-							<li>
-								展示数据：<input type="text" name="enumTrue"/>
-							</li>
-
-							<li>
-								展示数据：<input type="text" name="enumFalse"/>
-							</li>
-
-							<li>
-								指标最大值：<input type="text" name="maxValue"/>
-							</li>
-
-							<li>
-								指标最小值：<input type="text" name="minValue"/>
-							</li>
-
-							<li>
-								：<input type="text" name="viewMetrics"/>
-							</li>
-
-							<li>
-								：<input type="text" name="viewTable"/>
-							</li>
-
-							<li>
-								：<input type="text" name="viewGraph"/>
-							</li>
-
-							<li>
-								名称：<input type="text" name="cnName"/>
-							</li>
-
-							<li>
-								编码：<input type="text" name="enName"/>
-							</li>
-							<!--
-							<li>
-								状态：<input type="text" name="status"/>
-							</li>
-
-							<li>
-								删除：<input type="text" name="delflag"/>
-							</li>
-
-							<li>
-								创建者：<input type="text" name="createBy"/>
-							</li>
-
-							<li>
-								建立时间：<input type="text" name="createTime"/>
-							</li>
-
-							<li>
-								更新者：<input type="text" name="updateBy"/>
-							</li>
-
-							<li>
-								更新时间：<input type="text" name="updateTime"/>
-							</li>
-							-->
-							<li>
-								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-							</li>
-						</ul>
-					</div>
-				</form>
+<div class="ui-layout-west">
+	<div class="main-content">
+		<div class="box box-main">
+			<div class="box-header">
+				<div class="box-title">
+					<i class="fa icon-grid"></i> 组织机构
+				</div>
+				<div class="box-tools pull-right">
+					<a type="button" class="btn btn-box-tool menuItem" href="#" onclick="dept()" title="类型"><i class="fa fa-edit"></i></a>
+					<button type="button" class="btn btn-box-tool" id="btnExpand" title="展开" style="display:none;"><i class="fa fa-chevron-up"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnCollapse" title="折叠"><i class="fa fa-chevron-down"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新部门"><i class="fa fa-refresh"></i></button>
+				</div>
 			</div>
-			
-	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="wx:tUiMetrics:add">
-					<i class="fa fa-plus"></i> 添加
-				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="wx:tUiMetrics:edit">
-					<i class="fa fa-edit"></i> 修改
-				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="wx:tUiMetrics:remove">
-					<i class="fa fa-remove"></i> 删除
-				</a>
-				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="wx:tUiMetrics:export">
-						<i class="fa fa-download"></i> 导出
-				 </a>-->
-			</div>
-			<div class="col-sm-12 select-table table-striped">
-				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			<div class="ui-layout-content">
+				<div id="tree" class="ztree"></div>
 			</div>
 		</div>
 	</div>
-    <div th:include="include :: footer"></div>
-    <script th:inline="javascript">
-        var prefix = ctx + "wx/tUiMetrics";
+</div>
 
-        $(function() {
-            var options = {
-                url: prefix + "/list",
-                createUrl: prefix + "/add",
-                updateUrl: prefix + "/edit/{id}",
-                removeUrl: prefix + "/remove",
-				exportUrl: prefix + "/export",
-                modalName: "一键寻检数据",
-				search: false,
-		        showExport: true,
-                columns: [{
-		            checkbox: true
-		        },
-				{
-					field : 'id', 
-					title : 'id',
-					visible: false
-				},
-				{
-					field : 'kindTypeId', 
-					title : '指标所属设备类型id',
-					sortable: true
-				},
-				{
-					field : 'kindType', 
-					title : '指标所属设备类型',
-					sortable: true
-				},
-				{
-					field : 'orderNum', 
-					title : '指标展示顺序',
-					sortable: true
-				},
-				{
-					field : 'unit', 
-					title : '指标单位',
-					sortable: true
-				},
-				{
-					field : 'enumTrue', 
-					title : '展示数据',
-					sortable: true
-				},
-				{
-					field : 'enumFalse', 
-					title : '展示数据',
-					sortable: true
-				},
-				{
-					field : 'maxValue', 
-					title : '指标最大值',
-					sortable: true
-				},
-				{
-					field : 'minValue', 
-					title : '指标最小值',
-					sortable: true
-				},
-				{
-					field : 'viewMetrics', 
-					title : '',
-					sortable: true
-				},
-				{
-					field : 'viewTable', 
-					title : '',
-					sortable: true
-				},
-				{
-					field : 'viewGraph', 
-					title : '',
-					sortable: true
-				},
-				{
-					field : 'cnName', 
-					title : '名称',
-					sortable: true
-				},
-				{
-					field : 'enName', 
-					title : '编码',
-					sortable: true
-				},
-				// {
-				// 	field : 'status',
-				// 	title : '状态',
-				// 	sortable: true
-				// },
-				// {
-				// 	field : 'delflag',
-				// 	title : '删除',
-				// 	sortable: true
-				// },
-				// {
-				// 	field : 'createBy',
-				// 	title : '创建者',
-				// 	sortable: true
-				// },
-				// {
-				// 	field : 'createTime',
-				// 	title : '建立时间',
-				// 	sortable: true
-				// },
-				// {
-				// 	field : 'updateBy',
-				// 	title : '更新者',
-				// 	sortable: true
-				// },
-				// {
-				// 	field : 'updateTime',
-				// 	title : '更新时间',
-				// 	sortable: true
-				// },
-		        {
-		            title: '操作',
-		            align: 'center',
-		            formatter: function(value, row, index) {
-		            	var actions = [];
-		            	actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+<div class="container-div ui-layout-center">
+	<div class="row">
+		<div class="col-sm-12 search-collapse">
+			<form id="formId">
+				<input type="hidden" id="kindTypeId" name="kindTypeId">
+				<div class="select-list">
+					<ul>
+
+						<li>
+							名称：<input type="text" name="cnName"/>
+						</li>
+
+
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+
+		<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+			<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="wx:tUiMetrics:add">
+				<i class="fa fa-plus"></i> 新增
+			</a>
+			<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="wx:tUiMetrics:edit">
+				<i class="fa fa-edit"></i> 修改
+			</a>
+			<a class="btn btn-danger btn-del  disabled" onclick="$.operate.removeAll()" shiro:hasPermission="wx:tUiMetrics:remove">
+				<i class="fa fa-remove"></i> 删除
+			</a>
+		</div>
+		<div class="col-sm-12 select-table table-striped">
+			<table id="bootstrap-table" data-mobile-responsive="true"></table>
+		</div>
+	</div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/assets/plugins/jquery-layout/jquery.layout-latest.js}"></script>
+<script th:src="@{/assets/plugins/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+<script th:inline="javascript">
+    // var editFlag = [ [ $ { @permission.hasPermi('system:user:edit')}]];
+    var prefix = ctx + "wx/tUiMetrics";
+
+    $(function() {
+        var panehHidden = false;
+        if ($(this).width() < 769) {
+            panehHidden = true;
+        }
+        $('body').layout({ initClosed: panehHidden, west__size: 185 });
+        //queryUserList();
+        queryDeptTree();
+
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "一键寻检数据",
+            search: false,
+            showExport: true,
+            columns: [
+                {
+                    field: 'id',
+                    title: '',
+                    formatter: function (value,row,index) {
+                        return "<input type='hidden' value='"+row.id+"' />"
+
+                    }
+
+                },
+                {
+                    field : 'cnName',
+                    title : '名称',
+                    sortable: true
+                },
+                {
+                    field : 'enName',
+                    title : '编码',
+                    sortable: true
+                },
+                {
+                    field : 'kind.cnName',
+                    title : '类型',
+                    sortable: true
+                },
+
+                {
+                    field : 'unit',
+                    title : '指标单位',
+                    sortable: true
+                },
+
+                {
+                    field : 'maxValue',
+                    title : '指标最大值',
+                    sortable: true
+                },
+                {
+                    field : 'minValue',
+                    title : '指标最小值',
+                    sortable: true
+                },
+                {
+                    field : 'viewMetrics',
+                    title : '一键寻检',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        if(value=="false"){
+                            return '<span class="badge badge-danger" onclick="change(this)">停用</span>';
+                        }
+                        return '<span class="badge badge-primary" onclick="change(this)">正常</span>';
+                    }
+                },
+                {
+                    field : 'viewTable',
+                    title : '开关状态',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+
+                        if(value=="false"){
+                            return '<span class="badge badge-danger" onclick="change(this)">停用</span>';
+                        }
+                        return '<span class="badge badge-primary" onclick="change(this)">正常</span>';
+                    }
+                },
+                {
+                    field : 'viewGraph',
+                    title : '图表',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        if(value=="false"){
+                            return '<span class="badge badge-danger" onclick="change(this)">停用</span>';
+                        }
+                        return '<span class="badge badge-primary" onclick="change(this)">正常</span>';
+                    }
+                },
+
+
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
                         actions.push('<a class="btn btn-danger btn-xs " href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
-						return actions.join('');
-		            }
-		        }]
-            };
-            $.table.init(options);
-        });
-    </script>
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+    function queryDeptTree()
+    {
+        var url = ctx + "iot/kind/treeDataOrg";
+        var options = {
+            url: url,
+            expandLevel: 2,
+            onClick : zOnClick
+        };
+        $.tree.init(options);
+
+        function zOnClick(event, treeId, treeNode) {
+            $("#kindTypeId").val(treeNode.id);
+            //$("#parentId").val(treeNode.pId);
+            $.table.search();
+        }
+    }
+    function change(it){
+        var id = $(it).parents("tr").find("td>input[type=hidden]").val();
+        var index = $(it).parents("tr").find("td").index($(it).parent());
+        var obj ={9:"ViewGraph"
+                  ,8:"ViewTable"
+        ,7:"ViewMetrics"}
+        $.ajax({
+			url: prefix + "/change?id="+id+"&name="+obj[index],
+            type: "get",
+            success:function (data) {
+                $.table.search();
+            }
+
+		})
+
+
+
+
+	}
+
+</script>
 </body>
 </html>
