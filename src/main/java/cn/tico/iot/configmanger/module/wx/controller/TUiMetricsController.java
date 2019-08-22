@@ -10,6 +10,7 @@ import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
+import org.nutz.lang.Mirror;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Lang;
 import org.nutz.lang.util.NutMap;
@@ -163,20 +164,21 @@ public class TUiMetricsController {
 	public Object change(@Param("id")String id,@Param("name")String name, HttpServletRequest req) {
 		try {
 			 TUiMetrics tUiMetrics=tUiMetricsService.fetch(id);
-			 NutMap map =Json.fromJson(NutMap.class,Json.toJson(tUiMetrics));
-			 Object is = Mapl.cell(Json.toJson(tUiMetrics),name);
+			Mirror<TUiMetrics> mirror = Mirror.me(TUiMetrics.class);
+
+			Object is  = mirror.getValue(tUiMetrics, name);
+
 			 if(Lang.isEmpty(is)){
 			 	return Result.success("system.error");
 			 }
 			 if(Strings.equalsIgnoreCase(is.toString(),"true")){
-			 	 Mapl.put(map,name,"false");
+				 mirror.setValue(tUiMetrics, mirror.getField(name), "false");
 			 }
 			if(Strings.equalsIgnoreCase(is.toString(),"false")){
-				Mapl.put(map,name,"true");
+				mirror.setValue(tUiMetrics, mirror.getField(name), "true");
 			}
-			tUiMetrics = Json.fromJson(TUiMetrics.class,Json.toJson(map));
 			tUiMetricsService.update(tUiMetrics);
-			return Result.success("system.success");
+			return Result.success("system.success",tUiMetrics);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}

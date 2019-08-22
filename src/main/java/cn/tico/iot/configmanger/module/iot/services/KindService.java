@@ -67,6 +67,7 @@ public class KindService extends Service<Kind> {
         if (Strings.isNotBlank(parentId)) {
             cnd.and("parent_id", "=", parentId);
         }
+        cnd.and("level","<","5");
         cnd.and("status", "=", "true");//
         List<Kind> deptList = this.query(cnd);
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
