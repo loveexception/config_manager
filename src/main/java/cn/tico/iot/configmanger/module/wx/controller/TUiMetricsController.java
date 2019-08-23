@@ -231,7 +231,7 @@ public class TUiMetricsController {
 				temp.setKindTypeId(id);
 				temp.setOrderNum(normal.getOrderNum());
 				temp.setCnName(normal.getCnName());
-				temp.setEnName(normal.getOperateKey());
+				temp.setEnName(normal.getEnName());
 				temp.setViewMetrics("false");
 				temp.setViewTable("false");
 				temp.setViewGraph("false");
