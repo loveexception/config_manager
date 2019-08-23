@@ -201,7 +201,7 @@ public class TUiMetricsController {
 			if(Lang.isEmpty(id)){
 				return Result.error(101,"system.error");
 			}
-			Cnd cnd = Cnd.where("kind_id","=",id);
+			Cnd cnd = Cnd.where("kind_id","=",id).and("delflag","=","false");
 			List<Driver> drivers = driverService.query(cnd);
 			if(Lang.isEmpty(drivers)){
 				return Result.error(201,"system.error");
