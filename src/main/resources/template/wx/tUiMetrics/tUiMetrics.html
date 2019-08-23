@@ -57,11 +57,11 @@
 			<a class="btn btn-primary btn-edit " onclick="myexport()" shiro:hasPermission="wx:tUiMetrics:edit">
 				<i class="fa fa-edit"></i>导入
 			</a>
-			<!--
+
 			<a class="btn btn-danger btn-del  disabled" onclick="$.operate.removeAll()" shiro:hasPermission="wx:tUiMetrics:remove">
 				<i class="fa fa-remove"></i> 删除
 			</a>
-			-->
+
 		</div>
 		<div class="col-sm-12 select-table table-striped">
 			<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -93,7 +93,9 @@
             modalName: "一键寻检数据",
             search: false,
             showExport: true,
-            columns: [
+            columns: [{
+                checkbox: true
+            },
                 {
                     field: 'id',
                     title: '',
@@ -203,9 +205,9 @@
     function change(it){
         var id = $(it).parents("tr").find("td>input[type=hidden]").val();
         var index = $(it).parents("tr").find("td").index($(it).parent());
-        var obj ={9:"viewGraph"
-                  ,8:"viewTable"
-        ,7:"viewMetrics"}
+        var obj ={10:"viewGraph"
+                  ,9:"viewTable"
+        ,8:"viewMetrics"}
         $.ajax({
 			url: prefix + "/change?id="+id+"&name="+obj[index],
             type: "get",
