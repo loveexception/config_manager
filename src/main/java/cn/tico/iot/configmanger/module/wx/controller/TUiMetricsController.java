@@ -1,9 +1,11 @@
 package cn.tico.iot.configmanger.module.wx.controller;
 
 import cn.tico.iot.configmanger.common.page.TableDataInfo;
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.module.iot.services.DriverService;
+import cn.tico.iot.configmanger.module.iot.services.KindService;
 import com.google.common.collect.Lists;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.TUiMetrics;
@@ -49,6 +51,9 @@ public class TUiMetricsController {
 
 	@Inject
 	private DriverService driverService;
+
+	@Inject
+	private KindService kindService;
 
 	@RequiresPermissions("wx:tUiMetrics:view")
 	@At("")
@@ -201,7 +206,17 @@ public class TUiMetricsController {
 			if(Lang.isEmpty(id)){
 				return Result.error(101,"system.error");
 			}
-			Cnd cnd = Cnd.where("kind_id","=",id).and("delflag","=","false");
+			Cnd cnd = Cnd.NEW();
+
+			List<Kind> kinds = kindService.query(Cnd.where("parent_id","=",id));
+			Kind kind = kindService.fetch(id);
+			kinds.add(kind);
+			List<String> inkinds = Lists.newArrayList();
+			for (int i = 0; i < kinds.size(); i++) {
+				inkinds.add(kinds.get(i).getId());
+			}
+			cnd.and("kindid","in",inkinds);
+			cnd.and("delflag","=","false");
 			List<Driver> drivers = driverService.query(cnd);
 			if(Lang.isEmpty(drivers)){
 				return Result.error(201,"system.error");
