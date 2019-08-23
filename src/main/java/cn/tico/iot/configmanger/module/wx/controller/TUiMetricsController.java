@@ -49,6 +49,7 @@ public class TUiMetricsController {
 	@Inject
 	private TUiMetricsService tUiMetricsService;
 
+
 	@Inject
 	private DriverService driverService;
 
@@ -228,7 +229,7 @@ public class TUiMetricsController {
 				TUiMetrics temp = new TUiMetrics();
 				Normal normal =normals.get(i);
 				temp.setKindTypeId(id);
-				temp.setOrderNum(new Long(i));
+				temp.setOrderNum(normal.getOrderNum());
 				temp.setCnName(normal.getCnName());
 				temp.setEnName(normal.getOperateKey());
 				temp.setViewMetrics("false");
