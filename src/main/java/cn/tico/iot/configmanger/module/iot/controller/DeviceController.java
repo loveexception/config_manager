@@ -13,6 +13,7 @@ import cn.tico.iot.configmanger.module.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
+import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -500,14 +501,26 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object updataDrivers(@Param("data")List<Device> devices
+	public Object updataDrivers(@Param("data")List<String> deviceids
 			,@Param("driverid") String driverid
 			,HttpServletRequest req ){
 
 
+		Cnd cnd = Cnd.NEW();
 
+		cnd.and("id","in",deviceids	);
 
-		return  Result.success("system.success",devices);
+		List<Device> devices = deviceService.query(cnd);
+		List<Device> result = Lists.newArrayList();
+		for (int i = 0; i < deviceids.size(); i++) {
+			Device device = devices.get(i);
+			device.setDriverid(driverid);
+			device = deviceService.extAttr(device);
+			result.add(device);
+		}
+		deviceService.update(result);
+
+		return  Result.success("system.success",result);
 	}
 
 
