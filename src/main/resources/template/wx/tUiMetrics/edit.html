@@ -21,7 +21,8 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label">类型：</label>
 			<div class="col-sm-8">
-				<span >${tUiMetrics.kind.cnName}</span>
+				<input class="form-control" th:value="tUiMetrics.kindType" type="text" name="kindType" onclick="selectDeptTree()" readonly="true" id="treeName">
+				<input class="form-control" type="hidden" name="kindTypeId" th:value="${tUiMetrics.kindTypeId}" readonly="true" id="treeId">
 			</div>
 		</div>
 
