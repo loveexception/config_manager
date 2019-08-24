@@ -45,7 +45,7 @@ public class TUiMetrics extends I18NModel implements Serializable {
 			/** 指标单位 */
 	@Column("unit")
 	@Comment("指标单位")
-	private Long unit;
+	private String unit;
 
 			/** 展示数据 */
 	@Column("enum_true")

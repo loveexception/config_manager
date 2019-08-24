@@ -83,6 +83,34 @@ public class TagController implements AdminKey {
 		return tagService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
 
+	/**
+	 * 查询业务列表
+	 */
+
+	@At("/tag_page")
+	@Ok("json")
+	public Object page(@Param("pageNum")int pageNum,
+					   @Param("pageSize")int pageSize,
+					   @Param("name") String name,
+					   @Param("orderByColumn") String orderByColumn,
+					   @Param("isAsc") String isAsc,
+					   HttpServletRequest req) {
+		Cnd cnd = Cnd.NEW();
+		if (!Strings.isBlank(name)){
+			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
+			cnd.and(group);
+		}
+
+		if(!isAdmin()){
+			SqlExpressionGroup
+					group = Cnd
+					.exps("dept_id", "=", DEPT_ADMIN)
+					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+			cnd.and(group);
+		}
+		Object obj =  tagService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+		return Result.success("system.success",obj);
+	}
 
 	/**
 	 * 用户权限
