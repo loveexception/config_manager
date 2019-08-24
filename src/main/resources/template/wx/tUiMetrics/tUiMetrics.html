@@ -212,7 +212,7 @@
 			url: prefix + "/change?id="+id+"&name="+obj[index],
             type: "get",
             success:function (data) {
-                $.table.search();
+                $.table.refresh();
             }
 
 		});
@@ -238,6 +238,7 @@
 
         });
     }
+
 
 </script>
 </body>
