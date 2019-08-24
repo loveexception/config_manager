@@ -124,6 +124,7 @@ public class DeviceController implements AdminKey {
 
 		cnd.and(group);
 		cnd.and("delflag", "=", "false");
+
 		// cnd.and("asset_status","=","0");
 		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver|gateway|tags$");
 
@@ -494,6 +495,20 @@ public class DeviceController implements AdminKey {
 		return  Result.success("system.success",device);
 	}
 
+
+	@At("/drivers_update")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object updataDrivers(@Param("data")List<Device> devices
+			,@Param("driverid") String driverid
+			,HttpServletRequest req ){
+
+
+
+
+		return  Result.success("system.success",devices);
+	}
 
 
 }

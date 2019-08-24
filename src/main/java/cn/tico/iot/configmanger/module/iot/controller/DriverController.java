@@ -79,11 +79,13 @@ public class DriverController implements AdminKey {
 	public Object driverPage(
 			@Param("pageNum")int pageNum
 			, @Param("pageSize")int pageSize
+			, @Param("orderByColumn") String orderByColumn
+			, @Param("isAsc") String isAsc
 			, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		cnd.and("delflag","=","false");
 
-		Object obj =  driverService.tableList(pageNum,pageSize,cnd,"updateTime","desc","^kind|normals$");
+		Object obj =  driverService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"^kind|normals$");
 
 		return Result.success("system.success" ,obj);
 	}
