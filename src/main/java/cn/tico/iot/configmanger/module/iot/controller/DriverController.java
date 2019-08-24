@@ -71,6 +71,22 @@ public class DriverController implements AdminKey {
 		cnd.and("delflag","=","false");
 		return driverService.tableList(0,1000,cnd,"updateTime","desc","^kind|normals$");
 	}
+	/**
+	 * 查询业务列表
+	 */
+	@At("/driver_page")
+	@Ok("json")
+	public Object driverPage(
+			@Param("pageNum")int pageNum
+			, @Param("pageSize")int pageSize
+			, HttpServletRequest req) {
+		Cnd cnd = Cnd.NEW();
+		cnd.and("delflag","=","false");
+
+		Object obj =  driverService.tableList(pageNum,pageSize,cnd,"updateTime","desc","^kind|normals$");
+
+		return Result.success("system.success" ,obj);
+	}
 
 	/**
 	 * 包起来
