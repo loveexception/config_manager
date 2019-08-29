@@ -11,6 +11,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.log.Logs;
 
 import java.util.Arrays;
 import java.util.Properties;
@@ -59,11 +60,11 @@ public  class KafkaBlock  {
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(1000);
             for (ConsumerRecord<String, String> record : records) {
-//                System.out.printf("%s [%d] offset=%d, key=%s, value=\"%s\"\n",
-//								  record.topic(), record.partition(),
-//								  record.offset(), record.key(), record.value());
-                block.exec(topic,record.key(),record.value(),record.offset());
-
+                try {
+                    block.exec(topic, record.key(), record.value(), record.offset());
+                }catch (Exception e){
+                    Logs.get().debug(e);
+                }
 
 			}
         }
