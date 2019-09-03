@@ -551,8 +551,13 @@ public class DeviceController implements AdminKey {
 		for (int i = 0; i < deviceids.size(); i++) {
 			Device device = devices.get(i);
 			device = deviceService.extAttr(device);
+			if(Lang.isEmpty(device.getTags())){
+				device.setTags(new ArrayList<Tag>());
+			}
+			device.getTags().add(tag);
+
 			result.add(device);
-			deviceService.dao().insertWith(device, "tags");
+			deviceService.dao().insertRelation(device, "tags");
 
 		}
 		deviceService.update(result);
