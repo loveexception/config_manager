@@ -88,15 +88,21 @@ class ListBox extends React.PureComponent {
 				title: '更新时间',
 				dataIndex: 'updateTime'
 			}
-		]
+		],
+		table_search: {
+			total: 0,
+			pageSize: 10,
+			pageNum: 1
+		}
 	};
 	componentDidMount() {
 		this.init();
 	}
 	init = () => {
+		let { pageNum, pageSize } = this.state.table_search || {};
 		this.setState({ loading: true });
 		$.ajax({
-			url: '/iot/driver/driver_list',
+			url: `/iot/driver/driver_page?pageNum=${pageNum}&pageSize=${pageSize}&orderByColumn=updateTime&isAsc=desc`,
 			// data: {},
 			cache: false,
 			contentType: false,
@@ -108,14 +114,16 @@ class ListBox extends React.PureComponent {
 					this.setState({ loading: false });
 					return;
 				}
+				let data = results.data || [];
+				let { total } = data;
 				this.setState({
-					old_data: results.rows,
-					data: results.rows,
-					loading: false
+					loading: false,
+					data: data.rows || [],
+					table_search: {
+						...this.state.table_search,
+						total: total
+					}
 				});
-			},
-			error: () => {
-				this.setState({ loading: false });
 			}
 		});
 	};
@@ -166,7 +174,7 @@ class ListBox extends React.PureComponent {
 				}
 			}
 		];
-		let { data = [] } = this.state;
+		let { data = [], table_search = {} } = this.state;
 		return (
 			<div className="drive-list-body">
 				<div className="drive-list-content">
@@ -236,7 +244,24 @@ class ListBox extends React.PureComponent {
 					dataSource={data}
 					scroll={{ x: '150%' }}
 					pagination={{
-						simple: true
+						current: table_search.pageNum,
+						total: table_search.total,
+						pageSize: table_search.pageSize,
+						simple: true,
+						onChange: (page, pageSize) => {
+							this.setState(
+								{
+									table_search: {
+										...this.state.table_search,
+										pageNum: page,
+										pageSize
+									}
+								},
+								() => {
+									this.init();
+								}
+							);
+						}
 					}}
 				/>
 			</div>

@@ -65,7 +65,7 @@ var xhrOnProgress = function(fun) {
 	};
 };
 
-let { Table, Select, Button, Input, Icon, Cascader, Dropdown, Menu, message, Modal } = antd;
+let { Table, Select, Button, Input, Icon, Cascader, Dropdown, Menu, message, Modal, Radio, Pagination } = antd;
 class ListBox extends React.PureComponent {
 	state = {
 		data: [],
@@ -180,7 +180,8 @@ class ListBox extends React.PureComponent {
 			pageNum: 1
 		},
 		upload_visible: false,
-		loading: false
+		loading: false,
+		selectedRowKeys: []
 	};
 	componentDidMount() {
 		this.getSelectList();
@@ -190,7 +191,7 @@ class ListBox extends React.PureComponent {
 		let { pageNum, pageSize } = this.state.table_search || {};
 		this.setState({ loading: true });
 		$.ajax({
-			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}`,
+			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}&orderByColumn=updateTime&isAsc=desc`,
 			// data: {},
 			cache: false,
 			contentType: false,
@@ -263,10 +264,12 @@ class ListBox extends React.PureComponent {
 	};
 
 	render = () => {
-		let { data = [], columns = [], select_list = [], cascader_list = [], table_search = {} } = this.state;
+		let { data = [], columns = [], select_list = [], cascader_list = [], table_search = {}, selectedRowKeys } = this.state;
 		const rowSelection = {
 			onChange: (selectedRowKeys, selectedRows) => {
-				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+				this.setState({
+					selectedRowKeys
+				});
 			},
 			getCheckboxProps: record => ({
 				disabled: record.name === 'Disabled User', // Column configuration not to be checked
@@ -284,10 +287,70 @@ class ListBox extends React.PureComponent {
 				{/* <Menu.Item>
 					<span>模版下载</span>
 				</Menu.Item> */}
-				<Menu.Item>
+				<Menu.Item
+					onClick={() => {
+						if (_.isEmpty(selectedRowKeys)) {
+							message.info('请选择设备', 0.5);
+							return;
+						}
+						Modal.confirm({
+							width: '75%',
+							title: '驱动列表',
+							content: <PublicList ref={el => (this.device_list = el)} url="/iot/driver/driver_page" />,
+							okText: '确认',
+							cancelText: '取消',
+							onOk: close => {
+								if (this.device_list) {
+									let { state = {} } = this.device_list;
+									let { value } = state;
+									if (_.isEmpty(value)) {
+										message.info('请选择驱动', 0.5);
+										return;
+									}
+									let params = {
+										data: selectedRowKeys,
+										driverid: value
+									};
+									console.log(params);
+								}
+								// close();
+							}
+						});
+					}}
+				>
 					<span>更新驱动</span>
 				</Menu.Item>
-				<Menu.Item>
+				<Menu.Item
+					onClick={() => {
+						if (_.isEmpty(selectedRowKeys)) {
+							message.info('请选择设备', 0.5);
+							return;
+						}
+						Modal.confirm({
+							width: '75%',
+							title: '业务类型列表',
+							content: <PublicList ref={el => (this.tag_list = el)} url="/iot/tag/list" />,
+							okText: '确认',
+							cancelText: '取消',
+							onOk: close => {
+								if (this.tag_list) {
+									let { state = {} } = this.tag_list;
+									let { value } = state;
+									if (_.isEmpty(value)) {
+										message.info('请选择驱动', 0.5);
+										return;
+									}
+									let params = {
+										data: selectedRowKeys,
+										driverid: value
+									};
+									console.log(params);
+								}
+								// close();
+							}
+						});
+					}}
+				>
 					<span>添加业务类型</span>
 				</Menu.Item>
 				<Menu.Item>
@@ -419,6 +482,7 @@ class ListBox extends React.PureComponent {
 					</div>
 				</div>
 				<Table
+					rowKey={record => record.id}
 					loading={this.state.loading}
 					bordered
 					rowSelection={rowSelection}
@@ -436,7 +500,7 @@ class ListBox extends React.PureComponent {
 									table_search: {
 										...this.state.table_search,
 										pageNum: page,
-										pageSize
+										page_size
 									}
 								},
 								() => {
@@ -444,17 +508,7 @@ class ListBox extends React.PureComponent {
 								}
 							);
 						}
-						// showQuickJumper: true,
 					}}
-					// pagination={{
-					// 	current: 1,
-					// 	pageSize: 10,
-					// 	total: 10,
-					// 	simple: true,
-					// 	onChange: (page, pageSize) => {
-					// 		console.log(page, pageSize);
-					// 	}
-					// }}
 				/>
 				<Modal
 					className="device-upload-modal"
@@ -477,6 +531,100 @@ class ListBox extends React.PureComponent {
 		);
 	};
 }
+
+class PublicList extends React.PureComponent {
+	state = {
+		value: null,
+		data: [],
+		table_search: {
+			total: 0,
+			pageSize: 10,
+			pageNum: 1
+		}
+	};
+	componentDidMount() {
+		this.init();
+	}
+	init = () => {
+		let { pageNum, pageSize } = this.state.table_search || {};
+		if (_.isEmpty(this.props.url)) {
+			return;
+		}
+		$.ajax({
+			url: `${this.props.url}?pageNum=${pageNum}&pageSize=${pageSize}&orderByColumn=updateTime&isAsc=desc`,
+			// data: {},
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'GET',
+			success: results => {
+				if (results.code != 0) {
+					message.error('接口错误');
+					return;
+				}
+				let data = results.data || [];
+				let { total } = data;
+				this.setState({
+					data: data.rows || [],
+					table_search: {
+						...this.state.table_search,
+						total: total
+					}
+				});
+			}
+		});
+	};
+	render() {
+		let { data = [], table_search = {} } = this.state;
+		return (
+			<div className="devier-list-box">
+				<Radio.Group
+					className="radio-list"
+					value={this.state.value}
+					onChange={e => {
+						this.setState({
+							value: e.target.value
+						});
+					}}
+				>
+					{data.map((item, index) => {
+						let bool = (index + 1) % 4 == 0;
+						return [
+							<Radio.Button key={`radio_${index}`} value={item.id} className="radio-li">
+								{item.cnName}
+							</Radio.Button>,
+							bool && <br key={`br_${index}`} />
+						];
+					})}
+				</Radio.Group>
+				<Pagination
+					className="pagination-list"
+					{...{
+						current: table_search.pageNum,
+						total: table_search.total,
+						pageSize: table_search.pageSize,
+						simple: true,
+						onChange: (page, pageSize) => {
+							this.setState(
+								{
+									table_search: {
+										...this.state.table_search,
+										pageNum: page,
+										pageSize
+									}
+								},
+								() => {
+									this.init();
+								}
+							);
+						}
+					}}
+				/>
+			</div>
+		);
+	}
+}
+
 class ImportFile extends React.PureComponent {
 	state = {
 		file: {}
