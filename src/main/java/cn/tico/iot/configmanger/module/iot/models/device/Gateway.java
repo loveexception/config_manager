@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.module.iot.models.DeviceEnvModel;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
+import org.nutz.lang.Lang;
 
 @Data
 @Table("t_iot_gateways")
@@ -51,6 +52,15 @@ public class Gateway extends DeviceEnvModel {
     @GraphQLQuery(name = "subgateway", description = "注册绑定")
     private SubGateway subGateway;
 
+    public String isHaveSno(){
+        if(Lang.isEmpty(subGateway)){
+            return "";
+        }
+
+        return subGateway.getExtSno();
+
+
+    }
 
 
 

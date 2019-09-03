@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger;
 import cn.tico.iot.configmanger.common.base.Globals;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.TreeUtils;
+import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
@@ -13,7 +14,6 @@ import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.nutz.boot.NbApp;
 import org.nutz.conf.NutConf;
 import org.nutz.dao.Dao;
-import org.nutz.dao.util.Daos;
 import org.nutz.el.opt.RunMethod;
 import org.nutz.el.opt.custom.CustomMake;
 import org.nutz.ioc.Ioc;
@@ -48,6 +48,9 @@ public class MainLauncher {
 
     @Inject
     protected KafkaBlock block;
+
+    @Inject
+    public GatewayBlock gatewayBlock;
 
     @Inject
     private UserService userService;
@@ -107,9 +110,10 @@ public class MainLauncher {
             }
         });
         // 创建数据库
-        Daos.createTablesInPackage(dao, "cn.tico.iot", false);
-//        block.init();
-//        block.consume("register", gatewayBlock);
+        //Daos.createTablesInPackage(dao, "cn.tico.iot", false);
+        block.init();
+        new Thread(()->block.consume("register", gatewayBlock)).start();
+        ;
     }
 
     public void depose() {

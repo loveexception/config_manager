@@ -523,5 +523,29 @@ public class DeviceController implements AdminKey {
 		return  Result.success("system.success",result);
 	}
 
+	@At("/drivers_Tags")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object updataTags(@Param("data")List<String> deviceids
+			,@Param("driverid") String driverid
+			,HttpServletRequest req ){
 
+
+		Cnd cnd = Cnd.NEW();
+
+		cnd.and("id","in",deviceids	);
+
+		List<Device> devices = deviceService.query(cnd);
+		List<Device> result = Lists.newArrayList();
+		for (int i = 0; i < deviceids.size(); i++) {
+			Device device = devices.get(i);
+			device.setDriverid(driverid);
+			device = deviceService.extAttr(device);
+			result.add(device);
+		}
+		deviceService.update(result);
+
+		return  Result.success("system.success",result);
+	}
 }

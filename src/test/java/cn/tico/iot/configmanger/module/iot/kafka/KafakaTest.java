@@ -13,6 +13,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.Test;
+import org.nutz.ioc.Ioc;
 
 
 public class KafakaTest {
@@ -103,4 +104,29 @@ public class KafakaTest {
                         record.offset(), record.key(), record.value());
         }
     }
+
+//    @Test
+//    public void testALLSNO(){
+//
+//        String topic = "config";//args[0].toString();
+//        String group = "config_manager";//args[1].toString();
+//        Properties props = new Properties();
+//        props.put("bootstrap.servers", "172.16.16.9:9092");
+//        props.put("group.id", group);
+//        props.put("enable.auto.commit", "true");
+//
+//        props.put("auto.commit.interval.ms", "100000");
+//
+//        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+//
+//        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+//
+//
+//       KafkaProducer<String,String>         producer = new KafkaProducer<>(props);
+//
+//        Dao dao = Ioc.
+//
+//        producer.send(new ProducerRecord<>(topic, "sno",value));
+//
+//    }
 }

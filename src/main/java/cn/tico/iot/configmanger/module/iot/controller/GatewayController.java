@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.GatewayService;
@@ -53,6 +54,9 @@ public class GatewayController implements AdminKey {
 	@Inject
 	private DeptService deptService;
 
+	@Inject
+	public KafkaBlock kafkaBlock;
+
 	@RequiresPermissions("iot:gateway:view")
 	@At("")
 	@Ok("th:/iot/gateway/list.html")
@@ -78,7 +82,6 @@ public class GatewayController implements AdminKey {
 					   HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
 			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
 			cnd.and(group);
 		}
@@ -149,6 +152,10 @@ public class GatewayController implements AdminKey {
 	public Object addDo(@Param("..") Gateway gateway, HttpServletRequest req) {
 		try {
 			gatewayService.insertEntity(gateway);
+			//TODO： 注册并敲钟
+
+			//kafkaBlock.produce(kafkaBlock.TOPIC,kafkaBlock.EXTSNO,);
+
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -177,9 +184,12 @@ public class GatewayController implements AdminKey {
 	public Object editDo(@Param("..") Gateway gateway, HttpServletRequest req) {
 		try {
 			if(Lang.isNotEmpty(gateway)){
-
 				gatewayService.updateEntity(gateway);
+				//TODO： 注册并敲钟
+
+				//kafkaBlock.produce(kafkaBlock.TOPIC,kafkaBlock.EXTSNO,);
 			}
+
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -196,6 +206,8 @@ public class GatewayController implements AdminKey {
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
 			gatewayService.vDelete(ids);
+			//TODO: 删除钟声
+			// kafkaBlock.produce(kafkaBlock.TOPIC,kafkaBlock.EXTSNO,);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -214,7 +226,7 @@ public class GatewayController implements AdminKey {
 	}
 
 	/**
-	 * 删除网关
+	 * 网关
 	 */
 	@At("/subgateway")
 	@Ok("json")
@@ -227,6 +239,8 @@ public class GatewayController implements AdminKey {
 									   HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
+		cnd.and("status","=","true");
+		cnd.and("delflag","=","false");
 
 
 		Object obj =gatewayService.selectSub(pageNum,pageSize,cnd,orderByColumn,isAsc,null);

@@ -47,6 +47,12 @@ public class GatewayService extends Service<Gateway> {
 		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
 		return forup.update(gateway);
 	}
+	public int updateEntityRobot(Gateway gateway) {
+		gateway.setUpdateBy("0");
+		gateway.setUpdateTime(new Date());
+		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
+		return forup.update(gateway);
+	}
 
 	public Object selectSub(int pageNumber, int pageSize,Cnd cnd,String orderByColumn,String isAsc,String linkname) {
 

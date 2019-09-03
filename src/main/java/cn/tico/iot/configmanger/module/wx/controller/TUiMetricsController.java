@@ -129,6 +129,7 @@ public class TUiMetricsController {
 	@Ok("th://wx/tUiMetrics/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		TUiMetrics tUiMetrics = tUiMetricsService.fetch(id);
+		tUiMetrics = tUiMetricsService.fetchLinks(tUiMetrics,"kind");
 		req.setAttribute("tUiMetrics",tUiMetrics);
 	}
 

@@ -1,20 +1,15 @@
 package cn.tico.iot.configmanger.module.iot.models.device;
 
+import cn.tico.iot.configmanger.module.iot.bean.CommonModel;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
 @Data
 @Table("t_iot_sub_gateways")
-public class SubGateway  {
+public class SubGateway extends CommonModel {
 
-    @Name
-    @Column("id")
-    @Comment
-    @ColDefine(type = ColType.VARCHAR, width = 32)
-    @Prev(els = {@EL("uuid()")})
-    @GraphQLQuery
-    private String id;
+
 
     /**
      * SNO 机器码
@@ -29,10 +24,39 @@ public class SubGateway  {
      * SNO  外网IP
      */
     @Column("ext_ip")
-    @Comment("机器码")
+    @Comment("外网IP")
     @ColDefine(type = ColType.VARCHAR, width = 32)
-    @GraphQLQuery(name = "ext_ip", description = "机器码")
+    @GraphQLQuery(name = "ext_ip", description = "外网IP")
     private String extip;
+
+    /**
+     * SNO  内网IP
+     */
+    @Column("ip")
+    @Comment("内网IP")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "ip", description = "内网IP")
+    private String ip;
+
+    /**
+     * contrl_device_api_port  外网控制端口
+     */
+    @Column("port")
+    @Comment("外网控制端口")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @GraphQLQuery(name = "port", description = "外网控制端口")
+    private String port;
+
+    /**
+     * contrl_device_api_uri  外网控制接口
+     */
+    @Column("api")
+    @Comment("外网控制接口")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    @GraphQLQuery(name = "api", description = "外网控制接口")
+    private String api;
+
+
 
 
 
