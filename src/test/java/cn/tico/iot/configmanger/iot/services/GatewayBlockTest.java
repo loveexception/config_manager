@@ -1,7 +1,9 @@
 package cn.tico.iot.configmanger.iot.services;
 
-import cn.tico.iot.configmanger.SimpleMainLauncher;
+import cn.tico.iot.configmanger.MainLauncher;
 import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
+import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
+import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import org.junit.Assert;
@@ -9,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nutz.boot.NbApp;
 import org.nutz.boot.test.junit4.NbJUnit4Runner;
+import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.util.Daos;
 import org.nutz.ioc.Ioc;
@@ -16,6 +19,8 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
 import org.nutz.lang.util.NutMap;
+
+import java.util.List;
 
 @IocBean(create = "init")
 @RunWith(NbJUnit4Runner.class)
@@ -32,9 +37,12 @@ public class GatewayBlockTest extends Assert {
     @Inject
     GatewayBlock block ;
 
+    @Inject
+    KafkaBlock kafkaBlock;
+
     public static NbApp createNbApp() {
 
-        return new NbApp().setMainClass(SimpleMainLauncher.class).setPrintProcDoc(false);
+        return new NbApp().setMainClass(MainLauncher.class).setPrintProcDoc(false);
     }
 
     public void init(){
@@ -66,4 +74,23 @@ public class GatewayBlockTest extends Assert {
         assertEquals(gateway.getIp(),"2.2.2.2");
 
     }
+
+    @Test
+    public void AllSnoZhong() {
+        Cnd cnd = Cnd.NEW();
+
+        cnd.and("status","=","true");
+        cnd.and("delflag","=","false");
+
+        List<Device> devices =  dao.query(Device.class ,cnd);
+
+        System.out.println(devices);
+        assertEquals(5,devices.size());
+        for (int i = 0; i < devices.size(); i++) {
+            kafkaBlock.produce("config","sno",devices.get(i).getSno());
+        }
+
+
+    }
+
 }

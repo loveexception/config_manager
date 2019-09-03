@@ -67,6 +67,11 @@ public  class KafkaBlock  {
                 }
 
 			}
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                Logs.get().error(e);
+            }
         }
     }
 

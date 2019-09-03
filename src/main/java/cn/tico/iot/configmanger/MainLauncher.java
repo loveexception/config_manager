@@ -112,7 +112,8 @@ public class MainLauncher {
         // 创建数据库
         //Daos.createTablesInPackage(dao, "cn.tico.iot", false);
         block.init();
-        block.consume("register", gatewayBlock);
+        new Thread(()->block.consume("register", gatewayBlock)).start();
+        ;
     }
 
     public void depose() {

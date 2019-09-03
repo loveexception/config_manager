@@ -45,7 +45,7 @@ public class GatewayBlock implements Block {
         Gateway gateway = haveSnoGateway(subGateway);
 
         if(Lang.isEmpty(gateway)){
-           // subGatewayService.insertEntity(subGateway);
+            subGatewayService.insertEntity(subGateway);
             return subGateway;
         }
         if(Strings.isNotBlank(gateway.getSubid())){
@@ -73,7 +73,7 @@ public class GatewayBlock implements Block {
 
         gateway.setSubid(subGateway.getId());
 
-        gateway.setGitPath(conf.get("gitpath")+"/"+extsno);
+        //gateway.setGitPath(conf.get("gitpath")+"/"+extsno);
 
 
         gatewayService.updateEntityRobot(gateway);
