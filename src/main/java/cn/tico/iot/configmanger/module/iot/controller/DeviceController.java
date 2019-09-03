@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.excel.ImportExcel;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.iot.models.device.*;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.iot.models.driver.Grade;
@@ -75,6 +76,9 @@ public class DeviceController implements AdminKey {
 
 	@Inject
     private KafkaBlock kafkaBlock;
+
+	@Inject
+	private TagService tagService;
 
 	@RequiresPermissions("iot:device:view")
 	@At("")
@@ -523,12 +527,12 @@ public class DeviceController implements AdminKey {
 		return  Result.success("system.success",result);
 	}
 
-	@At("/drivers_Tags")
+	@At("/drivers_tags")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object updataTags(@Param("data")List<String> deviceids
-			,@Param("driverid") String driverid
+			,@Param("tags") String[] tagids
 			,HttpServletRequest req ){
 
 
@@ -536,11 +540,18 @@ public class DeviceController implements AdminKey {
 
 		cnd.and("id","in",deviceids	);
 
+
 		List<Device> devices = deviceService.query(cnd);
+		cnd = Cnd.NEW();
+		cnd.and("id","in",tagids);
+		List<Tag> tags = tagService.query(cnd);
+
+
+
 		List<Device> result = Lists.newArrayList();
 		for (int i = 0; i < deviceids.size(); i++) {
 			Device device = devices.get(i);
-			device.setDriverid(driverid);
+			device.setTags(tags);
 			device = deviceService.extAttr(device);
 			result.add(device);
 		}

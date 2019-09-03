@@ -82,7 +82,20 @@ public class TagController implements AdminKey {
 		//cnd.and("del_flag","=",false);
 		return tagService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
-
+	/**
+	 * 查询业务列表
+	 */
+	@At
+	@Ok("json")
+	public Object tags(@Param("pageNum")int pageNum,
+					   @Param("pageSize")int pageSize,
+					   @Param("name") String name,
+					   @Param("orderByColumn") String orderByColumn,
+					   @Param("isAsc") String isAsc,
+					   HttpServletRequest req) {
+		Object obj = list(pageNum,pageSize,name,orderByColumn,isAsc,req);
+		return Result.success("system.success",obj);
+	}
 	/**
 	 * 查询业务列表
 	 */
