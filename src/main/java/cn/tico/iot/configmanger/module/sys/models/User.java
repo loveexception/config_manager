@@ -28,7 +28,12 @@ public class User extends BaseModel implements Serializable {
     @Column("dept_id")
     @Comment("部门ID")
     private String deptId;
-
+    /**
+     * 地区ID
+     */
+    @Column("location_id")
+    @Comment("地区ID")
+    private String locationId;
     /**
      * 部门父ID
      */
@@ -192,6 +197,10 @@ public class User extends BaseModel implements Serializable {
     public void setDeptId(String deptId) {
         this.deptId = deptId;
     }
+
+    public String getLocationId(){return locationId;}
+
+    public void setLocationId(String locationId){this.locationId = locationId; }
 
     public String getParentId() {
         return parentId;

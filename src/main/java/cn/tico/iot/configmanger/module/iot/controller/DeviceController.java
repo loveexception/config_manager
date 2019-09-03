@@ -532,7 +532,7 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object updataTags(@Param("data")List<String> deviceids
-			,@Param("tags") String[] tagids
+			,@Param("tagid") String tagid
 			,HttpServletRequest req ){
 
 
@@ -542,18 +542,18 @@ public class DeviceController implements AdminKey {
 
 
 		List<Device> devices = deviceService.query(cnd);
-		cnd = Cnd.NEW();
-		cnd.and("id","in",tagids);
-		List<Tag> tags = tagService.query(cnd);
+
+		Tag tag = tagService.fetch(tagid);
 
 
 
 		List<Device> result = Lists.newArrayList();
 		for (int i = 0; i < deviceids.size(); i++) {
 			Device device = devices.get(i);
-			device.setTags(tags);
 			device = deviceService.extAttr(device);
 			result.add(device);
+			deviceService.dao().insertWith(device, "tags");
+
 		}
 		deviceService.update(result);
 

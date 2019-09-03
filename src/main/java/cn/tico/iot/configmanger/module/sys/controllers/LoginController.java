@@ -11,6 +11,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.util.NutMap;
 import org.nutz.mvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +57,13 @@ public class LoginController {
             AsyncManager.me().execute(asyncFactory.recordLogininfor(user.getLoginName(), true,"登录成功"));
             userService.recordLoginInfo(user);
 
-            return Result.success("login.success");
+            NutMap map = NutMap.NEW();
+            map.addv("dept",user.getDeptId());
+            map.addv("id",user.getId());
+            map.addv("location",user.getLocationId());
+            map.addv("loginname",user.getLoginName());
+
+            return Result.success("login.success",map );
         } catch (LockedAccountException e) {
             AsyncManager.me().execute(asyncFactory.recordLogininfor(username, false,"账号锁定"));
             return Result.error(3, "login.error.locked");
