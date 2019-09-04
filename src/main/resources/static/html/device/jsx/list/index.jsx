@@ -143,24 +143,25 @@ class ListBox extends React.PureComponent {
 							</Button>
 							<Button
 								onClick={() => {
-									$.ajax({
-										cache: true,
-										type: 'POST',
-										url: '/iot/device/device_remove',
-										data: JSON.stringify({
-											id: record.id
-										}),
-										dataType: 'json',
-										async: false,
-										success: results => {
-											if (results.code != 0) {
-												message.error('接口错误');
-												return;
+									if (record.id) {
+										$.ajax({
+											cache: true,
+											type: 'POST',
+											url: '/iot/device/device_remove',
+											data: JSON.stringify({
+												id: record.id
+											}),
+											dataType: 'json',
+											async: false,
+											success: results => {
+												if (results.code != 0) {
+													message.error('接口错误');
+													return;
+												}
+												this.getTable();
 											}
-
-											this.getTable();
-										}
-									});
+										});
+									}
 								}}
 							>
 								删除
@@ -311,9 +312,25 @@ class ListBox extends React.PureComponent {
 										data: selectedRowKeys,
 										driverid: value
 									};
-									console.log(params);
+									$.ajax({
+										cache: true,
+										type: 'POST',
+										url: '/iot/device/drivers_update',
+										data: JSON.stringify({
+											...params
+										}),
+										dataType: 'json',
+										async: false,
+										success: results => {
+											if (results.code != 0) {
+												message.error('接口错误');
+												return;
+											}
+											close();
+											this.getTable();
+										}
+									});
 								}
-								// close();
 							}
 						});
 					}}
@@ -329,7 +346,7 @@ class ListBox extends React.PureComponent {
 						Modal.confirm({
 							width: '75%',
 							title: '业务类型列表',
-							content: <PublicList ref={el => (this.tag_list = el)} url="/iot/tag/list" />,
+							content: <PublicList ref={el => (this.tag_list = el)} url="/iot/tag/tags" />,
 							okText: '确认',
 							cancelText: '取消',
 							onOk: close => {
@@ -337,16 +354,32 @@ class ListBox extends React.PureComponent {
 									let { state = {} } = this.tag_list;
 									let { value } = state;
 									if (_.isEmpty(value)) {
-										message.info('请选择驱动', 0.5);
+										message.info('请选择业务类型', 0.5);
 										return;
 									}
 									let params = {
 										data: selectedRowKeys,
-										driverid: value
+										tagid: value
 									};
-									console.log(params);
+									$.ajax({
+										cache: true,
+										type: 'POST',
+										url: '/iot/device/drivers_tags',
+										data: JSON.stringify({
+											...params
+										}),
+										dataType: 'json',
+										async: false,
+										success: results => {
+											if (results.code != 0) {
+												message.error('接口错误');
+												return;
+											}
+											close();
+											this.getTable();
+										}
+									});
 								}
-								// close();
 							}
 						});
 					}}
@@ -500,7 +533,7 @@ class ListBox extends React.PureComponent {
 									table_search: {
 										...this.state.table_search,
 										pageNum: page,
-										page_size
+										pageSize
 									}
 								},
 								() => {
