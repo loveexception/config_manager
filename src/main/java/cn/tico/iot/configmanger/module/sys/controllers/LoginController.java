@@ -58,10 +58,10 @@ public class LoginController {
             userService.recordLoginInfo(user);
 
             NutMap map = NutMap.NEW();
-            map.addv("dept",user.getDeptId());
-            map.addv("id",user.getId());
-            map.addv("location",user.getLocationId());
-            map.addv("loginname",user.getLoginName());
+            map.addv("dept_id",user.getDeptId());
+            map.addv("user_id",user.getId());
+            map.addv("location_id",user.getLocationId());
+            map.addv("login_name",user.getLoginName());
 
             return Result.success("login.success",map );
         } catch (LockedAccountException e) {
