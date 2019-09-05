@@ -26,6 +26,12 @@ public  class KafkaBlock  {
     public  Producer<String, String> producer ;
     public  KafkaConsumer<String, String> consumer;
 
+    public static final String TOPIC ="config";
+    public static final String KEY_SNO="sno";
+    public static final String KEY_EXT_SNO ="extsno";
+
+
+
 
 
 

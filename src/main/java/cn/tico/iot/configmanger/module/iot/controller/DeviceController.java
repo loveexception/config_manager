@@ -490,12 +490,12 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object kafka(@Param("data")Device device ,HttpServletRequest req ){
+	public Object over(@Param("data")Device device ,HttpServletRequest req ){
 
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
-		System.out.println(device);
 		kafkaBlock.produce("config","sno",device.getSno());
+		deviceService.kafka(Arrays.asList(device));
 
 		return  Result.success("system.success",device);
 	}
@@ -523,6 +523,7 @@ public class DeviceController implements AdminKey {
 			result.add(device);
 		}
 		deviceService.update(result);
+		deviceService.kafka(result);
 
 		return  Result.success("system.success",result);
 	}
@@ -561,6 +562,9 @@ public class DeviceController implements AdminKey {
 
 		}
 		deviceService.update(result);
+
+		deviceService.kafka(result);
+
 
 		return  Result.success("system.success",result);
 	}

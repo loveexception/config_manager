@@ -113,7 +113,7 @@ public class MainLauncher {
         //Daos.createTablesInPackage(dao, "cn.tico.iot", false);
         block.init();
         new Thread(()->block.consume("register", gatewayBlock)).start();
-        ;
+
     }
 
     public void depose() {

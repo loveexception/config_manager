@@ -2,11 +2,13 @@ package cn.tico.iot.configmanger.module.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
 import org.nutz.dao.util.Daos;
+import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 
@@ -21,6 +23,9 @@ import java.util.List;
  */
 @IocBean(args = {"refer:dao"})
 public class DeviceService extends Service<Device> {
+    @Inject
+    KafkaBlock kafkaBlock;
+
     public DeviceService(Dao dao) {
         super(dao);
     }
@@ -79,5 +84,12 @@ public class DeviceService extends Service<Device> {
     public Object updateAll(List<Driver> drivers) {
 
         return this.dao().update(drivers);
+    }
+
+    public void kafka(List<Device> result) {
+
+        for (int i = 0; i < result.size(); i++) {
+            kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_SNO,result.get(i).getSno());
+        }
     }
 }
