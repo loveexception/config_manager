@@ -50,7 +50,6 @@ public class ApiService {
         List<Device> devices = dao.queryByJoin(Device.class, "^dept|kind|location|driver|gateway|tags$", cnd);
         Iterator<Device> it = devices.iterator();
         if (it.hasNext()) {
-            // Device device =  it.next();
             return devices.get(0);
         }
         return null;

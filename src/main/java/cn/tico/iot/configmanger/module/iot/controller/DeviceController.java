@@ -104,7 +104,6 @@ public class DeviceController implements AdminKey {
 
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)) {
-			//cnd.and("name", "like", "%" + name +"%");
 			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%")
 					.or("en_name", "like", "%" + name + "%")
 					.or("sno","like", "%" + name + "%");
@@ -130,7 +129,6 @@ public class DeviceController implements AdminKey {
 		cnd.and(group);
 		cnd.and("delflag", "=", "false");
 
-		// cnd.and("asset_status","=","0");
 		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver|gateway|tags$");
 
 		return Result.success("system.success",obj);
@@ -172,7 +170,9 @@ public class DeviceController implements AdminKey {
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object deviceRemove(@Param("..")Device device, HttpServletRequest req) {
 		try {
+			device = deviceService.fetch(device.getId());
 			int  i = deviceService.vDelete(device.getId());
+			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -231,8 +231,7 @@ public class DeviceController implements AdminKey {
 			if(Lang.isEmpty(device.getKindid())||device.getKindid().length()==0){
 				return Result.error(9,"not choose kind ");
 			}
-			Cnd cnd = Cnd.NEW();
-			cnd.where("kind_id","=",device.getKindid());
+			Cnd cnd = Cnd.where("kind_id","=",device.getKindid());
 
 			List<Driver> drivers = driverService.query(cnd);
 

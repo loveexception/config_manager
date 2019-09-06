@@ -37,9 +37,17 @@ public class PersonGradeService extends Service<PersonGrade> {
         List<PersonGrade> obj = this.dao().queryByJoin(this.getEntityClass(),"^rulers$",cnd);
         for (PersonGrade grade:obj) {
             List<PersonRuler> rulers = grade.getRulers();
+
+
             if(Lang.isEmpty(rulers)){
                 continue;
             }
+            List<PersonRuler> temps = new ArrayList<PersonRuler>();
+            for (int i = 0; i < rulers.size(); i++) {
+                PersonRuler temp =  dao().fetchLinks(rulers.get(i),"normal");
+                temps.add(temp);
+            }
+
 
             Comparator compare = ComparableComparator.getInstance ();
             compare = ComparatorUtils. nullHighComparator(compare);
@@ -50,8 +58,8 @@ public class PersonGradeService extends Service<PersonGrade> {
 
 
 
-            Collections.sort(rulers,multiSort);
-            grade.setRulers(rulers);
+            Collections.sort(temps,multiSort);
+            grade.setRulers(temps);
         }
 
         return obj;
