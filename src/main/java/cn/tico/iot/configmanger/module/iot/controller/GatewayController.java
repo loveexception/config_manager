@@ -152,9 +152,11 @@ public class GatewayController implements AdminKey {
 	public Object addDo(@Param("..") Gateway gateway, HttpServletRequest req) {
 		try {
 			gatewayService.insertEntity(gateway);
-			//TODO： 注册并敲钟
+			if(Lang.isEmpty(gateway.getSubGateway())){
+				return Result.success("system.success");
+			}
 
-			//kafkaBlock.produce(kafkaBlock.TOPIC,kafkaBlock.EXTSNO,);
+			kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,gateway.getSubGateway().getExtSno());
 
 			return Result.success("system.success");
 		} catch (Exception e) {
@@ -185,9 +187,8 @@ public class GatewayController implements AdminKey {
 		try {
 			if(Lang.isNotEmpty(gateway)){
 				gatewayService.updateEntity(gateway);
-				//TODO： 注册并敲钟
 
-				//kafkaBlock.produce(kafkaBlock.TOPIC,kafkaBlock.EXTSNO,);
+				kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,gateway.getSubGateway().getExtSno());
 			}
 
 			return Result.success("system.success");
@@ -206,8 +207,12 @@ public class GatewayController implements AdminKey {
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
 			gatewayService.vDelete(ids);
-			//TODO: 删除钟声
-			// kafkaBlock.produce(kafkaBlock.TOPIC,kafkaBlock.EXTSNO,);
+			Gateway gateway = gatewayService.fetch(ids[0]);
+			gatewayService.dao().fetchLinks(gateway,"subgateway");
+			gatewayService.dao().updateWith(gateway, "subgateway");
+
+
+			kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,gateway.getSubGateway().getExtSno());
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");

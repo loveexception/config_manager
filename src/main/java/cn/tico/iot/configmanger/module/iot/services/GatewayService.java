@@ -34,14 +34,24 @@ public class GatewayService extends Service<Gateway> {
 
 
 	public Gateway insertEntity(Gateway gateway) {
+		if(Lang.isNotEmpty(gateway.getSubid())){
+			dao().fetchLinks(gateway,"subgateway");
+		}
 
 
 		gateway.setCreateBy(ShiroUtils.getSysUserId());
 		gateway.setCreateTime(new Date());
-		return this.dao().insert(gateway);
+		return this.dao().insertWith(gateway,"subgateway");
 	}
 
 	public int updateEntity(Gateway gateway) {
+
+		if(Lang.isNotEmpty(gateway.getSubid())){
+			dao().fetchLinks(gateway,"subgateway");
+			dao().updateLinks(gateway,"subgateway");
+		}
+
+
 		gateway.setUpdateBy(ShiroUtils.getSysUserId());
 		gateway.setUpdateTime(new Date());
 		Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
