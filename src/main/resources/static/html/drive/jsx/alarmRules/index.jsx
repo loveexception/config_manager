@@ -695,7 +695,7 @@ class SearchInput extends React.PureComponent {
 		data: []
 	};
 
-	handleSearch = value => {
+	handleSearch = (value = '') => {
 		let { driverid } = urlArgs();
 		if (driverid) {
 			$.ajax({
@@ -721,8 +721,19 @@ class SearchInput extends React.PureComponent {
 	render() {
 		const options = this.state.data.map(d => <Select.Option key={d.id}>{d.cnName}</Select.Option>);
 		return (
-			<Select {...this.props} showSearch defaultActiveFirstOption={false} showArrow={false} filterOption={false} onSearch={this.handleSearch} notFoundContent={null}>
-				{options.length>0?options:this.props.children}
+			<Select
+				{...this.props}
+				showSearch
+				defaultActiveFirstOption={false}
+				showArrow={false}
+				filterOption={false}
+				onSearch={this.handleSearch}
+				onFocus={e => {
+					this.handleSearch();
+				}}
+				notFoundContent={null}
+			>
+				{options.length > 0 ? options : this.props.children}
 			</Select>
 		);
 	}
