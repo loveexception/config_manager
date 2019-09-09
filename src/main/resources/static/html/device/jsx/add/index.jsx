@@ -736,6 +736,7 @@ class AlarmConfiguration extends React.PureComponent {
 			>
 				<div className="title">{title}</div>
 				<Table
+					rowKey={record => record.id}
 					bordered
 					columns={columns}
 					dataSource={data}
