@@ -2,11 +2,14 @@ package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.adaptor.GraphQLAdaptor;
 import cn.tico.iot.configmanger.common.base.Result;
+import cn.tico.iot.configmanger.common.utils.DictUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.ApiService;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
+import cn.tico.iot.configmanger.module.sys.models.Dict;
+import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -48,6 +51,9 @@ public class ApiController implements AdminKey {
 	private ApiService apiService;
 	@Inject
 	private KafkaBlock kafkaBlock;
+
+	@Inject
+	public 	DictService dictService;
 
 	@Inject
 	private Dao dao;
@@ -153,6 +159,13 @@ public class ApiController implements AdminKey {
 		kafkaBlock.produce("config","extsno",extsno);
 		return  Result.success("system.success",extsno );
 
+	}
+	@At("/dict")
+	@Ok("json")
+	public Object api(@Param("type")String type,HttpServletRequest req){
+		List<Dict> list =  dictService.query(Cnd.where("type","=",type));
+
+		return Result.success("system.success", list);
 	}
 
 	static final String GRAPH_DEVICE=

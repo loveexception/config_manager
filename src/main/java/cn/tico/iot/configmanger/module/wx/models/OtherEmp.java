@@ -17,6 +17,7 @@ import java.util.Date;
  */
 @Table("other_emp")
 @Data
+@Comment("运维人员表")
 public class OtherEmp extends BaseModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
