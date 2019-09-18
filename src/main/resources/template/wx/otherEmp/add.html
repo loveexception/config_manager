@@ -95,7 +95,7 @@
 		<div th:include="include::footer"></div>
 		<script type="text/javascript">
 			var prefix = ctx + 'wx/otherEmp';
-
+			var _params = '';
 			$('#form-otherEmp-add').validate({
 				onkeyup: false,
 				rules: {
@@ -114,9 +114,14 @@
 								processData: false,
 								contentType: false,
 								data: form,
-								dataFilter: function(data, type) {
-									console.log('dataFilter', data);
-									return data;
+								dataFilter: function(results, type) {
+									console.log('dataFilter', results);
+									if (results.code != 0) {
+										return false;
+									}
+									var data = results.data || {};
+									_params += `&imageId=${data.id}&image=${data.localPath}`;
+									return true;
 								}
 							};
 						}
@@ -126,8 +131,11 @@
 
 			function submitHandler() {
 				if ($.validate.form()) {
-					console.log('submitHandler', $('#form-otherEmp-add').serialize());
-					// $.operate.save(prefix + '/addDo', $('#form-otherEmp-add').serialize());
+					if (_params) {
+						$.operate.save(prefix + '/addDo', $('#form-otherEmp-add').serialize() + _params);
+					} else {
+						console.log('图片上传中，请稍候');
+					}
 				}
 			}
 		</script>
