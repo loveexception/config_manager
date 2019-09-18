@@ -84,10 +84,11 @@ public class OtherEmpController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:otherEmp:add")
-	@Slog(tag="运维人员", after="新增保存运维人员 id=${args[0].id}")
+	//@Slog(tag="运维人员", after="新增保存运维人员 id=${args[0].id}")
 	public Object addDo(@Param("..") OtherEmp otherEmp,HttpServletRequest req) {
 		try {
-			otherEmpService.insert(otherEmp);
+//			otherEmpService.insert(otherEmp);
+			otherEmpService.addEmp(otherEmp);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
