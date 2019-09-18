@@ -113,7 +113,10 @@ public class ApiService {
 
     @GraphQLQuery(name = "person")
     public Person onePerson(@GraphQLContext Normal normal, @GraphQLArgument(name = "sno") String sno) {
-        List<Device> devices = dao.query(Device.class, Cnd.NEW().and("sno", "=", sno));
+        List<Device> devices = dao.query(Device.class
+                , Cnd.NEW()
+                        .and("sno", "=", sno)
+                        .and("delflag","=","false"));
         if (Lang.isEmpty(devices)) {
             return null;
         }
