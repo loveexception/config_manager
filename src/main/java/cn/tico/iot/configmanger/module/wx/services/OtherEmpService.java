@@ -29,12 +29,26 @@ public class OtherEmpService extends Service<OtherEmp> {
     public void addEmp(OtherEmp otherEmp) {
         String imageRealPath = otherEmp.getImage();
         if (!StringUtils.isEmpty(imageRealPath)) {
-            String appUploadPath = configService.getValue(APP_UPLOAD_PATH);
-            String nginxHost = configService.getValue(NGINX_HOST);
-            String nginxUploadPath = configService.getValue(NGINX_UPLOAD_PATH);
-            String imageNginxPath = imageRealPath.replaceFirst(appUploadPath, nginxHost + nginxUploadPath);
+            String imageNginxPath = updateImagePath(imageRealPath);
             otherEmp.setImage(imageNginxPath);
         }
         insert(otherEmp);
+    }
+
+    public void updateEmp(OtherEmp otherEmp) {
+        String imageRealPath = otherEmp.getImage();
+        if (!StringUtils.isEmpty(imageRealPath)) {
+            String imageNginxPath = updateImagePath(imageRealPath);
+            otherEmp.setImage(imageNginxPath);
+        }
+        update(otherEmp);
+    }
+
+    private String updateImagePath(String imageRealPath) {
+        String appUploadPath = configService.getValue(APP_UPLOAD_PATH);
+        String nginxHost = configService.getValue(NGINX_HOST);
+        String nginxUploadPath = configService.getValue(NGINX_UPLOAD_PATH);
+        String imageNginxPath = imageRealPath.replaceFirst(appUploadPath, nginxHost + nginxUploadPath);
+        return imageNginxPath;
     }
 }
