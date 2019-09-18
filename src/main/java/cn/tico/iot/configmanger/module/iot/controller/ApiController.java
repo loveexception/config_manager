@@ -2,11 +2,14 @@ package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.adaptor.GraphQLAdaptor;
 import cn.tico.iot.configmanger.common.base.Result;
+import cn.tico.iot.configmanger.common.utils.DictUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.ApiService;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
+import cn.tico.iot.configmanger.module.sys.models.Dict;
+import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -48,6 +51,9 @@ public class ApiController implements AdminKey {
 	private ApiService apiService;
 	@Inject
 	private KafkaBlock kafkaBlock;
+
+	@Inject
+	public 	DictService dictService;
 
 	@Inject
 	private Dao dao;
@@ -154,7 +160,15 @@ public class ApiController implements AdminKey {
 		return  Result.success("system.success",extsno );
 
 	}
+	@At("/dict")
+	@Ok("json")
+	public Object api(@Param("type")String type,HttpServletRequest req){
+		List<Dict> list =  dictService.query(Cnd.where("type","=",type));
+
+		return Result.success("system.success", list);
+	}
 
 	static final String GRAPH_DEVICE=
-		"query{device(sno:\"${sno}\")  {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},driver{id,i18n,cn_name,en_name,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,status,person(sno:\"${sno}\"){id,i18n,cn_name,en_name,status,grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}},grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}}}}}";
+			"query{device(sno:\"${sno}\")  {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},driver{id,i18n,cn_name,en_name,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,status,person(sno:\\\"${sno}\\\"){id,i18n,cn_name,en_name,status,grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit}}}},grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit}}}}}}}";
+		//"query{device(sno:\"${sno}\")  {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},driver{id,i18n,cn_name,en_name,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,status,person(sno:\"${sno}\"){id,i18n,cn_name,en_name,status,grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}},grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}}}}}";
 	}
