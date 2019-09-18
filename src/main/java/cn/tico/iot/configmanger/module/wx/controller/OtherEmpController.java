@@ -87,6 +87,8 @@ public class OtherEmpController {
 	//@Slog(tag="运维人员", after="新增保存运维人员 id=${args[0].id}")
 	public Object addDo(@Param("..") OtherEmp otherEmp,HttpServletRequest req) {
 		try {
+			otherEmp.setCreateBy(ShiroUtils.getSysUserId());
+			otherEmp.setCreateTime(new Date());
 //			otherEmpService.insert(otherEmp);
 			otherEmpService.addEmp(otherEmp);
 			return Result.success("system.success");
@@ -118,7 +120,8 @@ public class OtherEmpController {
 			if(Lang.isNotEmpty(otherEmp)){
 				otherEmp.setUpdateBy(ShiroUtils.getSysUserId());
 				otherEmp.setUpdateTime(new Date());
-				otherEmpService.update(otherEmp);
+//				otherEmpService.update(otherEmp);
+				otherEmpService.updateEmp(otherEmp);
 			}
 			return Result.success("system.success");
 		} catch (Exception e) {
