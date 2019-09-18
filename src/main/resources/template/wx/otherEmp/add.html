@@ -115,11 +115,11 @@
 								contentType: false,
 								data: form,
 								dataFilter: function(results, type) {
-									console.log('dataFilter', results);
-									if (results.code != 0) {
+                                    var results_new=JSON.parse(results);
+									if (results_new.code != 0) {
 										return false;
 									}
-									var data = results.data || {};
+									var data = results_new.data || {};
 									_params += `&imageId=${data.id}&image=${data.localPath}`;
 									return true;
 								}
