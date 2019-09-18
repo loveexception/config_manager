@@ -1,1 +1,1 @@
-mvn compile nutzboot:run
+mvn clean compile nutzboot:run
