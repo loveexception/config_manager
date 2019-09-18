@@ -2,10 +2,7 @@ package cn.tico.iot.configmanger.module.iot.graphql;
 
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
-import cn.tico.iot.configmanger.module.iot.models.device.Device;
-import cn.tico.iot.configmanger.module.iot.models.device.Person;
-import cn.tico.iot.configmanger.module.iot.models.device.PersonGrade;
-import cn.tico.iot.configmanger.module.iot.models.device.PersonRuler;
+import cn.tico.iot.configmanger.module.iot.models.device.*;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
@@ -174,5 +171,22 @@ public class ApiService {
 
         List<PersonRuler> result = dao.queryByJoin(PersonRuler.class,"^normal$", cnd);
         return result;
+    }
+    @GraphQLQuery(name = "subgateway")
+    public SubGateway getSubGateWay(@GraphQLContext Gateway gateway) {
+        if(Lang.isEmpty(gateway)){
+            return null;
+        }
+        if(Strings.isEmpty(gateway.getSubid())){
+            return null;
+        }
+
+        SubGateway subGateway = dao.fetch(SubGateway.class,gateway.getSubid());
+        if(Lang.isEmpty(subGateway)){
+            return null;
+        }
+
+
+        return subGateway;
     }
 }

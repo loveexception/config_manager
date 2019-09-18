@@ -6,3 +6,5 @@
 src/main/resources/static/WEB-INF
 
 target
+.classpath
+bin
