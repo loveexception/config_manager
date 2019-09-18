@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.module.wx.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
+import lombok.Data;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.nutz.dao.entity.annotation.*;
@@ -14,7 +15,8 @@ import java.util.Date;
  * @author maodajun
  * @date 2019-08-05
  */
-@Table("other_Emp")
+@Table("other_emp")
+@Data
 public class OtherEmp extends BaseModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -54,6 +56,10 @@ public class OtherEmp extends BaseModel implements Serializable {
 	@Column("image")
 	@Comment("照片： ")
 	private String image;
+
+	@Column("image_id")
+	@Comment("照片id： ")
+	private String imageId;
 
 			/** 名称 */
 	@Column("cn_name")
@@ -256,6 +262,7 @@ public class OtherEmp extends BaseModel implements Serializable {
             .append("tel", getTel())
             .append("email", getEmail())
             .append("image", getImage())
+			.append("imageId", getImageId())
             .append("cnName", getCnName())
             .append("enName", getEnName())
             .append("status", getStatus())
