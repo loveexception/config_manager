@@ -1,12 +1,17 @@
 package cn.tico.iot.configmanger.module.wx.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.StringUtils;
 import cn.tico.iot.configmanger.module.sys.services.ConfigService;
 import cn.tico.iot.configmanger.module.wx.models.OtherEmp;
 import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+
+import java.util.Date;
 
 /**
  * 运维人员 服务层实现
@@ -42,6 +47,19 @@ public class OtherEmpService extends Service<OtherEmp> {
             otherEmp.setImage(imageNginxPath);
         }
         update(otherEmp);
+
+    }
+
+    public int updateEntitys(OtherEmp otherEmp) {
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass()
+                , null
+                , "^create_by|create_time$"
+                , true));
+
+        otherEmp.setUpdateBy(ShiroUtils.getSysUserId());
+        otherEmp.setUpdateTime(new Date());
+
+        return forup.update(otherEmp);
     }
 
     private String updateImagePath(String imageRealPath) {
