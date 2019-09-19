@@ -21,4 +21,20 @@ public class MysqlTestDao {
 
         return  new NutDao(dataSource);
     }
+
+    public static Dao NEW2() {
+        SimpleDataSource dataSource = new SimpleDataSource();
+        dataSource.setUrl("jdbc:mysql://172.16.16.6/nutzsite");
+//        dataSource.setUrl("jdbc:mysql://localhost/zhihutest");
+        String mysqldriver ="com.mysql.cj.jdbc.Driver";
+        try {
+            dataSource.setDriverClassName(mysqldriver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        dataSource.setUsername("root");
+        dataSource.setPassword("123456");
+
+        return  new NutDao(dataSource);
+    }
 }
