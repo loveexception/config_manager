@@ -68,6 +68,8 @@ public class OtherEmpController {
         if (Lang.isNotEmpty(endTime)) {
             cnd.and("create_time", "<=", endTime);
         }
+        cnd.where().and("status", "=", "true");
+        cnd.where().and("delflag", "=", "false");
         return otherEmpService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, null);
     }
 
@@ -92,6 +94,8 @@ public class OtherEmpController {
         try {
             otherEmp.setCreateBy(ShiroUtils.getSysUserId());
             otherEmp.setCreateTime(new Date());
+            otherEmp.setStatus("true");
+            otherEmp.setDelflag("false");
 //			otherEmpService.insert(otherEmp);
             otherEmpService.addEmp(otherEmp);
             return Result.success("system.success");
@@ -142,7 +146,8 @@ public class OtherEmpController {
     @Slog(tag = "运维人员", after = "删除运维人员:${array2str(args[0])}")
     public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
         try {
-            otherEmpService.delete(ids);
+//            otherEmpService.delete(ids);
+            otherEmpService.deleteEmps(ids);
             return Result.success("system.success");
         } catch (Exception e) {
             return Result.error("system.error");
