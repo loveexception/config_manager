@@ -105,6 +105,15 @@
                     <label class="radio-box"> <input type="radio" name="status" value="false" /> 停用 </label>
                 </div>
             </div>
+            <hr>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">员工：</label>
+                <div class="col-sm-8">
+                    <label th:each="emp:${emps}" class="check-box">
+                        <input name="empIds" type="checkbox" th:value="${emp.id}" th:text="${emp.cnName}" th:disabled="${emp.status != 'true'}" >
+                    </label>
+                </div>
+            </div>
         </form>
     </div>
     <div th:include="include::footer"></div>
@@ -121,9 +130,37 @@
 
     function submitHandler() {
         if ($.validate.form()) {
-            $.operate.save(prefix + "/addDo", $('#form-otherWorkflow-add').serialize());
+            // $.operate.save(prefix + "/addDo", $('#form-otherWorkflow-add').serialize());
+            //$.modal.alertError("参数错误");
+
+            var obj = {};
+            var form = $('#form-otherWorkflow-add');
+            $.each(form.serializeArray(), function(index) {
+                if (obj[this['name']]) {
+                    obj[this['name']] = obj[this['name']] + "," + this['value'];
+                } else {
+                    obj[this['name']] = this['value'];
+                }
+            });
+
+            console.log(obj);
+            obj.status = $("input[name='status']").is(':checked') == true ? true : false;
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: prefix + "/addDo",
+                data: obj,
+                async: false,
+                error: function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success: function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
         }
     }
+
     $(function() {
 
 

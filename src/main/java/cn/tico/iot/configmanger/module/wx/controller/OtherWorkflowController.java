@@ -1,5 +1,10 @@
 package cn.tico.iot.configmanger.module.wx.controller;
 
+import cn.tico.iot.configmanger.module.other.models.Emp;
+import cn.tico.iot.configmanger.module.sys.models.Role;
+import cn.tico.iot.configmanger.module.sys.models.User;
+import cn.tico.iot.configmanger.module.wx.models.OtherEmp;
+import cn.tico.iot.configmanger.module.wx.services.OtherEmpService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.OtherWorkflow;
 import cn.tico.iot.configmanger.module.wx.services.OtherWorkflowService;
@@ -20,6 +25,8 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+
 /**
  * 运维 信息操作处理
  * 
@@ -33,7 +40,10 @@ public class OtherWorkflowController {
 
 	@Inject
 	private OtherWorkflowService otherWorkflowService;
-	
+
+	@Inject
+	private OtherEmpService otherEmpService;
+
 	@RequiresPermissions("wx:otherWorkflow:view")
 	@At("")
 	@Ok("th:/wx/otherWorkflow/otherWorkflow.html")
@@ -74,6 +84,10 @@ public class OtherWorkflowController {
 	@At("/add")
 	@Ok("th:/wx/otherWorkflow/add.html")
 	public void add( HttpServletRequest req) {
+		List<OtherEmp> emps = otherEmpService.query(
+				Cnd.where("status","=",true)
+						.and("delflag","=",false));
+		req.setAttribute("emps",emps);
 
 	}
 
@@ -90,7 +104,7 @@ public class OtherWorkflowController {
 			if(Lang.isNotEmpty(otherWorkflow)){
 				otherWorkflow.setCreateBy(ShiroUtils.getSysUserId());
 				otherWorkflow.setCreateTime(new Date());
-				otherWorkflowService.insert(otherWorkflow);
+				otherWorkflowService.insertEntity(otherWorkflow);
 				return Result.success("system.success",otherWorkflow);
 
 			}
@@ -109,6 +123,15 @@ public class OtherWorkflowController {
 	public void edit(String id, HttpServletRequest req) {
 		OtherWorkflow otherWorkflow = otherWorkflowService.fetch(id);
 		req.setAttribute("otherWorkflow",otherWorkflow);
+
+		otherWorkflowService.fetchLinks(otherWorkflow,"emps");
+		List<OtherEmp> emps = otherEmpService.query(Cnd.where("status","=",true).and("delflag","=",false));
+		emps.forEach(emp -> {
+			if(otherWorkflow.getEmps()!=null && otherWorkflow.getEmps().size()>0){
+				emp.setFlag(""+otherWorkflow.getEmps().contains(emp));
+			}
+		});
+		req.setAttribute("emps",emps);
 	}
 
 	/**
@@ -124,9 +147,9 @@ public class OtherWorkflowController {
 			if(Lang.isNotEmpty(otherWorkflow)){
 				otherWorkflow.setUpdateBy(ShiroUtils.getSysUserId());
 				otherWorkflow.setUpdateTime(new Date());
-				otherWorkflowService.update(otherWorkflow);
+				otherWorkflowService.updateEntity(otherWorkflow);
 			}
-			return Result.success("system.success");
+			return Result.success("system.success",otherWorkflow);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}

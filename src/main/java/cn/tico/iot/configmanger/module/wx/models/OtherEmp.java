@@ -21,14 +21,17 @@ import java.util.Date;
 public class OtherEmp extends BaseModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-		@Name
+	@Name
 	@Column("id")
 	@Comment("id")
 	@ColDefine(type = ColType.VARCHAR, width = 64)
 	@Prev(els = {@EL("uuid()")})
 	private String id;
 
-			/** 序号 */
+	private String flag;
+
+
+	/** 序号 */
 	@Column("no")
 	@Comment("序号")
 	private String no;

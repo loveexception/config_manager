@@ -43,6 +43,8 @@ public class OtherWorkflow extends BaseModel implements Serializable {
 	@ManyMany(relation ="other_work_emp",from = "work_id",to="emp_id")
 	private List<OtherEmp> emps;
 
+	private String empIds;
+
 
 
 
@@ -160,6 +162,8 @@ public class OtherWorkflow extends BaseModel implements Serializable {
 	@Column("update_time")
 	@Comment("更新时间")
 	private Date updateTime;
+
+
 
 	
 

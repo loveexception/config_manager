@@ -25,9 +25,7 @@
                 </div>
                 <label class="col-sm-2 control-label">〜结束日期：</label>
                 <div class="col-sm-4">
-                    <div class="col-sm-8">
                         <input name="endTime" th:value="${#dates.format(otherWorkflow.endTime,'yyyy-MM-dd')}" type="text" class="time-input form-control" id="endTime" placeholder="结束时间">
-                    </div>
                 </div>
             </div>
             <hr>
@@ -101,13 +99,22 @@
                     <input id="offSun" name="offSun" th:value="${otherWorkflow.offSun}" class="my-time form-control" type="text">
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">状态：</label>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">状态：</label>
                 <div class="col-sm-8">
-                    <label class="radio-box"> <input type="radio" name="status" value="true" th:checked="'true'==${kind.status}" /> 正常 </label>
-                    <label class="radio-box"> <input type="radio" name="status" value="false" th:checked="'false'==${kind.status}" /> 停用 </label>
+                    <label class="radio-box"> <input type="radio" name="status" value="true"  th:checked="'true'==${otherWorkflow.status}" /> 正常 </label>
+                    <label class="radio-box"> <input type="radio" name="status" value="false" th:checked="'false'==${otherWorkflow.status}" /> 停用 </label>
                 </div>
             </div>
+            <hr>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">角色：</label>
+				<div class="col-sm-8">
+					<label th:each="emp:${emps}" class="check-box">
+						<input name="empIds" type="checkbox" th:value="${emp.id}" th:text="${emp.cnName}" th:checked="${emp.flag}" th:disabled="${emp.status == 'false'}">
+					</label>
+				</div>
+			</div>
         </form>
     </div>
     <div th:include="include::footer"></div>
@@ -122,11 +129,41 @@
         }
     });
 
-    function submitHandler() {
+   function submitHandler() {
         if ($.validate.form()) {
-            $.operate.save(prefix + "/editDo", $('#form-otherWorkflow-edit').serialize());
+            // $.operate.save(prefix + "/addDo", $('#form-otherWorkflow-add').serialize());
+            //$.modal.alertError("参数错误");
+
+            var obj = {};
+            var form = $('#form-otherWorkflow-edit');
+            $.each(form.serializeArray(), function(index) {
+                if (obj[this['name']]) {
+                    obj[this['name']] = obj[this['name']] + "," + this['value'];
+                } else {
+                    obj[this['name']] = this['value'];
+                }
+            });
+
+            console.log(obj);
+            //obj.status = $("input[name='status']").is(':checked') == true ? true : false;
+        	$.ajax({
+        		cache : true,
+        		type : "POST",
+        		url : prefix + "/editDo",
+                data: obj,
+        		async : false,
+        		error : function(request) {
+        			$.modal.alertError("系统错误");
+        		},
+        		success : function(data) {
+        			$.operate.successCallback(data);
+        		}
+        	});
         }
     }
+
+
+        
     $(function() {
 
 
