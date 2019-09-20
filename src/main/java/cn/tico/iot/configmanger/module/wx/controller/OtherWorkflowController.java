@@ -84,11 +84,18 @@ public class OtherWorkflowController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:otherWorkflow:add")
-	@Slog(tag="运维", after="新增保存运维 id=${args[0].id}")
+//	@Slog(tag="运维班组", after="新增保存运维班组 id=${args[0].id}")
 	public Object addDo(@Param("..") OtherWorkflow otherWorkflow,HttpServletRequest req) {
 		try {
-			otherWorkflowService.insert(otherWorkflow);
-			return Result.success("system.success");
+			if(Lang.isNotEmpty(otherWorkflow)){
+				otherWorkflow.setCreateBy(ShiroUtils.getSysUserId());
+				otherWorkflow.setCreateTime(new Date());
+				otherWorkflowService.insert(otherWorkflow);
+				return Result.success("system.success",otherWorkflow);
+
+			}
+			return Result.success("system.error");
+
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -111,7 +118,7 @@ public class OtherWorkflowController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:otherWorkflow:edit")
-	@Slog(tag="运维", after="修改保存运维")
+//	@Slog(tag="运维班组", after="修改保存运维班组")
 	public Object editDo(@Param("..") OtherWorkflow otherWorkflow,HttpServletRequest req) {
 		try {
 			if(Lang.isNotEmpty(otherWorkflow)){
@@ -126,12 +133,12 @@ public class OtherWorkflowController {
 	}
 
 	/**
-	 * 删除运维
+	 * 删除运维班组
 	 */
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("wx:otherWorkflow:remove")
-	@Slog(tag ="运维", after= "删除运维:${array2str(args[0])}")
+//	@Slog(tag ="运维班组", after= "删除运维班组:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
 			otherWorkflowService.delete(ids);

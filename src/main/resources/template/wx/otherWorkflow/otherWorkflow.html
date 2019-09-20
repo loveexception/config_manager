@@ -11,61 +11,9 @@
 					<div class="select-list">
 						<ul>
 							<li>
-								日期：<input type="text" name="day"/>
+								名子：<input type="text" name="name"/>
 							</li>
-
-							<li>
-								开始时间：<input type="text" name="startTime"/>
-							</li>
-
-							<li>
-								开始时间：<input type="text" name="endTime"/>
-							</li>
-
-							<li>
-								时长：<input type="text" name="hours"/>
-							</li>
-
-							<li>
-								名子：<input type="text" name="userName"/>
-							</li>
-
-							<li>
-								部门：<input type="text" name="deptName"/>
-							</li>
-
-							<li>
-								职位：<input type="text" name="title"/>
-							</li>
-
-							<li>
-								联系电话：<input type="text" name="tel"/>
-							</li>
-
-							<li>
-								状态：<input type="text" name="status"/>
-							</li>
-
-							<li>
-								删除：<input type="text" name="delflag"/>
-							</li>
-
-							<li>
-								创建者：<input type="text" name="createBy"/>
-							</li>
-
-							<li>
-								建立时间：<input type="text" name="createTime"/>
-							</li>
-
-							<li>
-								更新者：<input type="text" name="updateBy"/>
-							</li>
-
-							<li>
-								更新时间：<input type="text" name="updateTime"/>
-							</li>
-
+							
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
 								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -105,7 +53,7 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
-                modalName: "运维",
+                modalName: "运维班组",
 				search: false,
 		        showExport: true,
                 columns: [{
@@ -117,70 +65,210 @@
 					visible: false
 				},
 				{
-					field : 'day', 
-					title : '日期',
-					sortable: true
-				},
-				{
-					field : 'startTime', 
-					title : '开始时间',
-					sortable: true
-				},
-				{
-					field : 'endTime', 
-					title : '开始时间',
-					sortable: true
-				},
-				{
-					field : 'hours', 
-					title : '时长',
-					sortable: true
-				},
-				{
-					field : 'userName', 
+					field : 'cnName', 
 					title : '名子',
 					sortable: true
 				},
 				{
-					field : 'deptName', 
-					title : '部门',
+					field : 'enName', 
+					title : '编号',
 					sortable: true
 				},
 				{
-					field : 'title', 
-					title : '职位',
-					sortable: true
+					field : 'start_end_time', 
+					align: 'center',
+
+					title : '班组计划:开始时间-结束时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.startTime );
+                        actions.push("<br>~<br>");
+                        actions.push(row.startTime);
+						return actions.join('');
+		            }
+				},
+				// {
+				// 	field : 'endTime', 
+				// 	title : '班组计划结束时间',
+				// 	sortable: true
+				// },
+				{
+					field : 'mon', 
+					align: 'center',
+					title : '周一上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onMon );
+                        actions.push("<br>~<br>");
+                       actions.push(row.offMon);
+						return actions.join('');
+		            }
 				},
 				{
-					field : 'tel', 
-					title : '联系电话',
-					sortable: true
+					field : 'tue', 
+					align: 'center',
+					title : '周二上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onTue );
+                        actions.push("<br>~<br>");
+                        actions.push(row.offTue);
+						return actions.join('');
+		            }
 				},
+				{
+					field : 'web', 
+					align: 'center',
+					title : '周三上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onWed);
+                         actions.push("<br>~<br>");
+                       actions.push(row.offWed);
+						return actions.join('');
+		            }
+				},
+				{
+					field : 'thu', 
+					align: 'center',
+					title : '周四上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onThu );
+
+		            	actions.push("<br>~<br>");
+
+                        actions.push(row.offThu);
+						return actions.join('');
+		            }
+				},
+				{
+					field : 'fri', 
+					align: 'center',
+					title : '周五上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onFri );
+                        actions.push("<br>~<br>");
+                        actions.push(row.offFri);
+						return actions.join('');
+		            }
+				},
+				{
+					field : 'sat', 
+					align: 'center',
+					title : '周六上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onSat );
+                         actions.push("<br>~<br>");
+                       actions.push(row.offSat);
+						return actions.join('');
+		            }
+				},
+				{
+					field : 'sun', 
+					align: 'center',
+					title : '周日上班时间',
+					 formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push(row.onSun );
+                        actions.push("<br>~<br>");
+                        actions.push(row.offSun);
+						return actions.join('');
+		            }
+				},
+
+				// {
+				// 	field : 'offMon', 
+				// 	title : '周一下班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'onTue', 
+				// 	title : '周二上班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'offTue', 
+				// 	title : '周二下班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'onWed', 
+				// 	title : '周三上班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'offWed', 
+				// 	title : '周三下班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'onThu', 
+				// 	title : '周四上班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'offThu', 
+				// 	title : '周四下班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'onFri', 
+				// 	title : '周五上班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'offFri', 
+				// 	title : '周五下班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'onSat', 
+				// 	title : '周六上班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'offSat', 
+				// 	title : '周六下班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'onSun', 
+				// 	title : '周日上班时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'offSun', 
+				// 	title : '周日下班时间',
+				// 	sortable: true
+				// },
 				{
 					field : 'status', 
 					title : '状态',
 					sortable: true
 				},
-				{
-					field : 'delflag', 
-					title : '删除',
-					sortable: true
-				},
-				{
-					field : 'createBy', 
-					title : '创建者',
-					sortable: true
-				},
-				{
-					field : 'createTime', 
-					title : '建立时间',
-					sortable: true
-				},
-				{
-					field : 'updateBy', 
-					title : '更新者',
-					sortable: true
-				},
+				// {
+				// 	field : 'delflag', 
+				// 	title : '删除',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'createBy', 
+				// 	title : '创建者',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'createTime', 
+				// 	title : '建立时间',
+				// 	sortable: true
+				// },
+				// {
+				// 	field : 'updateBy', 
+				// 	title : '更新者',
+				// 	sortable: true
+				// },
 				{
 					field : 'updateTime', 
 					title : '更新时间',
