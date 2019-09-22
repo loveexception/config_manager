@@ -58,7 +58,11 @@ public class OtherEmpService extends Service<OtherEmp> {
 
         otherEmp.setUpdateBy(ShiroUtils.getSysUserId());
         otherEmp.setUpdateTime(new Date());
-
+        String imageRealPath = otherEmp.getImage();
+        if (!StringUtils.isEmpty(imageRealPath)) {
+            String imageNginxPath = updateImagePath(imageRealPath);
+            otherEmp.setImage(imageNginxPath);
+        }
         return forup.update(otherEmp);
     }
 
