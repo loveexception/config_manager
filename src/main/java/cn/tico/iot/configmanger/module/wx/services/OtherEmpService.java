@@ -58,8 +58,28 @@ public class OtherEmpService extends Service<OtherEmp> {
 
         otherEmp.setUpdateBy(ShiroUtils.getSysUserId());
         otherEmp.setUpdateTime(new Date());
-
+        String imageRealPath = otherEmp.getImage();
+        if (!StringUtils.isEmpty(imageRealPath)) {
+            String imageNginxPath = updateImagePath(imageRealPath);
+            otherEmp.setImage(imageNginxPath);
+        }
         return forup.update(otherEmp);
+    }
+
+    public void deleteEmps(String[] ids) {
+        for (String id : ids) {
+            OtherEmp otherEmp = dao().fetch(OtherEmp.class, id);
+            Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass()
+                    , null
+                    , "^create_by|create_time$"
+                    , true));
+
+            otherEmp.setUpdateBy(ShiroUtils.getSysUserId());
+            otherEmp.setUpdateTime(new Date());
+            otherEmp.setDelflag("true");
+            otherEmp.setStatus("false");
+            forup.update(otherEmp);
+        }
     }
 
     private String updateImagePath(String imageRealPath) {
