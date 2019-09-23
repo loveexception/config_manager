@@ -235,9 +235,13 @@ public class DriverController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object editAllNormal(@Param("data") Normal[] normals,HttpServletRequest req) {
+	public Object editAllNormal(@Param("data") Normal[] normals,@Param("start") Integer start,HttpServletRequest req) {
 		try {
-			Object obj = normalService.updateAllNormal(Arrays.asList(normals),0);
+			if(Lang.isEmpty(start)){
+				start = 0;
+			}
+
+			Object obj = normalService.updateAllNormal(Arrays.asList(normals),start);
 			return Result.success("system.success",obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
