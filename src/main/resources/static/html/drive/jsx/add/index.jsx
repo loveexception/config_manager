@@ -394,6 +394,7 @@ class EditableTableRadio extends React.PureComponent {
 						type: 'POST',
 						url: '/iot/driver/normal_update_all',
 						data: JSON.stringify({
+							start: data.orderNum,
 							data: [
 								{
 									...data
