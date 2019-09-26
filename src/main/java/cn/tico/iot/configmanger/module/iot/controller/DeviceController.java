@@ -493,7 +493,7 @@ public class DeviceController implements AdminKey {
 
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
-		kafkaBlock.produce("config","sno",device.getSno());
+		//kafkaBlock.produce("config","sno",device.getSno());
 		deviceService.kafka(Arrays.asList(device));
 
 		return  Result.success("system.success",device);
