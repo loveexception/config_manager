@@ -74,8 +74,8 @@ public class DeviceController implements AdminKey {
 	@Inject
 	private PersonRulerService personRulerService;
 
-	@Inject
-    private KafkaBlock kafkaBlock;
+//	@Inject
+//    private KafkaBlock kafkaBlock;
 
 	@Inject
 	private TagService tagService;

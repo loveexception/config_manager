@@ -104,6 +104,7 @@ public class OtherWorkflowController {
 			if(Lang.isNotEmpty(otherWorkflow)){
 				otherWorkflow.setCreateBy(ShiroUtils.getSysUserId());
 				otherWorkflow.setCreateTime(new Date());
+				otherWorkflow.setDelflag("false");
 				otherWorkflowService.insertEntity(otherWorkflow);
 				return Result.success("system.success",otherWorkflow);
 
@@ -147,6 +148,8 @@ public class OtherWorkflowController {
 			if(Lang.isNotEmpty(otherWorkflow)){
 				otherWorkflow.setUpdateBy(ShiroUtils.getSysUserId());
 				otherWorkflow.setUpdateTime(new Date());
+				otherWorkflow.setDelflag("false");
+
 				otherWorkflowService.updateEntity(otherWorkflow);
 			}
 			return Result.success("system.success",otherWorkflow);

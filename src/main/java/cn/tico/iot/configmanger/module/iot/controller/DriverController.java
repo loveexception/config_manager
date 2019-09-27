@@ -265,6 +265,8 @@ public class DriverController implements AdminKey {
             normal.setDriverid(driverid);
             List<Device> devices =  deviceService.query(Cnd.where("driver_id","=",driverid));
             deviceService.kafka(devices);
+
+
             return allNormals(normal,req);
 		} catch (Exception e) {
 			return Result.error("system.error");
