@@ -30,12 +30,12 @@ public class LocationServiceTest {
         service = null;
     }
 
-    @Test
+    //@Test
     public void getTrees() {
        List list = service.selectTree(null,null);
        assertEquals(0,list.size());
     }
-    @Test
+    //@Test
     public void autoID() {
         Location location = new Location();
         location.setStatus("true");
@@ -45,7 +45,7 @@ public class LocationServiceTest {
         System.out.println(list.get(0).get("id"));
         assertEquals(1,list.size());
     }
-    @Test
+    //@Test
     public void getTrees100() {
         Location location = new Location();
         location.setId("100");
@@ -54,7 +54,7 @@ public class LocationServiceTest {
         List list = service.selectTree(null,null);
         assertEquals(1,list.size());
     }
-    @Test
+    //@Test
     public void getTrees101() {
         Location
                 location = new Location();
@@ -67,7 +67,7 @@ public class LocationServiceTest {
         List list = service.selectTree("100",null);
         assertEquals(1,list.size());
     }
-    @Test
+    //@Test
     public void getTrees102() {
         Location
                 location = new Location();
@@ -85,7 +85,7 @@ public class LocationServiceTest {
         assertEquals(2,list.size());
     }
 
-    @Test
+    //@Test
     public void getTrees103() {
         Location
                 location = new Location();
@@ -103,7 +103,7 @@ public class LocationServiceTest {
         assertEquals(1,list.size());
     }
 
-    @Test
+    //@Test
     public void getTreesCNname() {
         Location location = new Location();
         location.setId("100");
@@ -126,7 +126,7 @@ public class LocationServiceTest {
         list = service.selectTree("100","毛");
         assertEquals(1,list.size());
     }
-    @Test
+    //@Test
     public void getTreesEnname() {
         Location location = new Location();
         location.setId("100");
@@ -151,7 +151,7 @@ public class LocationServiceTest {
     }
 
 
-    @Test
+    //@Test
     public void selectFathers() {
 
         Location

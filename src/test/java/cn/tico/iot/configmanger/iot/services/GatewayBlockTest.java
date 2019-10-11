@@ -75,7 +75,7 @@ public class GatewayBlockTest extends Assert {
 
     }
 
-    @Test
+    //@Test
     public void AllSnoZhong() {
         Cnd cnd = Cnd.NEW();
 

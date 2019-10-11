@@ -25,7 +25,7 @@ public class LocationTest {
         dao = null;
     }
 
-    @Test
+    //@Test
     public void creatDBOne(){
         Location location = new Location();
         //location.setId("1001");

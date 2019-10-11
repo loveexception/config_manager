@@ -36,7 +36,7 @@ public class KindTest {
     }
 
 
-    @Test
+    //@Test
     public void getId() {
         Kind kind = new Kind();
         dao.create(Kind.class,true);
@@ -46,7 +46,7 @@ public class KindTest {
 
 
     }
-    @Test
+    //@Test
     public void getModel() {
         Device dev = new Device();
 
@@ -60,7 +60,7 @@ public class KindTest {
 
     }
 
-    @Test
+    //@Test
     public void getJson() {
         Device dev = new Device();
 
@@ -80,18 +80,18 @@ public class KindTest {
 
     }
 
-    @Test
+    //@Test
     public  void getTag(){
         dao.create(Tag.class,true);
     }
 
-    @Test
+    //@Test
     public  void getKind(){
         dao.create(Normal.class,true);
 
     }
 
-    @Test
+    //@Test
     public void allTable(){
 
        //  Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.iot.models",true );

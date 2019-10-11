@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class Ttest {
 
-    @Test
+    //@Test
     public void myUtile(){
 //        Object obj =  ClassUtils.newInstance("io.nutz.nutzsite.common.shiro.session.SimpleAuthorizingRealm");
 //

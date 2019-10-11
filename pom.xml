@@ -6,7 +6,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
-        <nutzboot.version>2.3.5.v20190516</nutzboot.version>
+        <nutzboot.version>2.3.6.v20190621</nutzboot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencyManagement>
@@ -100,11 +100,6 @@
              <version>5.1.45</version>
          </dependency>-->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.1.12</version>
-        </dependency>
-        <dependency>
             <groupId>org.nutz</groupId>
             <artifactId>nutzboot-starter-thymeleaf</artifactId>
         </dependency>
@@ -119,7 +114,10 @@
             <artifactId>thymeleaf-extras-shiro</artifactId>
             <version>2.0.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutzboot-starter-redis</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.nutz</groupId>
             <artifactId>nutzboot-starter-swagger</artifactId>
@@ -177,7 +175,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.47</version>
+            <version>1.2.60</version>
         </dependency>
         <!-- 解析客户端操作系统、浏览器等 -->
         <dependency>
@@ -199,7 +197,6 @@
             <artifactId>alipay-sdk-java</artifactId>
             <version>3.3.87.ALL</version>
         </dependency>
-
         <!--阿里云消息推送-->
         <dependency>
             <groupId>com.aliyun</groupId>
@@ -287,7 +284,7 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.20</version>
+            <version>1.22</version>
         </dependency>
 
         <!-- api token web server -->
@@ -370,6 +367,9 @@
         <repository>
             <id>nutz-snapshots</id>
             <url>http://jfrog.nutz.cn/artifactory/snapshots</url>
+            <!--
+            <url>http://jfrog.wchin.cn/artifactory/snapshots</url>
+            -->
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -383,6 +383,9 @@
         <pluginRepository>
             <id>nutz-snapshots</id>
             <url>http://jfrog.nutz.cn/artifactory/snapshots</url>
+            <!--
+            <url>http://jfrog.wchin.cn/artifactory/snapshots</url>
+            -->
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -406,7 +409,8 @@
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
-            <!-- <plugin>
+            <!-- 修改之后版本-->
+	    <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.3</version>
@@ -414,8 +418,8 @@
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
-             -->
-			<!-- 修改之后版本-->
+            <!-- 修改之后版本 -->
+			<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -424,7 +428,7 @@
 				<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
-			 <!-- 修改之后版本 -->
+			  -->
             <plugin>
                 <groupId>org.nutz.boot</groupId>
                 <artifactId>nutzboot-maven-plugin</artifactId>

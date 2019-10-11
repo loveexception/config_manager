@@ -18,7 +18,7 @@ import org.nutz.ioc.Ioc;
 
 public class KafakaTest {
 
-    @Test
+    //@Test
     public void test1(){
 
         String topic = "test";//args[0].toString();
@@ -46,7 +46,7 @@ public class KafakaTest {
                         record.offset(), record.key(), record.value());
         }
     }
-    @Test
+    //@Test
     public void test2(){
 
         String topic = "config";//args[0].toString();
@@ -76,7 +76,7 @@ public class KafakaTest {
     }
 
 
-    @Test
+    //@Test
     public void test3(){
 
         String topic = "testrawdata";//args[0].toString();

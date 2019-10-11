@@ -13,7 +13,7 @@ import org.nutz.mapl.Mapl;
 import java.util.HashMap;
 
 public class KafkaBlockTest {
-    @Test
+    //@Test
     public void tests(){
 
         String brokers = "172.16.16.5:9092";//System.getenv("CLOUDKARAFKA_BROKERS");
