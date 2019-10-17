@@ -370,7 +370,7 @@ class EditableTableRadio extends React.PureComponent {
 	state = {
 		value: 'false'
 	};
-	componentWillMount() {
+	componentDidMount() {
 		let { data = {} } = this.props;
 		this.setState({
 			value: data['status']
