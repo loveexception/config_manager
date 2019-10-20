@@ -293,11 +293,6 @@ class EditableCell extends React.PureComponent {
 	}
 }
 class EditableTableRadio extends React.PureComponent {
-	// state = {
-	// 	value: 'false'
-	// };
-	// componentWillMount() {
-	// }
 	render() {
 		let { data = {} } = this.props;
 		let value = data['status'];

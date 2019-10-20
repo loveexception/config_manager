@@ -152,7 +152,7 @@ class EditBox extends React.PureComponent {
 														data: JSON.stringify({
 															data: {
 																id: device_id,
-																assetStatus: params.assetStatus||'0'
+																assetStatus: params.assetStatus || '0'
 															}
 														}),
 														dataType: 'json',
@@ -248,7 +248,7 @@ class BasicInformation extends React.PureComponent {
 							});
 						}
 					});
-					this.getLocationData(_device.locationid);
+					this.getLocationData(_device.deptid);
 					this.getKindList(_device.kindid);
 					this.setState({
 						_device
