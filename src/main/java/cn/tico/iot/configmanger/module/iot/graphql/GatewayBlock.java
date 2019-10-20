@@ -61,8 +61,7 @@ public class GatewayBlock implements Block {
 
         //subGateway.setGateway(gateway);
 
-        //gateway =gitBlock .createProject(gateway);
-        kafkaBlock.produce("config","extsno",subGateway.getExtSno());
+        // kafkaBlock.produce("config","extsno",subGateway.getExtSno());
 
 
         GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);

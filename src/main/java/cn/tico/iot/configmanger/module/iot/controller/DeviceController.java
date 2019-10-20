@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.excel.ImportExcel;
+import cn.tico.iot.configmanger.module.iot.bean.GitBean;
 import cn.tico.iot.configmanger.module.iot.graphql.GitBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
@@ -21,6 +22,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -36,6 +38,7 @@ import org.nutz.mvc.upload.UploadAdaptor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -501,6 +504,26 @@ public class DeviceController implements AdminKey {
 		device = deviceService._fetch(device);
 		//kafkaBlock.produce("config","sno",device.getSno());
 		deviceService.kafka(Arrays.asList(device));
+		Gateway gateway = gatewayService.fetch(device.getGatewayid());
+		if(Lang.isEmpty(gateway)){
+			return Result.success("system.success",device);
+		}
+
+		gateway = gatewayService.fetchLinks(gateway,"subGateway");
+
+		if(Lang.isEmpty(gateway.getSubGateway())){
+			return  Result.success("system.success",device);
+		}
+		if(Strings.isBlank(gateway.getSubGateway().getExtSno())){
+			return  Result.success("system.success",device);
+		}
+		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver",Cnd.NEW().and("gateway_id","=",gateway.getId()));
+		GitBean gitbean = gitBlock.gitBeanBuilder(gateway.getSubGateway());
+		try {
+			gitBlock.changGit(gitbean,gateway,devices);
+		} catch (Exception e) {
+			Result.error(503,"system.error");
+		}
 
 		return  Result.success("system.success",device);
 	}

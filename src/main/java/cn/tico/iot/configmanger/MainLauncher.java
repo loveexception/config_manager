@@ -32,8 +32,6 @@ import java.util.List;
  * @author haiming
  */
 @IocBean(create = "init", depose = "depose")
-@IocBy(args="*slog")
-@Localization(value = "locales/", defaultLocalizationKey = "zh-CN")
 public class MainLauncher {
     private static final Log log = Logs.get();
 
