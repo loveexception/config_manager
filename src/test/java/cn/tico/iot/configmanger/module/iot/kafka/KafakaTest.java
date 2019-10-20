@@ -26,9 +26,9 @@ public class KafakaTest {
         Properties props = new Properties();
         props.put("bootstrap.servers", "172.16.16.5:9092");
         props.put("group.id", group);
-        props.put("enable.auto.commit", "true");
+        props.put("enable.auto.end", "true");
 
-        props.put("auto.commit.interval.ms", "100000");
+        props.put("auto.end.interval.ms", "100000");
 
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
@@ -54,9 +54,9 @@ public class KafakaTest {
         Properties props = new Properties();
         props.put("bootstrap.servers", "172.16.16.5:9092");
         props.put("group.id", group);
-        props.put("enable.auto.commit", "true");
+        props.put("enable.auto.end", "true");
 
-        props.put("auto.commit.interval.ms", "100000");
+        props.put("auto.end.interval.ms", "100000");
 
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
@@ -84,9 +84,9 @@ public class KafakaTest {
         Properties props = new Properties();
         props.put("bootstrap.servers", "172.16.16.5:9092");
         props.put("group.id", group);
-        props.put("enable.auto.commit", "true");
+        props.put("enable.auto.end", "true");
 
-        props.put("auto.commit.interval.ms", "100000");
+        props.put("auto.end.interval.ms", "100000");
 
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
@@ -113,9 +113,9 @@ public class KafakaTest {
 //        Properties props = new Properties();
 //        props.put("bootstrap.servers", "172.16.16.9:9092");
 //        props.put("group.id", group);
-//        props.put("enable.auto.commit", "true");
+//        props.put("enable.auto.end", "true");
 //
-//        props.put("auto.commit.interval.ms", "100000");
+//        props.put("auto.end.interval.ms", "100000");
 //
 //        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 //

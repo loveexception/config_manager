@@ -1,10 +1,12 @@
 package cn.tico.iot.configmanger.module.iot.graphql;
 
+import cn.tico.iot.configmanger.module.iot.bean.GitBean;
 import cn.tico.iot.configmanger.module.iot.graphql.Block;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.GatewayService;
 import cn.tico.iot.configmanger.module.iot.services.SubGatewayService;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -13,8 +15,10 @@ import org.nutz.json.Json;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.random.R;
+import org.nutz.log.Logs;
 import org.nutz.mapl.Mapl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +57,21 @@ public class GatewayBlock implements Block {
         }
 
         subGateway = registerSubGateWay(subGateway, gateway);
+        //gateway.setSubGateway(subGateway);
 
-        gateway =gitBlock .createProject(gateway);
+        //subGateway.setGateway(gateway);
+
+        //gateway =gitBlock .createProject(gateway);
+        kafkaBlock.produce("config","extsno",subGateway.getExtSno());
+
+
+        GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);
+
+        gateway = gitBlock.createGit(gateway,gitBean);
 
         kafkaBlock.produce("config","extsno",subGateway.getExtSno());
 
+        gatewayService.update(gateway);
 
         return subGateway;
 
@@ -78,7 +92,7 @@ public class GatewayBlock implements Block {
 
         gatewayService.updateEntityRobot(gateway);
 
-        subGateway.setGateway(gateway);
+
         return subGateway;
     }
 

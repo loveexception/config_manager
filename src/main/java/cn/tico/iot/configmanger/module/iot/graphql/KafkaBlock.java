@@ -12,6 +12,8 @@ import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.log.Logs;
+import org.nutz.trans.Atom;
+import org.nutz.trans.Trans;
 
 import java.util.Arrays;
 import java.util.Properties;
@@ -46,8 +48,8 @@ public  class KafkaBlock  {
         Properties props = new Properties();
         props.put("bootstrap.servers", conf.get("kafka.brokers"));
         props.put("group.id", conf.get("kafka.group"));
-        props.put("enable.auto.commit", "true");
-        props.put("auto.commit.interval.ms", "1000");
+        props.put("enable.auto.end", "true");
+        props.put("auto.end.interval.ms", "1000");
         props.put("auto.offset.reset", "earliest");
         props.put("session.timeout.ms", "30001");
 
@@ -66,11 +68,11 @@ public  class KafkaBlock  {
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(1000);
             for (ConsumerRecord<String, String> record : records) {
-                try {
-                    block.exec(topic, record.key(), record.value(), record.offset());
-                }catch (Exception e){
-                    Logs.get().debug(e);
-                }
+
+                Trans.exec(new Atom(){
+                    public void run() {
+                        block.exec(topic, record.key(), record.value(), record.offset());
+                    }});
 
 			}
             try {

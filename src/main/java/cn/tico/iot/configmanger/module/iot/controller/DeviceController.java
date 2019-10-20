@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.excel.ImportExcel;
+import cn.tico.iot.configmanger.module.iot.graphql.GitBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
@@ -76,6 +77,10 @@ public class DeviceController implements AdminKey {
 
 	@Inject
     private KafkaBlock kafkaBlock;
+
+	@Inject
+	private GitBlock  gitBlock;
+
 
 	@Inject
 	private TagService tagService;
@@ -172,6 +177,7 @@ public class DeviceController implements AdminKey {
 		try {
 			device = deviceService.fetch(device.getId());
 			int  i = deviceService.vDelete(device.getId());
+
 			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
 		} catch (Exception e) {
@@ -493,7 +499,7 @@ public class DeviceController implements AdminKey {
 
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
-		kafkaBlock.produce("config","sno",device.getSno());
+		//kafkaBlock.produce("config","sno",device.getSno());
 		deviceService.kafka(Arrays.asList(device));
 
 		return  Result.success("system.success",device);
