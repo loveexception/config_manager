@@ -19,6 +19,7 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.log.Logs;
 
 import java.util.Iterator;
 import java.util.List;
@@ -172,6 +173,34 @@ public class ApiService {
         List<PersonRuler> result = dao.queryByJoin(PersonRuler.class,"^normal$", cnd);
         return result;
     }
+
+    /**
+     * 这里是EXT SNO 入口
+     * @param extsno
+     * @return
+     */
+    @GraphQLQuery(name = "subgateway")
+    public SubGateway subGateway(@GraphQLArgument(name = "extsno") String extsno) {
+        Logs.get().infof("subgateway start by extsno:%s",extsno);
+        if (Strings.isBlank(extsno)) {
+            return null;
+        }
+        Cnd cnd = Cnd.NEW();
+        cnd.and("ext_sno", "=", extsno);
+        List<SubGateway> subGateways = dao.queryByJoin(SubGateway.class, "^gateway$", cnd);
+        for(SubGateway sub : subGateways){
+            return sub;
+        }
+        return null;
+    }
+
+
+
+    /**
+     * 从GATE WAY 到 SUBGATEWAY
+     * @param gateway
+     * @return
+     */
     @GraphQLQuery(name = "subgateway")
     public SubGateway getSubGateWay(@GraphQLContext Gateway gateway) {
         if(Lang.isEmpty(gateway)){
@@ -188,5 +217,21 @@ public class ApiService {
 
 
         return subGateway;
+    }
+    @GraphQLQuery(name = "devices")
+    public List<Device>  gateWayDevices(@GraphQLContext Gateway gateway) {
+        if(Lang.isEmpty(gateway)){
+            return null;
+        }
+        if(Strings.isEmpty(gateway.getId())){
+            return null;
+        }
+        Cnd cnd = Cnd.NEW();
+        cnd .and("gateway_id","=",gateway.getId());
+
+        List<Device> devices = dao.query(Device.class,cnd);
+
+
+        return devices;
     }
 }

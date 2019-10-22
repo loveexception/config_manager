@@ -181,6 +181,11 @@ public class DeviceController implements AdminKey {
 			device = deviceService.fetch(device.getId());
 			int  i = deviceService.vDelete(device.getId());
 
+//			Object object = changGit(device);
+//			if (object != null) {
+//				return object;
+//			}
+
 			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
 		} catch (Exception e) {
@@ -503,7 +508,16 @@ public class DeviceController implements AdminKey {
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
 		//kafkaBlock.produce("config","sno",device.getSno());
+		Object result = changGit(device);
+		if (result != null) {
+			return result;
+		}
 		deviceService.kafka(Arrays.asList(device));
+
+		return  Result.success("system.success",device);
+	}
+
+	private Object changGit(@Param("data") Device device) {
 		Gateway gateway = gatewayService.fetch(device.getGatewayid());
 		if(Lang.isEmpty(gateway)){
 			return Result.success("system.success",device);
@@ -517,15 +531,14 @@ public class DeviceController implements AdminKey {
 		if(Strings.isBlank(gateway.getSubGateway().getExtSno())){
 			return  Result.success("system.success",device);
 		}
-		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver",Cnd.NEW().and("gateway_id","=",gateway.getId()));
+		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver", Cnd.NEW().and("gateway_id","=",gateway.getId()));
 		GitBean gitbean = gitBlock.gitBeanBuilder(gateway.getSubGateway());
 		try {
 			gitBlock.changGit(gitbean,gateway,devices);
 		} catch (Exception e) {
-			Result.error(503,"system.error");
+			return Result.error(503,"system.error");
 		}
-
-		return  Result.success("system.success",device);
+		return null;
 	}
 
 
@@ -551,6 +564,15 @@ public class DeviceController implements AdminKey {
 			result.add(device);
 		}
 		deviceService.update(result);
+		for(Device device : result){
+			Object object = changGit(device);
+			if (object != null) {
+				return object;
+			}
+		}
+
+
+
 		deviceService.kafka(result);
 
 		return  Result.success("system.success",result);

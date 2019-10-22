@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import lombok.Data;
 import org.nutz.json.Json;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Strings;
 import org.nutz.lang.util.NutMap;
 import org.nutz.mapl.Mapl;
 
@@ -20,19 +21,22 @@ public class GitBean {
     private String username;
     private String password;
 
-    public GitBean(Object  obj){
-        //NutMap map = Lang.obj2nutmap(obj);
-        //sno = map.getString("sno","");
-//        sno = ""+Mapl.cell(obj,"extsno");
-//        sshhome = map.getString("sshhome","");
-//        localhome = map.getString("localhome","");
-//        githome = map.getString("githome","");
-//        username = map.getString("username","");
-//        password = map.getString("password","");
-    }
+//    public GitBean(Object  obj){
+//        //NutMap map = Lang.obj2nutmap(obj);
+//        //sno = map.getString("sno","");
+////        sno = ""+Mapl.cell(obj,"extsno");
+////        sshhome = map.getString("sshhome","");
+////        localhome = map.getString("localhome","");
+////        githome = map.getString("githome","");
+////        username = map.getString("username","");
+////        password = map.getString("password","");
+//    }
 
     public GitBean(SubGateway obj){
         sno = obj.getExtSno();
+        if(Strings.isBlank(sno)){
+            sno="";
+        }
 
     }
     public GitBean (){}

@@ -38,6 +38,9 @@ public class GitBlockTest {
 
     @After
     public void tearDown() throws Exception {
+        if(true){
+            return;
+        }
         File[] all= Files.ls(GIT_HOME,"test*",null);
         for (int i = 0; i < all.length; i++) {
             System.out.println("del:"+all[i].getAbsolutePath());
@@ -57,7 +60,7 @@ public class GitBlockTest {
 
     @Test
     public void createGitNullSno() throws GitAPIException, IOException {
-        GitBean git = new GitBean(new Gateway());
+        GitBean git = new GitBean(new SubGateway());
         git  = block .createProject(git);
         assertEquals(git.getSno(),"");
 
@@ -174,7 +177,7 @@ public class GitBlockTest {
         System.out.println( git.getLocalPath()+":end:"+ Arrays.toString(list));
     }
     private GitBean getGitBean() {
-        GitBean git = new GitBean(new Gateway());
+        GitBean git = new GitBean(new SubGateway());
         git.setSno("test1"+ R.random(1000,9999));
         git.setGithome(GIT_HOME);
         git.setLocalhome(LOCAL_HOME);

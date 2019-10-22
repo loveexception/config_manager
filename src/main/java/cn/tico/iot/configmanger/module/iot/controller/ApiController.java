@@ -110,6 +110,20 @@ public class ApiController implements AdminKey {
 		List<SubGateway> list = this.dao.queryByJoin(SubGateway.class , "^gateway$",cnd);
 		return  Result.success("system.success",list);
 	}
+
+	@At("/gatewayGraphql")
+	@Ok("json")
+	public Object gatewayGraphql(
+			@Param("..") String sql,
+			HttpServletRequest req) {
+		init();
+
+		GraphQL graphQL = new GraphQL.Builder(schema).build();
+
+		ExecutionResult result = graphQL.execute(sql);
+
+		return result;
+	}
 	/**
 	 * 查询业务列表
 	 */
