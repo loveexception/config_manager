@@ -507,7 +507,8 @@ public class DeviceController implements AdminKey {
 
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
-		//kafkaBlock.produce("config","sno",device.getSno());
+
+
 		Object result = changGit(device);
 		if (result != null) {
 			return result;
@@ -534,7 +535,15 @@ public class DeviceController implements AdminKey {
 		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver", Cnd.NEW().and("gateway_id","=",gateway.getId()));
 		GitBean gitbean = gitBlock.gitBeanBuilder(gateway.getSubGateway());
 		try {
-			gitBlock.changGit(gitbean,gateway,devices);
+			Gateway finalGateway = gateway;
+			new Thread(()->{
+				try {
+					gitBlock.changGit(gitbean, finalGateway,devices);
+				} catch (Exception e) {
+					Logs.get().error("%s",e);
+				}
+			}).start();
+
 		} catch (Exception e) {
 			return Result.error(503,"system.error");
 		}
@@ -564,12 +573,12 @@ public class DeviceController implements AdminKey {
 			result.add(device);
 		}
 		deviceService.update(result);
-		for(Device device : result){
-			Object object = changGit(device);
-			if (object != null) {
-				return object;
-			}
-		}
+//		for(Device device : result){
+//			Object object = changGit(device);
+//			if (object != null) {
+//				return object;
+//			}
+//		}
 
 
 
