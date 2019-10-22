@@ -104,6 +104,7 @@ public class OtherWorkflowController {
 			if(Lang.isNotEmpty(otherWorkflow)){
 				otherWorkflow.setCreateBy(ShiroUtils.getSysUserId());
 				otherWorkflow.setCreateTime(new Date());
+				otherWorkflow.setDelflag("false");
 				otherWorkflowService.insertEntity(otherWorkflow);
 				return Result.success("system.success",otherWorkflow);
 
