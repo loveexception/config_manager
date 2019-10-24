@@ -217,7 +217,6 @@ public class GitBlock {
 
         Logs.getLog(this.getClass()).debugf("local:%s;git:%s;",localfile,gitfile);
 
-
         if(!Files.deleteDir(localfile)) {
             throw new IOException("Could not delete temporary file " + localfile.getPath());
         }

@@ -181,10 +181,7 @@ public class DeviceController implements AdminKey {
 			device = deviceService.fetch(device.getId());
 			int  i = deviceService.vDelete(device.getId());
 
-//			Object object = changGit(device);
-//			if (object != null) {
-//				return object;
-//			}
+			changGit(device);
 
 			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
@@ -573,18 +570,22 @@ public class DeviceController implements AdminKey {
 			result.add(device);
 		}
 		deviceService.update(result);
-//		for(Device device : result){
-//			Object object = changGit(device);
-//			if (object != null) {
-//				return object;
-//			}
-//		}
+
+		changManyGit(result);
 
 
 
 		deviceService.kafka(result);
 
 		return  Result.success("system.success",result);
+	}
+
+	private Object  changManyGit(List<Device> result) {
+		for(Device device : result){
+			 changGit(device);
+
+		}
+		return null;
 	}
 
 	@At("/drivers_tags")
