@@ -41,39 +41,39 @@ public class GatewayBlock implements Block {
     public Object exec(String topic, String key, String value, long offset) {
 
 
-        SubGateway subGateway = canRegister(value);
-        if(Lang.isEmpty(subGateway)){
-            return null;
-        }
-
-        Gateway gateway = haveSnoGateway(subGateway);
-
-        if(Lang.isEmpty(gateway)){
-            subGatewayService.insertEntity(subGateway);
-            return subGateway;
-        }
-        if(Strings.isNotBlank(gateway.getSubid())){
-            return null;
-        }
-
-        subGateway = registerSubGateWay(subGateway, gateway);
-        //gateway.setSubGateway(subGateway);
-
-        //subGateway.setGateway(gateway);
-
-        // kafkaBlock.produce("config","extsno",subGateway.getExtSno());
-
-
-        GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);
-
-        gateway = gitBlock.createGit(gateway,gitBean);
-
-        kafkaBlock.produce("config","extsno",subGateway.getExtSno());
-
-        gatewayService.update(gateway);
-
-        return subGateway;
-
+//        SubGateway subGateway = canRegister(value);
+//        if(Lang.isEmpty(subGateway)){
+//            return null;
+//        }
+//
+//        Gateway gateway = haveSnoGateway(subGateway);
+//
+//        if(Lang.isEmpty(gateway)){
+//            subGatewayService.insertEntity(subGateway);
+//            return subGateway;
+//        }
+//        if(Strings.isNotBlank(gateway.getSubid())){
+//            return null;
+//        }
+//
+//        subGateway = registerSubGateWay(subGateway, gateway);
+//        //gateway.setSubGateway(subGateway);
+//
+//        //subGateway.setGateway(gateway);
+//
+//        // kafkaBlock.produce("config","extsno",subGateway.getExtSno());
+//
+//
+//        GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);
+//
+//        gateway = gitBlock.createGit(gateway,gitBean);
+//
+//        kafkaBlock.produce("config","extsno",subGateway.getExtSno());
+//
+//        gatewayService.update(gateway);
+//
+//        return subGateway;
+        return null;
     }
 
     private SubGateway registerSubGateWay(SubGateway subGateway, Gateway gateway) {

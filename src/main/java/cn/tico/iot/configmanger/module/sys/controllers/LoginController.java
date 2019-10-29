@@ -3,6 +3,8 @@ package cn.tico.iot.configmanger.module.sys.controllers;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.manager.AsyncManager;
 import cn.tico.iot.configmanger.common.manager.factory.AsyncFactory;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.SecurityUtils;
@@ -11,6 +13,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.lang.util.NutMap;
 import org.nutz.mvc.annotation.*;
 
@@ -28,6 +31,9 @@ public class LoginController {
     private UserService userService;
     @Inject
     private AsyncFactory asyncFactory;
+
+    @Inject
+    private LocationService locationService;
 
 
     @GET
@@ -58,6 +64,13 @@ public class LoginController {
             userService.recordLoginInfo(user);
 
             NutMap map = NutMap.NEW();
+            if(Strings.isNotBlank(user.getLocationId())){
+                Location location = locationService.fetch(user.getLocationId());
+                map.addv("location",location);
+            }else{
+                map.addv("location",new Object());
+            }
+
             map.addv("dept_id",user.getDeptId());
             map.addv("user_id",user.getId());
             map.addv("location_id",user.getLocationId());

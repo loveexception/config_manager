@@ -507,10 +507,10 @@ public class DeviceController implements AdminKey {
 
 
 		Object result = changGit(device);
+		deviceService.kafka(Arrays.asList(device));
 		if (result != null) {
 			return result;
 		}
-		deviceService.kafka(Arrays.asList(device));
 
 		return  Result.success("system.success",device);
 	}

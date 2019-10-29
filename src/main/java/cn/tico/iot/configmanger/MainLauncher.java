@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.TreeUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
+import cn.tico.iot.configmanger.module.iot.graphql.SubGatewayBlock;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
 import cn.tico.iot.configmanger.module.sys.models.User;
@@ -51,7 +52,11 @@ public class MainLauncher {
     public GatewayBlock gatewayBlock;
 
     @Inject
+    public SubGatewayBlock subGatewayBlock;
+
+    @Inject
     private UserService userService;
+
     @Inject
     private MenuService menuService;
 
@@ -110,7 +115,8 @@ public class MainLauncher {
         // 创建数据库
         //Daos.createTablesInPackage(dao, "cn.tico.iot", false);
         block.init();
-        new Thread(()->block.consume("register", gatewayBlock)).start();
+        new Thread(()->block.consume("register", subGatewayBlock)).start();
+        new Thread(()->block.consume("config", gatewayBlock)).start();
 
     }
 

@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
+import org.nutz.json.Json;
+import org.nutz.lang.util.NutMap;
 
 import static org.junit.Assert.*;
 @Slf4j
@@ -28,4 +30,16 @@ public class ConfigServiceTest {
         String appUploadPath = configService.getValue("AppUploadPath");
         log.info(appUploadPath);
     }
+
+    @Test
+    public void getJson(){
+
+        NutMap map = Json.fromJson(NutMap.class, "{data:{pager:{pagerSize:20},users:[{id:123,name:'wendal'}, {id:345}]}}");
+        System.out.println(map.eval("data.pager.pagerSize"));
+        System.out.println(map.eval("data.users[0].name"));
+        System.out.println(map.eval("data.users[1].name"));
+
+    }
+
+
 }
