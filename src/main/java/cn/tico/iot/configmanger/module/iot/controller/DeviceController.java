@@ -181,7 +181,7 @@ public class DeviceController implements AdminKey {
 			device = deviceService.fetch(device.getId());
 			int  i = deviceService.vDelete(device.getId());
 
-			changGit(device);
+			//changGit(device);
 
 			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
@@ -506,46 +506,46 @@ public class DeviceController implements AdminKey {
 		device = deviceService._fetch(device);
 
 
-		Object result = changGit(device);
+		//Object result = changGit(device);
 		deviceService.kafka(Arrays.asList(device));
-		if (result != null) {
-			return result;
-		}
+//		if (result != null) {
+//			return result;
+//		}
 
 		return  Result.success("system.success",device);
 	}
 
-	private Object changGit(@Param("data") Device device) {
-		Gateway gateway = gatewayService.fetch(device.getGatewayid());
-		if(Lang.isEmpty(gateway)){
-			return Result.success("system.success",device);
-		}
-
-		gateway = gatewayService.fetchLinks(gateway,"subGateway");
-
-		if(Lang.isEmpty(gateway.getSubGateway())){
-			return  Result.success("system.success",device);
-		}
-		if(Strings.isBlank(gateway.getSubGateway().getExtSno())){
-			return  Result.success("system.success",device);
-		}
-		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver", Cnd.NEW().and("gateway_id","=",gateway.getId()));
-		GitBean gitbean = gitBlock.gitBeanBuilder(gateway.getSubGateway());
-		try {
-			Gateway finalGateway = gateway;
-			new Thread(()->{
-				try {
-					gitBlock.changGit(gitbean, finalGateway,devices);
-				} catch (Exception e) {
-					Logs.get().error("%s",e);
-				}
-			}).start();
-
-		} catch (Exception e) {
-			return Result.error(503,"system.error");
-		}
-		return null;
-	}
+//	private Object changGit(@Param("data") Device device) {
+//		Gateway gateway = gatewayService.fetch(device.getGatewayid());
+//		if(Lang.isEmpty(gateway)){
+//			return Result.success("system.success",device);
+//		}
+//
+//		gateway = gatewayService.fetchLinks(gateway,"subGateway");
+//
+//		if(Lang.isEmpty(gateway.getSubGateway())){
+//			return  Result.success("system.success",device);
+//		}
+//		if(Strings.isBlank(gateway.getSubGateway().getExtSno())){
+//			return  Result.success("system.success",device);
+//		}
+//		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver", Cnd.NEW().and("gateway_id","=",gateway.getId()));
+//		GitBean gitbean = gitBlock.gitBeanBuilder(gateway.getSubGateway());
+//		try {
+//			Gateway finalGateway = gateway;
+//			new Thread(()->{
+//				try {
+//					gitBlock.changGit(gitbean, finalGateway,devices);
+//				} catch (Exception e) {
+//					Logs.get().error("%s",e);
+//				}
+//			}).start();
+//
+//		} catch (Exception e) {
+//			return Result.error(503,"system.error");
+//		}
+//		return null;
+//	}
 
 
 	@At("/drivers_update")
@@ -571,7 +571,7 @@ public class DeviceController implements AdminKey {
 		}
 		deviceService.update(result);
 
-		changManyGit(result);
+		//changManyGit(result);
 
 
 
@@ -581,10 +581,10 @@ public class DeviceController implements AdminKey {
 	}
 
 	private Object  changManyGit(List<Device> result) {
-		for(Device device : result){
-			 changGit(device);
-
-		}
+//		for(Device device : result){
+//			 changGit(device);
+//
+//		}
 		return null;
 	}
 

@@ -93,7 +93,7 @@ public class SubGatewayBlock implements Block {
         /**
          * 	发送KAFKA（还末建立 GIT ）
          */
-        kafkaBlock.produce("config","extsno",extSno);
+        kafkaBlock.produce("config","wait",extSno);
         Logs.get().infof("send tipc : config  ;keys :extsno ; value : ",extSno);
 
 

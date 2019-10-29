@@ -2,8 +2,10 @@ package cn.tico.iot.configmanger.module.iot.graphql;
 
 import cn.tico.iot.configmanger.module.iot.bean.GitBean;
 import cn.tico.iot.configmanger.module.iot.graphql.Block;
+import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
+import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.GatewayService;
 import cn.tico.iot.configmanger.module.iot.services.SubGatewayService;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -36,10 +38,34 @@ public class GatewayBlock implements Block {
     GatewayService gatewayService;
     @Inject
     SubGatewayService subGatewayService;
+    @Inject
+    DeviceService deviceService;
 
     @Override
     public Object exec(String topic, String key, String value, long offset) {
+        if(Strings.isBlank(key)){
+            return null;
+        }
+        if(!Strings.equals(key,"wait")){
+            return null;
+        }
 
+        String extsno = value;
+        Cnd cnd = Cnd.NEW()
+                .and("status","=","true")
+                .and("delflage","=","false")
+                .and("extsno","=",extsno);
+
+        List<SubGateway> subGateways = subGatewayService.query(cnd);
+        if(Lang.isEmpty(subGateways)){
+            return null;
+        }
+        SubGateway subGateway = subGateways.get(0);
+        subGateway = subGatewayService.fetchLinks(subGateway,"gateway");
+        Gateway gateway = subGateway.getGateway();
+        if(Lang.isEmpty(gateway)){
+            return null;
+        }
 
 //        SubGateway subGateway = canRegister(value);
 //        if(Lang.isEmpty(subGateway)){
@@ -57,23 +83,35 @@ public class GatewayBlock implements Block {
 //        }
 //
 //        subGateway = registerSubGateWay(subGateway, gateway);
-//        //gateway.setSubGateway(subGateway);
-//
-//        //subGateway.setGateway(gateway);
-//
-//        // kafkaBlock.produce("config","extsno",subGateway.getExtSno());
-//
-//
-//        GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);
-//
-//        gateway = gitBlock.createGit(gateway,gitBean);
-//
-//        kafkaBlock.produce("config","extsno",subGateway.getExtSno());
-//
-//        gatewayService.update(gateway);
-//
-//        return subGateway;
-        return null;
+
+
+
+        GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);
+
+        if(Strings.isBlank(gateway.getGitPath())){
+            gateway = gitBlock.createGit(gateway,gitBean);
+        }else {
+            cnd = Cnd.NEW()
+                    .and("status","=","true")
+                    .and("delflage","=","false")
+                    .and("gateway_id","=",gateway.getId());
+
+            List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver",cnd);
+            try {
+                gitBlock.changGit(gitBean,gateway,devices);
+            } catch (Exception e) {
+                Logs.get().errorf("error for chang git gitBean: %s ; gateway: %s ; devices:  %s ; ", gitBean,gateway,devices);
+                return null;
+            }
+        }
+
+        gatewayService.update(gateway);
+
+
+        kafkaBlock.produce("config","extsno",extsno);
+
+
+        return subGateway;
     }
 
     private SubGateway registerSubGateWay(SubGateway subGateway, Gateway gateway) {

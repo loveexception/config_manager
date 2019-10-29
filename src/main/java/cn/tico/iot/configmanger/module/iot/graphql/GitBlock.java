@@ -103,7 +103,7 @@ public class GitBlock {
         git = commit_push(git);
 
 
-        gateway.setGitPath(git.getSshPath());
+        //gateway.setGitPath(git.getSshPath());
         return gateway;
     }
 
