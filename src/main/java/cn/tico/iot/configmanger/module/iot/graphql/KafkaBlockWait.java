@@ -20,7 +20,7 @@ import java.util.Properties;
 
 @IocBean(create = "init", depose = "depose")
 
-public  class KafkaBlock  {
+public  class KafkaBlockWait {
 
     @Inject
     public PropertiesProxy conf;

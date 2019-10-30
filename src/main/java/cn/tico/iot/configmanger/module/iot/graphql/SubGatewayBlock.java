@@ -247,6 +247,10 @@ public class SubGatewayBlock implements Block {
         int  count = gatewayService.count(cnd);
         return count >=1 ;
     }
+    public void init(){
 
+    }
+    public void depose(){
 
+    }
 }
