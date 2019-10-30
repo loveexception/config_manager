@@ -59,4 +59,21 @@ public class SubGatewayService extends Service<SubGateway> {
 			updateEntity(subGateway);
 		}
 	}
+
+    public SubGateway findByGateWayId(String gatewayid) {
+		if(Strings.isBlank(gatewayid)){
+			return null;
+		}
+		Cnd cnd = Cnd.NEW()
+				.and("status","=","true")
+				.and("delflage","=","false")
+				.and("gw_id","=",gatewayid);
+
+		List<SubGateway> subGateways = query(cnd);
+		if(Lang.isEmpty(subGateways)){
+			return null;
+		}
+		return subGateways.get(0);
+
+    }
 }

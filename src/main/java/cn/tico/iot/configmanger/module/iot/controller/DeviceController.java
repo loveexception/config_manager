@@ -67,6 +67,8 @@ public class DeviceController implements AdminKey {
 
 	@Inject
 	private GatewayService gatewayService;
+	@Inject
+    private SubGatewayService subGatewayService;
 
 
 	@Inject
@@ -181,8 +183,8 @@ public class DeviceController implements AdminKey {
 			device = deviceService.fetch(device.getId());
 			int  i = deviceService.vDelete(device.getId());
 
-			//changGit(device);
-
+            String extsno = getExtsno(device);
+            kafkaBlock.produce("config","wait",extsno);
 			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
 		} catch (Exception e) {
@@ -501,51 +503,38 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
 	public Object over(@Param("data")Device device ,HttpServletRequest req ){
+	    //先取出原始的EXTSNO
+        String oldextsno = getExtsno(device);
+
 
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
+        deviceService.kafka(Arrays.asList(device));
 
-
-		//Object result = changGit(device);
-		deviceService.kafka(Arrays.asList(device));
-//		if (result != null) {
-//			return result;
-//		}
+        //再取出新的EXTSNO
+        String extsno = getExtsno(device);
+        if(!Strings.equals(extsno,oldextsno)){
+            kafkaBlock.produce("config","wait",oldextsno);
+        }
+        kafkaBlock.produce("config","wait",extsno);
 
 		return  Result.success("system.success",device);
 	}
 
-//	private Object changGit(@Param("data") Device device) {
-//		Gateway gateway = gatewayService.fetch(device.getGatewayid());
-//		if(Lang.isEmpty(gateway)){
-//			return Result.success("system.success",device);
-//		}
-//
-//		gateway = gatewayService.fetchLinks(gateway,"subGateway");
-//
-//		if(Lang.isEmpty(gateway.getSubGateway())){
-//			return  Result.success("system.success",device);
-//		}
-//		if(Strings.isBlank(gateway.getSubGateway().getExtSno())){
-//			return  Result.success("system.success",device);
-//		}
-//		List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver", Cnd.NEW().and("gateway_id","=",gateway.getId()));
-//		GitBean gitbean = gitBlock.gitBeanBuilder(gateway.getSubGateway());
-//		try {
-//			Gateway finalGateway = gateway;
-//			new Thread(()->{
-//				try {
-//					gitBlock.changGit(gitbean, finalGateway,devices);
-//				} catch (Exception e) {
-//					Logs.get().error("%s",e);
-//				}
-//			}).start();
-//
-//		} catch (Exception e) {
-//			return Result.error(503,"system.error");
-//		}
-//		return null;
-//	}
+
+
+    public String getExtsno(@Param("data") Device device) {
+        String extsno = null;
+        if(Strings.isNotBlank(device.getId())){
+            Device oldDev = deviceService.fetch(device.getId()) ;
+            if (Strings.isNotBlank(device.getGatewayid())){
+                SubGateway oldSub = subGatewayService.findByGateWayId(oldDev.getGatewayid());
+                extsno = oldSub.getExtSno();
+            }
+        }
+        return extsno;
+    }
+
 
 
 	@At("/drivers_update")
@@ -571,22 +560,26 @@ public class DeviceController implements AdminKey {
 		}
 		deviceService.update(result);
 
-		//changManyGit(result);
 
 
 
 		deviceService.kafka(result);
 
+		Set<String> extsnos = new HashSet<String>();
+		for (Device device:result){
+            //changGit(device);
+            String extsno = getExtsno(device);
+            extsnos.add(extsno);
+        }
+
+        for (String extsno : extsnos){
+            kafkaBlock.produce("config","wait",extsno);
+        }
+
 		return  Result.success("system.success",result);
 	}
 
-	private Object  changManyGit(List<Device> result) {
-//		for(Device device : result){
-//			 changGit(device);
-//
-//		}
-		return null;
-	}
+
 
 	@At("/drivers_tags")
 	@POST
