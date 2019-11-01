@@ -11,7 +11,7 @@ import org.nutz.lang.random.R;
 import java.util.Date;
 
 @Data
-public abstract class CommonModel {
+public abstract class CommonModel  {
 
 
     @Name

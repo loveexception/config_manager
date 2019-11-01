@@ -66,7 +66,7 @@ public class SubGatewayService extends Service<SubGateway> {
 		}
 		Cnd cnd = Cnd.NEW()
 				.and("status","=","true")
-				.and("delflage","=","false")
+				//.and("delflage","=","false")
 				.and("gw_id","=",gatewayid);
 
 		List<SubGateway> subGateways = query(cnd);

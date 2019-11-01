@@ -513,10 +513,15 @@ public class DeviceController implements AdminKey {
 
         //再取出新的EXTSNO
         String extsno = getExtsno(device);
-        if(!Strings.equals(extsno,oldextsno)){
-            kafkaBlock.produce("config","wait",oldextsno);
-        }
-        kafkaBlock.produce("config","wait",extsno);
+
+        if(Strings.isNotBlank(extsno)){
+			kafkaBlock.produce("config","wait",extsno);
+		}
+		if(Strings.isBlank(oldextsno)){
+
+		}else if(!Strings.equals(extsno,oldextsno)){
+			kafkaBlock.produce("config","wait",oldextsno);
+		}
 
 		return  Result.success("system.success",device);
 	}
@@ -524,15 +529,33 @@ public class DeviceController implements AdminKey {
 
 
     public String getExtsno(@Param("data") Device device) {
-        String extsno = null;
-        if(Strings.isNotBlank(device.getId())){
-            Device oldDev = deviceService.fetch(device.getId()) ;
-            if (Strings.isNotBlank(device.getGatewayid())){
-                SubGateway oldSub = subGatewayService.findByGateWayId(oldDev.getGatewayid());
-                extsno = oldSub.getExtSno();
-            }
+        if(Lang.isEmpty(device)){
+        	return null;
+		}
+		if(Strings.isBlank(device.getId())){
+            return null;
         }
-        return extsno;
+        Device dev = deviceService.fetch(device.getId()) ;
+        if(Lang.isEmpty(dev)){
+        	return null;
+		}
+        if (Strings.isBlank(dev.getGatewayid())){
+            return null;
+        }
+        Gateway gateway = gatewayService.fetch(dev.getGatewayid());
+        if(Lang.isEmpty(gateway)){
+            return null;
+        }
+        if(Strings.isBlank(gateway.getSubid())){
+        	return null;
+		}
+        SubGateway sub = subGatewayService.fetch(gateway.getSubid());
+       // SubGateway oldSub = subGatewayService.findByGateWayId(device.getGatewayid());
+        if(Lang.isEmpty(sub)){
+            return null;
+        }
+
+        return sub.getExtSno();
     }
 
 
