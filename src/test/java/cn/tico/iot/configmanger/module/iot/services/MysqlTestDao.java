@@ -24,8 +24,8 @@ public class MysqlTestDao {
 
     public static Dao NEW2() {
         SimpleDataSource dataSource = new SimpleDataSource();
-        dataSource.setUrl("jdbc:mysql://172.16.16.6/nutzsite");
-//        dataSource.setUrl("jdbc:mysql://localhost/zhihutest");
+//        dataSource.setUrl("jdbc:mysql://172.16.16.6/nutzsite");
+        dataSource.setUrl("jdbc:mysql://localhost/nutztest");
         String mysqldriver ="com.mysql.cj.jdbc.Driver";
         try {
             dataSource.setDriverClassName(mysqldriver);
@@ -33,7 +33,7 @@ public class MysqlTestDao {
             e.printStackTrace();
         }
         dataSource.setUsername("root");
-        dataSource.setPassword("123456");
+        //dataSource.setPassword("123456");
 
         return  new NutDao(dataSource);
     }

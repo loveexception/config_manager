@@ -146,7 +146,7 @@ public class SubGatewayBlock implements Block {
     public Gateway chooseOneGatwayUnbind(String sno) {
         Cnd cnd = Cnd.NEW()
                 .and("status","=","true")
-                .and("delflage","=","false")
+                .and("delflag","=","false")
                 .and("sno","=",sno)
                 .and ("subgateway_id","is ",null );
         List<Gateway> list = gatewayService.query(cnd);
@@ -180,9 +180,9 @@ public class SubGatewayBlock implements Block {
     public SubGateway chooseOneSubGatewayUnbind(String sno) {
         Cnd cnd = Cnd.NEW()
                 .and("status","=","true")
-                .and("delflage","=","false")
+                .and("delflag","=","false")
                 .and("sno","=",sno)
-                .and ("subgateway_id","is ",null );
+                .and ("gw_id","is ",null );
         List<SubGateway> list = subGatewayService.query(cnd);
         if(Lang.isEmpty(list)){
             return null;
@@ -201,9 +201,9 @@ public class SubGatewayBlock implements Block {
     public  Object removeOneSubGateway(String sno) {
         Cnd cnd = Cnd.NEW()
                 .and("status","=","true")
-                .and("delflage","=","false")
+                .and("delflag","=","false")
                 .and("sno","=",sno)
-                .and ("subgateway_id","is not",null );
+                .and ("gw_id","is not",null );
                 ;
 
         List<SubGateway> list = subGatewayService.query(cnd);
@@ -226,9 +226,9 @@ public class SubGatewayBlock implements Block {
     public boolean isSnoBindingOneSubGatesy(String sno) {
         Cnd cnd = Cnd.NEW()
                 .and("status","=","true")
-                .and("delflage","=","false")
+                .and("delflag","=","false")
                 .and("sno","=",sno)
-                .and ("subgateway_id","is not",null );
+                .and ("gw_id","is not",null );
         ;
         return subGatewayService.count(cnd)>0;
     }
@@ -241,7 +241,7 @@ public class SubGatewayBlock implements Block {
     public boolean isSnoBindingAtLessOneGateWay(String sno) {
         Cnd cnd  = Cnd.NEW()
                 .and("status","=","true")
-                .and ("delflage","=","false")
+                .and ("delflag","=","false")
                 .and ("sno","=",sno)
                 .and ("subgateway_id","is not",null );
         int  count = gatewayService.count(cnd);

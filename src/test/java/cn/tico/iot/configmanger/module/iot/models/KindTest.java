@@ -23,7 +23,7 @@ public class KindTest {
     public void setUp() throws Exception {
 
 
-        dao = MysqlTestDao.NEW();
+        dao = MysqlTestDao.NEW2();
        // Daos.createTablesInPackage(dao, "cn.tico.iot.configmanger.module.iot.models", true);
 
         //Daos.migration(dao, "cn.tico.iot.configmanger.module.iot.models", true, false, false);
@@ -94,11 +94,11 @@ public class KindTest {
     //@Test
     public void allTable(){
 
-       //  Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.iot.models",true );
+         Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.other.models",true );
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
 
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
+       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
     }
 
 }

@@ -8,6 +8,7 @@ import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
+import cn.tico.iot.configmanger.module.iot.services.TopuService;
 import cn.tico.iot.configmanger.module.sys.models.Dict;
 import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
@@ -26,6 +27,7 @@ import org.nutz.lang.segment.Segment;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.*;
+import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -54,6 +56,9 @@ public class ApiController implements AdminKey {
 
 	@Inject
 	public 	DictService dictService;
+
+	@Inject
+	public TopuService topuService;
 
 	@Inject
 	private Dao dao;
@@ -176,10 +181,18 @@ public class ApiController implements AdminKey {
 	}
 	@At("/dict")
 	@Ok("json")
-	public Object api(@Param("type")String type,HttpServletRequest req){
+    @Filters(@By(type=CrossOriginFilter.class))
+
+    public Object api(@Param("type")String type,HttpServletRequest req){
 		List<Dict> list =  dictService.query(Cnd.where("type","=",type));
 
 		return Result.success("system.success", list);
+	}
+	@At("/topu")
+	@Ok("json")
+	@Filters({@By(type=CrossOriginFilter.class, args={"*", "GET, POST, PUT, DELETE, OPTIONS, PATCH", "Origin, Content-Type, Accept, X-Requested-With", "true"})})
+    public Object topu(@Param("tag")String tag ,HttpServletRequest req){
+		return topuService.drawByTag(tag);
 	}
 
 	static final String GRAPH_DEVICE=

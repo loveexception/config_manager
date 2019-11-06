@@ -198,7 +198,7 @@ public class DeptController {
             List<Map<String, Object>> tree = deptService.selectFathers("100", null);
             return tree;
         }else{
-            List<Map<String, Object>> tree = deptService.selectFathers("100" , user.getDept().getDeptName());
+            List<Map<String, Object>> tree = deptService.selectFathers(user.getDeptId() , user.getDept().getDeptName());
             return tree;
         }
 

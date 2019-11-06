@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
+import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.GatewayService;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
@@ -188,7 +189,14 @@ public class GatewayController implements AdminKey {
 			if(Lang.isNotEmpty(gateway)){
 				gatewayService.updateEntity(gateway);
 
-				kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,gateway.getSubGateway().getExtSno());
+
+				SubGateway subGateway = getExtsnoByGatewayId(gateway);
+
+				if(Lang.isNotEmpty(subGateway)&&Strings.isNotBlank(subGateway.getExtSno())){
+					kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,subGateway.getExtSno());
+
+				}
+				//kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,gateway.getSubGateway().getExtSno());
 			}
 
 			return Result.success("system.success");
@@ -208,15 +216,31 @@ public class GatewayController implements AdminKey {
 		try {
 			gatewayService.vDelete(ids);
 			Gateway gateway = gatewayService.fetch(ids[0]);
-			gatewayService.dao().fetchLinks(gateway,"subgateway");
-			gatewayService.dao().updateWith(gateway, "subgateway");
+			SubGateway subGateway = getExtsnoByGatewayId(gateway);
 
+			if(Lang.isNotEmpty(subGateway)&&Strings.isNotBlank(subGateway.getExtSno())){
+				kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,subGateway.getExtSno());
 
-			kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_EXT_SNO,gateway.getSubGateway().getExtSno());
+			}
+			gatewayService.dao().fetchLinks(gateway,"subGateway");
+			gatewayService.dao().clearLinks(gateway,"subGateway");
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
+	}
+
+	public SubGateway getExtsnoByGatewayId(Gateway gateway) {
+		if(Lang.isEmpty(gateway)){
+			return null;
+		}
+		if(Strings.isNotBlank(gateway.getSubid())){
+			return null;
+		}
+		gatewayService.dao().fetchLinks(gateway,"subGateway");
+
+
+		return gateway.getSubGateway();
 	}
 
 	/**

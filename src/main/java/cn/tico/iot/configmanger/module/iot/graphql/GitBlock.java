@@ -182,18 +182,18 @@ public class GitBlock {
 
 
 
-            String devjson = Json.toJson(device);
-            dev.putAll(Json.fromJsonAsMap(String.class,devjson));
+            String newDevice = Json.toJson(device);
+            dev.putAll(Json.fromJsonAsMap(String.class,newDevice));
             env.putAll(device.getEnv());
-            String drijson = Json.toJson(device.getDriver());
-            dri.putAll(Json.fromJsonAsMap(String.class,drijson));
+            String newDriver = Json.toJson(device.getDriver());
+            dri.putAll(Json.fromJsonAsMap(String.class,newDriver));
             File file = Files.createFileIfNoExists2(dri.getString("path"));
             dri.put("filename",file.getName());
 
 
             dev.put("env",env);
 
-            dev.put("drive",dri);
+            dev.put("driver",dri);
 
 
 

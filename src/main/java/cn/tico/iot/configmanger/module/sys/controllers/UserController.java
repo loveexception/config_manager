@@ -24,6 +24,7 @@ import org.nutz.plugins.slog.annotation.Slog;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户 信息操作处理
@@ -78,10 +79,21 @@ public class UserController {
 		if(Lang.isNotEmpty(endTime)){
 			cnd.and("create_time","<=", endTime);
 		}
+
+		User user = ShiroUtils.getSysUser();
+
+		user =userService.fetchLinks(user,"dept|image");
+		Set roles = userService.getRoleCodeList(user);
+
+
 		if (!Strings.isBlank(deptId)){
 			cnd.where().andInBySql("dept_id","SELECT id FROM sys_dept  WHERE FIND_IN_SET ('%s',ancestors)", deptId)
 					.or("dept_id","=", deptId);
+		}else if(!roles.contains("admin")){
+			cnd.and("dept_id","=",user.getDeptId());
 		}
+
+
 		return userService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"dept");
 	}
 

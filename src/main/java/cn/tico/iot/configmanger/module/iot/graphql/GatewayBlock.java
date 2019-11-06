@@ -53,8 +53,8 @@ public class GatewayBlock implements Block {
         String extsno = value;
         Cnd cnd = Cnd.NEW()
                 .and("status","=","true")
-                .and("delflage","=","false")
-                .and("extsno","=",extsno);
+               // .and("delflag","=","false")
+                .and("ext_sno","=",extsno);
 
         List<SubGateway> subGateways = subGatewayService.query(cnd);
         if(Lang.isEmpty(subGateways)){
@@ -93,7 +93,7 @@ public class GatewayBlock implements Block {
         }else {
             cnd = Cnd.NEW()
                     .and("status","=","true")
-                    .and("delflage","=","false")
+                    .and("delflag","=","false")
                     .and("gateway_id","=",gateway.getId());
 
             List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver",cnd);
