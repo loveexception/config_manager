@@ -117,10 +117,12 @@ public class TIotDevicesController {
 					 continue;
 				}
 			}
-			Set<Owner> sets = new TreeSet<>(device.getNext());
-			if(Lang.isEmpty(sets)){
+			List<Owner> lists = device.getNext();
+			if(Lang.isEmpty(lists)){
 				continue;
 			}
+			TreeSet<Owner> sets = new TreeSet<>();
+			sets.addAll(lists);
 
 			Owner last = sets.iterator().next();
 			//device.setNext(Lists.newArrayList(last));
@@ -183,20 +185,21 @@ public class TIotDevicesController {
 		String deptid = user.getDeptId();
 		Dept dept =deptService.fetch(deptid);
 
-		Set<Owner> sets = new TreeSet<>(tIotDevices.getNext());
+		List<Owner> sets = tIotDevices.getNext();
+		Owner last = new Owner();
 		if(Lang.isEmpty(sets)){
 			Owner owner= new Owner();
-			owner.setCycle("365");
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.YEAR,1);
-			String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-			owner.setTime(day);
+//			owner.setCycle("365");
+//			Calendar cal = Calendar.getInstance();
+//			cal.add(Calendar.YEAR,1);
+//			String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
+//			owner.setTime(day);
 			owner.setDeviceid(tIotDevices.getId());
-
-			sets = Sets.newHashSet(owner);
+			 last = owner;
+		}else{
+			last = sets.iterator().next();
 		}
 
-		Owner last = sets.iterator().next();
 		tIotDevices.setNext(Lists.newArrayList(last));
 
 
@@ -213,7 +216,7 @@ public class TIotDevicesController {
 	@Ok("json")
 	@RequiresPermissions("wx:tIotDevices:edit")
 	@Slog(tag="设备资本", after="修改保存设备资本")
-	public Object editDo(@Param("..") Device tIotDevices,HttpServletRequest req) {
+	public Object editDo(@Param("..") Device tIotDevices,@Param("next.cycle")String cycle,@Param("next.time")String time, HttpServletRequest req) {
 		try {
 			if(Lang.isNotEmpty(tIotDevices)){
 
@@ -225,22 +228,19 @@ public class TIotDevicesController {
 				Owner owner = new Owner();
 
 				if(Lang.isEmpty(owners)){
-					owner.setCycle("365");
-					Calendar cal = Calendar.getInstance();
-					cal.add(Calendar.YEAR,1);
-					String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-					owner.setTime(day);
+					owner.setCycle(cycle);
+
+					owner.setTime(time);
 					owner.setDeviceid(tIotDevices.getId());
 					deviceService.dao().insert(owner);
 
 				}else{
 					Owner temp = owners.get(0);
 
-					Calendar cal = Calendar.getInstance();
-					cal.add(Calendar.DATE, Integer.parseInt(temp.cycle));
-					String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-					temp.setTime(day);
-					deviceService.dao().update(owner);
+					temp.setCycle(cycle);
+					temp.setTime(time);
+
+					deviceService.dao().update(temp);
 
 				}
 
