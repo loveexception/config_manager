@@ -380,7 +380,7 @@ public class TIotDevicesController implements AdminKey {
     @At("/money")
     @Ok("json")
     public Object money( HttpServletRequest req) {
-        String deptid =null ;
+        String deptid = null ;
         if(!isAdmin()){
            deptid = ShiroUtils.getSysUser().getDeptId();
         }else{
@@ -390,6 +390,28 @@ public class TIotDevicesController implements AdminKey {
 
 
         List<Map> list =  tIotOwnerService.queryCountPrice(deptid);
+
+
+        return Result.success("system.success",list);
+
+    }
+
+    /**
+     * 设备资产统计
+     */
+    @At("/group")
+    @Ok("json")
+    public Object group( HttpServletRequest req) {
+        String deptid = null ;
+        if(!isAdmin()){
+            deptid = ShiroUtils.getSysUser().getDeptId();
+        }else{
+
+        }
+
+
+
+        List<Map> list =  tIotOwnerService.queryCountGroup(deptid);
 
 
         return Result.success("system.success",list);

@@ -107,4 +107,9 @@ public class TIotOwnerService extends Service<TIotOwner> {
 	}
 
 
+	public List<Map> queryCountGroup(String deptid) {
+
+
+		return null;
+	}
 }
