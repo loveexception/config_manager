@@ -54,7 +54,9 @@ public class DeviceService extends Service<Device> {
     public Device creatAttr(Device device) {
         device.setCreateBy(ShiroUtils.getSysUserId());
         device.setCreateTime(new Date());
-        device.setAssetStatus("0");
+        if(Strings.isBlank(device.getAssetStatus())){
+            device.setAssetStatus("0");
+        }
 
         return device;
     }

@@ -4,14 +4,39 @@ import cn.tico.iot.configmanger.common.utils.excel.annotation.ExcelField;
 import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.nutz.dao.entity.annotation.*;
 import org.nutz.mvc.annotation.Param;
+
+import java.util.Date;
 
 
 @Data
 @Table("t_iot_owner")
-@Comment("资产管理")
-public class Owner extends I18NModel {
+@Comment("资产管理维护")
+public class Owner extends I18NModel implements Comparable<Owner> {
+
+    @Column
+    @Comment("下次检查时间")
+    public String time;
+
+
+    @Column
+    @Comment("下次检查时间间隔（天）")
+    public String cycle;
+
+    @Column(value = "device_id")
+    @Comment("检修记录")
+    public String deviceid;
+
+    @One(field = "deviceid",key = "id")
+    public Device device;
+
+    @Override
+    public int compareTo(Owner o) {
+        return CompareToBuilder.reflectionCompare(o.getTime(),this.getTime());
+        // return o.time.compareTo(this.time);
+    }
 
 //    @Column("status")
 //    @Comment("资产状态")

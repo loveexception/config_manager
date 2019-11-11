@@ -41,7 +41,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "order_time", description = "购买日期")
     @ExcelField(title="购买日期")
-    private Long orderTime;
+    private String orderTime;
 
 
 
@@ -57,7 +57,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "discard_time", description = "报废时间")
     @ExcelField(title="报废时间")
-    private Long discardTime;
+    private String discardTime;
 
     @Column("asset_status")
     @Comment("资产状态,0,1,2")
@@ -110,6 +110,10 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Many(field = "deviceid")
     @GraphQLQuery(name = "persons", description = "个性化规则")
     private List<Person> persons;
+
+    @Many(field = "deviceid",key="id" )
+    @GraphQLQuery(name="next",description = "检修")
+    private List<Owner> next;
 
 
 
