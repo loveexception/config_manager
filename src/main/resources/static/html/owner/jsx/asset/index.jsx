@@ -560,88 +560,80 @@ function Frame(props) {
 	let mesFlag;
 	const columns = [
 		{
-			title: 'Name',
+			title: 'Full Name',
+			width: 100,
 			dataIndex: 'name',
-			key: 'name'
+			key: 'name',
+			fixed: 'left'
 		},
 		{
 			title: 'Age',
+			width: 100,
 			dataIndex: 'age',
 			key: 'age',
-			width: '12%'
+			fixed: 'left'
 		},
 		{
-			title: 'Address',
+			title: 'Column 1',
 			dataIndex: 'address',
-			width: '30%',
-			key: 'address'
+			key: '1',
+			width: 150
+		},
+		{
+			title: 'Column 2',
+			dataIndex: 'address',
+			key: '2',
+			width: 150
+		},
+		{
+			title: 'Column 3',
+			dataIndex: 'address',
+			key: '3',
+			width: 150
+		},
+		{
+			title: 'Column 4',
+			dataIndex: 'address',
+			key: '4',
+			width: 150
+		},
+		{
+			title: 'Column 5',
+			dataIndex: 'address',
+			key: '5',
+			width: 150
+		},
+		{
+			title: 'Column 6',
+			dataIndex: 'address',
+			key: '6',
+			width: 150
+		},
+		{
+			title: 'Column 7',
+			dataIndex: 'address',
+			key: '7',
+			width: 150
+		},
+		{ title: 'Column 8', dataIndex: 'address', key: '8' },
+		{
+			title: 'Action',
+			key: 'operation',
+			fixed: 'right',
+			width: 100,
+			render: () => <LinkButton text="确认" />
 		}
 	];
 
-	const data = [
-		{
-			key: 1,
-			name: 'John Brown sr.',
-			age: 60,
-			address: 'New York No. 1 Lake Park',
-			children: [
-				{
-					key: 11,
-					name: 'John Brown',
-					age: 42,
-					address: 'New York No. 2 Lake Park'
-				},
-				{
-					key: 12,
-					name: 'John Brown jr.',
-					age: 30,
-					address: 'New York No. 3 Lake Park',
-					children: [
-						{
-							key: 121,
-							name: 'Jimmy Brown',
-							age: 16,
-							address: 'New York No. 3 Lake Park'
-						}
-					]
-				},
-				{
-					key: 13,
-					name: 'Jim Green sr.',
-					age: 72,
-					address: 'London No. 1 Lake Park',
-					children: [
-						{
-							key: 131,
-							name: 'Jim Green',
-							age: 42,
-							address: 'London No. 2 Lake Park',
-							children: [
-								{
-									key: 1311,
-									name: 'Jim Green jr.',
-									age: 25,
-									address: 'London No. 3 Lake Park'
-								},
-								{
-									key: 1312,
-									name: 'Jimmy Green sr.',
-									age: 18,
-									address: 'London No. 4 Lake Park'
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			key: 2,
-			name: 'Joe Black',
+	const data = [];
+	for (let i = 0; i < 100; i++) {
+		data.push({
+			key: i,
+			name: `Edrward ${i}`,
 			age: 32,
-			address: 'Sidney No. 1 Lake Park'
-		}
-	];
+			address: `London Park no. ${i}`
+		});
+	}
 	React.useEffect(() => {
 		setModal1Visible(props && props.isEdit);
 
@@ -670,7 +662,7 @@ function Frame(props) {
 		<div className="modal-box">
 			<Modal title="20px to Top" width={1000} style={{ top: 20 }} visible={modal1Visible} onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton {...linkButtonConfig} style={{ background: '#08CE01', color: '#F3F3F3' }} onClick={handleData} />
-				<Table columns={columns} rowSelection={rowSelection} dataSource={data} onSelect={selectCallback} />
+				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} onSelect={selectCallback} scroll={{ x: 1500, y: 300 }} />
 			</Modal>
 		</div>
 	);
@@ -700,14 +692,37 @@ class AssetContent extends React.PureComponent {
 		super(props);
 		this.state = {
 			change: 0,
-			couter: 0,
+			couter: 20,
 			isLoading: true
 		};
 	}
 	componentDidMount() {
 		this.init();
+		let url = 'localhost:8090/wx/tIotDevices/';
+		let params = {
+			next_time: dateUtil(new Date())
+		};
+		function dateUtil(time) {
+			let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
+			return result;
+		}
+		$.get(
+			url + 'count',
+			params,
+			function(obj) {
+				console.log(obj);
+				if (obj.code === 0) {
+					//this.setState({
+					// couter:
+					// })
+				} else {
+					console.log('接口报错');
+				}
+			},
+			'json'
+		);
 		setTimeout(() => {
-			this.setState({ change: 20, couter: 10, isLoading: false });
+			this.setState({ change: 20, isLoading: false });
 		}, 1000);
 	}
 	init = () => {};
