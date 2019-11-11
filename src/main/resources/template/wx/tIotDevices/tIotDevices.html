@@ -139,8 +139,12 @@
 					sortable: true ,
                     formatter: function(value, row, index) {
                         var actions = [];
-                        var v = value.substring(0,10);
-                        actions.push('<a class="btn btn-success btn-xs " href="#" onclick="change(this)">时间：'+v+'</a> ');
+                        var v ="";
+                        if(value){
+                             v = value.substring(0,10);
+                            actions.push('<a class="btn btn-success btn-xs " href="#" onclick="change(this)">时间：'+v+'</a> ');
+
+                        }
                         return actions.join('');
                     }
 
