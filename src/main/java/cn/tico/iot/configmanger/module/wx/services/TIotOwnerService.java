@@ -74,13 +74,17 @@ public class TIotOwnerService extends Service<TIotOwner> {
 
     public List<Map> queryCountPrice(String deptid) {
 		String str = "select count(*) count ,sum( price) sum ,\n" +
-				"case when asset_status =0 then \'已用\' else \'未用\' end as asset \n" +
-				"from t_iot_devices ";
+				"case when asset_status =0 then \"true\" else \"false\" end as asset \n" +
+				"from t_iot_devices \n" +
+				"where 1=1 \n" +
+				"and delflag = \"false\" \n" +
+				"and status =\"true\"\n" ;
+
 		String group = "group by asset  ";
 		if (Strings.isBlank(deptid)) {
 			str += group;
 		} else {
-			str += " where dept_id = @mydept ";
+			str += " and  dept_id = @mydept ";
 			str += group;
 		}
 
@@ -108,8 +112,42 @@ public class TIotOwnerService extends Service<TIotOwner> {
 
 
 	public List<Map> queryCountGroup(String deptid) {
+		String str = "select mykey.type as type ,count(0) as count from t_iot_devices dev left join (select k1.cn_name as  type ,k5.cn_name as k5name  , k5.id as k5id \n" +
+				"from t_iot_kinds k1 left join t_iot_kinds k5 on k5.ancestors like CONCAT('%',k1.id,'%')\n" +
+				"where k1.level =1 \n" +
+				") mykey on dev.kind_id = mykey.k5id \n" +
+				"where 1=1 \n" +
+				"and dev.delflag = 'false'\n" +
+				"and dev.status = 'true'\n" ;
 
 
-		return null;
+		String group = "group by mykey.type   ";
+		if (Strings.isBlank(deptid)) {
+			str += group;
+		} else {
+			str += "and dev.dept_id  = @mydept ";
+			str += group;
+		}
+
+		Sql sql = Sqls.create(str);
+		sql
+				.setParam("mydept", deptid);
+		sql.setCallback(new SqlCallback() {
+			public Object invoke(Connection conn, ResultSet rs, Sql sql) throws SQLException {
+				List<Map> list = new LinkedList<Map>();
+				while (rs.next()) {
+					NutMap map = NutMap.NEW();
+					map.addv("count", rs.getString("count"))
+							.addv("type", rs.getString("type"))
+							;
+					list.add(map);
+				}
+				return list;
+			}
+		});
+
+
+		dao().execute(sql);
+		return sql.getList(Map.class);
 	}
 }
