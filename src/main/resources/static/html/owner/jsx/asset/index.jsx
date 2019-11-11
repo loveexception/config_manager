@@ -514,13 +514,9 @@ function AssetFooter(props) {
 			<div className="option-box-left" onClick={leftHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
 				<div className="option-left-text">{text.leftText}</div>
-				{props.couter > 0 ? (
-					<div className="option-waring-box" style={{ color }}>
-						{props.couter}
-					</div>
-				) : (
-					''
-				)}
+				<div className="option-waring-box" style={{ color }}>
+					{props.couter}
+				</div>
 			</div>
 			<div className="option-box-right" onClick={rightHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
@@ -555,90 +551,125 @@ const rowSelection = {
 function Frame(props) {
 	let {} = props;
 	let [modal1Visible, setModal1Visible] = React.useState(false);
-	let [modal2Visible, setModal2Visible] = React.useState(false);
-	let [] = React.useState([]);
+	let [reqFlag, setReqFlag] = React.useState(true);
+
+	let [data, setData] = React.useState([]);
 	let mesFlag;
 	const columns = [
 		{
-			title: 'Full Name',
+			title: '资产机器码',
 			width: 100,
-			dataIndex: 'name',
-			key: 'name',
+			dataIndex: 'cno',
+			key: 'sno',
 			fixed: 'left'
 		},
 		{
-			title: 'Age',
+			title: '资产状态',
 			width: 100,
-			dataIndex: 'age',
-			key: 'age',
+			dataIndex: 'asset_status',
+			key: 'asset_status',
 			fixed: 'left'
 		},
 		{
-			title: 'Column 1',
-			dataIndex: 'address',
-			key: '1',
+			title: '资产编码',
+			dataIndex: 'enName',
+			key: '资产编码',
 			width: 150
 		},
 		{
-			title: 'Column 2',
-			dataIndex: 'address',
-			key: '2',
+			title: '资产名称',
+			dataIndex: 'cnName',
+			key: '资产名称',
 			width: 150
 		},
 		{
-			title: 'Column 3',
-			dataIndex: 'address',
-			key: '3',
+			title: '部门',
+			dataIndex: 'dept',
+			key: '部门',
 			width: 150
 		},
 		{
-			title: 'Column 4',
-			dataIndex: 'address',
-			key: '4',
+			title: '价格',
+			dataIndex: 'price',
+			key: '价格',
 			width: 150
 		},
 		{
-			title: 'Column 5',
-			dataIndex: 'address',
-			key: '5',
+			title: '购买日期',
+			dataIndex: 'orderTime',
+			key: '购买日期',
 			width: 150
 		},
 		{
-			title: 'Column 6',
-			dataIndex: 'address',
-			key: '6',
+			title: '检查时间',
+			dataIndex: 'gatewayExtsno',
+			key: '检查时间',
 			width: 150
 		},
 		{
-			title: 'Column 7',
-			dataIndex: 'address',
-			key: '7',
+			title: '类型',
+			dataIndex: 'kind.cnName',
+			key: '类型',
 			width: 150
 		},
-		{ title: 'Column 8', dataIndex: 'address', key: '8' },
+		{ title: '厂家', dataIndex: 'kindmap', key: '厂家' },
 		{
-			title: 'Action',
-			key: 'operation',
+			title: '操作',
+			key: '操作',
 			fixed: 'right',
 			width: 100,
 			render: () => <LinkButton text="确认" />
 		}
 	];
 
-	const data = [];
-	for (let i = 0; i < 100; i++) {
-		data.push({
-			key: i,
-			name: `Edrward ${i}`,
-			age: 32,
-			address: `London Park no. ${i}`
-		});
-	}
+	// for (let i = 0; i < 100; i++) {
+	// 	data.push({
+	// 		key: i,
+	// 		name: `Edrward ${i}`,
+	// 		age: 32,
+	// 		address: `London Park no. ${i}`
+	// 	});
+	// }
 	React.useEffect(() => {
 		setModal1Visible(props && props.isEdit);
-
+		setReqFlag(false);
+		if (reqFlag) {
+			$.get(
+				'http://127.0.0.1:8090/wx/tIotDevices/out_time',
+				{
+					next_time: dateUtil(new Date())
+				},
+				function(obj) {
+					if (obj.code === 0) {
+						let arr = obj.rows;
+						!_.isEmpty(arr) &&
+							arr.forEach(({ cno, asset_status, enName, cnName, dept, price, orderTime, gatewayExtsno, kindmap }, index) => {
+								data.push({
+									cno,
+									asset_status,
+									enName,
+									cnName,
+									dept,
+									price,
+									orderTime,
+									gatewayExtsno,
+									cnName,
+									kindmap
+								});
+							});
+						setData(data);
+					} else {
+						console.log('接口报错');
+					}
+				}
+			);
+		}
 		return () => {};
 	}, [props]);
+	function dateUtil(time) {
+		let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
+		return result;
+	}
 	let linkButtonConfig = {
 		text: '已查看'
 		// handleBackground: 'pink',
@@ -662,7 +693,7 @@ function Frame(props) {
 		<div className="modal-box">
 			<Modal title="20px to Top" width={1000} style={{ top: 20 }} visible={modal1Visible} onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton {...linkButtonConfig} style={{ background: '#08CE01', color: '#F3F3F3' }} onClick={handleData} />
-				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} onSelect={selectCallback} scroll={{ x: 1500, y: 300 }} />
+				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} scroll={{ x: 1500, y: 300 }} />
 			</Modal>
 		</div>
 	);
@@ -698,7 +729,7 @@ class AssetContent extends React.PureComponent {
 	}
 	componentDidMount() {
 		this.init();
-		let url = 'localhost:8090/wx/tIotDevices/';
+		let url = 'http://127.0.0.1:8090/wx/tIotDevices/';
 		let params = {
 			next_time: dateUtil(new Date())
 		};
@@ -709,21 +740,21 @@ class AssetContent extends React.PureComponent {
 		$.get(
 			url + 'count',
 			params,
-			function(obj) {
-				console.log(obj);
+			obj => {
 				if (obj.code === 0) {
-					//this.setState({
-					// couter:
-					// })
+					this.setState({
+						couter: obj.data.count,
+						isLoading: false
+					});
 				} else {
+					this.setState({
+						isLoading: false
+					});
 					console.log('接口报错');
 				}
 			},
 			'json'
 		);
-		setTimeout(() => {
-			this.setState({ change: 20, isLoading: false });
-		}, 1000);
 	}
 	init = () => {};
 	componentWillUnmount() {
