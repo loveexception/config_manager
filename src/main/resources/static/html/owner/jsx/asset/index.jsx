@@ -73,21 +73,68 @@ class ChartCircle extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: [
-				{
-					type: '再用:50%',
-					value: 50
-				},
-				{
-					type: '闲置:50%',
-					value: 50
-				}
-			]
+			data: []
 		};
 	}
 	componentDidMount() {
-		this.init();
+		let { chartData = [] } = this.props.chartData;
+		let data = [];
+		let allCount = 0;
+		chartData.forEach(item => {
+			allCount += item.count;
+		});
+		!_.isEmpty(chartData) &&
+			chartData.forEach(e => {
+				if (e.asset) {
+					data.unshift({
+						type: `再用:${(e.count / allCount).toFixed(0)}%`,
+						value: e.count
+					});
+				} else {
+					data.push({
+						type: `闲置:${(e.count / allCount).toFixed(0)}%`,
+						value: e.count
+					});
+				}
+			});
+		this.setState({
+			data
+		});
 	}
+	componentDidUpdate() {
+		//复用
+		let { chartData = [] } = this.props;
+		let data = [];
+		let allCount = 0;
+		chartData.forEach(item => {
+			allCount += item.count;
+		});
+		!_.isEmpty(chartData) &&
+			chartData.forEach(e => {
+				if (e.asset === '已用') {
+					data.unshift({
+						type: `再用:${(e.count / allCount).toFixed(2) * 100}%`,
+						value: e.count
+					});
+				} else {
+					data.push({
+						type: `闲置:${(e.count / allCount).toFixed(2) * 100}%`,
+						value: e.count
+					});
+				}
+			});
+		if (data.length != this.state.data.length) {
+			this.setState(
+				{
+					data
+				},
+				() => {
+					this.init();
+				}
+			);
+		}
+	}
+
 	init = () => {
 		var startAngle = (-Math.PI / 2) * -1;
 		let { data } = this.state;
@@ -128,7 +175,7 @@ class ChartCircle extends React.PureComponent {
 					shadowColor: 'rgba(0, 0, 0, .45)'
 				},
 				formatter: function formatter(val) {
-					return parseInt(val * 100) + '%';
+					return (val - 0).toFixed(2) * 100 + '%';
 				}
 			});
 		chart.guide().html({
@@ -349,7 +396,7 @@ class ChartCircle extends React.PureComponent {
 	};
 
 	render() {
-		let { countMenoy, count, countMenoyIdle, countIdle } = this.props;
+		let { chartData = [] } = this.props;
 		return (
 			<div className="ChartCircle-box">
 				<div id="mountNode"></div>
@@ -361,14 +408,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产金额</div>
-									<div>{countMenoy ? '￥' + countMenoy : '￥511,325'}</div>
+									<div>{chartData.length > 0 ? '￥' + chartData[0].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-left-item">
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产个数</div>
-									<div>{count ? countMenoy + '个' : '25个'}</div>
+									<div>{chartData.length > 0 ? chartData[0].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -380,14 +427,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产金额</div>
-									<div>{countMenoyIdle ? '￥' + countMenoyIdle : '￥511,325'}</div>
+									<div>{chartData.length > 0 ? '￥' + chartData[1].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-right-item">
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产个数</div>
-									<div>{countIdle ? countMenoyIdle + '个' : '25个'}个</div>
+									<div>{chartData.length > 0 ? chartData[1].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -399,22 +446,22 @@ class ChartCircle extends React.PureComponent {
 }
 function Pillar(props) {
 	let [data, setData] = React.useState([
-		{
-			title: '视频',
-			value: 17
-		},
-		{
-			title: '音频',
-			value: 40
-		},
-		{
-			title: '网络',
-			value: 50
-		},
-		{
-			title: '其他',
-			value: 70
-		}
+		// {
+		// 	title: '视频',
+		// 	value: 17
+		// },
+		// {
+		// 	title: '音频',
+		// 	value: 40
+		// },
+		// {
+		// 	title: '网络',
+		// 	value: 50
+		// },
+		// {
+		// 	title: '其他',
+		// 	value: 70
+		// }
 	]);
 	function init() {
 		var chart = new G2.Chart({
@@ -470,9 +517,10 @@ function Pillar(props) {
 			.color('#30359D');
 		chart.render();
 	}
-	React.useEffect((...data) => {
+	React.useEffect(() => {
+		props;
 		init();
-	});
+	}, [props]);
 	return (
 		<div className="Pillar-box">
 			<div className="Pillar-unit">单位：{'台'}</div>
@@ -724,7 +772,8 @@ class AssetContent extends React.PureComponent {
 		this.state = {
 			change: 0,
 			couter: 20,
-			isLoading: true
+			isLoading: true,
+			chartData: []
 		};
 	}
 	componentDidMount() {
@@ -755,6 +804,24 @@ class AssetContent extends React.PureComponent {
 			},
 			'json'
 		);
+		$.get('http://127.0.0.1:8090/wx/tIotDevices/money', obj => {
+			if (obj.code === 0) {
+				let resultArr = obj.data.map(e => {
+					e.count = e.count - 0;
+					e.sum = e.sum - 0;
+				});
+				this.setState({
+					chartData: obj.data
+				});
+			} else {
+				console.log('接口报错');
+			}
+		});
+		$.get('http://127.0.0.1:8090/wx/tIotDevices/group', obj => {
+			if (obj.code === 0) {
+				this.setState({});
+			}
+		});
 	}
 	init = () => {};
 	componentWillUnmount() {
@@ -762,21 +829,37 @@ class AssetContent extends React.PureComponent {
 			return;
 		};
 	}
+	couterUtil = (arr, objName) => {
+		if (!Array.isArray(arr)) {
+			return 0;
+		}
+		let numCount = 0;
+		arr.forEach((e, i) => {
+			numCount += e[objName];
+		});
+		if (!numCount) {
+			return 0;
+		}
+		return numCount;
+	};
+
 	render() {
-		let { isLoading } = this.state;
-		let { isEdit } = this;
-		let obj = { couter: this.state.couter, change: this.state.change };
+		let { isLoading, chartData = [] } = this.state;
+		let { isEdit, couterUtil } = this;
+		let useCount = couterUtil(chartData, 'count'); // 应用总数
+		let assteCount = couterUtil(chartData, 'sum'); // 资产总数
+		let obj = { ...this.state };
 		// titlebox    img boolean  titleText 头部文字  count 数量 false 有单位￥
 		return (
 			<Spin size="large" spinning={isLoading} indicator={antIcon}>
 				<div className="asset-box">
 					<div className="asset-title-container">
-						<TitleBox titleImg={true} titleText="设备资产总数" count="25" />
-						<TitleBox titleImg={false} titleText="设备资产总数" count="25" />
+						<TitleBox titleImg={true} titleText="设备应用总数" count={useCount} />
+						<TitleBox titleImg={false} titleText="设备资产总数" count={assteCount} />
 					</div>
 					<div className="asset-middle">
-						<ContentBox Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
-						<ContentBox Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
+						<ContentBox componentData={obj} Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
+						<ContentBox componentData={obj} Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
 					</div>
 					<div className="asset-footer">
 						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text="信息提醒"></ContentBox>
