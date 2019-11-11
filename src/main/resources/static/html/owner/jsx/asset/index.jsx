@@ -58,7 +58,7 @@ class TitleBox extends React.PureComponent {
 		return (
 			<div className="assets-title-box">
 				<div className="assets-container">
-					<img className="assets-title-img" src={titleImg ? './jsx/list/assetAll.png' : './jsx/list/money.png'} alt="photo"></img>
+					<img className="assets-title-img" src={titleImg ? '/assets/img/assetAll.png' : '/assets/img/money.png'} alt="photo"></img>
 					<img src="" alt="" />
 					<div className="assets-text-box">
 						<div className="assets-text-top">{titleText}</div>
@@ -482,52 +482,261 @@ function Pillar(props) {
 }
 class ContentBox extends React.PureComponent {
 	render() {
-		let { width = '100px', height = '100px', text = '', Component = '' } = this.props;
+		let { width = '100px', height = '100px', text = '', Component = '', componentData = {} } = this.props;
 		return (
 			<div className="contentBox-box" style={{ width, height }}>
 				<div className="contentBox-title">{text}</div>
-				<Component></Component>
+				<Component {...componentData}></Component>
 			</div>
 		);
 	}
 }
+let { Icon, Spin, Modal, Button, Table, message } = antd;
+const antIcon = <Icon type="loading" style={{ fontSize: 24, color: 'deeppink' }} spin />;
 function AssetFooter(props) {
 	let [text, setText] = React.useState({ leftText: '检修提醒', rightText: '更换提醒' });
-
+	let [isEdit, setIsEdit] = React.useState(false);
+	// let [isShow, setShow] = React.useState(false);
+	let [color, setColor] = React.useState('greenyellow');
+	React.useEffect(() => {
+		setColor(props.couter === 0 ? 'greenyellow' : props.couter < 10 ? '#FFCD42' : 'red');
+		return () => {};
+	}, [props]);
+	function leftHandleClick() {
+		setIsEdit(!isEdit);
+	}
+	function rightHandleClick() {
+		setIsEdit(!isEdit);
+	}
 	return (
 		<div className="asset-footer-box">
-			<div className="option-box-left">
-				<img className="option-left-img" src="/html/drive/jsx/list/footer-setting.png" alt="" />
+			<Frame isEdit={isEdit}></Frame>
+			<div className="option-box-left" onClick={leftHandleClick}>
+				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
 				<div className="option-left-text">{text.leftText}</div>
+				{props.couter > 0 ? (
+					<div className="option-waring-box" style={{ color }}>
+						{props.couter}
+					</div>
+				) : (
+					''
+				)}
 			</div>
-			<div className="option-box-right">
-				<img className="option-left-img" src="/html/drive/jsx/list/footer-arrow.png" alt="" />
+			<div className="option-box-right" onClick={rightHandleClick}>
+				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
 				<div className="option-left-text">{text.rightText}</div>
+				{/* {props.change ? (
+					<div className="option-waring-box">
+						<Icon className="asset-footer-icon" type="warning" theme="filled" style={{ fontSize: 20 + 'px', color: '#FFCD42' }} />
+						{props.change}个更换提醒
+					</div>
+				) : (
+					''
+				)} */}
 			</div>
 		</div>
 	);
 }
 
+// rowSelection objects indicates the need for row selection
+const rowSelection = {
+	onChange: (selectedRowKeys, selectedRows) => {
+		console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+	},
+	onSelect: (record, selected, selectedRows) => {
+		console.log(record, selected, selectedRows);
+	},
+	onSelectAll: (selected, selectedRows, changeRows) => {
+		console.log(selected, selectedRows, changeRows);
+	}
+};
+
+//messagFrame props.isEdit(boolen) show or hidden
+function Frame(props) {
+	let {} = props;
+	let [modal1Visible, setModal1Visible] = React.useState(false);
+	let [modal2Visible, setModal2Visible] = React.useState(false);
+	let [] = React.useState([]);
+	let mesFlag;
+	const columns = [
+		{
+			title: 'Name',
+			dataIndex: 'name',
+			key: 'name'
+		},
+		{
+			title: 'Age',
+			dataIndex: 'age',
+			key: 'age',
+			width: '12%'
+		},
+		{
+			title: 'Address',
+			dataIndex: 'address',
+			width: '30%',
+			key: 'address'
+		}
+	];
+
+	const data = [
+		{
+			key: 1,
+			name: 'John Brown sr.',
+			age: 60,
+			address: 'New York No. 1 Lake Park',
+			children: [
+				{
+					key: 11,
+					name: 'John Brown',
+					age: 42,
+					address: 'New York No. 2 Lake Park'
+				},
+				{
+					key: 12,
+					name: 'John Brown jr.',
+					age: 30,
+					address: 'New York No. 3 Lake Park',
+					children: [
+						{
+							key: 121,
+							name: 'Jimmy Brown',
+							age: 16,
+							address: 'New York No. 3 Lake Park'
+						}
+					]
+				},
+				{
+					key: 13,
+					name: 'Jim Green sr.',
+					age: 72,
+					address: 'London No. 1 Lake Park',
+					children: [
+						{
+							key: 131,
+							name: 'Jim Green',
+							age: 42,
+							address: 'London No. 2 Lake Park',
+							children: [
+								{
+									key: 1311,
+									name: 'Jim Green jr.',
+									age: 25,
+									address: 'London No. 3 Lake Park'
+								},
+								{
+									key: 1312,
+									name: 'Jimmy Green sr.',
+									age: 18,
+									address: 'London No. 4 Lake Park'
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			key: 2,
+			name: 'Joe Black',
+			age: 32,
+			address: 'Sidney No. 1 Lake Park'
+		}
+	];
+	React.useEffect(() => {
+		setModal1Visible(props && props.isEdit);
+
+		return () => {};
+	}, [props]);
+	let linkButtonConfig = {
+		text: '已查看'
+		// handleBackground: 'pink',
+		// handleColor: 'black'
+	};
+	//selet callback
+	function selectCallback(...value) {
+		console.log(value, 'selected');
+	}
+	function handleData(btn) {
+		if (mesFlag) return;
+		message.loading('处理中···', 0.5, function() {
+			mesFlag = false;
+			message.destroy();
+
+			message.success('处理完毕', 0.5);
+		});
+		mesFlag = true;
+	}
+	return (
+		<div className="modal-box">
+			<Modal title="20px to Top" width={1000} style={{ top: 20 }} visible={modal1Visible} onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+				<LinkButton {...linkButtonConfig} style={{ background: '#08CE01', color: '#F3F3F3' }} onClick={handleData} />
+				<Table columns={columns} rowSelection={rowSelection} dataSource={data} onSelect={selectCallback} />
+			</Modal>
+		</div>
+	);
+}
+// button component 组件直接设置style 行内式callback执行 函数
+function LinkButton(props) {
+	// let {} = props;
+	let btn = React.createRef();
+	React.useEffect(() => {
+		// btn.onClick = function() {
+		// 	console.log(1);
+		// };
+	}, []);
+	// function handleClick() {
+	// 	// btn.current.style.background = props.handleBackground;
+	// 	// btn.current.style.border = props.handleBorder;
+	// 	// btn.current.style.color = props.handleColor;
+	// }
+	return (
+		<button ref={btn} className="link-button" {...props}>
+			{props.text}
+		</button>
+	);
+}
 class AssetContent extends React.PureComponent {
 	constructor(props) {
 		super(props);
+		this.state = {
+			change: 0,
+			couter: 0,
+			isLoading: true
+		};
+	}
+	componentDidMount() {
+		this.init();
+		setTimeout(() => {
+			this.setState({ change: 20, couter: 10, isLoading: false });
+		}, 1000);
+	}
+	init = () => {};
+	componentWillUnmount() {
+		this.setState = () => {
+			return;
+		};
 	}
 	render() {
+		let { isLoading } = this.state;
+		let { isEdit } = this;
+		let obj = { couter: this.state.couter, change: this.state.change };
 		// titlebox    img boolean  titleText 头部文字  count 数量 false 有单位￥
 		return (
-			<div className="asset-box">
-				<div className="asset-title-container">
-					<TitleBox titleImg={true} titleText="设备资产总数" count="25" />
-					<TitleBox titleImg={false} titleText="设备资产总数" count="25" />
+			<Spin size="large" spinning={isLoading} indicator={antIcon}>
+				<div className="asset-box">
+					<div className="asset-title-container">
+						<TitleBox titleImg={true} titleText="设备资产总数" count="25" />
+						<TitleBox titleImg={false} titleText="设备资产总数" count="25" />
+					</div>
+					<div className="asset-middle">
+						<ContentBox Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
+						<ContentBox Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
+					</div>
+					<div className="asset-footer">
+						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text="信息提醒"></ContentBox>
+					</div>
 				</div>
-				<div className="asset-middle">
-					<ContentBox Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
-					<ContentBox Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
-				</div>
-				<div className="asset-footer">
-					<ContentBox Component={AssetFooter} width="100%" height="194px" text="信息提醒"></ContentBox>
-				</div>
-			</div>
+			</Spin>
 		);
 	}
 }
