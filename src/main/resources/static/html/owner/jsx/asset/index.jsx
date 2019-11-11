@@ -467,7 +467,7 @@ function Pillar(props) {
 		var chart = new G2.Chart({
 			container: 'content',
 			//				forceFit: true,
-			width: 700,
+			width: 574,
 			height: 368,
 			padding: [10, 20, 50, 51]
 		});
@@ -518,9 +518,36 @@ function Pillar(props) {
 		chart.render();
 	}
 	React.useEffect(() => {
-		props;
-		init();
-	}, [props]);
+		if (data.length !== props.pillar.length) {
+			let result = props.pillar.map((e, i) => {
+				// {
+				// 	title: '视频',
+				// 	value: 17
+				// },
+				// {
+				// 	title: '音频',
+				// 	value: 40
+				// },
+				// {
+				// 	title: '网络',
+				// 	value: 50
+				// },
+				// {
+				// 	title: '其他',
+				// 	value: 70
+				// }
+				return {
+					title: e.type ? e.type : '音频设备',
+					value: e.count - 0
+				};
+			});
+
+			setData(result);
+		}
+		if (data.length > 0) {
+			init();
+		}
+	}, [props, data]);
 	return (
 		<div className="Pillar-box">
 			<div className="Pillar-unit">单位：{'台'}</div>
@@ -773,7 +800,8 @@ class AssetContent extends React.PureComponent {
 			change: 0,
 			couter: 20,
 			isLoading: true,
-			chartData: []
+			chartData: [],
+			pillar: []
 		};
 	}
 	componentDidMount() {
@@ -786,24 +814,19 @@ class AssetContent extends React.PureComponent {
 			let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
 			return result;
 		}
-		$.get(
-			url + 'count',
-			params,
-			obj => {
-				if (obj.code === 0) {
-					this.setState({
-						couter: obj.data.count,
-						isLoading: false
-					});
-				} else {
-					this.setState({
-						isLoading: false
-					});
-					console.log('接口报错');
-				}
-			},
-			'json'
-		);
+		$.get(url + 'count', params, obj => {
+			if (obj.code === 0) {
+				this.setState({
+					couter: obj.data.count,
+					isLoading: false
+				});
+			} else {
+				this.setState({
+					isLoading: false
+				});
+				antd.message.error('接口报错', 0.5);
+			}
+		});
 		$.get('http://127.0.0.1:8090/wx/tIotDevices/money', obj => {
 			if (obj.code === 0) {
 				let resultArr = obj.data.map(e => {
@@ -819,7 +842,11 @@ class AssetContent extends React.PureComponent {
 		});
 		$.get('http://127.0.0.1:8090/wx/tIotDevices/group', obj => {
 			if (obj.code === 0) {
-				this.setState({});
+				this.setState({
+					pillar: obj.data
+				});
+			} else {
+				console.log('接口报错');
 			}
 		});
 	}
