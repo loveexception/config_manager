@@ -35,7 +35,7 @@ public class TIotOwnerService extends Service<TIotOwner> {
 			time = Times.ts2S(new Date().getTime(),"yyyy-MM-dd");
 
 		}
-		String sql = "select  dev.sno as sno ,dev.id as id  " +
+		String str = "select  dev.sno as sno ,dev.id as id  " +
 				",from_unixtime(max(unix_timestamp(own.time))) as time " +
 				" from t_iot_devices  dev " +
 				" left join t_iot_owner own  on dev.id = own.device_id \n" +
@@ -43,16 +43,16 @@ public class TIotOwnerService extends Service<TIotOwner> {
 		String group = 		"group by dev.sno ,dev.id\n" +
 				"HAVING max(UNIX_TIMESTAMP(own.time)) < UNIX_TIMESTAMP(@mytime)";
 		if(Strings.isBlank(deptid)){
-			sql += group;
+			str += group;
 		}else{
-			sql  += "and dev.dept_id = @mydept \n";
-			sql += group;
+			str  += "and dev.dept_id = @mydept \n";
+			str += group;
 		}
-		Sql base = Sqls.create(sql);
-		base
+		Sql sql = Sqls.create(str);
+		sql
 				.setParam("mydept",deptid)
 				.setParam("mytime",time);
-		base.setCallback(new SqlCallback() {
+		sql.setCallback(new SqlCallback() {
 			public Object invoke(Connection conn, ResultSet rs, Sql sql) throws SQLException {
 				List<Map> list = new LinkedList<Map>();
 				while (rs.next()){
@@ -68,7 +68,43 @@ public class TIotOwnerService extends Service<TIotOwner> {
 
 
 
-		dao().execute(base);
-		return base.getList(Map.class);
+		dao().execute(sql);
+		return sql.getList(Map.class);
     }
+
+    public List<Map> queryCountPrice(String deptid) {
+		String str = "select count(*) count ,sum( price) sum ,\n" +
+				"case when asset_status =0 then \'已用\' else \'未用\' end as asset \n" +
+				"from t_iot_devices ";
+		String group = "group by asset  ";
+		if (Strings.isBlank(deptid)) {
+			str += group;
+		} else {
+			str += " where dept_id = @mydept ";
+			str += group;
+		}
+
+		Sql sql = Sqls.create(str);
+		sql
+				.setParam("mydept", deptid);
+		sql.setCallback(new SqlCallback() {
+			public Object invoke(Connection conn, ResultSet rs, Sql sql) throws SQLException {
+				List<Map> list = new LinkedList<Map>();
+				while (rs.next()) {
+					NutMap map = NutMap.NEW();
+					map.addv("count", rs.getString("count"))
+							.addv("sum", rs.getString("sum"))
+							.addv("asset", rs.getString("asset"));
+					list.add(map);
+				}
+				return list;
+			}
+		});
+
+
+		dao().execute(sql);
+		return sql.getList(Map.class);
+	}
+
+
 }

@@ -269,31 +269,39 @@ public class TIotDevicesController implements AdminKey {
 	@At("/change")
 	@Ok("json")
 	@Slog(tag ="设备资本", after= "删除设备资本:${array2str(args[0])}")
-	public Object change(@Param("id")String ids, HttpServletRequest req) {
+	public Object change(@Param("id")String[] ids, HttpServletRequest req) {
 		try {
-			Device device = deviceService.fetch(ids);
-			device = deviceService.fetchLinks(device,"next");
-			List<Owner> owners = device.getNext();
-			Owner owner = new Owner();
+		    if(Lang.isEmpty(ids)){
+                return Result.success("system.success");
 
-			if(Lang.isEmpty(owners)){
-				owner.setCycle("365");
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.YEAR,1);
-				String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-				owner.setTime(day);
-				owner.setDeviceid(ids);
-				deviceService.dao().insert(owner);
+            }
 
-			}else{
-				Owner temp = owners.get(0);
+            for(String id : ids) {
 
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DATE, Integer.parseInt(temp.cycle));
-				String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-				temp.setTime(day);
-				deviceService.dao().update(temp);
-			}
+                Device device = deviceService.fetch(id);
+                device = deviceService.fetchLinks(device, "next");
+                List<Owner> owners = device.getNext();
+                Owner owner = new Owner();
+
+                if (Lang.isEmpty(owners)) {
+                    owner.setCycle("365");
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.YEAR, 1);
+                    String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
+                    owner.setTime(day);
+                    owner.setDeviceid(id);
+                    deviceService.dao().insert(owner);
+
+                } else {
+                    Owner temp = owners.get(0);
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.DATE, Integer.parseInt(temp.cycle));
+                    String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
+                    temp.setTime(day);
+                    deviceService.dao().update(temp);
+                }
+            }
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -365,6 +373,28 @@ public class TIotDevicesController implements AdminKey {
 			return info ;
 
 	}
+
+    /**
+     * 设备资产统计
+     */
+    @At("/money")
+    @Ok("json")
+    public Object money( HttpServletRequest req) {
+        String deptid =null ;
+        if(!isAdmin()){
+           deptid = ShiroUtils.getSysUser().getDeptId();
+        }else{
+            
+        }
+        
+
+
+        List<Map> list =  tIotOwnerService.queryCountPrice(deptid);
+
+
+        return Result.success("system.success",list);
+
+    }
 
 	public void myKindNameFind(List<Device> list, List<Kind> kinds) {
 		for(Device device:list){
