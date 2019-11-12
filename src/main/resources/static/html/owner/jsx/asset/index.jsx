@@ -774,6 +774,11 @@ function Frame(props) {
 						!_.isEmpty(arr) &&
 							arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
 								console.log(assetStatus, ' assetStatus');
+								if (assetStatus == 2) {
+									assetStatus = '正常';
+								} else {
+									assetStatus = '异常';
+								}
 								data.push({
 									sno,
 									assetStatus,
