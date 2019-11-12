@@ -639,8 +639,8 @@ function Frame(props) {
 					return record.id === id;
 					})
 					 
-					reqArrList.splice(index,index+1);
-				return	[...reqArrList]
+					list.splice(index,index+1);
+				return	[...list]
 				})
 
 			}
