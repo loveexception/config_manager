@@ -815,7 +815,7 @@ function Frame(props) {
 	}
 	return (
 		<div className="modal-box">
-			<Modal title="检修提醒" width={1000} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+			<Modal title="检修提醒" width={"80%"} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
 						handleReq(reqArrList);
