@@ -773,6 +773,7 @@ function Frame(props) {
 						let arr = obj.rows;
 						!_.isEmpty(arr) &&
 							arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
+								console.log(assetStatus, ' assetStatus');
 								data.push({
 									sno,
 									assetStatus,
