@@ -35,15 +35,16 @@ public class TIotOwnerService extends Service<TIotOwner> {
 			time = Times.ts2S(new Date().getTime(),"yyyy-MM-dd");
 
 		}
-		String str = "select  dev.sno as sno ,dev.id as id  " +
-				",from_unixtime(max(unix_timestamp(own.time))) as time " +
-				" from t_iot_devices  dev " +
+		String str = "select  dev.sno as sno ,dev.id as id  \n" +
+				",from_unixtime(max(unix_timestamp(own.time))) as time \n" +
+				" from t_iot_devices  dev \n" +
 				" left join t_iot_owner own  on dev.id = own.device_id \n" +
 				" where own.time is not null \n" +
-				" and dev.delflag= 'false' " +
-				" and dev.status = 'true' " ;
+				" and dev.delflag= 'false' \n" +
+				" and dev.asset_status = '2' \n"+
+				" and dev.status = 'true' \n" ;
 		String group = 		"group by dev.sno ,dev.id\n" +
-				"HAVING max(UNIX_TIMESTAMP(own.time)) < UNIX_TIMESTAMP(@mytime)";
+				"HAVING max(UNIX_TIMESTAMP(own.time)) < UNIX_TIMESTAMP(@mytime) \n";
 		if(Strings.isBlank(deptid)){
 			str += group;
 		}else{
