@@ -280,9 +280,12 @@ public class TIotDevicesController implements AdminKey {
             }
 
             for(String id : ids) {
-
                 Device device = deviceService.fetch(id);
+				if(Lang.isEmpty(device)){
+					continue;
+				}
                 device = deviceService.fetchLinks(device, "next");
+
                 List<Owner> owners = device.getNext();
                 Owner owner = new Owner();
 
