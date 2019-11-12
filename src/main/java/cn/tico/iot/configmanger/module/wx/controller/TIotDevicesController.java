@@ -96,28 +96,31 @@ public class TIotDevicesController implements AdminKey {
 	@Ok("json")
 	public Object list(@Param("pageNum")int pageNum,
 					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("beginTime") Date beginTime,
-					   @Param("endTime") Date endTime,
+					   @Param("enName") String enName,
+					   @Param("cnName") String cnName,
+					   @Param("assetStatus") String assetStatus,
 					   @Param("orderByColumn") String orderByColumn,
 					   @Param("isAsc") String isAsc,
 					   HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)){
-			cnd.and("sno", "like", "%" + name +"%");
+		if (Strings.isNotBlank(enName)){
+			cnd.and("en_name", "like", "%" + enName +"%");
 		}
-		if(Lang.isNotEmpty(beginTime)){
-			cnd.and("create_time",">=", beginTime);
+		if (Strings.isNotBlank(cnName)){
+			cnd.and("cn_name", "like", "%" + cnName +"%");
 		}
-		if(Lang.isNotEmpty(endTime)){
-			cnd.and("create_time","<=", endTime);
+		if (Strings.isNotBlank(assetStatus)){
+			cnd.and("assetStatus", "=", assetStatus);
 		}
+//		if(Lang.isNotEmpty(beginTime)){
+//			cnd.and("create_time",">=", beginTime);
+//		}
+//		if(Lang.isNotEmpty(endTime)){
+//			cnd.and("create_time","<=", endTime);
+//		}
 		if(!isAdmin()){
-			SqlExpressionGroup
-					group = Cnd
-					.exps("dept_id", "=", DEPT_ADMIN)
-					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
-			cnd.and(group);
+
+			cnd.and("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
 		}
 		cnd.and("delflag","=","false");
 		if(Strings.isNotBlank(orderByColumn)){
