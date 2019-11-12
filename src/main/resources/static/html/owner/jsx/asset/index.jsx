@@ -745,6 +745,8 @@ function Frame(props) {
 			function(obj) {
 				if (obj.code == 0) {
 					let arr = obj.rows;
+					let reqArrRest = [];
+
 					!_.isEmpty(arr) &&
 						arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
 							if (assetStatus === "2") {
@@ -752,7 +754,7 @@ function Frame(props) {
 							} else {
 								assetStatus = '异常';
 							}
-							data.push({
+						reqArrRest.push({
 								sno,
 								assetStatus,
 								enName,
@@ -765,12 +767,13 @@ function Frame(props) {
 								kindmap,
 								kind: kind.cnName,
 								id,
-								key:Math.random()
+								key:id
 							});
 						});
-					setData(data);
+					setData(reqArrRest);
 				} else {
 					console.log('接口报错');
+					setData([])
 				}
 			}
 		);
