@@ -610,39 +610,74 @@ function AssetFooter(props) {
 }
 
 // rowSelection objects indicates the need for row selection
-const rowSelection = {
-	onChange: (selectedRowKeys, selectedRows) => {
-		console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-	},
-	onSelect: (record, selected, selectedRows) => {
-		console.log(record, selected, selectedRows);
-	},
-	onSelectAll: (selected, selectedRows, changeRows) => {
-		console.log(selected, selectedRows, changeRows);
-	}
-};
 
 //messagFrame props.isEdit(boolen) show or hidden
 function Frame(props) {
 	let {} = props;
 	let [modal1Visible, setModal1Visible] = React.useState(false);
 	let [reqFlag, setReqFlag] = React.useState(true);
-
+	let [reqArrList, setReqArrList] = React.useState([]);
 	let [data, setData] = React.useState([]);
 	let mesFlag;
+	const rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {},
+		onSelect: (record = {}, selected, selectedRows) => {
+			if (selected) {
+				reqArrList.push(record.id);
+			} else {
+				reqArrList.splice(
+					0,
+					reqArrList.findIndex(id => {
+						return record.id === id;
+					})
+				);
+			}
+		},
+		onSelectAll: (selected, selectedRows = [], changeRows) => {
+			let arr = [];
+			selectedRows.forEach(item => {
+				arr.push(item.id);
+			});
+			reqArrList = arr;
+		}
+	};
+	function reqUpdata(arr = []) {
+		let url = `http://127.0.0.1:8090/wx/tIotDevices/change?`;
+		arr.forEach((id, index) => {
+			url += `id=${id}`;
+		});
+		$.get(url, function(obj) {
+			if (obj.code === 0) {
+				setData(data => {
+					if (data.length === arr.length) {
+						return [];
+					}
+					arr.forEach(id => {
+						let index = data.findIndex((e, i) => {
+							return e.id === id;
+						});
+						data.splice(0, index);
+					});
+					return data;
+				});
+			} else {
+				antd.message.error('操作失败', 0.5);
+			}
+		});
+	}
 	const columns = [
 		{
 			title: '资产机器码',
 			width: 100,
-			dataIndex: 'cno',
+			dataIndex: 'sno',
 			key: 'sno',
 			fixed: 'left'
 		},
 		{
 			title: '资产状态',
 			width: 100,
-			dataIndex: 'asset_status',
-			key: 'asset_status',
+			dataIndex: 'assetStatus',
+			key: 'assetStatus',
 			fixed: 'left'
 		},
 		{
@@ -683,7 +718,7 @@ function Frame(props) {
 		},
 		{
 			title: '类型',
-			dataIndex: 'kind.cnName',
+			dataIndex: 'kind',
 			key: '类型',
 			width: 150
 		},
@@ -693,7 +728,14 @@ function Frame(props) {
 			key: '操作',
 			fixed: 'right',
 			width: 100,
-			render: () => <LinkButton text="确认" />
+			render: (a, record) => (
+				<LinkButton
+					text="确认"
+					onClick={function() {
+						handleReq(record);
+					}}
+				/>
+			)
 		}
 	];
 
@@ -705,6 +747,18 @@ function Frame(props) {
 	// 		address: `London Park no. ${i}`
 	// 	});
 	// }
+	function handleReq({ id, isAll }) {
+		if (isAll) {
+			reqArrList.length > 0 ? reqUpdata(reqArrList) : '';
+			return;
+		}
+		let result = reqArrList.find(e => {
+			return e === id;
+		});
+		if (result) {
+			reqUpdata([result]);
+		}
+	}
 	React.useEffect(() => {
 		setModal1Visible(props && props.isEdit);
 		setReqFlag(false);
@@ -718,20 +772,23 @@ function Frame(props) {
 					if (obj.code === 0) {
 						let arr = obj.rows;
 						!_.isEmpty(arr) &&
-							arr.forEach(({ cno, asset_status, enName, cnName, dept, price, orderTime, gatewayExtsno, kindmap }, index) => {
+							arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
 								data.push({
-									cno,
-									asset_status,
+									sno,
+									assetStatus,
 									enName,
 									cnName,
-									dept,
+									dept: dept.deptName,
 									price,
 									orderTime,
 									gatewayExtsno,
 									cnName,
-									kindmap
+									kindmap,
+									kind: kind.cnName,
+									id
 								});
 							});
+
 						setData(data);
 					} else {
 						console.log('接口报错');
@@ -751,9 +808,7 @@ function Frame(props) {
 		// handleColor: 'black'
 	};
 	//selet callback
-	function selectCallback(...value) {
-		console.log(value, 'selected');
-	}
+	function selectCallback(...value) {}
 	function handleData(btn) {
 		if (mesFlag) return;
 		message.loading('处理中···', 0.5, function() {
@@ -766,8 +821,14 @@ function Frame(props) {
 	}
 	return (
 		<div className="modal-box">
-			<Modal title="20px to Top" width={1000} style={{ top: 20 }} visible={modal1Visible} onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
-				<LinkButton {...linkButtonConfig} style={{ background: '#08CE01', color: '#F3F3F3' }} onClick={handleData} />
+			<Modal title="检修提醒" width={800} style={{ top: 20 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+				<LinkButton
+					onClick={function() {
+						handleReq({ isAll: true });
+					}}
+					{...linkButtonConfig}
+					style={{ background: '#08CE01', color: '#F3F3F3' }}
+				/>
 				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} scroll={{ x: 1500, y: 300 }} />
 			</Modal>
 		</div>
@@ -779,7 +840,6 @@ function LinkButton(props) {
 	let btn = React.createRef();
 	React.useEffect(() => {
 		// btn.onClick = function() {
-		// 	console.log(1);
 		// };
 	}, []);
 	// function handleClick() {
