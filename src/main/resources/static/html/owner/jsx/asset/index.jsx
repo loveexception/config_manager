@@ -794,10 +794,10 @@ function Frame(props) {
 								cnName,
 								kindmap,
 								kind: kind.cnName,
-								id
+								id,
+								key:Math.randomw()
 							});
 						});
-
 					setData(data);
 				} else {
 					console.log('接口报错');
@@ -813,13 +813,13 @@ function Frame(props) {
 			reqRestFnc()
 		}
 		return () => {};
-	}, [props]);
+	}, [props,data]);
 	function dateUtil(time) {
 		let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
 		return result;
 	}
 	let linkButtonConfig = {
-		text: '全部确认'
+		text: '确认'
 		// handleBackground: 'pink',
 		// handleColor: 'black'
 	};
@@ -852,6 +852,22 @@ function Frame(props) {
 		</div>
 	);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // button component 组件直接设置style 行内式callback执行 函数
 function LinkButton(props) {
 	// let {} = props;
