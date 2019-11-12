@@ -630,7 +630,9 @@ function Frame(props) {
 		onChange: (selectedRowKeys, selectedRows) => {},
 		onSelect: (record = {}, selected, selectedRows) => {
 			if (selected) {
-				setReqArrList(list=>[...list,record.id])
+				setReqArrList(list=>{
+				return [...list,record.id]
+		})
 			} else {
 				setReqArrList(list=>{
 					let index = reqArrList.findIndex(id => {
@@ -638,14 +640,17 @@ function Frame(props) {
 					})
 					 
 					reqArrList.splice(index,index+1);
-				return	[...list]
+				return	[...reqArrList]
 				})
 
 			}
 		},
 		onSelectAll: (selected, selectedRows = [], changeRows) => {
 			if(selected){ //点击 全部 的回调 if true allckecked
-				setReqArrList(selectedRows);
+				let result = selectedRows.map((e)=>{
+					return e.id
+				})
+				setReqArrList(result);
 			}else{
 				setReqArrList([])
 			}
@@ -663,18 +668,7 @@ function Frame(props) {
 		});
 		$.get(url, function(obj) {
 			if (obj.code == 0) {
-				setData(data => {
-					if (data.length === arr.length) {
-						return [];
-					}
-					arr.forEach(id => {
-						let index = data.findIndex((e, i) => {
-							return e.id == id;
-						});
-						data.splice(index, index+1);
-					});
-					return [...data];
-				});
+				reqRestFnc()
 			} else {
 				antd.message.error('操作失败', 0.5);
 			}
@@ -756,11 +750,9 @@ function Frame(props) {
 	];
 	function handleReq(data) {
 		if(Array.isArray(data)){
-			debugger
-			console.log( data,'data')
 			let arr = []
 			data.forEach(e=>{
-				arr.push(e.id)
+				arr.push(e)
 			})
 			data.length > 0 ? reqUpdata(arr ) : '';
 		}else{
@@ -774,47 +766,51 @@ function Frame(props) {
 		// 	reqUpdata([result]);
 		// }
 	}
+	function reqRestFnc() {
+		$.get(
+			'/wx/tIotDevices/out_time',
+			{
+				next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
+			},
+			function(obj) {
+				if (obj.code == 0) {
+					let arr = obj.rows;
+					!_.isEmpty(arr) &&
+						arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
+							if (assetStatus === "2") {
+								assetStatus = '正常';
+							} else {
+								assetStatus = '异常';
+							}
+							data.push({
+								sno,
+								assetStatus,
+								enName,
+								cnName,
+								dept: dept.deptName,
+								price,
+								orderTime,
+								gatewayExtsno,
+								cnName,
+								kindmap,
+								kind: kind.cnName,
+								id
+							});
+						});
+
+					setData(data);
+				} else {
+					console.log('接口报错');
+				}
+			}
+		);
+	}
+
 	React.useEffect(() => {
 		setModal1Visible(props && props.isEdit);
 		setReqFlag(false);
 		if (reqFlag) {
-			$.get(
-				'/wx/tIotDevices/out_time',
-				{
-					next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
-				},
-				function(obj) {
-					if (obj.code == 0) {
-						let arr = obj.rows;
-						!_.isEmpty(arr) &&
-							arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
-								if (assetStatus === "2") {
-									assetStatus = '正常';
-								} else {
-									assetStatus = '异常';
-								}
-								data.push({
-									sno,
-									assetStatus,
-									enName,
-									cnName,
-									dept: dept.deptName,
-									price,
-									orderTime,
-									gatewayExtsno,
-									cnName,
-									kindmap,
-									kind: kind.cnName,
-									id
-								});
-							});
-
-						setData(data);
-					} else {
-						console.log('接口报错');
-					}
-				}
-			);
+			reqRestFnc()
 		}
 		return () => {};
 	}, [props]);
