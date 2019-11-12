@@ -521,22 +521,6 @@ function Pillar(props) {
 		if (data.length !== props.pillar.length) {
 			let result = [];
 			props.pillar.forEach((e, i) => {
-				// {
-				// 	title: '视频',
-				// 	value: 17
-				// },
-				// {
-				// 	title: '音频',
-				// 	value: 40
-				// },
-				// {
-				// 	title: '网络',
-				// 	value: 50
-				// },
-				// {
-				// 	title: '其他',
-				// 	value: 70
-				// }
 				if (e.type) {
 					result.push({
 						title: e.type,
@@ -559,7 +543,7 @@ function Pillar(props) {
 		</div>
 	);
 }
-class ContentBox extends React.Component {
+class ContentBox extends React.PureComponent {
 	render() {
 		let { width = '100px', height = '100px', text = '', Component = '', componentData = {} } = this.props;
 		return (
@@ -603,14 +587,6 @@ function AssetFooter(props) {
 			<div className="option-box-right" style={{visibility:'hidden'}}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
 				<div className="option-left-text">{text.rightText}</div>
-				{/* {props.change ? (
-					<div className="option-waring-box">
-						<Icon className="asset-footer-icon" type="warning" theme="filled" style={{ fontSize: 20 + 'px', color: '#FFCD42' }} />
-						{props.change}个更换提醒
-					</div>
-				) : (
-					''
-				)} */}
 			</div>
 		</div>
 	);
@@ -759,12 +735,6 @@ function Frame(props) {
 
 			reqUpdata([data.id]);
 		}
-		// let result = reqArrList.find(e => {
-		// 	return e === id;
-		// });
-		// if (result) {
-		// 	reqUpdata([result]);
-		// }
 	}
 	function reqRestFnc() {
 		$.get(
@@ -795,7 +765,7 @@ function Frame(props) {
 								kindmap,
 								kind: kind.cnName,
 								id,
-								key:Math.randomw()
+								key:Math.random()
 							});
 						});
 					setData(data);
@@ -853,41 +823,19 @@ function Frame(props) {
 	);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // button component 组件直接设置style 行内式callback执行 函数
 function LinkButton(props) {
 	// let {} = props;
 	let btn = React.createRef();
 	React.useEffect(() => {
-		// btn.onClick = function() {
-		// };
 	}, []);
-	// function handleClick() {
-	// 	// btn.current.style.background = props.handleBackground;
-	// 	// btn.current.style.border = props.handleBorder;
-	// 	// btn.current.style.color = props.handleColor;
-	// }
 	return (
 		<button ref={btn} className="link-button" {...props}>
 			{props.text}
 		</button>
 	);
 }
-class AssetContent extends React.Component {
+class AssetContent extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -923,7 +871,6 @@ class AssetContent extends React.Component {
 	}
 	componentDidMount() {
 		this.init();
-	
 		this.reqFunc()
 		
 		$.get('/wx/tIotDevices/money', obj => {
