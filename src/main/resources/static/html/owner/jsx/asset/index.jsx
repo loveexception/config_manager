@@ -642,7 +642,7 @@ function Frame(props) {
 		}
 	};
 	function reqUpdata(arr = []) {
-		let url = `http://127.0.0.1:8090/wx/tIotDevices/change?`;
+		let url = `/wx/tIotDevices/change?`;
 		arr.forEach((id, index) => {
 			url += `id=${id}`;
 		});
@@ -764,7 +764,7 @@ function Frame(props) {
 		setReqFlag(false);
 		if (reqFlag) {
 			$.get(
-				'http://127.0.0.1:8090/wx/tIotDevices/out_time',
+				'/wx/tIotDevices/out_time',
 				{
 					next_time: dateUtil(new Date())
 				},
@@ -865,14 +865,14 @@ class AssetContent extends React.PureComponent {
 		this.state = {
 			change: 0,
 			couter: 20,
-			isLoading: true,
+			isLoading: false,
 			chartData: [],
 			pillar: []
 		};
 	}
 	componentDidMount() {
 		this.init();
-		let url = 'http://127.0.0.1:8090/wx/tIotDevices/';
+		let url = '/wx/tIotDevices/';
 		let params = {
 			next_time: dateUtil(new Date())
 		};
@@ -893,7 +893,7 @@ class AssetContent extends React.PureComponent {
 				antd.message.error('接口报错', 0.5);
 			}
 		});
-		$.get('http://127.0.0.1:8090/wx/tIotDevices/money', obj => {
+		$.get('/wx/tIotDevices/money', obj => {
 			if (obj.code === 0) {
 				let resultArr = obj.data.map(e => {
 					e.count = e.count - 0;
@@ -906,7 +906,7 @@ class AssetContent extends React.PureComponent {
 				console.log('接口报错');
 			}
 		});
-		$.get('http://127.0.0.1:8090/wx/tIotDevices/group', obj => {
+		$.get('/wx/tIotDevices/group', obj => {
 			if (obj.code === 0) {
 				this.setState({
 					pillar: obj.data
