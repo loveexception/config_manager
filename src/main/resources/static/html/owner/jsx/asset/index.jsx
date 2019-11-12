@@ -630,28 +630,36 @@ function Frame(props) {
 		onChange: (selectedRowKeys, selectedRows) => {},
 		onSelect: (record = {}, selected, selectedRows) => {
 			if (selected) {
-				reqArrList.push(record.id);
+				setReqArrList(list=>[...list,record.id])
 			} else {
-				reqArrList.splice(
-					0,
-					reqArrList.findIndex(id => {
-						return record.id === id;
+				setReqArrList(list=>{
+					let index = reqArrList.findIndex(id => {
+					return record.id === id;
 					})
-				);
+					 
+					reqArrList.splice(index,index+1);
+				return	[...list]
+				})
+
 			}
 		},
 		onSelectAll: (selected, selectedRows = [], changeRows) => {
-			let arr = [];
-			selectedRows.forEach(item => {
-				arr.push(item.id);
-			});
-			setReqArrList(arr);
+			if(selected){ //点击 全部 的回调 if true allckecked
+				setReqArrList(selectedRows);
+			}else{
+				setReqArrList([])
+			}
 		}
 	};
 	function reqUpdata(arr = []) {
 		let url = `/wx/tIotDevices/change?`;
 		arr.forEach((id, index) => {
-			url += `id=${id}`;
+			if(index+1 ==arr.length){
+				url += `id=${id}`;
+			}else{
+				url += `id=${id}&`;
+			}
+
 		});
 		$.get(url, function(obj) {
 			if (obj.code == 0) {
@@ -665,8 +673,6 @@ function Frame(props) {
 						});
 						data.splice(index, index+1);
 					});
-					console.log(data,'data')
-					debugger
 					return [...data];
 				});
 			} else {
@@ -748,26 +754,25 @@ function Frame(props) {
 			)
 		}
 	];
+	function handleReq(data) {
+		if(Array.isArray(data)){
+			debugger
+			console.log( data,'data')
+			let arr = []
+			data.forEach(e=>{
+				arr.push(e.id)
+			})
+			data.length > 0 ? reqUpdata(arr ) : '';
+		}else{
 
-	// for (let i = 0; i < 100; i++) {
-	// 	data.push({
-	// 		key: i,
-	// 		name: `Edrward ${i}`,
-	// 		age: 32,
-	// 		address: `London Park no. ${i}`
-	// 	});
-	// }
-	function handleReq({ id, isAll }) {
-		if (isAll) {
-			reqArrList.length > 0 ? reqUpdata(reqArrList) : '';
-			return;
+			reqUpdata([data.id]);
 		}
-		let result = reqArrList.find(e => {
-			return e === id;
-		});
-		if (result) {
-			reqUpdata([result]);
-		}
+		// let result = reqArrList.find(e => {
+		// 	return e === id;
+		// });
+		// if (result) {
+		// 	reqUpdata([result]);
+		// }
 	}
 	React.useEffect(() => {
 		setModal1Visible(props && props.isEdit);
@@ -838,7 +843,7 @@ function Frame(props) {
 			<Modal title="检修提醒" width={1600} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
-						handleReq({ isAll: true });
+						handleReq(reqArrList);
 					}}
 					{...linkButtonConfig}
 					style={{ background: '#08CE01', color: '#F3F3F3',margin:'0 0 15px 0' }}
