@@ -667,7 +667,7 @@ function Frame(props) {
 			title: '资产编码',
 			dataIndex: 'enName',
 			key: '资产编码',
-			width: 200
+			width: 100
 		},
 		{
 			title: '资产名称',
@@ -682,36 +682,35 @@ function Frame(props) {
 			width: 150
 
 		},
-		{
-			title: '价格',
-			dataIndex: 'price',
-			key: '价格',
-			width: 150
+		// {
+		// 	title: '价格',
+		// 	dataIndex: 'price',
+		// 	key: '价格',
+		// 	width: 150
 
-		},
-		{
-			title: '购买日期',
-			dataIndex: 'orderTime',
-			key: '购买日期',
-			width: 150
-		},
+		// },
+		// {
+		// 	title: '购买日期',
+		// 	dataIndex: 'orderTime',
+		// 	key: '购买日期',
+		// 	width: 150
+		// },
 		{
 			title: '检查时间',
 			dataIndex: 'gatewayExtsno',
 			key: '检查时间',
-			width: 150
+			width:200,
 		},
 		{
 			title: '类型',
 			dataIndex: 'kind',
 			key: '类型',
-			width: 150
 		},
 		{ title: '厂家', dataIndex: 'kindmap', key: '厂家', width: 150 },
 		{
 			title: '操作',
 			key: '操作',
-			width: 120,
+			width:160,
 			align:'center',
 			render: (a, record) => (
 				<LinkButton
@@ -816,7 +815,7 @@ function Frame(props) {
 	}
 	return (
 		<div className="modal-box">
-			<Modal title="检修提醒" width={1600} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+			<Modal title="检修提醒" width={1000} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
 						handleReq(reqArrList);
