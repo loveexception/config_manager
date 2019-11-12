@@ -576,7 +576,7 @@ function AssetFooter(props) {
 	}
 	return (
 		<div className="asset-footer-box">
-			<Frame reqFunc={props.reqFunc} isEdit={isEdit}></Frame>
+			<Frame reqFunc={props.reqFunc} isEdit={isEdit} leftHandleClick={leftHandleClick}></Frame>
 			<div className="option-box-left" onClick={leftHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
 				<div className="option-left-text">{text.leftText}</div>
@@ -596,7 +596,6 @@ function AssetFooter(props) {
 
 //messagFrame props.isEdit(boolen) show or hidden
 function Frame(props) {
-	let {} = props;
 	let [modal1Visible, setModal1Visible] = React.useState(false);
 	let [reqFlag, setReqFlag] = React.useState(true);
 	let [reqArrList, setReqArrList] = React.useState([]);
@@ -732,7 +731,6 @@ function Frame(props) {
 			})
 			data.length > 0 ? reqUpdata(arr ) : '';
 		}else{
-
 			reqUpdata([data.id]);
 		}
 	}
@@ -780,6 +778,9 @@ function Frame(props) {
 	}
 
 	React.useEffect(() => {
+		// if(props.isEdit === !props.isEdit){
+		// 	return
+		// }
 		setModal1Visible(props && props.isEdit);
 		setReqFlag(false);
 		if (reqFlag) {
@@ -808,7 +809,10 @@ function Frame(props) {
 		mesFlag = true;
 	}
 	function resetReq (){
+		// 关闭弹窗 
+		props.leftHandleClick()
 		props.reqFunc()
+
 	}
 	return (
 		<div className="modal-box">
@@ -846,7 +850,10 @@ class AssetContent extends React.PureComponent {
 			couter: 20,
 			isLoading: false,
 			chartData: [],
-			pillar: []
+			pillar: [],
+			reqFlag:false,
+			isEdit:false,
+
 		};
 	}
 	reqFunc=()=>{
@@ -918,10 +925,15 @@ class AssetContent extends React.PureComponent {
 		}
 		return numCount;
 	};
-
+	isEditFlag(){
+		let { isEdit } = this.state
+		this.setState({
+			isEdit
+		})
+	}
 	render() {
-		let { isLoading, chartData = [] } = this.state;
-		let { isEdit, couterUtil,reqFunc } = this;
+		let { isLoading, chartData = [],isEdit } = this.state;
+		let { couterUtil,reqFunc } = this;
 		let useCount = couterUtil(chartData, 'count'); // 应用总数
 		let assteCount = couterUtil(chartData, 'sum'); // 资产总数
 		let obj = { ...this.state,reqFunc };
