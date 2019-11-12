@@ -10,8 +10,11 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label">资产状态：</label>
 			<div class="col-sm-8">
-				<label class="radio-box"> <input type="radio" name="assetStatus" value="2"  th:checked="${tIotDevices.assetStatus=='2'}" /> 正常 </label>
-				<label class="radio-box"> <input type="radio" name="assetStatus" value="0" th:checked="${tIotDevices.assetStatus=='0'}" /> 停用 </label>
+				<label class="radio-box"> <input type="radio" name="assetStatus" value="2" th:checked="'2'==${tIotDevices.assetStatus }"
+				/> 正常 </label>
+				<label class="radio-box"> <input type="radio" name="assetStatus" value="0" th:checked="'0'==${tIotDevices.assetStatus }"
+
+				/> 停用 </label>
 
 			</div>
 		</div>
@@ -43,7 +46,8 @@
 			<label class="col-sm-3 control-label ">组织：</label>
 			<div class="col-sm-8">
 				<input id="deptid" name="deptid" type="hidden" th:value="${tIotDevices.deptid}" />
-				<input class="form-control" type="text" onclick="selectDept()" id="deptName" readonly="true" th:value="${tIotDevices.dept.deptName}"  />
+				<input class="form-control" type="text" onclick="selectDept()" id="deptName" readonly="true" th:value="${tIotDevices.dept.deptName}" shiro:hasPermission="wx:tIotDevices:admin" />
+				<div th:text="${tIotDevices.dept.deptName}" shiro:lacksPermission="wx:tIotDevices:admin"></div>
 			</div>
 		</div>
 
@@ -130,11 +134,11 @@
         var options = {
             title: '选择组织',
             width: "380",
-            url: prefix + "/selectDept/" + $("#deptid").val(),
+            url: "/sys/dept/selectTree/100" ,//+ "/selectDept/100"),
             callBack: function (index, layero){
                 var body = layer.getChildFrame('body', index);
-                $("#deptid").val(body.find('#id').val());
-                $("#deptName").val(body.find('#cnName').val());
+                $("#deptid").val(body.find('#treeId').val());
+                $("#deptName").val(body.find('#treeName').val());
                 layer.close(index);
             }
         };
