@@ -519,7 +519,8 @@ function Pillar(props) {
 	}
 	React.useEffect(() => {
 		if (data.length !== props.pillar.length) {
-			let result = props.pillar.map((e, i) => {
+			let result = [];
+			props.pillar.forEach((e, i) => {
 				// {
 				// 	title: '视频',
 				// 	value: 17
@@ -536,10 +537,13 @@ function Pillar(props) {
 				// 	title: '其他',
 				// 	value: 70
 				// }
-				return {
-					title: e.type ? e.type : '音频设备',
-					value: e.count - 0
-				};
+				if (e.type) {
+					result.push({
+						title: e.type,
+						value: e.count - 0
+					});
+				}
+				return;
 			});
 
 			setData(result);
@@ -574,7 +578,10 @@ function AssetFooter(props) {
 	// let [isShow, setShow] = React.useState(false);
 	let [color, setColor] = React.useState('greenyellow');
 	React.useEffect(() => {
-		setColor(props.couter === 0 ? 'greenyellow' : props.couter < 10 ? '#FFCD42' : 'red');
+		setColor(
+			// props.couter === 0 ? 'greenyellow' :
+			props.couter < 10 ? '#FFCD42' : 'red'
+		);
 		return () => {};
 	}, [props]);
 	function leftHandleClick() {
