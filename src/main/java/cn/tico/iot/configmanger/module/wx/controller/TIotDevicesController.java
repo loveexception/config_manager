@@ -290,9 +290,9 @@ public class TIotDevicesController implements AdminKey {
                 Owner owner = new Owner();
 
                 if (Lang.isEmpty(owners)) {
-                    owner.setCycle("365");
+                    owner.setCycle("10");
                     Calendar cal = Calendar.getInstance();
-                    cal.add(Calendar.YEAR, 1);
+                    cal.add(Calendar.DATE, 10);
                     String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
                     owner.setTime(day);
                     owner.setDeviceid(id);
@@ -306,7 +306,7 @@ public class TIotDevicesController implements AdminKey {
                     	continue;
 					}
 					if(Strings.isBlank(temp.getCycle())){
-                    	temp.setCycle("1");
+                    	temp.setCycle("10");
 					}
                     int step =Lang.str2number(temp.cycle).intValue();
                     cal.add(Calendar.DATE, step);
@@ -371,14 +371,10 @@ public class TIotDevicesController implements AdminKey {
 			Cnd cnd = Cnd.NEW();
 			cnd.and("id","in",ids);
 
-			if(!isAdmin()){
-				SqlExpressionGroup
-						group = Cnd
-						.exps("dept_id", "=", DEPT_ADMIN)
-						.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
-				cnd.and(group);
-			}
+
 			cnd.and("delflag","=","false");
+			cnd.and("status","=","true");
+			cnd.and("asset_status","=","2");
 			TableDataInfo info  =  deviceService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"^dept|kind|owner|next$");
 			List<Device> list = (List<Device>) info.getRows();
 			List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag","=","false").and("level","=","3"));
