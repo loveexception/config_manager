@@ -16,7 +16,7 @@
 
 
 		<div class="form-group">
-			<label class="col-sm-3 control-label">资产机器码：</label>
+			<label class="col-sm-3 control-label">SNO：</label>
 			<div class="col-sm-8">
 				<input id="sno" name="sno" class="form-control" type="text" />
 			</div>
@@ -68,7 +68,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label"> 维修周期（天）：</label>
 			<div class="col-sm-8">
-				<input id="quality" name="next.cycle" class="form-control" type="text" value="365" />
+				<input id="quality" name="next.cycle" class="form-control" type="text" value="" />
 			</div>
 		</div>
 		<div class="select-time form-group">
@@ -90,7 +90,7 @@
 
 
 
-
+        <!--
 
 		<div class="form-group">
 			<label class="col-sm-3 control-label">状态：</label>
@@ -102,8 +102,11 @@
 			</div>
 		</div>
 
+``      -->
+        <input type="hidden" name="status" value="true" />
 
-	</form>
+
+    </form>
 </div>
 <div th:include="include::footer"></div>
 <script type="text/javascript">
@@ -130,11 +133,11 @@
         var options = {
             title: '选择组织',
             width: "380",
-            url: prefix + "/selectDept/" + $("#deptid").val(),
+            url: "/sys/dept/selectTree/100" ,//+ "/selectDept/100"),
             callBack: function (index, layero){
                 var body = layer.getChildFrame('body', index);
-                $("#deptid").val(body.find('#id').val());
-                $("#deptName").val(body.find('#cnName').val());
+                $("#deptid").val(body.find('#treeId').val());
+                $("#deptName").val(body.find('#treeName').val());
                 layer.close(index);
             }
         };
