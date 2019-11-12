@@ -385,6 +385,7 @@ class EditableTableRadio extends React.PureComponent {
 	}
 	render() {
 		let { data = {} } = this.props;
+		console.log(url, 'url');
 		return (
 			<Radio.Group
 				onChange={e => {

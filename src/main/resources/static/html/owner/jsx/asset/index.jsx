@@ -73,21 +73,68 @@ class ChartCircle extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: [
-				{
-					type: '再用:50%',
-					value: 50
-				},
-				{
-					type: '闲置:50%',
-					value: 50
-				}
-			]
+			data: []
 		};
 	}
 	componentDidMount() {
-		this.init();
+		let { chartData = [] } = this.props.chartData;
+		let data = [];
+		let allCount = 0;
+		chartData.forEach(item => {
+			allCount += item.count;
+		});
+		!_.isEmpty(chartData) &&
+			chartData.forEach(e => {
+				if (e.asset) {
+					data.unshift({
+						type: `再用:${(e.count / allCount).toFixed(0)}%`,
+						value: e.count
+					});
+				} else {
+					data.push({
+						type: `闲置:${(e.count / allCount).toFixed(0)}%`,
+						value: e.count
+					});
+				}
+			});
+		this.setState({
+			data
+		});
 	}
+	componentDidUpdate() {
+		//复用
+		let { chartData = [] } = this.props;
+		let data = [];
+		let allCount = 0;
+		chartData.forEach(item => {
+			allCount += item.count;
+		});
+		!_.isEmpty(chartData) &&
+			chartData.forEach(e => {
+				if (e.asset === '已用') {
+					data.unshift({
+						type: `再用:${(e.count / allCount).toFixed(2) * 100}%`,
+						value: e.count
+					});
+				} else {
+					data.push({
+						type: `闲置:${(e.count / allCount).toFixed(2) * 100}%`,
+						value: e.count
+					});
+				}
+			});
+		if (data.length != this.state.data.length) {
+			this.setState(
+				{
+					data
+				},
+				() => {
+					this.init();
+				}
+			);
+		}
+	}
+
 	init = () => {
 		var startAngle = (-Math.PI / 2) * -1;
 		let { data } = this.state;
@@ -128,7 +175,7 @@ class ChartCircle extends React.PureComponent {
 					shadowColor: 'rgba(0, 0, 0, .45)'
 				},
 				formatter: function formatter(val) {
-					return parseInt(val * 100) + '%';
+					return (val - 0).toFixed(2) * 100 + '%';
 				}
 			});
 		chart.guide().html({
@@ -349,7 +396,7 @@ class ChartCircle extends React.PureComponent {
 	};
 
 	render() {
-		let { countMenoy, count, countMenoyIdle, countIdle } = this.props;
+		let { chartData = [] } = this.props;
 		return (
 			<div className="ChartCircle-box">
 				<div id="mountNode"></div>
@@ -361,14 +408,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产金额</div>
-									<div>{countMenoy ? '￥' + countMenoy : '￥511,325'}</div>
+									<div>{chartData.length > 0 ? '￥' + chartData[0].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-left-item">
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产个数</div>
-									<div>{count ? countMenoy + '个' : '25个'}</div>
+									<div>{chartData.length > 0 ? chartData[0].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -380,14 +427,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产金额</div>
-									<div>{countMenoyIdle ? '￥' + countMenoyIdle : '￥511,325'}</div>
+									<div>{chartData.length > 0 ? '￥' + chartData[1].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-right-item">
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产个数</div>
-									<div>{countIdle ? countMenoyIdle + '个' : '25个'}个</div>
+									<div>{chartData.length > 0 ? chartData[1].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -399,28 +446,28 @@ class ChartCircle extends React.PureComponent {
 }
 function Pillar(props) {
 	let [data, setData] = React.useState([
-		{
-			title: '视频',
-			value: 17
-		},
-		{
-			title: '音频',
-			value: 40
-		},
-		{
-			title: '网络',
-			value: 50
-		},
-		{
-			title: '其他',
-			value: 70
-		}
+		// {
+		// 	title: '视频',
+		// 	value: 17
+		// },
+		// {
+		// 	title: '音频',
+		// 	value: 40
+		// },
+		// {
+		// 	title: '网络',
+		// 	value: 50
+		// },
+		// {
+		// 	title: '其他',
+		// 	value: 70
+		// }
 	]);
 	function init() {
 		var chart = new G2.Chart({
 			container: 'content',
 			//				forceFit: true,
-			width: 700,
+			width: 574,
 			height: 368,
 			padding: [10, 20, 50, 51]
 		});
@@ -470,9 +517,37 @@ function Pillar(props) {
 			.color('#30359D');
 		chart.render();
 	}
-	React.useEffect((...data) => {
-		init();
-	});
+	React.useEffect(() => {
+		if (data.length !== props.pillar.length) {
+			let result = props.pillar.map((e, i) => {
+				// {
+				// 	title: '视频',
+				// 	value: 17
+				// },
+				// {
+				// 	title: '音频',
+				// 	value: 40
+				// },
+				// {
+				// 	title: '网络',
+				// 	value: 50
+				// },
+				// {
+				// 	title: '其他',
+				// 	value: 70
+				// }
+				return {
+					title: e.type ? e.type : '音频设备',
+					value: e.count - 0
+				};
+			});
+
+			setData(result);
+		}
+		if (data.length > 0) {
+			init();
+		}
+	}, [props, data]);
 	return (
 		<div className="Pillar-box">
 			<div className="Pillar-unit">单位：{'台'}</div>
@@ -514,13 +589,9 @@ function AssetFooter(props) {
 			<div className="option-box-left" onClick={leftHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
 				<div className="option-left-text">{text.leftText}</div>
-				{props.couter > 0 ? (
-					<div className="option-waring-box" style={{ color }}>
-						{props.couter}
-					</div>
-				) : (
-					''
-				)}
+				<div className="option-waring-box" style={{ color }}>
+					{props.couter}
+				</div>
 			</div>
 			<div className="option-box-right" onClick={rightHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
@@ -555,98 +626,125 @@ const rowSelection = {
 function Frame(props) {
 	let {} = props;
 	let [modal1Visible, setModal1Visible] = React.useState(false);
-	let [modal2Visible, setModal2Visible] = React.useState(false);
-	let [] = React.useState([]);
+	let [reqFlag, setReqFlag] = React.useState(true);
+
+	let [data, setData] = React.useState([]);
 	let mesFlag;
 	const columns = [
 		{
-			title: 'Name',
-			dataIndex: 'name',
-			key: 'name'
+			title: '资产机器码',
+			width: 100,
+			dataIndex: 'cno',
+			key: 'sno',
+			fixed: 'left'
 		},
 		{
-			title: 'Age',
-			dataIndex: 'age',
-			key: 'age',
-			width: '12%'
+			title: '资产状态',
+			width: 100,
+			dataIndex: 'asset_status',
+			key: 'asset_status',
+			fixed: 'left'
 		},
 		{
-			title: 'Address',
-			dataIndex: 'address',
-			width: '30%',
-			key: 'address'
+			title: '资产编码',
+			dataIndex: 'enName',
+			key: '资产编码',
+			width: 150
+		},
+		{
+			title: '资产名称',
+			dataIndex: 'cnName',
+			key: '资产名称',
+			width: 150
+		},
+		{
+			title: '部门',
+			dataIndex: 'dept',
+			key: '部门',
+			width: 150
+		},
+		{
+			title: '价格',
+			dataIndex: 'price',
+			key: '价格',
+			width: 150
+		},
+		{
+			title: '购买日期',
+			dataIndex: 'orderTime',
+			key: '购买日期',
+			width: 150
+		},
+		{
+			title: '检查时间',
+			dataIndex: 'gatewayExtsno',
+			key: '检查时间',
+			width: 150
+		},
+		{
+			title: '类型',
+			dataIndex: 'kind.cnName',
+			key: '类型',
+			width: 150
+		},
+		{ title: '厂家', dataIndex: 'kindmap', key: '厂家' },
+		{
+			title: '操作',
+			key: '操作',
+			fixed: 'right',
+			width: 100,
+			render: () => <LinkButton text="确认" />
 		}
 	];
 
-	const data = [
-		{
-			key: 1,
-			name: 'John Brown sr.',
-			age: 60,
-			address: 'New York No. 1 Lake Park',
-			children: [
-				{
-					key: 11,
-					name: 'John Brown',
-					age: 42,
-					address: 'New York No. 2 Lake Park'
-				},
-				{
-					key: 12,
-					name: 'John Brown jr.',
-					age: 30,
-					address: 'New York No. 3 Lake Park',
-					children: [
-						{
-							key: 121,
-							name: 'Jimmy Brown',
-							age: 16,
-							address: 'New York No. 3 Lake Park'
-						}
-					]
-				},
-				{
-					key: 13,
-					name: 'Jim Green sr.',
-					age: 72,
-					address: 'London No. 1 Lake Park',
-					children: [
-						{
-							key: 131,
-							name: 'Jim Green',
-							age: 42,
-							address: 'London No. 2 Lake Park',
-							children: [
-								{
-									key: 1311,
-									name: 'Jim Green jr.',
-									age: 25,
-									address: 'London No. 3 Lake Park'
-								},
-								{
-									key: 1312,
-									name: 'Jimmy Green sr.',
-									age: 18,
-									address: 'London No. 4 Lake Park'
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			key: 2,
-			name: 'Joe Black',
-			age: 32,
-			address: 'Sidney No. 1 Lake Park'
-		}
-	];
+	// for (let i = 0; i < 100; i++) {
+	// 	data.push({
+	// 		key: i,
+	// 		name: `Edrward ${i}`,
+	// 		age: 32,
+	// 		address: `London Park no. ${i}`
+	// 	});
+	// }
 	React.useEffect(() => {
 		setModal1Visible(props && props.isEdit);
-
+		setReqFlag(false);
+		if (reqFlag) {
+			$.get(
+				'http://127.0.0.1:8090/wx/tIotDevices/out_time',
+				{
+					next_time: dateUtil(new Date())
+				},
+				function(obj) {
+					if (obj.code === 0) {
+						let arr = obj.rows;
+						!_.isEmpty(arr) &&
+							arr.forEach(({ cno, asset_status, enName, cnName, dept, price, orderTime, gatewayExtsno, kindmap }, index) => {
+								data.push({
+									cno,
+									asset_status,
+									enName,
+									cnName,
+									dept,
+									price,
+									orderTime,
+									gatewayExtsno,
+									cnName,
+									kindmap
+								});
+							});
+						setData(data);
+					} else {
+						console.log('接口报错');
+					}
+				}
+			);
+		}
 		return () => {};
 	}, [props]);
+	function dateUtil(time) {
+		let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
+		return result;
+	}
 	let linkButtonConfig = {
 		text: '已查看'
 		// handleBackground: 'pink',
@@ -670,7 +768,7 @@ function Frame(props) {
 		<div className="modal-box">
 			<Modal title="20px to Top" width={1000} style={{ top: 20 }} visible={modal1Visible} onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton {...linkButtonConfig} style={{ background: '#08CE01', color: '#F3F3F3' }} onClick={handleData} />
-				<Table columns={columns} rowSelection={rowSelection} dataSource={data} onSelect={selectCallback} />
+				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} scroll={{ x: 1500, y: 300 }} />
 			</Modal>
 		</div>
 	);
@@ -700,15 +798,57 @@ class AssetContent extends React.PureComponent {
 		super(props);
 		this.state = {
 			change: 0,
-			couter: 0,
-			isLoading: true
+			couter: 20,
+			isLoading: true,
+			chartData: [],
+			pillar: []
 		};
 	}
 	componentDidMount() {
 		this.init();
-		setTimeout(() => {
-			this.setState({ change: 20, couter: 10, isLoading: false });
-		}, 1000);
+		let url = 'http://127.0.0.1:8090/wx/tIotDevices/';
+		let params = {
+			next_time: dateUtil(new Date())
+		};
+		function dateUtil(time) {
+			let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
+			return result;
+		}
+		$.get(url + 'count', params, obj => {
+			if (obj.code === 0) {
+				this.setState({
+					couter: obj.data.count,
+					isLoading: false
+				});
+			} else {
+				this.setState({
+					isLoading: false
+				});
+				antd.message.error('接口报错', 0.5);
+			}
+		});
+		$.get('http://127.0.0.1:8090/wx/tIotDevices/money', obj => {
+			if (obj.code === 0) {
+				let resultArr = obj.data.map(e => {
+					e.count = e.count - 0;
+					e.sum = e.sum - 0;
+				});
+				this.setState({
+					chartData: obj.data
+				});
+			} else {
+				console.log('接口报错');
+			}
+		});
+		$.get('http://127.0.0.1:8090/wx/tIotDevices/group', obj => {
+			if (obj.code === 0) {
+				this.setState({
+					pillar: obj.data
+				});
+			} else {
+				console.log('接口报错');
+			}
+		});
 	}
 	init = () => {};
 	componentWillUnmount() {
@@ -716,21 +856,37 @@ class AssetContent extends React.PureComponent {
 			return;
 		};
 	}
+	couterUtil = (arr, objName) => {
+		if (!Array.isArray(arr)) {
+			return 0;
+		}
+		let numCount = 0;
+		arr.forEach((e, i) => {
+			numCount += e[objName];
+		});
+		if (!numCount) {
+			return 0;
+		}
+		return numCount;
+	};
+
 	render() {
-		let { isLoading } = this.state;
-		let { isEdit } = this;
-		let obj = { couter: this.state.couter, change: this.state.change };
+		let { isLoading, chartData = [] } = this.state;
+		let { isEdit, couterUtil } = this;
+		let useCount = couterUtil(chartData, 'count'); // 应用总数
+		let assteCount = couterUtil(chartData, 'sum'); // 资产总数
+		let obj = { ...this.state };
 		// titlebox    img boolean  titleText 头部文字  count 数量 false 有单位￥
 		return (
 			<Spin size="large" spinning={isLoading} indicator={antIcon}>
 				<div className="asset-box">
 					<div className="asset-title-container">
-						<TitleBox titleImg={true} titleText="设备资产总数" count="25" />
-						<TitleBox titleImg={false} titleText="设备资产总数" count="25" />
+						<TitleBox titleImg={true} titleText="设备应用总数" count={useCount} />
+						<TitleBox titleImg={false} titleText="设备资产总数" count={assteCount} />
 					</div>
 					<div className="asset-middle">
-						<ContentBox Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
-						<ContentBox Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
+						<ContentBox componentData={obj} Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
+						<ContentBox componentData={obj} Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
 					</div>
 					<div className="asset-footer">
 						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text="信息提醒"></ContentBox>
