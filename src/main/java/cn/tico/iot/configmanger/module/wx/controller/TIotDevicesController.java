@@ -302,7 +302,14 @@ public class TIotDevicesController implements AdminKey {
                     Owner temp = owners.get(0);
 
                     Calendar cal = Calendar.getInstance();
-                    cal.add(Calendar.DATE, Integer.parseInt(temp.cycle));
+                    if(Lang.isEmpty(temp)){
+                    	continue;
+					}
+					if(Strings.isBlank(temp.getCycle())){
+                    	temp.setCycle("1");
+					}
+                    int step =Lang.str2number(temp.cycle).intValue();
+                    cal.add(Calendar.DATE, step);
                     String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
                     temp.setTime(day);
                     deviceService.dao().update(temp);
