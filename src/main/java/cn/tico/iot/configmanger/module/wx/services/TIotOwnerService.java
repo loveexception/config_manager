@@ -40,8 +40,8 @@ public class TIotOwnerService extends Service<TIotOwner> {
 				" from t_iot_devices  dev " +
 				" left join t_iot_owner own  on dev.id = own.device_id \n" +
 				" where own.time is not null \n" +
-				" and dev.delflag= false " +
-				" and dev.status = true " ;
+				" and dev.delflag= 'false' " +
+				" and dev.status = 'true' " ;
 		String group = 		"group by dev.sno ,dev.id\n" +
 				"HAVING max(UNIX_TIMESTAMP(own.time)) < UNIX_TIMESTAMP(@mytime)";
 		if(Strings.isBlank(deptid)){
