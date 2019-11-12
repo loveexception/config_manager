@@ -580,7 +580,7 @@ function AssetFooter(props) {
 	React.useEffect(() => {
 		setColor(
 			// props.couter === 0 ? 'greenyellow' :
-			props.couter < 10 ? '#FFCD42' : 'red'
+			props.couter < 10 ? '#19A15F' : 'red'
 		);
 		return () => {};
 	}, [props]);
@@ -600,7 +600,7 @@ function AssetFooter(props) {
 					{props.couter}
 				</div>
 			</div>
-			<div className="option-box-right" onClick={rightHandleClick}>
+			<div className="option-box-right" style={{visibility:'hidden'}}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
 				<div className="option-left-text">{text.rightText}</div>
 				{/* {props.change ? (
@@ -645,7 +645,7 @@ function Frame(props) {
 			selectedRows.forEach(item => {
 				arr.push(item.id);
 			});
-			reqArrList = arr;
+			setReqArrList(arr);
 		}
 	};
 	function reqUpdata(arr = []) {
@@ -654,18 +654,20 @@ function Frame(props) {
 			url += `id=${id}`;
 		});
 		$.get(url, function(obj) {
-			if (obj.code === 0) {
+			if (obj.code == 0) {
 				setData(data => {
 					if (data.length === arr.length) {
 						return [];
 					}
 					arr.forEach(id => {
 						let index = data.findIndex((e, i) => {
-							return e.id === id;
+							return e.id == id;
 						});
-						data.splice(0, index);
+						data.splice(index, index+1);
 					});
-					return data;
+					console.log(data,'data')
+					debugger
+					return [...data];
 				});
 			} else {
 				antd.message.error('操作失败', 0.5);
@@ -675,23 +677,22 @@ function Frame(props) {
 	const columns = [
 		{
 			title: '资产机器码',
-			width: 100,
+			width: 200,
 			dataIndex: 'sno',
 			key: 'sno',
-			fixed: 'left'
 		},
 		{
 			title: '资产状态',
-			width: 100,
 			dataIndex: 'assetStatus',
 			key: 'assetStatus',
-			fixed: 'left'
+			width: 150
+
 		},
 		{
 			title: '资产编码',
 			dataIndex: 'enName',
 			key: '资产编码',
-			width: 150
+			width: 200
 		},
 		{
 			title: '资产名称',
@@ -704,12 +705,14 @@ function Frame(props) {
 			dataIndex: 'dept',
 			key: '部门',
 			width: 150
+
 		},
 		{
 			title: '价格',
 			dataIndex: 'price',
 			key: '价格',
 			width: 150
+
 		},
 		{
 			title: '购买日期',
@@ -729,12 +732,12 @@ function Frame(props) {
 			key: '类型',
 			width: 150
 		},
-		{ title: '厂家', dataIndex: 'kindmap', key: '厂家' },
+		{ title: '厂家', dataIndex: 'kindmap', key: '厂家', width: 150 },
 		{
 			title: '操作',
 			key: '操作',
-			fixed: 'right',
-			width: 100,
+			width: 120,
+			align:'center',
 			render: (a, record) => (
 				<LinkButton
 					text="确认"
@@ -773,15 +776,14 @@ function Frame(props) {
 			$.get(
 				'/wx/tIotDevices/out_time',
 				{
-					next_time: dateUtil(new Date())
+					next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
 				},
 				function(obj) {
-					if (obj.code === 0) {
+					if (obj.code == 0) {
 						let arr = obj.rows;
 						!_.isEmpty(arr) &&
 							arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
-								console.log(assetStatus, ' assetStatus');
-								if (assetStatus == 2) {
+								if (assetStatus === "2") {
 									assetStatus = '正常';
 								} else {
 									assetStatus = '异常';
@@ -816,7 +818,7 @@ function Frame(props) {
 		return result;
 	}
 	let linkButtonConfig = {
-		text: '已查看'
+		text: '全部确认'
 		// handleBackground: 'pink',
 		// handleColor: 'black'
 	};
@@ -827,22 +829,21 @@ function Frame(props) {
 		message.loading('处理中···', 0.5, function() {
 			mesFlag = false;
 			message.destroy();
-
 			message.success('处理完毕', 0.5);
 		});
 		mesFlag = true;
 	}
 	return (
 		<div className="modal-box">
-			<Modal title="检修提醒" width={800} style={{ top: 20 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+			<Modal title="检修提醒" width={1600} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
 						handleReq({ isAll: true });
 					}}
 					{...linkButtonConfig}
-					style={{ background: '#08CE01', color: '#F3F3F3' }}
+					style={{ background: '#08CE01', color: '#F3F3F3',margin:'0 0 15px 0' }}
 				/>
-				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} scroll={{ x: 1500, y: 300 }} />
+				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} />
 			</Modal>
 		</div>
 	);
@@ -881,7 +882,7 @@ class AssetContent extends React.PureComponent {
 		this.init();
 		let url = '/wx/tIotDevices/';
 		let params = {
-			next_time: dateUtil(new Date())
+			next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
 		};
 		function dateUtil(time) {
 			let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
@@ -901,7 +902,7 @@ class AssetContent extends React.PureComponent {
 			}
 		});
 		$.get('/wx/tIotDevices/money', obj => {
-			if (obj.code === 0) {
+			if (obj.code == 0) {
 				let resultArr = obj.data.map(e => {
 					e.count = e.count - 0;
 					e.sum = e.sum - 0;
@@ -914,7 +915,7 @@ class AssetContent extends React.PureComponent {
 			}
 		});
 		$.get('/wx/tIotDevices/group', obj => {
-			if (obj.code === 0) {
+			if (obj.code == 0) {
 				this.setState({
 					pillar: obj.data
 				});

@@ -35,6 +35,7 @@ MainLauncher 是入口,启动即可
 
 仅供测试用,使用 mvn 命令即可
 m
+
 ```
 // for windows
 set MAVEN_OPTS="-Dfile.encoding=UTF-8"
@@ -56,5 +57,5 @@ mvn clean package nutzboot:shade
 ## start 命令:
 
 ```
-	mvn compile nutzboot:run
+	mvn clean  compile nutzboot:run -o
 ```
