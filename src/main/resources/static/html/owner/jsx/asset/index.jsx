@@ -592,7 +592,7 @@ function AssetFooter(props) {
 	}
 	return (
 		<div className="asset-footer-box">
-			<Frame isEdit={isEdit}></Frame>
+			<Frame reqFunc={props.reqFunc} isEdit={isEdit}></Frame>
 			<div className="option-box-left" onClick={leftHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
 				<div className="option-left-text">{text.leftText}</div>
@@ -838,9 +838,12 @@ function Frame(props) {
 		});
 		mesFlag = true;
 	}
+	function resetReq (){
+		props.reqFunc()
+	}
 	return (
 		<div className="modal-box">
-			<Modal title="检修提醒" width={1600} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+			<Modal title="检修提醒" width={1600} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
 						handleReq(reqArrList);
@@ -883,16 +886,15 @@ class AssetContent extends React.PureComponent {
 			pillar: []
 		};
 	}
-	componentDidMount() {
-		this.init();
-		let url = '/wx/tIotDevices/';
-		let params = {
-			next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
-		};
+	reqFunc=()=>{
 		function dateUtil(time) {
 			let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
 			return result;
 		}
+		let url = '/wx/tIotDevices/';
+		let params = {
+			next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
+		};
 		$.get(url + 'count', params, obj => {
 			if (obj.code === 0) {
 				this.setState({
@@ -906,6 +908,12 @@ class AssetContent extends React.PureComponent {
 				antd.message.error('接口报错', 0.5);
 			}
 		});
+	}
+	componentDidMount() {
+		this.init();
+	
+		this.reqFunc()
+		
 		$.get('/wx/tIotDevices/money', obj => {
 			if (obj.code == 0) {
 				let resultArr = obj.data.map(e => {
@@ -951,10 +959,10 @@ class AssetContent extends React.PureComponent {
 
 	render() {
 		let { isLoading, chartData = [] } = this.state;
-		let { isEdit, couterUtil } = this;
+		let { isEdit, couterUtil,reqFunc } = this;
 		let useCount = couterUtil(chartData, 'count'); // 应用总数
 		let assteCount = couterUtil(chartData, 'sum'); // 资产总数
-		let obj = { ...this.state };
+		let obj = { ...this.state,reqFunc };
 		// titlebox    img boolean  titleText 头部文字  count 数量 false 有单位￥
 		return (
 			<Spin size="large" spinning={isLoading} indicator={antIcon}>
