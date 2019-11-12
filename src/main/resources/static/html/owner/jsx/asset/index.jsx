@@ -559,7 +559,7 @@ function Pillar(props) {
 		</div>
 	);
 }
-class ContentBox extends React.PureComponent {
+class ContentBox extends React.Component {
 	render() {
 		let { width = '100px', height = '100px', text = '', Component = '', componentData = {} } = this.props;
 		return (
@@ -871,7 +871,7 @@ function LinkButton(props) {
 		</button>
 	);
 }
-class AssetContent extends React.PureComponent {
+class AssetContent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
