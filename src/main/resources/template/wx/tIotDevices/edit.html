@@ -10,8 +10,8 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label">资产状态：</label>
 			<div class="col-sm-8">
-				<label class="radio-box"> <input type="radio" name="assetStatus" value="true"  th:checked="${tIotDevices.assetStatus}" /> 正常 </label>
-				<label class="radio-box"> <input type="radio" name="assetStatus" value="false" th:checked="${!tIotDevices.assetStatus}" /> 停用 </label>
+				<label class="radio-box"> <input type="radio" name="assetStatus" value="2"  th:checked="${tIotDevices.assetStatus=='2'}" /> 正常 </label>
+				<label class="radio-box"> <input type="radio" name="assetStatus" value="0" th:checked="${tIotDevices.assetStatus=='0'}" /> 停用 </label>
 
 			</div>
 		</div>
