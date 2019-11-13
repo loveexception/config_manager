@@ -1,3 +1,5 @@
+let { Icon, Spin, Modal, Button, Table, message, Popover } = antd;
+
 var domId = '';
 var scripts = document.getElementsByTagName('script');
 for (var i = 0; i < scripts.length; i++) {
@@ -295,9 +297,17 @@ class ChartCircle extends React.PureComponent {
 			var points = void 0;
 			if (_router.y !== y) {
 				// 文本位置做过调整
-				points = [[_anchor.x, _anchor.y], [_router.x, y], [lastPoint.x, lastPoint.y]];
+				points = [
+					[_anchor.x, _anchor.y],
+					[_router.x, y],
+					[lastPoint.x, lastPoint.y]
+				];
 			} else {
-				points = [[_anchor.x, _anchor.y], [_router.x, _router.y], [lastPoint.x, lastPoint.y]];
+				points = [
+					[_anchor.x, _anchor.y],
+					[_router.x, _router.y],
+					[lastPoint.x, lastPoint.y]
+				];
 			}
 
 			labelGroup.addShape('polyline', {
@@ -554,7 +564,6 @@ class ContentBox extends React.PureComponent {
 		);
 	}
 }
-let { Icon, Spin, Modal, Button, Table, message } = antd;
 const antIcon = <Icon type="loading" style={{ fontSize: 24, color: 'deeppink' }} spin />;
 function AssetFooter(props) {
 	let [text, setText] = React.useState({ leftText: '检修提醒', rightText: '更换提醒' });
@@ -571,9 +580,6 @@ function AssetFooter(props) {
 	function leftHandleClick() {
 		setIsEdit(!isEdit);
 	}
-	function rightHandleClick() {
-		setIsEdit(!isEdit);
-	}
 	return (
 		<div className="asset-footer-box">
 			<Frame reqFunc={props.reqFunc} isEdit={isEdit} leftHandleClick={leftHandleClick}></Frame>
@@ -584,10 +590,12 @@ function AssetFooter(props) {
 					{props.couter}
 				</div>
 			</div>
-			<div className="option-box-right" style={{visibility:'hidden'}}>
-				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
-				<div className="option-left-text">{text.rightText}</div>
-			</div>
+			<Popover placement="topLeft" style={{ fontSize: '2em' }} content={<div style={{ color: '#404040', fontSize: '13px' }}>暂未开放.</div>} title="新的功能..." trigger="hover">
+				<div className="option-box-right" style={{ opacity: 0.3 }}>
+					<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
+					<div className="option-left-text">{text.rightText}</div>
+				</div>
+			</Popover>
 		</div>
 	);
 }
@@ -605,45 +613,44 @@ function Frame(props) {
 		onChange: (selectedRowKeys, selectedRows) => {},
 		onSelect: (record = {}, selected, selectedRows) => {
 			if (selected) {
-				setReqArrList(list=>{
-				return [...list,record.id]
-		})
+				setReqArrList(list => {
+					return [...list, record.id];
+				});
 			} else {
-				setReqArrList(list=>{
+				setReqArrList(list => {
 					let index = reqArrList.findIndex(id => {
-					return record.id === id;
-					})
-					 
-					list.splice(index,index+1);
-				return	[...list]
-				})
+						return record.id === id;
+					});
 
+					list.splice(index, index + 1);
+					return [...list];
+				});
 			}
 		},
 		onSelectAll: (selected, selectedRows = [], changeRows) => {
-			if(selected){ //点击 全部 的回调 if true allckecked
-				let result = selectedRows.map((e)=>{
-					return e.id
-				})
+			if (selected) {
+				//点击 全部 的回调 if true allckecked
+				let result = selectedRows.map(e => {
+					return e.id;
+				});
 				setReqArrList(result);
-			}else{
-				setReqArrList([])
+			} else {
+				setReqArrList([]);
 			}
 		}
 	};
 	function reqUpdata(arr = []) {
 		let url = `/wx/tIotDevices/change?`;
 		arr.forEach((id, index) => {
-			if(index+1 ==arr.length){
+			if (index + 1 == arr.length) {
 				url += `id=${id}`;
-			}else{
+			} else {
 				url += `id=${id}&`;
 			}
-
 		});
 		$.get(url, function(obj) {
 			if (obj.code == 0) {
-				reqRestFnc()
+				reqRestFnc();
 			} else {
 				antd.message.error('操作失败', 0.5);
 			}
@@ -654,14 +661,13 @@ function Frame(props) {
 			title: '资产机器码',
 			width: 200,
 			dataIndex: 'sno',
-			key: 'sno',
+			key: 'sno'
 		},
 		{
 			title: '资产状态',
 			dataIndex: 'assetStatus',
 			key: 'assetStatus',
 			width: 150
-
 		},
 		{
 			title: '资产编码',
@@ -680,7 +686,6 @@ function Frame(props) {
 			dataIndex: 'dept',
 			key: '部门',
 			width: 150
-
 		},
 		// {
 		// 	title: '价格',
@@ -699,19 +704,19 @@ function Frame(props) {
 			title: '检查时间',
 			dataIndex: 'gatewayExtsno',
 			key: '检查时间',
-			width:200,
+			width: 200
 		},
 		{
 			title: '类型',
 			dataIndex: 'kind',
-			key: '类型',
+			key: '类型'
 		},
 		{ title: '厂家', dataIndex: 'kindmap', key: '厂家', width: 150 },
 		{
 			title: '操作',
 			key: '操作',
-			width:160,
-			align:'center',
+			width: 160,
+			align: 'center',
 			render: (a, record) => (
 				<LinkButton
 					text="确认"
@@ -723,13 +728,13 @@ function Frame(props) {
 		}
 	];
 	function handleReq(data) {
-		if(Array.isArray(data)){
-			let arr = []
-			data.forEach(e=>{
-				arr.push(e)
-			})
-			data.length > 0 ? reqUpdata(arr ) : '';
-		}else{
+		if (Array.isArray(data)) {
+			let arr = [];
+			data.forEach(e => {
+				arr.push(e);
+			});
+			data.length > 0 ? reqUpdata(arr) : '';
+		} else {
 			reqUpdata([data.id]);
 		}
 	}
@@ -746,12 +751,12 @@ function Frame(props) {
 
 					!_.isEmpty(arr) &&
 						arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
-							if (assetStatus === "2") {
+							if (assetStatus === '2') {
 								assetStatus = '正常';
 							} else {
 								assetStatus = '异常';
 							}
-						reqArrRest.push({
+							reqArrRest.push({
 								sno,
 								assetStatus,
 								enName,
@@ -764,13 +769,13 @@ function Frame(props) {
 								kindmap,
 								kind: kind.cnName,
 								id,
-								key:id
+								key: id
 							});
 						});
 					setData(reqArrRest);
 				} else {
 					console.log('接口报错');
-					setData([])
+					setData([]);
 				}
 			}
 		);
@@ -783,45 +788,32 @@ function Frame(props) {
 		setModal1Visible(props && props.isEdit);
 		setReqFlag(false);
 		if (reqFlag) {
-			reqRestFnc()
+			reqRestFnc();
 		}
 		return () => {};
-	}, [props,data]);
+	}, [props, data]);
 	function dateUtil(time) {
 		let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
 		return result;
 	}
 	let linkButtonConfig = {
 		text: '确认'
-		// handleBackground: 'pink',
-		// handleColor: 'black'
 	};
 	//selet callback
-	function selectCallback(...value) {}
-	function handleData(btn) {
-		if (mesFlag) return;
-		message.loading('处理中···', 0.5, function() {
-			mesFlag = false;
-			message.destroy();
-			message.success('处理完毕', 0.5);
-		});
-		mesFlag = true;
-	}
-	function resetReq (){
-		// 关闭弹窗 
-		props.leftHandleClick()
-		props.reqFunc()
-
+	function resetReq() {
+		// 关闭弹窗
+		props.leftHandleClick();
+		props.reqFunc();
 	}
 	return (
 		<div className="modal-box">
-			<Modal title="检修提醒" width={"80%"} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+			<Modal title="检修提醒" width={'80%'} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
 						handleReq(reqArrList);
 					}}
 					{...linkButtonConfig}
-					style={{ background: '#08CE01', color: '#F3F3F3',margin:'0 0 15px 0' }}
+					style={{ background: '#08CE01', color: '#F3F3F3', margin: '0 0 15px 0' }}
 				/>
 				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} />
 			</Modal>
@@ -833,8 +825,7 @@ function Frame(props) {
 function LinkButton(props) {
 	// let {} = props;
 	let btn = React.createRef();
-	React.useEffect(() => {
-	}, []);
+	React.useEffect(() => {}, []);
 	return (
 		<button ref={btn} className="link-button" {...props}>
 			{props.text}
@@ -850,12 +841,11 @@ class AssetContent extends React.PureComponent {
 			isLoading: false,
 			chartData: [],
 			pillar: [],
-			reqFlag:false,
-			isEdit:false,
-
+			reqFlag: false,
+			isEdit: false
 		};
 	}
-	reqFunc=()=>{
+	reqFunc = () => {
 		function dateUtil(time) {
 			let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
 			return result;
@@ -877,11 +867,11 @@ class AssetContent extends React.PureComponent {
 				antd.message.error('接口报错', 0.5);
 			}
 		});
-	}
+	};
 	componentDidMount() {
 		this.init();
-		this.reqFunc()
-		
+		this.reqFunc();
+
 		$.get('/wx/tIotDevices/money', obj => {
 			if (obj.code == 0) {
 				let resultArr = obj.data.map(e => {
@@ -924,18 +914,18 @@ class AssetContent extends React.PureComponent {
 		}
 		return numCount;
 	};
-	isEditFlag(){
-		let { isEdit } = this.state
+	isEditFlag() {
+		let { isEdit } = this.state;
 		this.setState({
 			isEdit
-		})
+		});
 	}
 	render() {
-		let { isLoading, chartData = [],isEdit } = this.state;
-		let { couterUtil,reqFunc } = this;
+		let { isLoading, chartData = [], isEdit } = this.state;
+		let { couterUtil, reqFunc } = this;
 		let useCount = couterUtil(chartData, 'count'); // 应用总数
 		let assteCount = couterUtil(chartData, 'sum'); // 资产总数
-		let obj = { ...this.state,reqFunc };
+		let obj = { ...this.state, reqFunc };
 		// titlebox    img boolean  titleText 头部文字  count 数量 false 有单位￥
 		return (
 			<Spin size="large" spinning={isLoading} indicator={antIcon}>
