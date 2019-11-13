@@ -139,7 +139,7 @@ public class DeviceController implements AdminKey {
 		cnd.and(group);
 		cnd.and("delflag", "=", "false");
 		cnd.and("status", "=", "true");
-		cnd.and("asset_status", "=", "true");
+		cnd.and("asset_status", "=", "2");
 
 		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver|gateway|tags$");
 
