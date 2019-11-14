@@ -77,7 +77,7 @@ public class TIotOwnerService extends Service<TIotOwner> {
 
     public List<Map> queryCountPrice(String deptid) {
 		String str = "select count(*) count ,sum( price) sum ,\n" +
-				"case when asset_status =0 then \"true\" else \"false\" end as asset \n" +
+				"case when asset_status ='2' then \"true\" else \"false\" end as asset \n" +
 				"from t_iot_devices \n" +
 				"where 1=1 \n" +
 				"and delflag = \"false\" \n" +

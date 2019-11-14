@@ -90,10 +90,11 @@
                         sortable: true,
                         align: 'center',
                         formatter: function(value, row, index) {
-                            if(value=="0"){
-                                return '<span class=" text-danger" onclick="change(this)" >停用</span>';
+                            if(value=="2"){
+                                return '<span class=" text-primary"  onclick="change(this)">正常</span>';
                             }
-                            return '<span class=" text-primary"  onclick="change(this)">正常</span>';
+                            return '<span class=" text-danger" onclick="change(this)" >停用</span>';
+
                         }
                     },
 				{
