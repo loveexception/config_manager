@@ -67,6 +67,10 @@ var xhrOnProgress = function(fun) {
 
 let { Table, Select, Button, Input, Icon, Cascader, Dropdown, Menu, message, Modal, Radio, Pagination } = antd;
 class ListBox extends React.PureComponent {
+	constructor(props) {
+		super(props);
+		this.inputRef = React.createRef();
+	}
 	state = {
 		data: [],
 		columns: [
@@ -175,6 +179,7 @@ class ListBox extends React.PureComponent {
 		select_cascader: [],
 		select_dept: void 0,
 		cascader_list: [],
+		searchValue: '',
 		table_search: {
 			total: 0,
 			pageSize: 10,
@@ -188,11 +193,11 @@ class ListBox extends React.PureComponent {
 		this.getSelectList();
 		this.getTable();
 	}
-	getTable = (locationid = '', deptid = '') => {
+	getTable = (locationid = '', deptid = '', searchData) => {
 		let { pageNum, pageSize } = this.state.table_search || {};
 		this.setState({ loading: true });
 		$.ajax({
-			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}&orderByColumn=updateTime&isAsc=desc`,
+			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}&cnName=${searchData}&orderByColumn=updateTime&isAsc=desc`,
 			// data: {},
 			cache: false,
 			contentType: false,
@@ -439,6 +444,16 @@ class ListBox extends React.PureComponent {
 										});
 									}}
 								/>
+								<Input
+									style={{ width: '200px' }}
+									ref={this.inputRef}
+									placeholder="请输入搜索内容"
+									onInput={event => {
+										this.setState({
+											searchValue: event.target.value
+										});
+									}}
+								></Input>
 							</div>
 							{/* <div className="content-li">
 								<Select
@@ -460,8 +475,8 @@ class ListBox extends React.PureComponent {
 							className="search-btn"
 							type="parimay"
 							onClick={() => {
-								let { select_dept, select_cascader = [] } = this.state;
-								this.getTable(select_cascader.length > 0 ? select_cascader[select_cascader.length - 1] : '', select_dept);
+								let { select_dept, select_cascader = [], searchValue = '' } = this.state;
+								this.getTable(select_cascader.length > 0 ? select_cascader[select_cascader.length - 1] : '', select_dept, searchValue);
 							}}
 						>
 							确认选择
