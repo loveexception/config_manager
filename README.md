@@ -62,3 +62,6 @@ mvn clean package nutzboot:shade -o
 ```
 	mvn clean  compile nutzboot:run -o
 ```
+
+新的 git 地址
+http://172.16.16.1/NimbleLink1.0/configmanager.git
