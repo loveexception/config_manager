@@ -418,14 +418,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产金额</div>
-									<div>{chartData.length > 0 ? '￥' + chartData[0].sum : '￥0'}</div>
+									<div>{chartData[0] > 0 ? '￥' + chartData[0].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-left-item">
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产个数</div>
-									<div>{chartData.length > 0 ? chartData[0].count : '0'}个</div>
+									<div>{chartData[0] > 0 ? chartData[0].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -437,14 +437,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产金额</div>
-									<div>{chartData.length > 0 ? '￥' + chartData[1].sum : '￥0'}</div>
+									<div>{chartData[1] ? '￥' + chartData[1].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-right-item">
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产个数</div>
-									<div>{chartData.length > 0 ? chartData[1].count : '0'}个</div>
+									<div>{chartData[1] ? chartData[1].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -874,13 +874,15 @@ class AssetContent extends React.PureComponent {
 
 		$.get('/wx/tIotDevices/money', obj => {
 			if (obj.code == 0) {
-				let resultArr = obj.data.map(e => {
-					e.count = e.count - 0;
-					e.sum = e.sum - 0;
-				});
-				this.setState({
-					chartData: obj.data
-				});
+				if (Array.isArray(obj.data) && obj.data.length > 0) {
+					let resultArr = obj.data.map(e => {
+						e.count = e.count - 0;
+						e.sum = e.sum - 0;
+					});
+					this.setState({
+						chartData: obj.data
+					});
+				}
 			} else {
 				console.log('接口报错');
 			}
