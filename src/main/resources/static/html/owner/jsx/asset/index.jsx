@@ -89,7 +89,7 @@ class ChartCircle extends React.PureComponent {
 			chartData.forEach(e => {
 				if (e.asset) {
 					data.unshift({
-						type: `再用:${(e.count / allCount).toFixed(0)}%`,
+						type: `已用:${(e.count / allCount).toFixed(0)}%`,
 						value: e.count
 					});
 				} else {
@@ -115,7 +115,7 @@ class ChartCircle extends React.PureComponent {
 			chartData.forEach(e => {
 				if (e.asset === '已用') {
 					data.unshift({
-						type: `再用:${(e.count / allCount).toFixed(2) * 100}%`,
+						type: `已用:${(e.count / allCount).toFixed(2) * 100}%`,
 						value: e.count
 					});
 				} else {
@@ -418,14 +418,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产金额</div>
-									<div>{chartData[0] > 0 ? '￥' + chartData[0].sum : '￥0'}</div>
+									<div>{chartData[0] && chartData[0].sum ? '￥' + chartData[0].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-left-item">
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
 									<div>资产个数</div>
-									<div>{chartData[0] > 0 ? chartData[0].count : '0'}个</div>
+									<div>{chartData[0] && chartData[0].count ? chartData[0].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
@@ -437,14 +437,14 @@ class ChartCircle extends React.PureComponent {
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产金额</div>
-									<div>{chartData[1] ? '￥' + chartData[1].sum : '￥0'}</div>
+									<div>{chartData[1] && chartData[1].sum ? '￥' + chartData[1].sum : '￥0'}</div>
 								</div>
 							</div>
 							<div className="mountNode-right-item">
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产个数</div>
-									<div>{chartData[1] ? chartData[1].count : '0'}个</div>
+									<div>{chartData[1] && chartData[1].count ? chartData[1].count : '0'}个</div>
 								</div>
 							</div>
 						</li>
