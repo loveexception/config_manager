@@ -193,11 +193,12 @@ class ListBox extends React.PureComponent {
 		this.getSelectList();
 		this.getTable();
 	}
-	getTable = (locationid = '', deptid = '', searchData) => {
+	getTable = (locationid = '', deptid = '') => {
+		let { searchValue = '' } = this.state;
 		let { pageNum, pageSize } = this.state.table_search || {};
 		this.setState({ loading: true });
 		$.ajax({
-			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}&cnName=${searchData}&orderByColumn=updateTime&isAsc=desc`,
+			url: `/iot/device/device_list?pageNum=${pageNum}&pageSize=${pageSize}&locationid=${locationid}&deptid=${deptid}&cnName=${searchValue}&orderByColumn=updateTime&isAsc=desc`,
 			// data: {},
 			cache: false,
 			contentType: false,
@@ -476,7 +477,7 @@ class ListBox extends React.PureComponent {
 							type="parimay"
 							onClick={() => {
 								let { select_dept, select_cascader = [], searchValue = '' } = this.state;
-								this.getTable(select_cascader.length > 0 ? select_cascader[select_cascader.length - 1] : '', select_dept, searchValue);
+								this.getTable(select_cascader.length > 0 ? select_cascader[select_cascader.length - 1] : '', select_dept);
 							}}
 						>
 							确认选择
