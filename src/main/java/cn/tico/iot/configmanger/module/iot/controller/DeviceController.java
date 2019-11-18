@@ -105,7 +105,7 @@ public class DeviceController implements AdminKey {
 	public Object deviceList(
 			@Param("pageNum")int pageNum
 			, @Param("pageSize")int pageSize
-			, @Param("name") String name
+			, @Param("cnName") String name
 			, @Param("orderByColumn") String orderByColumn
 			, @Param("isAsc") String isAsc
 			, @Param("deptid") String deptid
