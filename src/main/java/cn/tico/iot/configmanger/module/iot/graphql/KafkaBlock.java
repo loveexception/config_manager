@@ -11,11 +11,17 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
+import org.nutz.lang.Strings;
+import org.nutz.lang.util.NutMap;
+import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.trans.Atom;
 import org.nutz.trans.Trans;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 @IocBean(create = "init", depose = "depose")
@@ -41,7 +47,6 @@ public  class KafkaBlock  {
         if(consumer!=null){
             return;
         }
-
         String serializer = StringSerializer.class.getName();
         String deserializer = StringDeserializer.class.getName();
 
@@ -62,19 +67,17 @@ public  class KafkaBlock  {
         consumer = new KafkaConsumer<>(props);
 
     }
-
-    public void  consume(String topic ,Block block ) {
-        consumer.subscribe(Arrays.asList(topic));
+    public void consume(Map<String,Block> map) {
+        consumer.subscribe(map.keySet());
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(1000);
             for (ConsumerRecord<String, String> record : records) {
+                Block block= map.get(record.topic());
+                if(Lang.isNotEmpty(block)){
+                    block.exec(record.topic(),record.key(),record.value(),record.offset());
+                }
 
-                Trans.exec(new Atom(){
-                    public void run() {
-                        block.exec(topic, record.key(), record.value(), record.offset());
-                    }});
-
-			}
+            }
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -82,6 +85,30 @@ public  class KafkaBlock  {
             }
         }
     }
+//    public void  consume(List topic , List<Block> blocks ) {
+//        consumer.subscribe(topic);
+//        while (true) {
+//            ConsumerRecords<String, String> records = consumer.poll(1000);
+//            for (ConsumerRecord<String, String> record : records) {
+//                if(Strings.equals("config",record.topic())){
+//                    //block.exec(record.topic(), record.key(), record.value(), record.offset());
+//                    Logs.get().infof("config record : %s",record);
+//                    continue;
+//                }
+//                if(Strings.equals("register",record.topic())){
+//                    Logs.get().infof("register , record: %s",record);
+//                    //block.exec(record.topic(), record.key(), record.value(), record.offset());
+//                    continue;
+//                }
+//
+//			}
+//            try {
+//                Thread.sleep(10000);
+//            } catch (InterruptedException e) {
+//                Logs.get().error(e);
+//            }
+//        }
+//    }
 
     public void produce(String topic ,String key , String value ) {
             producer.send(new ProducerRecord<>(topic, key,value));
@@ -91,7 +118,6 @@ public  class KafkaBlock  {
     public void depose(){
 
     }
-
 
 
 
