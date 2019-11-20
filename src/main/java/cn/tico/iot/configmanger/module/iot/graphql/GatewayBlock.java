@@ -92,9 +92,9 @@ public class GatewayBlock implements Block {
             gateway = gitBlock.createGit(gateway,gitBean);
         }else {
             cnd = Cnd.NEW()
-                    .and("status","=","true")
-                    .and("delflag","=","false")
-                    .and("gateway_id","=",gateway.getId());
+                    .and("t_iot_devices.status","=","true")
+                    .and("t_iot_devices.delflag","=","false")
+                    .and("t_iot_devices.gateway_id","=",gateway.getId());
 
             List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver",cnd);
             try {

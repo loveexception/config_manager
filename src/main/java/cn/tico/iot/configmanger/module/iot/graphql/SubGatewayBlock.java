@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.GatewayService;
 import cn.tico.iot.configmanger.module.iot.services.SubGatewayService;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -33,8 +34,14 @@ public class SubGatewayBlock implements Block {
 
     @Override
     public Object exec(String topic, String key, String value, long offset) {
-        
+        if(Strings.isEmpty(value)){
+            return null;
+        }
         SubGateway temp = Json.fromJson(SubGateway.class , value);
+        if(Lang.isEmpty(temp)){
+            return null;
+        }
+
         String sno = temp.getSno();
         /**
          * 1。	gateway已绑 退出
@@ -129,7 +136,7 @@ public class SubGatewayBlock implements Block {
         if(!Strings.equals(sno,subGateway.getSno())){
             return null;
         }
-        String extsno = sno + R.sg(8);
+        String extsno = sno + R.captchaChar(8);
         subGateway.setExtSno(extsno);
         subGateway.setGwid(gateway.getId());
         gateway.setSubid(subGateway.getId());
@@ -144,11 +151,10 @@ public class SubGatewayBlock implements Block {
      * @return
      */
     public Gateway chooseOneGatwayUnbind(String sno) {
-        Cnd cnd = Cnd.NEW()
-                .and("status","=","true")
-                .and("delflag","=","false")
-                .and("sno","=",sno)
-                .and ("subgateway_id","is ",null );
+        Cnd cnd = getSnoCnd(sno);
+
+        isNullAndLengthZero(cnd, "subgateway_id", false);
+
         List<Gateway> list = gatewayService.query(cnd);
         if(Lang.isEmpty(list)){
             return null;
@@ -178,11 +184,8 @@ public class SubGatewayBlock implements Block {
      * @return
      */
     public SubGateway chooseOneSubGatewayUnbind(String sno) {
-        Cnd cnd = Cnd.NEW()
-                .and("status","=","true")
-                .and("delflag","=","false")
-                .and("sno","=",sno)
-                .and ("gw_id","is ",null );
+        Cnd cnd =getSnoCnd(sno);
+        isNullAndLengthZero(cnd, "gw_id", false);
         List<SubGateway> list = subGatewayService.query(cnd);
         if(Lang.isEmpty(list)){
             return null;
@@ -199,12 +202,9 @@ public class SubGatewayBlock implements Block {
      * @return
      */
     public  Object removeOneSubGateway(String sno) {
-        Cnd cnd = Cnd.NEW()
-                .and("status","=","true")
-                .and("delflag","=","false")
-                .and("sno","=",sno)
-                .and ("gw_id","is not",null );
-                ;
+        Cnd cnd = getSnoCnd(sno);
+        isNullAndLengthZero(cnd, "gw_id", true);
+        ;
 
         List<SubGateway> list = subGatewayService.query(cnd);
         if(Lang.isEmpty(list)){
@@ -224,11 +224,8 @@ public class SubGatewayBlock implements Block {
      * @return
      */
     public boolean isSnoBindingOneSubGatesy(String sno) {
-        Cnd cnd = Cnd.NEW()
-                .and("status","=","true")
-                .and("delflag","=","false")
-                .and("sno","=",sno)
-                .and ("gw_id","is not",null );
+        Cnd cnd = getSnoCnd(sno);
+        isNullAndLengthZero(cnd, "gw_id", true);
         ;
         return subGatewayService.count(cnd)>0;
     }
@@ -239,14 +236,31 @@ public class SubGatewayBlock implements Block {
      * @return
      */
     public boolean isSnoBindingAtLessOneGateWay(String sno) {
-        Cnd cnd  = Cnd.NEW()
-                .and("status","=","true")
-                .and ("delflag","=","false")
-                .and ("sno","=",sno)
-                .and ("subgateway_id","is not",null );
+        Cnd cnd = getSnoCnd(sno);
+
+        isNullAndLengthZero(cnd, "subgateway_id", true);
         int  count = gatewayService.count(cnd);
         return count >=1 ;
     }
+
+
+    public void isNullAndLengthZero(Cnd cnd, String subgateway_id, Boolean not_null) {
+        if(not_null){           cnd.and(subgateway_id,"is not ",null);
+            cnd.and("length("+subgateway_id+")",">",0);
+        }else{
+            SqlExpressionGroup ors = Cnd.exps(subgateway_id,"is  ",null)
+                    .or("length("+subgateway_id+")","=",0);
+            cnd.and(ors);
+        }
+    }
+
+    public Cnd getSnoCnd(String sno) {
+        return Cnd.NEW()
+                    .and("status","=","true")
+                    .and ("delflag","=","false")
+                    .and ("sno","=",sno);
+    }
+
     public void init(){
 
     }

@@ -3,9 +3,9 @@ package cn.tico.iot.configmanger;
 import cn.tico.iot.configmanger.common.base.Globals;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.TreeUtils;
+import cn.tico.iot.configmanger.module.iot.graphql.Block;
 import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
-import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlockWait;
 import cn.tico.iot.configmanger.module.iot.graphql.SubGatewayBlock;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
@@ -13,6 +13,8 @@ import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.ConfigService;
 import cn.tico.iot.configmanger.module.sys.services.MenuService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.nutz.boot.NbApp;
 import org.nutz.conf.NutConf;
 import org.nutz.dao.Dao;
@@ -29,6 +31,7 @@ import org.nutz.mvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author haiming
@@ -48,8 +51,7 @@ public class MainLauncher {
 
     @Inject
     protected KafkaBlock block;
-    @Inject
-    protected KafkaBlockWait blockWait;
+
 
     @Inject
     public GatewayBlock gatewayBlock;
@@ -118,9 +120,12 @@ public class MainLauncher {
         // 创建数据库
         //Daos.createTablesInPackage(dao, "cn.tico.iot", false);
         block.init();
-        blockWait.init();
-        new Thread(()->block.consume("register", subGatewayBlock)).start();
-        new Thread(()->blockWait.consume("config", gatewayBlock)).start();
+        Map<String,Block> map = Maps.newHashMap();
+        map.put("register",subGatewayBlock);
+        map.put("config",gatewayBlock);
+        new Thread(()->{
+            block.consume(map);
+        }).start();
 
     }
 
