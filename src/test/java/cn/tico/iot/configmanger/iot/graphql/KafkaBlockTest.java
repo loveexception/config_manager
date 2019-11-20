@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KafkaBlockTest {
-    @Test
+    //@Test
         public void tests(){
 
         String brokers = "localhost:9092";//System.getenv("CLOUDKARAFKA_BROKERS");
