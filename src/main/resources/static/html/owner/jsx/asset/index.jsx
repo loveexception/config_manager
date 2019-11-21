@@ -433,13 +433,13 @@ class ChartCircle extends React.PureComponent {
 					<ul className="mountNode-right-list">
 						<li className="mountNode-right-title">闲置</li>
 						<li className="mountNode-right-content">
-							<div className="mountNode-right-item">
+							{/* <div className="mountNode-right-item">
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
 									<div>资产金额</div>
 									<div>{chartData[1] && chartData[1].sum ? '￥' + chartData[1].sum : '￥0'}</div>
 								</div>
-							</div>
+							</div> */}
 							<div className="mountNode-right-item">
 								<div className="mountNode-right-strip"></div>
 								<div className="mountNode-right-text">
@@ -558,7 +558,6 @@ class ContentBox extends React.PureComponent {
 		let { width = '100px', height = '100px', text = '', Component = '', componentData = {} } = this.props;
 		return (
 			<div className="contentBox-box" style={{ width, height }}>
-				<div className="contentBox-title">{text}</div>
 				<Component {...componentData}></Component>
 			</div>
 		);
@@ -610,7 +609,6 @@ function AssetFooter(props) {
 		</div>
 	);
 }
-
 // rowSelection objects indicates the need for row selection
 
 //messagFrame props.isEdit(boolen) show or hidden
@@ -946,7 +944,7 @@ class AssetContent extends React.PureComponent {
 				<div className="asset-box">
 					<div className="asset-title-container">
 						<TitleBox titleImg={true} titleText="设备应用总数" count={useCount} />
-						<TitleBox titleImg={false} titleText="设备资产总数" count={assteCount} />
+						{/* <TitleBox titleImg={false} titleText="设备资产总数" count={assteCount} /> */}
 					</div>
 					<div className="asset-middle">
 						<ContentBox componentData={obj} Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>

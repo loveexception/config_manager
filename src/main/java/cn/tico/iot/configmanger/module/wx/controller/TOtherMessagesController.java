@@ -65,7 +65,7 @@ public class TOtherMessagesController {
 		if(Lang.isNotEmpty(endTime)){
 			cnd.and("create_time","<=", endTime);
 		}
-		return tOtherMessagesService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+		return tOtherMessagesService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"dept");
 	}
 
 	/**
