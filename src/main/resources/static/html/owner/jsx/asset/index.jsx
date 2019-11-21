@@ -656,6 +656,7 @@ function Frame(props) {
 			}
 		});
 	}
+
 	const columns = [
 		{
 			title: '资产机器码',

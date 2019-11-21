@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-tOtherMessages-edit" >
+            <input id="id" name="id"th:value="${tOtherMessages.id}"  type="hidden">
+					<div class="form-group">
+					<label class="col-sm-3 control-label">内容：</label>
+					<div class="col-sm-8">
+						<input id="message" name="message"th:value="${tOtherMessages.message}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">sno：</label>
+					<div class="col-sm-8">
+						<input id="sno" name="sno"th:value="${tOtherMessages.sno}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">名称：</label>
+					<div class="col-sm-8">
+						<input id="cnName" name="cnName"th:value="${tOtherMessages.cnName}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">编码：</label>
+					<div class="col-sm-8">
+						<input id="enName" name="enName"th:value="${tOtherMessages.enName}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">状态：</label>
+					<div class="col-sm-8">
+						<input id="status" name="status"th:value="${tOtherMessages.status}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">删除：</label>
+					<div class="col-sm-8">
+						<input id="delflag" name="delflag"th:value="${tOtherMessages.delflag}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">创建者：</label>
+					<div class="col-sm-8">
+						<input id="createBy" name="createBy"th:value="${tOtherMessages.createBy}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">建立时间：</label>
+					<div class="col-sm-8">
+						<input id="createTime" name="createTime"th:value="${tOtherMessages.createTime}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">更新者：</label>
+					<div class="col-sm-8">
+						<input id="updateBy" name="updateBy"th:value="${tOtherMessages.updateBy}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">更新时间：</label>
+					<div class="col-sm-8">
+						<input id="updateTime" name="updateTime"th:value="${tOtherMessages.updateTime}" class="form-control" type="text">
+					</div>
+				</div>
+				</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "wx/tOtherMessages";
+		$("#form-tOtherMessages-edit").validate({
+			onkeyup: false,
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/editDo", $('#form-tOtherMessages-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>
