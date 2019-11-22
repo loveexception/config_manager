@@ -568,18 +568,27 @@ const antIcon = <Icon type="loading" style={{ fontSize: 24, color: 'deeppink' }}
 function AssetFooter(props) {
 	let [text, setText] = React.useState({ leftText: '检修提醒', rightText: '更换提醒' });
 	let [isEdit, setIsEdit] = React.useState(false);
+	let [isEditUpdata, setIsEditUpdata] = React.useState(false);
 	// let [isShow, setShow] = React.useState(false);
 	let [color, setColor] = React.useState('greenyellow');
+	let [colorUpdata, setcolorUpdata] = React.useState('greenyellow');
 	React.useEffect(() => {
 		setColor(
 			// props.couter === 0 ? 'greenyellow' :
 			props.couter < 10 ? '#19A15F' : 'red'
 		);
+		setcolorUpdata(props.couterUpdata < 10 ? '#19A15F' : 'red');
 		return () => {};
 	}, [props]);
 	function leftHandleClick() {
 		setIsEdit(!isEdit);
 	}
+	function rightHandleClick() {
+		setIsEditUpdata(!isEditUpdata);
+	}
+	// function reqFuncUpdata() {
+	// 	alert(1);
+	// }
 	return (
 		<div className="asset-footer-box">
 			<Frame reqFunc={props.reqFunc} isEdit={isEdit} leftHandleClick={leftHandleClick}></Frame>
@@ -590,12 +599,14 @@ function AssetFooter(props) {
 					{props.couter}
 				</div>
 			</div>
-			<Popover placement="topLeft" style={{ fontSize: '2em' }} content={<div style={{ color: '#404040', fontSize: '13px' }}>暂未开放.</div>} title="新的功能..." trigger="hover">
-				<div className="option-box-right" style={{ opacity: 0.3 }}>
-					<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
-					<div className="option-left-text">{text.rightText}</div>
+			<Frame right={{ isRight: true }} isEditUpdata={isEditUpdata} rightHandleClick={rightHandleClick}></Frame>
+			<div className="option-box-right" onClick={rightHandleClick}>
+				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
+				<div className="option-left-text">{text.rightText}</div>
+				<div className="option-waring-box" style={{ color: colorUpdata }}>
+					{props.couterUpdata}
 				</div>
-			</Popover>
+			</div>
 		</div>
 	);
 }
@@ -656,6 +667,7 @@ function Frame(props) {
 			}
 		});
 	}
+
 	const columns = [
 		{
 			title: '资产机器码',
@@ -785,10 +797,13 @@ function Frame(props) {
 		// if(props.isEdit === !props.isEdit){
 		// 	return
 		// }
-		setModal1Visible(props && props.isEdit);
+		if (props.right && props.right.isRIght) {
+			props.right.isRIght = !props.right.isRIght;
+		}
+		setModal1Visible(props.isEdit || props.isEditUpdata);
 		setReqFlag(false);
 		if (reqFlag) {
-			reqRestFnc();
+			props.reqRestFnc && props.reqRestFnc();
 		}
 		return () => {};
 	}, [props, data]);
@@ -802,8 +817,9 @@ function Frame(props) {
 	//selet callback
 	function resetReq() {
 		// 关闭弹窗
-		props.leftHandleClick();
-		props.reqFunc();
+		props.leftHandleClick && props.leftHandleClick();
+		props.rightHandleClick && props.rightHandleClick();
+		props.reqFunc && props.reqFunc();
 	}
 	return (
 		<div className="modal-box">
@@ -837,12 +853,13 @@ class AssetContent extends React.PureComponent {
 		super(props);
 		this.state = {
 			change: 0,
-			couter: 20,
+			couter: 0,
 			isLoading: false,
 			chartData: [],
 			pillar: [],
 			reqFlag: false,
-			isEdit: false
+			isEdit: false,
+			couterUpdata: 0
 		};
 	}
 	reqFunc = () => {
@@ -857,7 +874,7 @@ class AssetContent extends React.PureComponent {
 		$.get(url + 'count', params, obj => {
 			if (obj.code === 0) {
 				this.setState({
-					couter: obj.data.count,
+					couter: obj.data.count, //更改 数量 左1
 					isLoading: false
 				});
 			} else {
@@ -916,12 +933,7 @@ class AssetContent extends React.PureComponent {
 		}
 		return numCount;
 	};
-	isEditFlag() {
-		let { isEdit } = this.state;
-		this.setState({
-			isEdit
-		});
-	}
+
 	render() {
 		let { isLoading, chartData = [], isEdit } = this.state;
 		let { couterUtil, reqFunc } = this;
