@@ -448,32 +448,17 @@ class ChartCircle extends React.PureComponent {
 	}
 }
 function Pillar(props) {
-	let [data, setData] = React.useState([
-		// {
-		// 	title: '视频',
-		// 	value: 17
-		// },
-		// {
-		// 	title: '音频',
-		// 	value: 40
-		// },
-		// {
-		// 	title: '网络',
-		// 	value: 50
-		// },
-		// {
-		// 	title: '其他',
-		// 	value: 70
-		// }
-	]);
+	let [data, setData] = React.useState([]);
+	let [chartFlag, setChartFlag] = React.useState(false);
 	function init() {
 		var chart = new G2.Chart({
 			container: 'content',
 			//				forceFit: true,
-			width: 574,
-			height: 368,
+			width: 450,
+			height: 390,
 			padding: [10, 20, 50, 51]
 		});
+		setChartFlag(true);
 		chart.source(data);
 		chart.scale('value', {
 			alias: '分类统计(台)'
@@ -535,7 +520,7 @@ function Pillar(props) {
 
 			setData(result);
 		}
-		if (data.length > 0) {
+		if (data.length > 0 && !chartFlag) {
 			init();
 		}
 	}, [props, data]);
@@ -548,9 +533,10 @@ function Pillar(props) {
 }
 class ContentBox extends React.PureComponent {
 	render() {
-		let { width = '100px', height = '100px', text = '', Component = '', componentData = {} } = this.props;
+		let { width = '100px', height = '100px', text = '', Component = '', componentData = {}, useCounter = 0 } = this.props;
 		return (
 			<div className="contentBox-box" style={{ width, height }}>
+				{text ? <div className="contentBox-title">{text}</div> : ''}
 				<Component {...componentData}></Component>
 			</div>
 		);
@@ -558,18 +544,18 @@ class ContentBox extends React.PureComponent {
 }
 const antIcon = <Icon type="loading" style={{ fontSize: 24, color: 'deeppink' }} spin />;
 function AssetFooter(props) {
-	let [text, setText] = React.useState({ leftText: '检修提醒', rightText: '更换提醒' });
+	let [text, setText] = React.useState({ leftText: '检修提醒', rightText: '更换提醒', useCount: '设备应用总数' });
 	let [isEdit, setIsEdit] = React.useState(false);
 	let [isEditUpdata, setIsEditUpdata] = React.useState(false);
 	// let [isShow, setShow] = React.useState(false);
-	let [color, setColor] = React.useState('greenyellow');
-	let [colorUpdata, setcolorUpdata] = React.useState('greenyellow');
+	let [color, setColor] = React.useState('#2F359D');
+	let [colorUpdata, setcolorUpdata] = React.useState('#2F359D');
 	React.useEffect(() => {
-		setColor(
-			// props.couter === 0 ? 'greenyellow' :
-			props.couter < 10 ? '#19A15F' : 'red'
-		);
-		setcolorUpdata(props.couterUpdata < 10 ? '#19A15F' : 'red');
+		// setColor(
+		// 	// props.couter === 0 ? 'greenyellow' :
+		// 	props.couter < 10 ? '#19A15F' : 'red'
+		// );
+		// setcolorUpdata(props.couterUpdata < 10 ? '#19A15F' : 'red');
 		return () => {};
 	}, [props]);
 	function leftHandleClick() {
@@ -583,6 +569,13 @@ function AssetFooter(props) {
 	// }
 	return (
 		<div className="asset-footer-box">
+			<div className="option-box-left" onClick={leftHandleClick}>
+				<img className="option-left-img" style={{ width: '70px', height: '80', marginTop: '6px' }} src="/assets/img/assetAll.png" alt="" />
+				<div className="option-left-text">{text.useCount}</div>
+				<div className="option-waring-box" style={{ color, left: '46%' }}>
+					{(props && props.useCounter) || 0}
+				</div>
+			</div>
 			<Frame reqFunc={props.reqFunc} isEdit={isEdit} leftHandleClick={leftHandleClick}></Frame>
 			<div className="option-box-left" onClick={leftHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
@@ -595,7 +588,7 @@ function AssetFooter(props) {
 			<div className="option-box-right" onClick={rightHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
 				<div className="option-left-text">{text.rightText}</div>
-				<div className="option-waring-box" style={{ color: colorUpdata }}>
+				<div className="option-waring-box" style={{ color: colorUpdata, left: '53%' }}>
 					{props.couterUpdata}
 				</div>
 			</div>
@@ -690,19 +683,6 @@ function Frame(props) {
 			key: '部门',
 			width: 150
 		},
-		// {
-		// 	title: '价格',
-		// 	dataIndex: 'price',
-		// 	key: '价格',
-		// 	width: 150
-
-		// },
-		// {
-		// 	title: '购买日期',
-		// 	dataIndex: 'orderTime',
-		// 	key: '购买日期',
-		// 	width: 150
-		// },
 		{
 			title: '检查时间',
 			dataIndex: 'gatewayExtsno',
@@ -715,6 +695,38 @@ function Frame(props) {
 			key: '类型'
 		},
 		{ title: '厂家', dataIndex: 'kindmap', key: '厂家', width: 150 },
+		{
+			title: '操作',
+			key: '操作',
+			width: 160,
+			align: 'center',
+			render: (a, record) => (
+				<LinkButton
+					text="确认"
+					onClick={function() {
+						handleReq(record);
+					}}
+				/>
+			)
+		}
+	];
+	const columnsUpdata = [
+		{
+			title: 'sno',
+			dataIndex: 'sno',
+			key: 'sno'
+		},
+
+		{
+			title: '资产名称',
+			dataIndex: 'cnName',
+			key: '资产名称'
+		},
+		{
+			title: '提醒',
+			dataIndex: 'message',
+			key: '提醒'
+		},
 		{
 			title: '操作',
 			key: '操作',
@@ -929,22 +941,20 @@ class AssetContent extends React.PureComponent {
 		let { isLoading, chartData = [], isEdit } = this.state;
 		let { couterUtil, reqFunc } = this;
 		let useCount = couterUtil(chartData, 'count'); // 应用总数
-		let assteCount = couterUtil(chartData, 'sum'); // 资产总数
-		let obj = { ...this.state, reqFunc };
+		// let assteCount = couterUtil(chartData, 'sum'); // 资产总数
+		let obj = { ...this.state, reqFunc, useCounter: useCount };
 		// titlebox    img boolean  titleText 头部文字  count 数量 false 有单位￥
 		return (
 			<Spin size="large" spinning={isLoading} indicator={antIcon}>
 				<div className="asset-box">
 					<div className="asset-title-container">
-						<TitleBox titleImg={true} titleText="设备应用总数" count={useCount} />
+						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text={false}></ContentBox>
+
 						{/* <TitleBox titleImg={false} titleText="设备资产总数" count={assteCount} /> */}
 					</div>
 					<div className="asset-middle">
-						<ContentBox componentData={obj} Component={ChartCircle} width="686px" height="500px" text="资产概况"></ContentBox>
-						<ContentBox componentData={obj} Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
-					</div>
-					<div className="asset-footer">
-						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text={false}></ContentBox>
+						<ContentBox componentData={obj} Component={ChartCircle} width="450px" height="350px" text="资产概况"></ContentBox>
+						<ContentBox componentData={obj} Component={Pillar} width="450px" height="345px" text="资产分类统计"></ContentBox>
 					</div>
 				</div>
 			</Spin>
