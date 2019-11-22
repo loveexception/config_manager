@@ -100,10 +100,10 @@
     /*选择注册库中的GATEWAY*/
     function selectSno() {
         var options = {
-            title: '未绑定GATEWAY',
             width: "380",
             url: prefix + "/selectExtSno" ,
-            callBack: function (index, layero){
+            cal            title: '未绑定GATEWAY',
+            lBack: function (index, layero){
                 var body = layer.getChildFrame('body', index);
                 $("#subid").val(body.find('#id').val());
                 $("#extSno").val(body.find('#extSno').val());

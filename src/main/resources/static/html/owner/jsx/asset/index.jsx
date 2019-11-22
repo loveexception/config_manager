@@ -151,8 +151,8 @@ class ChartCircle extends React.PureComponent {
 		var chart = new G2.Chart({
 			container: 'mountNode',
 			forceFit: true,
-			height: '338',
-			width: '100%',
+			height: '350',
+			width: '450',
 			padding: 'auto'
 		});
 		chart.source(dv);
@@ -414,13 +414,6 @@ class ChartCircle extends React.PureComponent {
 					<ul className="mountNode-left-list">
 						<li className="mountNode-left-title">在用</li>
 						<li className="mountNode-left-content">
-							<div className="mountNode-left-item">
-								<div className="mountNode-left-strip"></div>
-								<div className="mountNode-left-text">
-									<div>资产金额</div>
-									<div>{chartData[0] && chartData[0].sum ? '￥' + chartData[0].sum : '￥0'}</div>
-								</div>
-							</div>
 							<div className="mountNode-left-item">
 								<div className="mountNode-left-strip"></div>
 								<div className="mountNode-left-text">
@@ -951,7 +944,7 @@ class AssetContent extends React.PureComponent {
 						<ContentBox componentData={obj} Component={Pillar} width="686px" height="500px" text="资产分类统计"></ContentBox>
 					</div>
 					<div className="asset-footer">
-						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text="信息提醒"></ContentBox>
+						<ContentBox Component={AssetFooter} componentData={obj} width="100%" height="194px" text={false}></ContentBox>
 					</div>
 				</div>
 			</Spin>

@@ -5,6 +5,7 @@
 .settings
 src/main/resources/static/WEB-INF
 .properties
+velocity
 
 target
 .classpath

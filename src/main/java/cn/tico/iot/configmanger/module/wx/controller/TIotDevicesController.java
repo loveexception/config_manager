@@ -68,7 +68,7 @@ public class TIotDevicesController implements AdminKey {
 	public DeptService deptService;
 	@Inject
 	public TIotOwnerService tIotOwnerService;
-	
+
 	@RequiresPermissions("wx:tIotDevices:view")
 	@At("")
 	@Ok("th:/wx/tIotDevices/tIotDevices.html")
@@ -78,6 +78,7 @@ public class TIotDevicesController implements AdminKey {
 
 	/**
 	 * 用户权限
+	 * 
 	 * @return
 	 */
 	private boolean isAdmin() {
@@ -88,52 +89,54 @@ public class TIotDevicesController implements AdminKey {
 
 		return roles.contains(ROLE_ADMIN);
 	}
+
 	/**
 	 * 查询设备资本列表
 	 */
+	public Object lists() {
+
+		return new Object();
+	}
+
 	@RequiresPermissions("wx:tIotDevices:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("enName") String enName,
-					   @Param("cnName") String cnName,
-					   @Param("assetStatus") String assetStatus,
-					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
-					   HttpServletRequest req) {
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("enName") String enName,
+			@Param("cnName") String cnName, @Param("assetStatus") String assetStatus,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (Strings.isNotBlank(enName)){
-			cnd.and("en_name", "like", "%" + enName +"%");
+		if (Strings.isNotBlank(enName)) {
+			cnd.and("en_name", "like", "%" + enName + "%");
 		}
-		if (Strings.isNotBlank(cnName)){
-			cnd.and("cn_name", "like", "%" + cnName +"%");
+		if (Strings.isNotBlank(cnName)) {
+			cnd.and("cn_name", "like", "%" + cnName + "%");
 		}
-		if (Strings.isNotBlank(assetStatus)){
+		if (Strings.isNotBlank(assetStatus)) {
 			cnd.and("assetStatus", "=", assetStatus);
 		}
-//		if(Lang.isNotEmpty(beginTime)){
-//			cnd.and("create_time",">=", beginTime);
-//		}
-//		if(Lang.isNotEmpty(endTime)){
-//			cnd.and("create_time","<=", endTime);
-//		}
-		if(!isAdmin()){
+		// if(Lang.isNotEmpty(beginTime)){
+		// cnd.and("create_time",">=", beginTime);
+		// }
+		// if(Lang.isNotEmpty(endTime)){
+		// cnd.and("create_time","<=", endTime);
+		// }
+		if (!isAdmin()) {
 
-			cnd.and("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+			cnd.and("dept_id", "=", ShiroUtils.getSysUser().getDeptId());
 		}
-		cnd.and("delflag","=","false");
-		if(Strings.isNotBlank(orderByColumn)){
-			cnd.orderBy(orderByColumn,isAsc);
-		}else {
+		cnd.and("delflag", "=", "false");
+		if (Strings.isNotBlank(orderByColumn)) {
+			cnd.orderBy(orderByColumn, isAsc);
+		} else {
 			cnd.orderBy("sno", "desc");
 		}
-		TableDataInfo info  =  deviceService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"^dept|kind|owner|next$");
+		TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
+				"^dept|kind|owner|next$");
 		List<Device> list = (List<Device>) info.getRows();
-		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag","=","false").and("level","=","3"));
+		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "=", "3"));
 		myKindNameFind(list, kinds);
 
-		return info ;
+		return info;
 	}
 
 	/**
@@ -141,11 +144,11 @@ public class TIotDevicesController implements AdminKey {
 	 */
 	@At("/add")
 	@Ok("th:/wx/tIotDevices/add.html")
-	public void add( HttpServletRequest req) {
+	public void add(HttpServletRequest req) {
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
-		Dept dept =deptService.fetch(deptid);
-		req.setAttribute("dept",dept);
+		Dept dept = deptService.fetch(deptid);
+		req.setAttribute("dept", dept);
 	}
 
 	/**
@@ -155,8 +158,9 @@ public class TIotDevicesController implements AdminKey {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:tIotDevices:add")
-	@Slog(tag="设备资本", after="新增保存设备资本 id=${args[0].id}")
-	public Object addDo(@Param("..") Device tIotDevices,@Param("next.cycle")String cycle,@Param("next.time")String time, HttpServletRequest req) {
+	@Slog(tag = "设备资本", after = "新增保存设备资本 id=${args[0].id}")
+	public Object addDo(@Param("..") Device tIotDevices, @Param("next.cycle") String cycle,
+			@Param("next.time") String time, HttpServletRequest req) {
 		try {
 			deviceService.insert(tIotDevices);
 			Owner owner = new Owner();
@@ -178,33 +182,32 @@ public class TIotDevicesController implements AdminKey {
 	@Ok("th://wx/tIotDevices/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Device tIotDevices = deviceService.fetch(id);
-		deviceService.fetchLinks(tIotDevices,"^dept|next|kind$");
+		deviceService.fetchLinks(tIotDevices, "^dept|next|kind$");
 
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
-		Dept dept =deptService.fetch(deptid);
+		Dept dept = deptService.fetch(deptid);
 
 		List<Owner> sets = tIotDevices.getNext();
 		Owner last = new Owner();
-		if(Lang.isEmpty(sets)){
-			Owner owner= new Owner();
-//			owner.setCycle("365");
-//			Calendar cal = Calendar.getInstance();
-//			cal.add(Calendar.YEAR,1);
-//			String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-//			owner.setTime(day);
+		if (Lang.isEmpty(sets)) {
+			Owner owner = new Owner();
+			// owner.setCycle("365");
+			// Calendar cal = Calendar.getInstance();
+			// cal.add(Calendar.YEAR,1);
+			// String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
+			// owner.setTime(day);
 			owner.setDeviceid(tIotDevices.getId());
-			 last = owner;
-		}else{
+			last = owner;
+		} else {
 			last = sets.iterator().next();
 		}
 
 		tIotDevices.setNext(Lists.newArrayList(last));
 
+		req.setAttribute("dept", dept);
 
-		req.setAttribute("dept",dept);
-
-		req.setAttribute("tIotDevices",tIotDevices);
+		req.setAttribute("tIotDevices", tIotDevices);
 	}
 
 	/**
@@ -214,26 +217,27 @@ public class TIotDevicesController implements AdminKey {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:tIotDevices:edit")
-	@Slog(tag="设备资本", after="修改保存设备资本")
-	public Object editDo(@Param("..") Device tIotDevices,@Param("next.cycle")String cycle,@Param("next.time")String time, HttpServletRequest req) {
+	@Slog(tag = "设备资本", after = "修改保存设备资本")
+	public Object editDo(@Param("..") Device tIotDevices, @Param("next.cycle") String cycle,
+			@Param("next.time") String time, HttpServletRequest req) {
 		try {
-			if(Lang.isNotEmpty(tIotDevices)){
+			if (Lang.isNotEmpty(tIotDevices)) {
 
 				deviceService.insertUpdate(tIotDevices);
 
-				tIotDevices = deviceService.fetchLinks(tIotDevices,"next");
+				tIotDevices = deviceService.fetchLinks(tIotDevices, "next");
 
 				List<Owner> owners = tIotDevices.getNext();
 				Owner owner = new Owner();
 
-				if(Lang.isEmpty(owners)){
+				if (Lang.isEmpty(owners)) {
 					owner.setCycle(cycle);
 
 					owner.setTime(time);
 					owner.setDeviceid(tIotDevices.getId());
 					deviceService.dao().insert(owner);
 
-				}else{
+				} else {
 					Owner temp = owners.get(0);
 
 					temp.setCycle(cycle);
@@ -256,8 +260,8 @@ public class TIotDevicesController implements AdminKey {
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("wx:tIotDevices:remove")
-	@Slog(tag ="设备资本", after= "删除设备资本:${array2str(args[0])}")
-	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
+	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
+	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
 			deviceService.vDelete(ids);
 			return Result.success("system.success");
@@ -271,50 +275,50 @@ public class TIotDevicesController implements AdminKey {
 	 */
 	@At("/change")
 	@Ok("json")
-	@Slog(tag ="设备资本", after= "删除设备资本:${array2str(args[0])}")
-	public Object change(@Param("id")String[] ids, HttpServletRequest req) {
+	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
+	public Object change(@Param("id") String[] ids, HttpServletRequest req) {
 		try {
-		    if(Lang.isEmpty(ids)){
-                return Result.success("system.success");
+			if (Lang.isEmpty(ids)) {
+				return Result.success("system.success");
 
-            }
+			}
 
-            for(String id : ids) {
-                Device device = deviceService.fetch(id);
-				if(Lang.isEmpty(device)){
+			for (String id : ids) {
+				Device device = deviceService.fetch(id);
+				if (Lang.isEmpty(device)) {
 					continue;
 				}
-                device = deviceService.fetchLinks(device, "next");
+				device = deviceService.fetchLinks(device, "next");
 
-                List<Owner> owners = device.getNext();
-                Owner owner = new Owner();
+				List<Owner> owners = device.getNext();
+				Owner owner = new Owner();
 
-                if (Lang.isEmpty(owners)) {
-                    owner.setCycle("10");
-                    Calendar cal = Calendar.getInstance();
-                    cal.add(Calendar.DATE, 10);
-                    String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
-                    owner.setTime(day);
-                    owner.setDeviceid(id);
-                    deviceService.dao().insert(owner);
+				if (Lang.isEmpty(owners)) {
+					owner.setCycle("10");
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.DATE, 10);
+					String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
+					owner.setTime(day);
+					owner.setDeviceid(id);
+					deviceService.dao().insert(owner);
 
-                } else {
-                    Owner temp = owners.get(0);
+				} else {
+					Owner temp = owners.get(0);
 
-                    Calendar cal = Calendar.getInstance();
-                    if(Lang.isEmpty(temp)){
-                    	continue;
+					Calendar cal = Calendar.getInstance();
+					if (Lang.isEmpty(temp)) {
+						continue;
 					}
-					if(Strings.isBlank(temp.getCycle())){
-                    	temp.setCycle("10");
+					if (Strings.isBlank(temp.getCycle())) {
+						temp.setCycle("10");
 					}
-                    int step =Lang.str2number(temp.cycle).intValue();
-                    cal.add(Calendar.DATE, step);
-                    String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
-                    temp.setTime(day);
-                    deviceService.dao().update(temp);
-                }
-            }
+					int step = Lang.str2number(temp.cycle).intValue();
+					cal.add(Calendar.DATE, step);
+					String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
+					temp.setTime(day);
+					deviceService.dao().update(temp);
+				}
+			}
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -326,135 +330,126 @@ public class TIotDevicesController implements AdminKey {
 	 */
 	@At("/count")
 	@Ok("json")
-	@Slog(tag ="设备资本", after= "删除设备资本:${array2str(args[0])}")
-	public Object count(@Param("next_time")String time, HttpServletRequest req) {
+	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
+	public Object count(@Param("next_time") String time, HttpServletRequest req) {
 		try {
 			String deptid = null;
-			if(!isAdmin()){
-				deptid =  ShiroUtils.getSysUser() .getDeptId();
+			if (!isAdmin()) {
+				deptid = ShiroUtils.getSysUser().getDeptId();
 			}
-			List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid,time);
+			List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid, time);
 
 			NutMap map = NutMap.NEW();
-			map.addv("count",deviceIds.size());
+			map.addv("count", deviceIds.size());
 
-
-
-			return Result.success("system.success",map);
+			return Result.success("system.success", map);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
+
 	/**
 	 * 过期设备列表
 	 */
 	@At("/out_time")
 	@Ok("json")
-	@Slog(tag ="设备资本", after= "删除设备资本:${array2str(args[0])}")
-	public Object outTime(@Param("next_time")String time,
-						  @Param("pageNum")int pageNum,
-						  @Param("pageSize")int pageSize,
+	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
+	public Object outTime(@Param("next_time") String time, @Param("pageNum") int pageNum,
+			@Param("pageSize") int pageSize,
 
-						  @Param("orderByColumn") String orderByColumn,
-						  @Param("isAsc") String isAsc,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc,
 
-						  HttpServletRequest req) {
+			HttpServletRequest req) {
 
-			String deptid = null;
-			if(!isAdmin()){
-				deptid =  ShiroUtils.getSysUser() .getDeptId();
-			}
-			List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid,time);
+		String deptid = null;
+		if (!isAdmin()) {
+			deptid = ShiroUtils.getSysUser().getDeptId();
+		}
+		List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid, time);
 
-			List<String> ids = deviceIds.stream().map( m-> m.get("id").toString()).collect(Collectors.toList());
+		List<String> ids = deviceIds.stream().map(m -> m.get("id").toString()).collect(Collectors.toList());
 
-			Cnd cnd = Cnd.NEW();
-			cnd.and("id","in",ids);
+		Cnd cnd = Cnd.NEW();
+		cnd.and("id", "in", ids);
 
-
-			cnd.and("delflag","=","false");
-			cnd.and("status","=","true");
-			cnd.and("asset_status","=","2");
-			TableDataInfo info  =  deviceService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"^dept|kind|owner|next$");
-			List<Device> list = (List<Device>) info.getRows();
-			List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag","=","false").and("level","=","3"));
-			myKindNameFind(list, kinds);
-			return info ;
+		cnd.and("delflag", "=", "false");
+		cnd.and("status", "=", "true");
+		cnd.and("asset_status", "=", "2");
+		TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
+				"^dept|kind|owner|next$");
+		List<Device> list = (List<Device>) info.getRows();
+		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "=", "3"));
+		myKindNameFind(list, kinds);
+		return info;
 
 	}
 
-    /**
-     * 设备资产统计
-     */
-    @At("/money")
-    @Ok("json")
-    public Object money( HttpServletRequest req) {
-        String deptid = null ;
-        if(!isAdmin()){
-           deptid = ShiroUtils.getSysUser().getDeptId();
-        }else{
-            
-        }
-        
+	/**
+	 * 设备资产统计
+	 */
+	@At("/money")
+	@Ok("json")
+	public Object money(HttpServletRequest req) {
+		String deptid = null;
+		if (!isAdmin()) {
+			deptid = ShiroUtils.getSysUser().getDeptId();
+		} else {
 
+		}
 
-        List<Map> list =  tIotOwnerService.queryCountPrice(deptid);
+		List<Map> list = tIotOwnerService.queryCountPrice(deptid);
 
+		return Result.success("system.success", list);
 
-        return Result.success("system.success",list);
+	}
 
-    }
+	/**
+	 * 设备资产统计
+	 */
+	@At("/group")
+	@Ok("json")
+	public Object group(HttpServletRequest req) {
+		String deptid = null;
+		if (!isAdmin()) {
+			deptid = ShiroUtils.getSysUser().getDeptId();
+		} else {
 
-    /**
-     * 设备资产统计
-     */
-    @At("/group")
-    @Ok("json")
-    public Object group( HttpServletRequest req) {
-        String deptid = null ;
-        if(!isAdmin()){
-            deptid = ShiroUtils.getSysUser().getDeptId();
-        }else{
+		}
 
-        }
+		List<Map> list = tIotOwnerService.queryCountGroup(deptid);
 
+		return Result.success("system.success", list);
 
-
-        List<Map> list =  tIotOwnerService.queryCountGroup(deptid);
-
-
-        return Result.success("system.success",list);
-
-    }
+	}
 
 	public void myKindNameFind(List<Device> list, List<Kind> kinds) {
-		for(Device device:list){
-            Kind kind = device.getKind();
-            if(Lang.isEmpty(kind)){
-                continue;
-            }
-            String fathers = kind.getAncestors();
-            if(Strings.isBlank(fathers)){
-                continue;
-            }
-            for (Kind k :kinds){
-                if(fathers.contains(k.getId())){
-                    device.setKindmap(k.getCnName());
-                    continue;
-                }
-            }
-            List<Owner> lists = device.getNext();
-            if(Lang.isEmpty(lists)){
-                continue;
-            }
-            TreeSet<Owner> sets = new TreeSet<>();
-            sets.addAll(lists);
+		for (Device device : list) {
+			Kind kind = device.getKind();
+			if (Lang.isEmpty(kind)) {
+				continue;
+			}
+			String fathers = kind.getAncestors();
+			if (Strings.isBlank(fathers)) {
+				continue;
+			}
+			for (Kind k : kinds) {
+				if (fathers.contains(k.getId())) {
+					device.setKindmap(k.getCnName());
+					continue;
+				}
+			}
+			List<Owner> lists = device.getNext();
+			if (Lang.isEmpty(lists)) {
+				continue;
+			}
+			TreeSet<Owner> sets = new TreeSet<>();
+			sets.addAll(lists);
 
-            Owner last = sets.iterator().next();
-            //device.setNext(Lists.newArrayList(last));
-            device.setGatewayExtsno(last.getTime());
+			Owner last = sets.iterator().next();
+			// device.setNext(Lists.newArrayList(last));
+			device.setGatewayExtsno(last.getTime());
 
-        }
+		}
 	}
 
 }
