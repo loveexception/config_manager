@@ -550,26 +550,41 @@ function AssetFooter(props) {
 	// let [isShow, setShow] = React.useState(false);
 	let [color, setColor] = React.useState('#2F359D');
 	let [colorUpdata, setcolorUpdata] = React.useState('#2F359D');
+	let [changeCount, setChangeCount] = React.useState(0);
+	let changFlag = true;
+
 	React.useEffect(() => {
 		// setColor(
 		// 	// props.couter === 0 ? 'greenyellow' :
 		// 	props.couter < 10 ? '#19A15F' : 'red'
+
 		// );
+		changFlag ? reqChange() : '';
 		// setcolorUpdata(props.couterUpdata < 10 ? '#19A15F' : 'red');
 		return () => {};
-	}, [props]);
+	}, [props, changeCount]);
+
+	function reqChange() {
+		$.get('/wx/tOtherMessages/change', obj => {
+			if (obj.code == 0) {
+				changFlag = false;
+				setChangeCount(obj.data);
+			}
+		});
+	}
 	function leftHandleClick() {
 		setIsEdit(!isEdit);
 	}
 	function rightHandleClick() {
 		setIsEditUpdata(!isEditUpdata);
 	}
+
 	// function reqFuncUpdata() {
 	// 	alert(1);
 	// }
 	return (
 		<div className="asset-footer-box">
-			<div className="option-box-left" onClick={leftHandleClick}>
+			<div className="option-box-left">
 				<img className="option-left-img" style={{ width: '70px', height: '80', marginTop: '6px' }} src="/assets/img/assetAll.png" alt="" />
 				<div className="option-left-text">{text.useCount}</div>
 				<div className="option-waring-box" style={{ color, left: '46%' }}>
@@ -584,17 +599,21 @@ function AssetFooter(props) {
 					{props.couter}
 				</div>
 			</div>
+			{/*  text={} */}
 			<Frame right={{ isRight: true }} isEditUpdata={isEditUpdata} rightHandleClick={rightHandleClick}></Frame>
 			<div className="option-box-right" onClick={rightHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
 				<div className="option-left-text">{text.rightText}</div>
 				<div className="option-waring-box" style={{ color: colorUpdata, left: '53%' }}>
-					{props.couterUpdata}
+					{changeCount}
 				</div>
 			</div>
 		</div>
 	);
 }
+AssetFooter = React.memo(AssetFooter, (oldProps, props) => {
+	//优化 return
+});
 // rowSelection objects indicates the need for row selection
 
 //messagFrame props.isEdit(boolen) show or hidden
@@ -603,7 +622,46 @@ function Frame(props) {
 	let [reqFlag, setReqFlag] = React.useState(true);
 	let [reqArrList, setReqArrList] = React.useState([]);
 	let [data, setData] = React.useState([]);
+	let [messageArr, setMessageArr] = React.useState([]);
+	let messageFlag = true;
 	let mesFlag;
+	React.useEffect(() => {
+		// if(props.isEdit === !props.isEdit){
+		// 	return
+		// }
+		props.right && props.right.isRight && messageFlag ? reqMessage() : '';
+		if (props.right && props.right.isRight) {
+		}
+		setModal1Visible(props.isEdit || props.isEditUpdata);
+		if (reqFlag && reqRestFnc) {
+			reqRestFnc && reqRestFnc();
+			setReqFlag(false);
+		}
+		return () => {};
+	}, [props]);
+
+	function reqMessage() {
+		$.get('/wx/tOtherMessages/messages', result => {
+			if (result.code == 0) {
+				let resultArr = [];
+				let obj = result.data;
+				if (Array.isArray(obj)) {
+					messageFlag = false;
+					obj.forEach(({ sno, cnName, id, message }) => {
+						resultArr.push({
+							sno,
+							cnName,
+							message,
+							id
+						});
+					});
+					setMessageArr(resultArr);
+				}
+			} else {
+				message.error('接口报错');
+			}
+		});
+	}
 	const rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {},
 		onSelect: (record = {}, selected, selectedRows) => {
@@ -646,6 +704,24 @@ function Frame(props) {
 		$.get(url, function(obj) {
 			if (obj.code == 0) {
 				reqRestFnc();
+			} else {
+				antd.message.error('操作失败', 0.5);
+			}
+		});
+	}
+	function reqUpdataMessage(arr = []) {
+		let url = `/wx/tOtherMessages/remove?`;
+		let ids = '';
+		arr.forEach((id, index) => {
+			if (index + 1 == arr.length) {
+				ids += `ids=${id}%`;
+			} else {
+				ids += `ids=${id}`;
+			}
+		});
+		$.post(url, { ids }, function(obj) {
+			if (obj.code == 0) {
+				reqMessage();
 			} else {
 				antd.message.error('操作失败', 0.5);
 			}
@@ -736,7 +812,7 @@ function Frame(props) {
 				<LinkButton
 					text="确认"
 					onClick={function() {
-						handleReq(record);
+						handleReqMessage(record);
 					}}
 				/>
 			)
@@ -753,6 +829,17 @@ function Frame(props) {
 			reqUpdata([data.id]);
 		}
 	}
+	function handleReqMessage(data) {
+		if (Array.isArray(data)) {
+			let arr = [];
+			data.forEach(e => {
+				arr.push(e);
+			});
+			data.length > 0 ? reqUpdataMessage(arr) : '';
+		} else {
+			reqUpdataMessage([data.id]);
+		}
+	}
 	function reqRestFnc() {
 		$.get(
 			'/wx/tIotDevices/out_time',
@@ -763,7 +850,6 @@ function Frame(props) {
 				if (obj.code == 0) {
 					let arr = obj.rows;
 					let reqArrRest = [];
-
 					!_.isEmpty(arr) &&
 						arr.forEach(({ sno, assetStatus, id, enName, cnName, dept = {}, price, orderTime, gatewayExtsno, kindmap, kind = {} }, index) => {
 							if (assetStatus === '2') {
@@ -796,20 +882,6 @@ function Frame(props) {
 		);
 	}
 
-	React.useEffect(() => {
-		// if(props.isEdit === !props.isEdit){
-		// 	return
-		// }
-		if (props.right && props.right.isRIght) {
-			props.right.isRIght = !props.right.isRIght;
-		}
-		setModal1Visible(props.isEdit || props.isEditUpdata);
-		setReqFlag(false);
-		if (reqFlag) {
-			props.reqRestFnc && props.reqRestFnc();
-		}
-		return () => {};
-	}, [props, data]);
 	function dateUtil(time) {
 		let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate();
 		return result;
@@ -826,15 +898,20 @@ function Frame(props) {
 	}
 	return (
 		<div className="modal-box">
-			<Modal title="检修提醒" width={'80%'} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
+			<Modal title={props.right && props.right.isRight ? '更换提醒' : '检修提醒'} width={'80%'} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
 					onClick={function() {
-						handleReq(reqArrList);
+						if (props.right && props.right.isRight) {
+							handleReqMessage(reqArrList);
+						} else {
+							handleReq(reqArrList);
+						}
 					}}
 					{...linkButtonConfig}
 					style={{ background: '#08CE01', color: '#F3F3F3', margin: '0 0 15px 0' }}
 				/>
-				<Table bordered columns={columns} rowSelection={rowSelection} dataSource={data} />
+				{/*  */}
+				<Table bordered columns={props.right && props.right.isRight ? columnsUpdata : columns} rowSelection={rowSelection} dataSource={props.right && props.right.isRight ? messageArr : data} />
 			</Modal>
 		</div>
 	);
@@ -875,7 +952,7 @@ class AssetContent extends React.PureComponent {
 			next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
 		};
 		$.get(url + 'count', params, obj => {
-			if (obj.code === 0) {
+			if (obj.code == 0) {
 				this.setState({
 					couter: obj.data.count, //更改 数量 左1
 					isLoading: false
@@ -891,7 +968,6 @@ class AssetContent extends React.PureComponent {
 	componentDidMount() {
 		this.init();
 		this.reqFunc();
-
 		$.get('/wx/tIotDevices/money', obj => {
 			if (obj.code == 0) {
 				if (Array.isArray(obj.data) && obj.data.length > 0) {
@@ -923,6 +999,7 @@ class AssetContent extends React.PureComponent {
 			return;
 		};
 	}
+
 	couterUtil = (arr, objName) => {
 		if (!Array.isArray(arr)) {
 			return 0;

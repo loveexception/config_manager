@@ -20,6 +20,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+
 /**
  * 资产管理 信息操作处理
  * 
@@ -33,7 +34,7 @@ public class TIotOwnerController {
 
 	@Inject
 	private TIotOwnerService tIotOwnerService;
-	
+
 	@RequiresPermissions("wx:tIotOwner:view")
 	@At("")
 	@Ok("th:/wx/tIotOwner/tIotOwner.html")
@@ -47,25 +48,20 @@ public class TIotOwnerController {
 	@RequiresPermissions("wx:tIotOwner:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("beginTime") Date beginTime,
-					   @Param("endTime") Date endTime,
-					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
-					   HttpServletRequest req) {
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
+			@Param("beginTime") Date beginTime, @Param("endTime") Date endTime,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
+		if (!Strings.isBlank(name)) {
+			// cnd.and("name", "like", "%" + name +"%");
 		}
-		if(Lang.isNotEmpty(beginTime)){
-			cnd.and("create_time",">=", beginTime);
+		if (Lang.isNotEmpty(beginTime)) {
+			cnd.and("create_time", ">=", beginTime);
 		}
-		if(Lang.isNotEmpty(endTime)){
-			cnd.and("create_time","<=", endTime);
+		if (Lang.isNotEmpty(endTime)) {
+			cnd.and("create_time", "<=", endTime);
 		}
-		return tIotOwnerService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+		return tIotOwnerService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, null);
 	}
 
 	/**
@@ -73,7 +69,7 @@ public class TIotOwnerController {
 	 */
 	@At("/add")
 	@Ok("th:/wx/tIotOwner/add.html")
-	public void add( HttpServletRequest req) {
+	public void add(HttpServletRequest req) {
 
 	}
 
@@ -84,8 +80,8 @@ public class TIotOwnerController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:tIotOwner:add")
-	@Slog(tag="资产管理", after="新增保存资产管理 id=${args[0].id}")
-	public Object addDo(@Param("..") TIotOwner tIotOwner,HttpServletRequest req) {
+	@Slog(tag = "资产管理", after = "新增保存资产管理 id=${args[0].id}")
+	public Object addDo(@Param("..") TIotOwner tIotOwner, HttpServletRequest req) {
 		try {
 			tIotOwnerService.insert(tIotOwner);
 			return Result.success("system.success");
@@ -101,7 +97,7 @@ public class TIotOwnerController {
 	@Ok("th://wx/tIotOwner/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		TIotOwner tIotOwner = tIotOwnerService.fetch(id);
-		req.setAttribute("tIotOwner",tIotOwner);
+		req.setAttribute("tIotOwner", tIotOwner);
 	}
 
 	/**
@@ -111,10 +107,10 @@ public class TIotOwnerController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:tIotOwner:edit")
-	@Slog(tag="资产管理", after="修改保存资产管理")
-	public Object editDo(@Param("..") TIotOwner tIotOwner,HttpServletRequest req) {
+	@Slog(tag = "资产管理", after = "修改保存资产管理")
+	public Object editDo(@Param("..") TIotOwner tIotOwner, HttpServletRequest req) {
 		try {
-			if(Lang.isNotEmpty(tIotOwner)){
+			if (Lang.isNotEmpty(tIotOwner)) {
 				tIotOwner.setUpdateBy(ShiroUtils.getSysUserId());
 				tIotOwner.setUpdateTime(new Date());
 				tIotOwnerService.update(tIotOwner);
@@ -131,8 +127,8 @@ public class TIotOwnerController {
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("wx:tIotOwner:remove")
-	@Slog(tag ="资产管理", after= "删除资产管理:${array2str(args[0])}")
-	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
+	@Slog(tag = "资产管理", after = "删除资产管理:${array2str(args[0])}")
+	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
 			tIotOwnerService.delete(ids);
 			return Result.success("system.success");

@@ -6,8 +6,10 @@ import cn.tico.iot.configmanger.module.sys.services.DeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.TOtherMessages;
 import cn.tico.iot.configmanger.module.wx.services.TOtherMessagesService;
+import io.leangen.graphql.execution.relay.Page;
 import cn.tico.iot.configmanger.common.base.Result;;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
@@ -23,6 +25,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 /**
  * kafka的推送 信息操作处理
@@ -151,12 +154,13 @@ public class TOtherMessagesController {
 		}
 	}
 
-	@At
+	@At("/change")
 	@Ok("json")
 	public Object count(@Param("..") TOtherMessages tOtherMessages, HttpServletRequest req) {
-
 		Cnd cnd = Cnd.NEW();
-		cnd.and("dept_id", "=", "105");
+		String deptid = ShiroUtils.getSysUser().getDeptId();
+
+		cnd.and("dept_id", "=", deptid);
 		Object obj = tOtherMessagesService.count(cnd);
 		// cnd.and("delflag", "=", "false");
 		// tOtherMessagesService.insert(tOtherMessages);
@@ -164,4 +168,77 @@ public class TOtherMessagesController {
 		// return Result.error("system.error");
 	}
 
+	// @At("/count") 资产个数
+	// @Ok("json")
+	// @Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
+	// public Object count(@Param("next_time") String time, HttpServletRequest req)
+	// {
+	// try {
+	// String deptid = null;
+	// if (!isAdmin()) {
+	// deptid = ShiroUtils.getSysUser().getDeptId();
+	// }
+	// List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid,
+	// time);
+
+	// NutMap map = NutMap.NEW();
+	// map.addv("count", deviceIds.size());
+
+	// return Result.success("system.success", map);
+	// } catch (Exception e) {
+	// return Result.error("system.error");
+	// }
+	// }
+
+	/**
+	 * 删除资产管理 //
+	 */
+	// @At("/remove")
+	// @Ok("json")
+	// @RequiresPermissions("wx:tIotOwner:remove")
+	// @Slog(tag = "资产管理", after = "删除资产管理:${array2str(args[0])}")
+	// public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
+	// try {
+	// tIotOwnerService.delete(ids);
+	// return Result.success("system.success");
+	// } catch (Exception e) {
+	// return Result.error("system.error");
+	// }
+	// }
+
+	/**
+	 * 过期设备列表
+	 */
+	@At("/messages")
+	@Ok("json")
+	public Object messages(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, HttpServletRequest req) {
+
+		String deptid = null;
+		deptid = ShiroUtils.getSysUser().getDeptId();
+		Cnd cnd = Cnd.NEW();
+		cnd.and("dept_id", "=", deptid);
+		Pager pager = new Pager();
+		List list = tOtherMessagesService.query(cnd, pager);
+		return Result.success("system.success", list);
+		// List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid,
+		// time);
+
+		// List<String> ids = deviceIds.stream().map(m ->
+		// m.get("id").toString()).collect(Collectors.toList());
+
+		// Cnd cnd = Cnd.NEW();
+		// cnd.and("id", "in", ids);
+
+		// cnd.and("delflag", "=", "false");
+		// cnd.and("status", "=", "true");
+		// cnd.and("asset_status", "=", "2");
+		// TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd,
+		// orderByColumn, isAsc,
+		// "^dept|kind|owner|next$");
+		// List<Device> list = (List<Device>) info.getRows();
+		// List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=",
+		// "false").and("level", "=", "3"));
+		// myKindNameFind(list, kinds);
+		// return info;
+	}
 }
