@@ -6,7 +6,9 @@
 src/main/resources/static/WEB-INF
 .properties
 velocity
+.log
 
 target
 .classpath
 bin
+
