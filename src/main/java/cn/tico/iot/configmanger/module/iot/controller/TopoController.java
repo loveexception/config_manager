@@ -323,7 +323,8 @@ public class TopoController implements AdminKey {
 		}
 		if(Lang.isNotEmpty(kindids)){
 			cnd.and("kind_id","in",kindids);
-		}		Object obj = deviceService.tableList(pageNum,pageSize,cnd);
+		}
+		Object obj = deviceService.tableList(pageNum,pageSize,cnd);
 
 
 		return Result.success("system.success",obj);
@@ -389,18 +390,26 @@ public class TopoController implements AdminKey {
 		return topoService.drawByAll(deptid);
 	}
 
+    @Filters({@By(type=CrossOriginFilter.class, args={"*"
+            , "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+            , "Origin, Content-Type, Accept, X-Requested-With"
+            + KEYS
+            , "true"})})
+    @At(value = "/save_topo",methods = "OPTIONS")
+    @GET
+    public void saveOPTIONS( ){}
 
 
 
+    @Filters({@By(type=CrossOriginFilter.class, args={"*"
+            , "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+            , "Origin, Content-Type, Accept, X-Requested-With"
+            + KEYS
+            , "true"})})
 	@At("/save_topo")
 	@Ok("json")
     @POST
 	@AdaptBy(type = JsonAdaptor.class)
-	@Filters({@By(type=CrossOriginFilter.class, args={"*"
-			, "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-			, "Origin, Content-Type, Accept, X-Requested-With"
-			+ KEYS
-			, "true"})})
 	public Object saveTopo(@Param("data")Topo topo  , HttpServletRequest req){
 		if(Lang.isEmpty(topo)){
 			return Result.error("not have tag");
@@ -410,10 +419,25 @@ public class TopoController implements AdminKey {
 		}
 		List<Topo> topos =  topoService.query(Cnd.NEW().and("tag_id","=",topo.getTagId()));
 		Tag tag = tagService.fetch(topo.getTagId());
+		String graph = topo.getGraph();
+		String hidemap=topo.getHideMap();
 		if(Lang.isEmpty(topos)){
 			topo=makeTopo(tag);
-		}
+			topo.setGraph(graph);
+			topo.setHideMap(hidemap);
+			topoService.insert(topo);
+            return Result.success("system.success",topo);
 
+        }
+        Iterator<Topo> iterator = topos.iterator();
+		topo = iterator.next();
+        while (iterator.hasNext()){
+            Topo temp =  iterator.next();
+            topoService.delete(temp.getId());
+        }
+
+        topo.setGraph(graph);
+        topo.setHideMap(hidemap);
 
 		topoService.update(topo);
 		return Result.success("system.success",topo);
