@@ -22,9 +22,15 @@ public class Topo extends I18NModel{
     public Tag tag;
 
     @Column("graph")
-    @Comment("拓扑图内容")
+    @Comment("对外显示拓扑图内容")
     @ColDefine(type = ColType.TEXT)
     public String graph;
+
+
+    @Column("hide_map")
+    @Comment("不显示的拓扑图")
+    @ColDefine(type = ColType.TEXT)
+    public String hideMap;
 
     @Column("is_check")
     @Comment("是否侦听系统信息")

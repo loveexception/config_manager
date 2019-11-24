@@ -95,7 +95,8 @@ public class TopoController implements AdminKey {
 		tag.setCreateBy("API");
 		tag.setCreateTime(new Date());
 		tagService.dao().insert(tag);
-		return makeTopo(tag);
+		Topo topo =  makeTopo(tag);
+		return Result.success("system.success",topo);
 	}
 	@At("/del_tag")
 	@Ok("json")
@@ -111,7 +112,7 @@ public class TopoController implements AdminKey {
 		return Result.success("system.success");
 	}
 
-	private Object makeTopo(Tag tag) {
+	private Topo makeTopo(Tag tag) {
 		Topo topo = new Topo();
 		topo.setIsCheck("false");
 		topo.setTagId(tag.getId());
@@ -122,7 +123,7 @@ public class TopoController implements AdminKey {
 		topo.setCreateBy("API");
 		topo = tagService.dao().insert(topo);
 		topo.setTag(tag);
-		return Result.success("system.success",topo);
+		return topo;
 	}
 
 	@At("/check_tag")
@@ -196,7 +197,7 @@ public class TopoController implements AdminKey {
 
 		deviceService.update(device);
 
-		deviceService.kafka(Lists.newArrayList(device));
+		//deviceService.kafka(Lists.newArrayList(device));
 
 		return Result.success("system.success",device);
 	}
@@ -244,7 +245,7 @@ public class TopoController implements AdminKey {
 
 		deviceService.update(device);
 
-		deviceService.kafka(Lists.newArrayList(device));
+		//deviceService.kafka(Lists.newArrayList(device));
 
 
 		return Result.success("system.success",device);
@@ -298,15 +299,14 @@ public class TopoController implements AdminKey {
 			, "true"})})
 	public Object devicesTag(@Param("..")Tag tag
 			,@Param("deptid")String deptId
+			,@Param("kindid") String kindid
 			,@Param("pageNum")int pageNum
 			, @Param("pageSize")int pageSize
 			,HttpServletRequest req){
 
 		tag = tagService.fetchLinks(tag,"devices");
 		List<Device> devices = tag.devices;
-		Pager pager = new Pager(
-				pageNum,pageSize
-		);
+
 		if(Lang.isEmpty(devices)){
 			return Result.success("system.success",Lists.newArrayList());
 		}
@@ -317,8 +317,13 @@ public class TopoController implements AdminKey {
 		cnd.and("delflag","=","false");
 		cnd.and("asset_status","=","2");
 		cnd.and("dept_id","=",deptId);
-		//devices = deviceService.query(cnd,pager);
-		Object obj = deviceService.tableList(pageNum,pageSize,cnd);
+		List<String> kindids = Lists.newArrayList();
+		if(Strings.isNotBlank(kindid)){
+			kindids = kindService.kindAllSonIds(kindid);
+		}
+		if(Lang.isNotEmpty(kindids)){
+			cnd.and("kind_id","in",kindids);
+		}		Object obj = deviceService.tableList(pageNum,pageSize,cnd);
 
 
 		return Result.success("system.success",obj);
@@ -339,10 +344,7 @@ public class TopoController implements AdminKey {
 
 		tag = tagService.fetchLinks(tag,"devices");
 		List<Device> devices = tag.devices;
-		List<String> kindids = Lists.newArrayList();
-		if(Strings.isNotBlank(kindid)){
-			 kindids = kindService.kindAllSonIds(kindid);
-		}
+
 
 
 		Cnd cnd = Cnd.NEW()
@@ -350,6 +352,11 @@ public class TopoController implements AdminKey {
 		.and("delflag","=","false")
 		.and("asset_status","=","2")
 		.and("dept_id","=",deptId);
+
+		List<String> kindids = Lists.newArrayList();
+		if(Strings.isNotBlank(kindid)){
+			kindids = kindService.kindAllSonIds(kindid);
+		}
 		if(Lang.isNotEmpty(kindids)){
 			cnd.and("kind_id","in",kindids);
 		}
@@ -395,8 +402,21 @@ public class TopoController implements AdminKey {
 			+ KEYS
 			, "true"})})
 	public Object saveTopo(@Param("data")Topo topo  , HttpServletRequest req){
-		 topoService.update(topo);
-		 return Result.success("system.success",topo);
+		if(Lang.isEmpty(topo)){
+			return Result.error("not have tag");
+		}
+		if(Strings.isEmpty(topo.getTagId())){
+			return Result.error("not have tag id ");
+		}
+		List<Topo> topos =  topoService.query(Cnd.NEW().and("tag_id","=",topo.getTagId()));
+		Tag tag = tagService.fetch(topo.getTagId());
+		if(Lang.isEmpty(topos)){
+			topo=makeTopo(tag);
+		}
+
+
+		topoService.update(topo);
+		return Result.success("system.success",topo);
 	}
 
 
