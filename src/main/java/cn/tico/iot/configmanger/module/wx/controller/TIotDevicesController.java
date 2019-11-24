@@ -422,6 +422,7 @@ public class TIotDevicesController implements AdminKey {
 
 	}
 
+	// myKindNameFind
 	public void myKindNameFind(List<Device> list, List<Kind> kinds) {
 		for (Device device : list) {
 			Kind kind = device.getKind();
@@ -444,7 +445,6 @@ public class TIotDevicesController implements AdminKey {
 			}
 			TreeSet<Owner> sets = new TreeSet<>();
 			sets.addAll(lists);
-
 			Owner last = sets.iterator().next();
 			// device.setNext(Lists.newArrayList(last));
 			device.setGatewayExtsno(last.getTime());
