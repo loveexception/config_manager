@@ -28,173 +28,186 @@ import java.util.Map;
 
 public class GatewayBlock implements Block {
 
-	@Inject
-	public PropertiesProxy conf;
-	@Inject
-	public KafkaBlock kafkaBlock;
-	@Inject
-	public GitBlock gitBlock;
-	@Inject
-	GatewayService gatewayService;
-	@Inject
-	SubGatewayService subGatewayService;
-	@Inject
-	DeviceService deviceService;
+    @Inject
+    public PropertiesProxy conf;
+    @Inject
+    public KafkaBlock kafkaBlock;
+    @Inject
+    public GitBlock gitBlock;
+    @Inject
+    GatewayService gatewayService;
+    @Inject
+    SubGatewayService subGatewayService;
+    @Inject
+    DeviceService deviceService;
 
-	@Override
-	public Object exec(String topic, String key, String value, long offset) {
-		if (Strings.isBlank(key)) {
-			return null;
-		}
-		if (!Strings.equals(key, "wait")) {
-			return null;
-		}
+    @Override
+    public Object exec(String topic, String key, String value, long offset) {
+        if(Strings.isBlank(key)){
+            return null;
+        }
+        if(!Strings.equals(key,"wait")){
+            return null;
+        }
 
-		String extsno = value;
-		Cnd cnd = Cnd.NEW().and("status", "=", "true")
-				// .and("delflag","=","false")
-				.and("ext_sno", "=", extsno);
+        String extsno = value;
+        Cnd cnd = Cnd.NEW()
+                .and("status","=","true")
+               // .and("delflag","=","false")
+                .and("ext_sno","=",extsno);
 
-		List<SubGateway> subGateways = subGatewayService.query(cnd);
-		if (Lang.isEmpty(subGateways)) {
-			return null;
-		}
-		SubGateway subGateway = subGateways.get(0);
-		subGateway = subGatewayService.fetchLinks(subGateway, "gateway");
-		Gateway gateway = subGateway.getGateway();
-		if (Lang.isEmpty(gateway)) {
-			return null;
-		}
+        List<SubGateway> subGateways = subGatewayService.query(cnd);
+        if(Lang.isEmpty(subGateways)){
+            return null;
+        }
+        SubGateway subGateway = subGateways.get(0);
+        subGateway = subGatewayService.fetchLinks(subGateway,"gateway");
+        Gateway gateway = subGateway.getGateway();
+        if(Lang.isEmpty(gateway)){
+            return null;
+        }
 
-		// SubGateway subGateway = canRegister(value);
-		// if(Lang.isEmpty(subGateway)){
-		// return null;
-		// }
-		//
-		// Gateway gateway = haveSnoGateway(subGateway);
-		//
-		// if(Lang.isEmpty(gateway)){
-		// subGatewayService.insertEntity(subGateway);
-		// return subGateway;
-		// }
-		// if(Strings.isNotBlank(gateway.getSubid())){
-		// return null;
-		// }
-		//
-		// subGateway = registerSubGateWay(subGateway, gateway);
+//        SubGateway subGateway = canRegister(value);
+//        if(Lang.isEmpty(subGateway)){
+//            return null;
+//        }
+//
+//        Gateway gateway = haveSnoGateway(subGateway);
+//
+//        if(Lang.isEmpty(gateway)){
+//            subGatewayService.insertEntity(subGateway);
+//            return subGateway;
+//        }
+//        if(Strings.isNotBlank(gateway.getSubid())){
+//            return null;
+//        }
+//
+//        subGateway = registerSubGateWay(subGateway, gateway);
 
-		GitBean gitBean = gitBlock.gitBeanBuilder(subGateway);
 
-		if (Strings.isBlank(gateway.getGitPath())) {
-			gateway = gitBlock.createGit(gateway, gitBean);
-		} else {
-			cnd = Cnd.NEW().and("t_iot_devices.status", "=", "true").and("t_iot_devices.delflag", "=", "false")
-					.and("t_iot_devices.gateway_id", "=", gateway.getId());
 
-			List<Device> devices = deviceService.dao().queryByJoin(Device.class, "driver", cnd);
-			try {
-				gitBlock.changGit(gitBean, gateway, devices);
-			} catch (Exception e) {
-				Logs.get().errorf("error for chang git gitBean: %s ; gateway: %s ; devices:  %s ; ", gitBean, gateway,
-						devices);
-				return null;
-			}
-		}
+        GitBean gitBean =gitBlock.gitBeanBuilder(subGateway);
 
-		gatewayService.update(gateway);
+        if(Strings.isBlank(gateway.getGitPath())){
+            gateway = gitBlock.createGit(gateway,gitBean);
+        }else {
+            cnd = Cnd.NEW()
+                    .and("t_iot_devices.status","=","true")
+                    .and("t_iot_devices.delflag","=","false")
+                    .and("t_iot_devices.gateway_id","=",gateway.getId());
 
-		kafkaBlock.produce("config", "extsno", extsno);
+            List<Device> devices = deviceService.dao().queryByJoin(Device.class,"driver",cnd);
+            try {
+                gitBlock.changGit(gitBean,gateway,devices);
+            } catch (Exception e) {
+                Logs.get().errorf("error for chang git gitBean: %s ; gateway: %s ; devices:  %s ; ", gitBean,gateway,devices);
+                return null;
+            }
+        }
 
-		return subGateway;
-	}
+        gatewayService.update(gateway);
 
-	private SubGateway registerSubGateWay(SubGateway subGateway, Gateway gateway) {
-		String extsno = subGateway.getSno() + R.sg(8).next();
-		subGateway.setExtSno(extsno);
-		subGateway.setGwid(gateway.getId());
 
-		subGatewayService.insertUpdateEntity(subGateway);
+        kafkaBlock.produce("config","extsno",extsno);
 
-		gateway.setSubid(subGateway.getId());
 
-		// gateway.setGitPath(conf.get("gitpath")+"/"+extsno);
+        return subGateway;
+    }
 
-		gatewayService.updateEntityRobot(gateway);
+    private SubGateway registerSubGateWay(SubGateway subGateway, Gateway gateway) {
+        String extsno = subGateway.getSno()+ R.sg(8).next();
+        subGateway.setExtSno(extsno);
+        subGateway.setGwid(gateway.getId());
 
-		return subGateway;
-	}
 
-	public SubGateway canRegister(String value) {
-		SubGateway subGateway = buileSubGateway(value);
-		if (Lang.isEmpty(subGateway)) {
-			return null;
-		}
-		if (Lang.isEmpty(subGateway.getSno())) {
-			return null;
-		}
-		Cnd cnd = Cnd.NEW();
-		cnd.and("sno", "=", subGateway.getSno());
-		cnd.and("status", "=", true);
-		cnd.and("delflag", "=", false);
-		List<SubGateway> registers = subGatewayService.query(cnd);
-		if (Lang.isEmpty(registers)) {
-			return subGateway;
-		}
-		if (registers.size() == 1) {
-			SubGateway sub = registers.get(0);
-			sub.setSno(subGateway.getSno());
-			sub.setExtip(subGateway.getExtip());
-			sub.setApi(subGateway.getApi());
-			sub.setPort(subGateway.getPort());
-			return sub;
-		}
-		return null;
-	}
+        subGatewayService.insertUpdateEntity(subGateway);
 
-	public Gateway haveSnoGateway(SubGateway subGateway) {
-		Cnd cnd = Cnd.NEW();
-		cnd.and("sno", "=", subGateway.getSno());
-		cnd.and("status", "=", true);
-		cnd.and("delflag", "=", false);
-		List<Gateway> gateways = gatewayService.query(cnd);
-		if (Lang.isEmpty(gateways)) {
-			return null;
-		}
+        gateway.setSubid(subGateway.getId());
 
-		return gateways.get(0);
-	}
+        //gateway.setGitPath(conf.get("gitpath")+"/"+extsno);
 
-	public SubGateway buileSubGateway(String value) {
-		if (Strings.isEmpty(value)) {
-			return null;
-		}
 
-		SubGateway gateway = new SubGateway();
+        gatewayService.updateEntityRobot(gateway);
 
-		Object obj = Json.fromJson(value);
 
-		Object sno = Mapl.cell(obj, "sno");
+        return subGateway;
+    }
 
-		if (Lang.isEmpty(sno)) {
-			return null;
-		}
+    public  SubGateway canRegister(String value) {
+        SubGateway subGateway = buileSubGateway(value);
+        if(Lang.isEmpty(subGateway)){
+            return null;
+        }
+        if(Lang.isEmpty(subGateway.getSno())){
+            return null;
+        }
+        Cnd cnd = Cnd.NEW();
+        cnd.and("sno","=",subGateway.getSno());
+        cnd.and("status","=",true);
+        cnd.and("delflag","=",false);
+        List<SubGateway> registers = subGatewayService.query(cnd);
+        if(Lang.isEmpty(registers)){
+            return subGateway;
+        }
+        if(registers.size()==1){
+            SubGateway sub =registers.get(0);
+            sub.setSno(subGateway.getSno());
+            sub.setExtip(subGateway.getExtip());
+            sub.setApi(subGateway.getApi());
+            sub.setPort(subGateway.getPort());
+            return sub;
+        }
+        return null;
+    }
 
-		Object extip = Mapl.cell(obj, "outerip");
 
-		if (Lang.isEmpty(extip)) {
-			extip = "127.0.0.1";
-		}
 
-		gateway.setExtip("" + extip);
-		gateway.setSno("" + sno);
-		return gateway;
-	}
+    public Gateway haveSnoGateway(SubGateway subGateway) {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("sno","=",subGateway.getSno());
+        cnd.and("status","=",true);
+        cnd.and("delflag","=",false);
+        List<Gateway> gateways =gatewayService.query(cnd);
+        if(Lang.isEmpty(gateways)){
+            return null;
+        }
 
-	public void init() {
 
-	}
+        return gateways.get(0);
+    }
 
-	public void depose() {
+    public SubGateway buileSubGateway(String value) {
+        if(Strings.isEmpty(value)){
+            return null;
+        }
 
-	}
+
+        SubGateway gateway = new SubGateway();
+
+        Object obj = Json.fromJson(value);
+
+
+        Object  sno = Mapl.cell(obj,"sno");
+
+        if(Lang.isEmpty(sno)){
+            return null;
+        }
+
+        Object extip = Mapl.cell(obj,"outerip");
+
+        if(Lang.isEmpty(extip)){
+            extip = "127.0.0.1";
+        }
+
+        gateway.setExtip(""+extip);
+        gateway.setSno(""+sno);
+        return gateway;
+    }
+
+    public void init(){
+
+    }
+    public void depose(){
+
+    }
 }

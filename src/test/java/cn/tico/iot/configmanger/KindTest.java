@@ -1,4 +1,4 @@
-package cn.tico.iot.configmanger.module.iot.models;
+package cn.tico.iot.configmanger;
 
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
@@ -91,10 +91,10 @@ public class KindTest {
 
     }
 
-    //@Test
+    @Test
     public void allTable(){
 
-         Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
+        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.other.models",true );
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
 

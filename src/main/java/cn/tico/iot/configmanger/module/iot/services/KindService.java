@@ -15,6 +15,7 @@ import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 类型service
@@ -194,5 +195,21 @@ public class KindService extends Service<Kind> {
             }
         }
         return result;
+    }
+
+    public List<String> kindAllSonIds(String kindid) {
+        Kind kind = fetch(kindid);
+        Cnd cnd = Cnd.NEW()
+                .and("ancestors","like","%"+kindid+"%")
+                .and("status","=","true")
+                .and("delflag","=","false")
+               ;
+
+        List<Kind> list = dao().query(Kind.class,cnd);
+
+        if(Lang.isEmpty(list)){
+            return Lists.newArrayList();
+        }
+        return list.stream().map(temp->temp.getId()).collect(Collectors.toList());
     }
 }
