@@ -714,9 +714,9 @@ function Frame(props) {
 		let ids = '';
 		arr.forEach((id, index) => {
 			if (index + 1 == arr.length) {
-				ids += `ids=${id}%`;
+				ids += `${id}`;
 			} else {
-				ids += `ids=${id}`;
+				ids += `${id},`;
 			}
 		});
 		$.post(url, { ids }, function(obj) {
