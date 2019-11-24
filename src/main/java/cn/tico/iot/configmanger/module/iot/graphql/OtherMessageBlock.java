@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.iot.graphql;
 
+import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.module.iot.bean.GitBean;
 import cn.tico.iot.configmanger.module.iot.graphql.Block;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
@@ -46,15 +47,27 @@ public class OtherMessageBlock implements Block {
 
 	@Inject
 	TOtherMessagesService tOtherMessagesService;
+
 	@Override
 	public Object exec(String topic, String key, String value, long offset) {
 		System.out.println("topic" + topic + "key:" + key + "value" + value);
 		TOtherMessages tOtherMessages = new TOtherMessages();
-		Map map = Json.fromJson(Map.class,value);
-		tOtherMessages.setMessage(""+map.get("message"));
-		tOtherMessages.setDeptId(""+map.get("dept"));
-		tOtherMessages.setSno(""+map.get("sno"));
-		tOtherMessagesService.insert(tOtherMessages);
+		Map map = Json.fromJson(Map.class, value);
+		tOtherMessages.setMessage("" + map.get("message"));
+		tOtherMessages.setDeptId("" + map.get("dept"));
+		tOtherMessages.setSno("" + map.get("sno"));
+		String message = ("" + map.get("message"));
+		String deptId = ("" + map.get("dept"));
+		String sno = ("" + map.get("sno"));
+		Cnd cnd = Cnd.NEW().and("dept_id", "=", deptId).and("message", "=", message).and("sno", "=", sno);
+		List<TOtherMessages> list = tOtherMessagesService.query(cnd);
+		if (Lang.isEmpty(list)) {
+			tOtherMessagesService.insert(tOtherMessages);
+		} else {
+			TOtherMessages otherMessages = list.get(0);
+			otherMessages.setMessage(message);
+			tOtherMessagesService.update(otherMessages);
+		}
 
 		if (Strings.isBlank(key)) {
 			return null;
