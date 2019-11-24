@@ -2,13 +2,12 @@ package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.adaptor.GraphQLAdaptor;
 import cn.tico.iot.configmanger.common.base.Result;
-import cn.tico.iot.configmanger.common.utils.DictUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.ApiService;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
-import cn.tico.iot.configmanger.module.iot.services.TopuService;
+import cn.tico.iot.configmanger.module.iot.services.TopoService;
 import cn.tico.iot.configmanger.module.sys.models.Dict;
 import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
@@ -58,7 +57,7 @@ public class ApiController implements AdminKey {
 	public 	DictService dictService;
 
 	@Inject
-	public TopuService topuService;
+	public TopoService topuService;
 
 	@Inject
 	private Dao dao;
