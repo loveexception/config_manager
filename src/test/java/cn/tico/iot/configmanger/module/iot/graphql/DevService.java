@@ -24,9 +24,8 @@ public class DevService {
 
     @GraphQLQuery(name="dept2")
     public Driver getDriver(@GraphQLContext Device dev) {
-
-        return dev.getDriver();
-
+//        return dev.getDriver();
+        return null;
     }
 
     @GraphQLQuery(name="depts")

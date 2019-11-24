@@ -91,7 +91,6 @@ public class TOtherMessagesController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:tOtherMessages:add")
-	@Slog(tag = "kafka的推送", after = "新增保存kafka的推送 id=${args[0].id}")
 	public Object addDo(@Param("..") TOtherMessages tOtherMessages, HttpServletRequest req) {
 		try {
 			tOtherMessagesService.insert(tOtherMessages);
@@ -144,7 +143,6 @@ public class TOtherMessagesController {
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("wx:tOtherMessages:remove")
-	@Slog(tag = "kafka的推送", after = "删除kafka的推送:${array2str(args[0])}")
 	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
 			tOtherMessagesService.delete(ids);
