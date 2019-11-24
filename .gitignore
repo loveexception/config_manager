@@ -8,7 +8,8 @@ src/main/resources/static/WEB-INF
 velocity
 .log
 
+eee
 target
 .classpath
 bin
-
+dependency-reduced-pom.xml
