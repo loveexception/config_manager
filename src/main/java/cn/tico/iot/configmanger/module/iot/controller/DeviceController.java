@@ -80,8 +80,6 @@ public class DeviceController implements AdminKey {
 	@Inject
 	private PersonRulerService personRulerService;
 
-	@Inject
-    private KafkaBlock kafkaBlock;
 
 	@Inject
 	private GitBlock  gitBlock;
@@ -186,7 +184,7 @@ public class DeviceController implements AdminKey {
 			int  i = deviceService.vDelete(device.getId());
 
             String extsno = getExtsno(device);
-            kafkaBlock.produce("config","wait",extsno);
+            subGatewayService.kafka(extsno);
 			deviceService.kafka(Arrays.asList(device));
 			return Result.success("system.success",i);
 		} catch (Exception e) {
@@ -517,12 +515,12 @@ public class DeviceController implements AdminKey {
         String extsno = getExtsno(device);
 
         if(Strings.isNotBlank(extsno)){
-			kafkaBlock.produce("config","wait",extsno);
+			subGatewayService.kafka(extsno);
 		}
 		if(Strings.isBlank(oldextsno)){
 
 		}else if(!Strings.equals(extsno,oldextsno)){
-			kafkaBlock.produce("config","wait",oldextsno);
+			subGatewayService.kafka(extsno);
 		}
 
 		return  Result.success("system.success",device);
@@ -552,7 +550,6 @@ public class DeviceController implements AdminKey {
         	return null;
 		}
         SubGateway sub = subGatewayService.fetch(gateway.getSubid());
-       // SubGateway oldSub = subGatewayService.findByGateWayId(device.getGatewayid());
         if(Lang.isEmpty(sub)){
             return null;
         }
@@ -598,7 +595,7 @@ public class DeviceController implements AdminKey {
         }
 
         for (String extsno : extsnos){
-            kafkaBlock.produce("config","wait",extsno);
+			subGatewayService.kafka(extsno);
         }
 
 		return  Result.success("system.success",result);

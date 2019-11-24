@@ -88,8 +88,6 @@ public class TopoController implements AdminKey {
 			return Result.error("system.error");
 		}
 
-
-
 		tag.setDeptid(tag.getDeptid());
 
 		tag.setCreateBy("API");
@@ -122,10 +120,39 @@ public class TopoController implements AdminKey {
 		topo.setCreateTime(new Date());
 		topo.setCreateBy("API");
 		topo = tagService.dao().insert(topo);
+		tag = initTag(tag);
 		topo.setTag(tag);
+
 		return topo;
 	}
+	private Tag initTag(Tag tag) {
+		List<String > snos = Arrays.asList("CR2160816028",
+				"CR2161207027",
+				"2102350DLSDMJB001611",
+				"2102359504DMK5001449",
+				"2102350DLSDMJB001614",
+				"2102359504DMK5001438",
+				"2102359504DMK5001523",
+				"2102359504DMK7002171");
 
+		Cnd cnd = Cnd.NEW();
+
+		cnd.and("sno","in",snos);
+		cnd.and("status","=","true");
+		cnd.and("delflag","=","false");
+		cnd.and("asset_status","=","2");
+
+		List<Device> devices =  deviceService.query(cnd);
+
+		for (Device dev:devices) {
+			dev.setTags(Lists.newArrayList(tag));
+			deviceService.dao().insertRelation(dev, "tags");
+		}
+
+
+
+		return tag;
+	}
 	@At("/check_tag")
 	@Ok("json")
 	@Filters({@By(type=CrossOriginFilter.class, args={"*"
@@ -386,7 +413,6 @@ public class TopoController implements AdminKey {
 			+ KEYS
 			, "true"})})
 	public Object fullTopo(@Param("deptid") String deptid , HttpServletRequest req){
-
 		return topoService.drawByAll(deptid);
 	}
 
@@ -397,7 +423,9 @@ public class TopoController implements AdminKey {
             , "true"})})
     @At(value = "/save_topo",methods = "OPTIONS")
     @GET
-    public void saveOPTIONS( ){}
+    public void saveOPTIONS( ){
+
+	}
 
 
 
@@ -440,6 +468,7 @@ public class TopoController implements AdminKey {
         topo.setHideMap(hidemap);
 
 		topoService.update(topo);
+		bellRing(tag);
 		return Result.success("system.success",topo);
 	}
 
@@ -458,6 +487,12 @@ public class TopoController implements AdminKey {
 		}
 
 		return topos.get(0);
+	}
+
+	public void bellRing(Tag tag ){
+		tag = tagService.fetchLinks(tag,"devices");
+		final List<Device> devices = tag.devices;
+		deviceService.kafka(devices);
 	}
 
 }

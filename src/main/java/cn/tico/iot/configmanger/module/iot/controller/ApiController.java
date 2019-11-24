@@ -15,14 +15,18 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
+import org.apache.kafka.common.cache.LRUCache;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.json.Json;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.segment.CharSegment;
 import org.nutz.lang.segment.Segment;
+import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.*;
@@ -62,6 +66,9 @@ public class ApiController implements AdminKey {
 	@Inject
 	private Dao dao;
 
+
+	public static LRUCache<String ,Object> LRU = new LRUCache<>(50);
+
 	static GraphQLSchema schema = null;
 
 	public GraphQLSchema init(){
@@ -81,11 +88,18 @@ public class ApiController implements AdminKey {
 	@Ok("json")
 	public Object device(
 			@Param("sno") String sno,
-			HttpServletRequest req) {
+			HttpServletRequest req
+	) {
+		Object json = LRU.get(sno);
+		if(Lang.isNotEmpty(json)){
+			return json;
+		}
 		Segment seg = new CharSegment(this.GRAPH_DEVICE);
 		seg.set("sno",sno);
 		String sql =seg.toString();
-		return graphql( sql,req ) ;
+		Object obj  =  graphql( sql,req ) ;
+		LRU.put(sno, obj);
+		return obj;
 
 	}
 	/**

@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.services;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.page.TableDataInfo;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import org.nutz.dao.Cnd;
@@ -11,6 +12,7 @@ import org.nutz.dao.FieldFilter;
 import org.nutz.dao.entity.MappingField;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.util.Daos;
+import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
@@ -26,6 +28,9 @@ import java.util.List;
  */
 @IocBean(args = {"refer:dao"})
 public class SubGatewayService extends Service<SubGateway> {
+
+	@Inject
+	KafkaBlock kafkaBlock;
 
 	public SubGatewayService(Dao dao) {
 		super(dao);
@@ -76,4 +81,9 @@ public class SubGatewayService extends Service<SubGateway> {
 		return subGateways.get(0);
 
     }
+
+    public void kafka(String extsno) {
+		kafkaBlock.produce("config","wait",extsno);
+
+	}
 }

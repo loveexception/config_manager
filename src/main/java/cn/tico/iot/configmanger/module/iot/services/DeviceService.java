@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.module.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.controller.ApiController;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
@@ -25,6 +26,9 @@ import java.util.List;
 public class DeviceService extends Service<Device> {
     @Inject
     KafkaBlock kafkaBlock;
+
+    @Inject
+    ApiController api;
 
     public DeviceService(Dao dao) {
         super(dao);
@@ -89,9 +93,23 @@ public class DeviceService extends Service<Device> {
     }
 
     public void kafka(List<Device> result) {
+        new Thread(){
+            @Override
+            public void run() {
+                for (int i = 0; i < result.size(); i++) {
+                    String sno =result.get(i).getSno();
+                    api.LRU.remove(sno);
+                    api.device(sno,null);
+                }
 
-        for (int i = 0; i < result.size(); i++) {
-            kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_SNO,result.get(i).getSno());
-        }
+                for (Device device:result) {
+                    kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_SNO,device.getSno());
+
+                }
+            }
+        }.start();
+
+
+
     }
 }
