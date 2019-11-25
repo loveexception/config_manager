@@ -580,7 +580,7 @@ function AssetFooter(props) {
 	}
 
 	// function reqFuncUpdata() {
-	// 	alert(1);
+	// 	alert(1);c
 	// }
 	return (
 		<div className="asset-footer-box">
@@ -648,13 +648,13 @@ function Frame(props) {
 				if (Array.isArray(obj)) {
 					messageFlag = false;
 					obj.forEach(item => {
-						let { sno, cnname = '', id, message } = item;
-						console.log(item, 'item', 111);
+						let { sno, cnName = '', id, message } = item;
 						resultArr.push({
 							sno,
-							cnname,
+							cnName,
 							message,
-							id
+							id,
+							key: id
 						});
 					});
 					setMessageArr(resultArr);
@@ -706,6 +706,7 @@ function Frame(props) {
 		$.get(url, function(obj) {
 			if (obj.code == 0) {
 				reqRestFnc();
+				antd.message.success('操作成功', 0.5);
 			} else {
 				antd.message.error('操作失败', 0.5);
 			}
@@ -724,6 +725,7 @@ function Frame(props) {
 		$.post(url, { ids }, function(obj) {
 			if (obj.code == 0) {
 				reqMessage();
+				antd.message.success('操作成功', 0.5);
 			} else {
 				antd.message.error('操作失败', 0.5);
 			}
@@ -797,7 +799,7 @@ function Frame(props) {
 
 		{
 			title: '资产名称',
-			dataIndex: 'cnname',
+			dataIndex: 'cnName',
 			key: '资产名称'
 		},
 		{
@@ -868,7 +870,6 @@ function Frame(props) {
 								price,
 								orderTime,
 								gatewayExtsno,
-								cnName,
 								kindmap,
 								kind: kind.cnName,
 								id,
