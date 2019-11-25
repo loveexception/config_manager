@@ -451,7 +451,7 @@ class ListBox extends React.PureComponent {
 									placeholder="请输入搜索内容"
 									onInput={event => {
 										this.setState({
-											searchValue: event.target.value || ''
+											searchValue: event.target.value && event.target.value.trim() || ''
 										});
 									}}
 								></Input>
