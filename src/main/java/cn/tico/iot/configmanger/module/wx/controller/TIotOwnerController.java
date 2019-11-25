@@ -97,6 +97,8 @@ public class TIotOwnerController {
 	@Ok("th://wx/tIotOwner/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		TIotOwner tIotOwner = tIotOwnerService.fetch(id);
+		tIotOwner = tIotOwnerService.fetchLinks(tIotOwner, "kind");
+
 		req.setAttribute("tIotOwner", tIotOwner);
 	}
 
