@@ -79,32 +79,30 @@ public class TOtherMessages extends BaseModel implements Serializable {
 	@Column("dept_id")
 	@Comment("组织id")
 	private String deptId;
-    @One(field = "deptId",key = "id")
+	@One(field = "deptId", key = "id")
 	private Dept dept;
 
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
+	public String getDeptId() {
+		return deptId;
+	}
 
+	public void setDeptId(String deptId) {
+		this.deptId = deptId;
+	}
 
-    public String getDeptId() {
-        return deptId;
-    }
+	public Dept getDept() {
+		return dept;
+	}
 
-    public void setDeptId(String deptId) {
-        this.deptId = deptId;
-    }
+	public void setDept(Dept dept) {
+		this.dept = dept;
+	}
 
-    public Dept getDept() {
-        return dept;
-    }
-
-    public void setDept(Dept dept) {
-        this.dept = dept;
-    }
-
-    public void setId(String id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
