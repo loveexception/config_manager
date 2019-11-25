@@ -59,7 +59,9 @@ public class OtherMessageBlock implements Block {
 		String message = ("" + map.get("message"));
 		String deptId = ("" + map.get("dept"));
 		String sno = ("" + map.get("sno"));
-		Cnd cnd = Cnd.NEW().and("dept_id", "=", deptId).and("message", "=", message).and("sno", "=", sno);
+		String cnname = ("" + map.get("cnname"));
+		Cnd cnd = Cnd.NEW().and("dept_id", "=", deptId).and("message", "=", message).and("sno", "=", sno).and("sno",
+				"=", cnname);
 		List<TOtherMessages> list = tOtherMessagesService.query(cnd);
 		if (Lang.isEmpty(list)) {
 			tOtherMessagesService.insert(tOtherMessages);
@@ -68,7 +70,6 @@ public class OtherMessageBlock implements Block {
 			otherMessages.setMessage(message);
 			tOtherMessagesService.update(otherMessages);
 		}
-
 		if (Strings.isBlank(key)) {
 			return null;
 		}

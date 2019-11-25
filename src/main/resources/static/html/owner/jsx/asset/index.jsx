@@ -647,10 +647,12 @@ function Frame(props) {
 				let obj = result.data;
 				if (Array.isArray(obj)) {
 					messageFlag = false;
-					obj.forEach(({ sno, cnName, id, message }) => {
+					obj.forEach(item => {
+						let { sno, cnname = '', id, message } = item;
+						console.log(item, 'item', 111);
 						resultArr.push({
 							sno,
-							cnName,
+							cnname,
 							message,
 							id
 						});
@@ -795,7 +797,7 @@ function Frame(props) {
 
 		{
 			title: '资产名称',
-			dataIndex: 'cnName',
+			dataIndex: 'cnname',
 			key: '资产名称'
 		},
 		{
