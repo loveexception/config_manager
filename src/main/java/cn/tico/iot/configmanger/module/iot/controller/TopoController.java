@@ -272,7 +272,7 @@ public class TopoController implements AdminKey {
 
 		deviceService.update(device);
 
-		//deviceService.kafka(Lists.newArrayList(device));
+		deviceService.kafka(Lists.newArrayList(device));
 
 
 		return Result.success("system.success",device);
