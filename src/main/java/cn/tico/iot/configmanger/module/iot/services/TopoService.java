@@ -1806,6 +1806,13 @@ public class TopoService extends Service<Topo> {
             "\t\t\t\t\"index\": 172\n" +
             "\t\t\t},\n" +
             "\t\t\t{\n" +
+            "\t\t\t\t\"source\": \"7\",\n" +
+            "\t\t\t\t\"target\": \"50\",\n" +
+            "\t\t\t\t\"description\": \"QM-Video-Access-4:G0/0/19,重点工程生产办公室行政:LAN1\",\n" +
+            "\t\t\t\t\"id\": \"edge-53\",\n" +
+            "\t\t\t\t\"index\": 184\n" +
+            "\t\t\t},\n" +
+            "\t\t\t{\n" +
             "\t\t\t\t\"source\": \"6\",\n" +
             "\t\t\t\t\"target\": \"64\",\n" +
             "\t\t\t\t\"description\": \"QM-Video-Access-3:G0/0/25,客服中心应急:LAN1\",\n" +
@@ -1884,13 +1891,6 @@ public class TopoService extends Service<Topo> {
             "\t\t\t},\n" +
             "\t\t\t{\n" +
             "\t\t\t\t\"source\": \"7\",\n" +
-            "\t\t\t\t\"target\": \"39\",\n" +
-            "\t\t\t\t\"description\": \"QM-Video-Access-4:G0/0/19,重点工程生产办公室行政:LAN1\",\n" +
-            "\t\t\t\t\"id\": \"edge-53\",\n" +
-            "\t\t\t\t\"index\": 184\n" +
-            "\t\t\t},\n" +
-            "\t\t\t{\n" +
-            "\t\t\t\t\"source\": \"7\",\n" +
             "\t\t\t\t\"target\": \"62\",\n" +
             "\t\t\t\t\"description\": \"QM-Video-Access-4:G0/0/23,大兴公司八层应急:LAN1\",\n" +
             "\t\t\t\t\"id\": \"edge-63-1\",\n" +
@@ -1925,7 +1925,7 @@ public class TopoService extends Service<Topo> {
             "\t\t\t\t\"index\": 189\n" +
             "\t\t\t}\n" +
             "\t\t]\n" +
-            "}"+
+            "\t}\n" +
             "}";
 
     public Object drawByAll(String deptid) {
