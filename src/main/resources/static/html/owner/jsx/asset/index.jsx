@@ -585,7 +585,7 @@ function AssetFooter(props) {
 	return (
 		<div className="asset-footer-box">
 			<div className="option-box-left">
-				<img className="option-left-img" style={{ width: '70px', height: '80', marginTop: '6px' }} src="/assets/img/assetAll.png" alt="" />
+				<img className="option-left-img" src="/assets/img/assetAll.png" alt="" />
 				<div className="option-left-text">{text.useCount}</div>
 				<div className="option-waring-box" style={{ color, left: '46%' }}>
 					{(props && props.useCounter) || 0}
