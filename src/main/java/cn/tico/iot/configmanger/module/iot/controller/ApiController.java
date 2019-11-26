@@ -2,12 +2,15 @@ package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.adaptor.GraphQLAdaptor;
 import cn.tico.iot.configmanger.common.base.Result;
+import cn.tico.iot.configmanger.common.page.TableDataInfo;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.graphql.ApiService;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.TopoService;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.Dict;
 import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
@@ -15,10 +18,12 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.kafka.common.cache.LRUCache;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.pager.Pager;
+import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
@@ -34,6 +39,7 @@ import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 业务 信息操作处理
@@ -200,6 +206,46 @@ public class ApiController implements AdminKey {
 		List<Dict> list =  dictService.query(Cnd.where("type","=",type));
 
 		return Result.success("system.success", list);
+	}
+
+	@Filters(@By(type=CrossOriginFilter.class))
+	@At("/init_snos")
+	@Ok("json")
+	public Object initSnos(
+			@Param("pageNum")int pageNum
+			, @Param("pageSize")int pageSize
+
+			, @Param("name") String name
+			, @Param("orderByColumn") String orderByColumn
+			, @Param("isAsc") String isAsc
+
+
+			, @Param("deptid") String deptid
+			, @Param("locationid") String locationid,
+									   HttpServletRequest req) {
+
+		Cnd cnd = Cnd.NEW();
+
+
+		cnd.and("delflag", "=", "false");
+		cnd.and("status", "=", "true");
+		cnd.and("asset_status", "=", "2");
+
+		if(Strings.isNotBlank(deptid)){
+			cnd.and("dept_id","=",deptid);
+
+		}
+		if(Strings.isNotBlank(locationid)){
+			cnd.and("location.location_id","=",locationid);
+		}
+
+
+		TableDataInfo devices = deviceService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,"location");
+
+		List<String> obj = devices.getRows().stream().map(device -> ((Device)device).getSno()).collect(Collectors.toList());
+		devices.setRows(obj);
+
+		return Result.success("system.success", devices);
 	}
 	@At("/topu")
 	@Ok("json")

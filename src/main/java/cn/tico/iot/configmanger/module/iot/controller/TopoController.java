@@ -17,6 +17,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.pager.Pager;
+import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -106,13 +107,11 @@ public class TopoController implements AdminKey {
 	public Object removeTag(@Param("..")Tag tag , HttpServletRequest req){
 		tagService.dao().clearLinks(tag,"devices");
 		tagService.dao().clear(Topo.class,Cnd.NEW().and("tag_id","=",tag.getId()));
-
-		tagService.deletex(tag);
+		tag = tagService.fetch(tag.getId());
+		tag.setDelFlag("true");
+		int delete = tagService.dao().update(tag);
 		bellRing(tag);
-
-
-
-		return Result.success("system.success");
+		return Result.success("system.success",delete);
 	}
 
 	private Topo makeTopo(Tag tag) {
@@ -296,22 +295,26 @@ public class TopoController implements AdminKey {
 
 			, @Param("pageNum")int pageNum
 			, @Param("pageSize")int pageSize
-			, @Param("cnName") String cnName
+			, @Param("name") String name
 			, @Param("orderByColumn") String orderByColumn
 			, @Param("isAsc") String isAsc
 
-			//, @Param("locationid") String locationid
 
 			, HttpServletRequest req){
 
 
-		Cnd cnd = Cnd.NEW().and("dept_id","=",deptId);
+		Cnd cnd = Cnd.NEW().and("tag.dept_id","=",deptId);
 		if(Strings.isNotBlank(check)){
-			cnd.and("is_check","=",check);
+			cnd.and("t_topo_graphs.is_check","=",check);
 
 		}
-		if(Strings.isNotBlank(cnName)){
-			cnd.and("tag.cn_name","like","%"+cnName+"%");
+		if(Strings.isNotBlank(name)){
+			cnd.and("tag.cn_name","like","%"+name+"%");
+		}
+		if (!Strings.isBlank(name)) {
+			SqlExpressionGroup group = Cnd.exps("tag.cn_name", "like", "%" + name + "%")
+					.or("tag.en_name", "like", "%" + name + "%");
+			cnd.and(group);
 		}
 
 
@@ -321,9 +324,11 @@ public class TopoController implements AdminKey {
 		cnd.and("id","in",tagids);
 		cnd.and("status","=","true");
 		cnd.and("delflag","=","false");
-
-		cnd.orderBy(orderByColumn,isAsc);
-
+		if(Strings.isNotBlank(orderByColumn)) {
+			cnd.orderBy(orderByColumn, isAsc);
+		}else{
+			cnd.orderBy("CONVERT(cn_name using gbk)","Asc");
+		}
 
 		if(pageSize==0){
 			pageSize = 200;
