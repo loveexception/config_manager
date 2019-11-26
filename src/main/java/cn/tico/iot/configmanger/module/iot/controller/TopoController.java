@@ -107,6 +107,11 @@ public class TopoController implements AdminKey {
 		tagService.dao().clearLinks(tag,"devices");
 		tagService.dao().clear(Topo.class,Cnd.NEW().and("tag_id","=",tag.getId()));
 
+		tagService.deletex(tag);
+		bellRing(tag);
+
+
+
 		return Result.success("system.success");
 	}
 
@@ -285,15 +290,31 @@ public class TopoController implements AdminKey {
 			, "Origin, Content-Type, Accept, X-Requested-With"
 			+ KEYS
 			, "true"})})
-	public Object listTag(@Param("deptid")String deptId,
-			@Param("check")String check
+	public Object listTag(
+			@Param("deptid")String deptId
+			, @Param("check")String check
+
+			, @Param("pageNum")int pageNum
+			, @Param("pageSize")int pageSize
+			, @Param("cnName") String cnName
+			, @Param("orderByColumn") String orderByColumn
+			, @Param("isAsc") String isAsc
+
+			//, @Param("locationid") String locationid
+
 			, HttpServletRequest req){
 
 
 		Cnd cnd = Cnd.NEW().and("dept_id","=",deptId);
 		if(Strings.isNotBlank(check)){
 			cnd.and("is_check","=",check);
+
 		}
+		if(Strings.isNotBlank(cnName)){
+			cnd.and("tag.cn_name","like","%"+cnName+"%");
+		}
+
+
 		List<Topo> topos = tagService.dao().queryByJoin(Topo.class,"tag",cnd);
 		List<String> tagids =topos.stream().map(topo -> topo.getTagId()).collect(Collectors.toList());
 		cnd = Cnd.NEW();
@@ -301,7 +322,17 @@ public class TopoController implements AdminKey {
 		cnd.and("status","=","true");
 		cnd.and("delflag","=","false");
 
-		List<Tag> tags = tagService.dao().query(Tag.class,cnd);
+		cnd.orderBy(orderByColumn,isAsc);
+
+
+		if(pageSize==0){
+			pageSize = 200;
+		}
+		Pager pager = new Pager(pageNum,pageSize);
+
+
+
+		List<Tag> tags = tagService.dao().query(Tag.class,cnd,pager);
 		List<Topo> result = Lists.newArrayList();
 		for (Tag tag:tags) {
 			for (Topo topo:topos) {
