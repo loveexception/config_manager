@@ -87,14 +87,14 @@ class ChartCircle extends React.PureComponent {
 		});
 		!_.isEmpty(chartData) &&
 			chartData.forEach(e => {
-				if (e.asset) {
+				if (e.asset === '已用') {
 					data.unshift({
-						type: `已用:${(e.count / allCount).toFixed(1)}%`,
+						type: `已用:${((e.count / allCount) * 100).toFixed(0)}%`,
 						value: e.count
 					});
 				} else {
 					data.push({
-						type: `闲置:${(e.count / allCount).toFixed(1)}%`,
+						type: `闲置:${((e.count / allCount) * 100).toFixed(0)}%`,
 						value: e.count
 					});
 				}
@@ -115,12 +115,12 @@ class ChartCircle extends React.PureComponent {
 			chartData.forEach(e => {
 				if (e.asset === '已用') {
 					data.unshift({
-						type: `已用:${(e.count / allCount).toFixed(2) * 100}%`,
+						type: `已用:${((e.count / allCount) * 100).toFixed(0)}%`,
 						value: e.count
 					});
 				} else {
 					data.push({
-						type: `闲置:${(e.count / allCount).toFixed(2) * 100}%`,
+						type: `闲置:${((e.count / allCount) * 100).toFixed(0)}%`,
 						value: e.count
 					});
 				}
