@@ -89,12 +89,12 @@ class ChartCircle extends React.PureComponent {
 			chartData.forEach(e => {
 				if (e.asset) {
 					data.unshift({
-						type: `已用:${(e.count / allCount).toFixed(0)}%`,
+						type: `已用:${(e.count / allCount).toFixed(1)}%`,
 						value: e.count
 					});
 				} else {
 					data.push({
-						type: `闲置:${(e.count / allCount).toFixed(0)}%`,
+						type: `闲置:${(e.count / allCount).toFixed(1)}%`,
 						value: e.count
 					});
 				}
