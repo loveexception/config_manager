@@ -544,7 +544,7 @@ class ContentBox extends React.PureComponent {
 }
 const antIcon = <Icon type="loading" style={{ fontSize: 24, color: 'deeppink' }} spin />;
 function AssetFooter(props) {
-	let [text, setText] = React.useState({ leftText: '检修提醒', rightText: '更换提醒', useCount: '设备应用总数' });
+	let [text, setText] = React.useState({ leftText: '运维提醒', rightText: '更换提醒', useCount: '设备应用总数' });
 	let [isEdit, setIsEdit] = React.useState(false);
 	let [isEditUpdata, setIsEditUpdata] = React.useState(false);
 	// let [isShow, setShow] = React.useState(false);
@@ -585,7 +585,7 @@ function AssetFooter(props) {
 	return (
 		<div className="asset-footer-box">
 			<div className="option-box-left">
-				<img className="option-left-img" src="/assets/img/assetAll.png" alt="" />
+				<img className="option-left-img" style={{ height: 50 }} src="/assets/img/assetAll.png" alt="" />
 				<div className="option-left-text">{text.useCount}</div>
 				<div className="option-waring-box" style={{ color, left: '46%' }}>
 					{(props && props.useCounter) || 0}
@@ -593,7 +593,7 @@ function AssetFooter(props) {
 			</div>
 			<Frame reqFunc={props.reqFunc} isEdit={isEdit} leftHandleClick={leftHandleClick}></Frame>
 			<div className="option-box-left" onClick={leftHandleClick}>
-				<img className="option-left-img" src="/assets/img/footer-setting.png" alt="" />
+				<img className="option-left-img" height="70px" src="/assets/img/footer-setting.png" alt="" />
 				<div className="option-left-text">{text.leftText}</div>
 				<div className="option-waring-box" style={{ color }}>
 					{props.couter}
