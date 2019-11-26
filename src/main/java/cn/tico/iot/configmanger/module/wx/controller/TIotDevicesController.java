@@ -133,7 +133,7 @@ public class TIotDevicesController implements AdminKey {
 		TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
 				"^dept|kind|owner|next$");
 		List<Device> list = (List<Device>) info.getRows();
-		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "=", "3"));
+		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "in", Lists.newArrayList("3","1")));
 		myKindNameFind(list, kinds);
 
 		return info;
@@ -434,9 +434,13 @@ public class TIotDevicesController implements AdminKey {
 				continue;
 			}
 			for (Kind k : kinds) {
-				if (fathers.contains(k.getId())) {
+				if (Strings.equals(k.getLevel(),"3")&&fathers.contains(k.getId())) {
 					device.setKindmap(k.getCnName());
-					continue;
+
+				}
+				if (Strings.equals(k.getLevel(),"1")&&fathers.contains(k.getId())) {
+					device.setLocationState(k.getCnName());
+
 				}
 			}
 			List<Owner> lists = device.getNext();
