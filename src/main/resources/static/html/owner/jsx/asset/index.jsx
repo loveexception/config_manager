@@ -463,10 +463,10 @@ function Pillar(props) {
 		chart.scale('value', {
 			alias: '分类统计(台)'
 		});
-		chart.axis('title', {
+		chart.axis('', {
 			label: {
 				textStyle: {
-					fill: '#aaaaaa'
+					fill: 'pink'
 				}
 			},
 			tickLine: {
