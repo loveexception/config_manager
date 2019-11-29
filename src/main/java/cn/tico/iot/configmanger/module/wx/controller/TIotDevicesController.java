@@ -246,8 +246,12 @@ public class TIotDevicesController implements AdminKey {
 					deviceService.dao().update(temp);
 
 				}
-
+				String id = tIotDevices.getId();
+				deviceService.kafka(Lists.newArrayList(new Device(){{
+					setId(id);
+				}}));
 			}
+
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -264,6 +268,14 @@ public class TIotDevicesController implements AdminKey {
 	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
 			deviceService.vDelete(ids);
+			List<Device> devices = Arrays.stream(ids).map(
+					id -> new Device(){{
+						this.setId(id);
+					}}).collect(Collectors.toList());
+
+
+			deviceService.kafka(devices);
+
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");

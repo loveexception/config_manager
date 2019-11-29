@@ -71,7 +71,8 @@ public class TagController implements AdminKey {
 			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
 			cnd.and(group);
 		}
-
+		cnd.and("status","=","true");
+		cnd.and("delflag","=","false");
 		if(!isAdmin()){
 			SqlExpressionGroup
 					group = Cnd
@@ -203,7 +204,7 @@ public class TagController implements AdminKey {
 	@Slog(tag ="业务", after= "删除业务:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
-			tagService.delete(ids);
+			tagService.deletex(ids);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
