@@ -114,12 +114,7 @@ public class TIotDevicesController implements AdminKey {
 		if (Strings.isNotBlank(assetStatus)) {
 			cnd.and("assetStatus", "=", assetStatus);
 		}
-		// if(Lang.isNotEmpty(beginTime)){
-		// cnd.and("create_time",">=", beginTime);
-		// }
-		// if(Lang.isNotEmpty(endTime)){
-		// cnd.and("create_time","<=", endTime);
-		// }
+
 		if (!isAdmin()) {
 
 			cnd.and("dept_id", "=", ShiroUtils.getSysUser().getDeptId());
