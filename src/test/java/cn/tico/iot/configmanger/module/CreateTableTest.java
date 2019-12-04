@@ -1,4 +1,4 @@
-package cn.tico.iot.configmanger;
+package cn.tico.iot.configmanger.module;
 
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
@@ -13,9 +13,11 @@ import org.nutz.dao.Dao;
 import org.nutz.dao.util.Daos;
 import org.nutz.json.Json;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
-public class KindTest {
+public class CreateTableTest {
     Dao dao ;
 
 
@@ -94,8 +96,8 @@ public class KindTest {
     @Test
     public void allTable(){
 
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
-       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.other.models",true );
+        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true );
+        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true );
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
 
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
