@@ -32,9 +32,13 @@ public class Topo extends I18NModel{
     @ColDefine(type = ColType.TEXT)
     public String hideMap;
 
-    @Column("is_check")
-    @Comment("是否侦听系统信息")
-    public String isCheck;
+    @Column("base_id")
+    @Comment("使用的什么母版")
+    public String baseId;
+
+    @One(field = "baseId",key = "id")
+    public Base base;
+
 
     @Many(field = "topoId",key = "id")
     public List<Square> squares ;
@@ -43,5 +47,10 @@ public class Topo extends I18NModel{
     public List<Wire>  wires;
 
 
+
+
+    @Column("is_check")
+    @Comment("是否侦听系统信息")
+    public String isCheck;
 
 }

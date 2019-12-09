@@ -45,6 +45,7 @@ public class ApiService {
         Cnd cnd = Cnd.NEW();
         cnd.and("t_iot_devices.sno", "=", sno);
         cnd.and("t_iot_devices.delflag","=","false");
+        cnd.and("t_iot_devices.asset_status", "=", "2");
         List<Device> devices = dao.queryByJoin(Device.class, "^dept|kind|location|driver|gateway|tags$", cnd);
         Iterator<Device> it = devices.iterator();
         if (it.hasNext()) {

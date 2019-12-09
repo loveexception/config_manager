@@ -99,7 +99,7 @@ public class DeviceService extends Service<Device> {
                 for (int i = 0; i < result.size(); i++) {
                     String sno =result.get(i).getSno();
                     api.LRU.remove(sno);
-                    api.device(sno,null);
+                    //api.device(sno,null);
                 }
 
                 for (Device device:result) {

@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-tTopoBases-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">对外显示拓扑图内容：</label>
+				<div class="col-sm-8">
+					<!-- <input id="graph" name="graph" class="form-control" type="text"> -->
+					<textarea name="graph"></textarea>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">组织：</label>
+				<div class="col-sm-8">
+					<input id="deptId" name="deptId" type="hidden" th:value="${dept.id}" />
+					<input class="form-control" type="text" onclick="selectDept()" id="deptName" readonly="true" th:value="${dept.deptName}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label "> 设备类型信息：</label>
+				<div class="col-sm-8">
+					<input id="kindId" name="kindId" type="hidden"  />
+					<input class="form-control" type="text" onclick="selectKind()" id="kindName" readonly="true"  />
+				</div>
+			</div>
+
+
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label "> 地理位置信息：</label>
+				<div class="col-sm-8">
+					<input id="locationId" name="locationId" type="hidden"  />
+					<input class="form-control" type="text" onclick="selectLocation()" id="locationName" readonly="true"  />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label "> 网关所在信息：</label>
+				<div class="col-sm-8">
+					<input id="gatewayId" name="gatewayId" type="hidden"  />
+					<input class="form-control" type="text" onclick="selectGateway()" id="gatewayName" readonly="true"  />
+				</div>
+			</div>
+
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">设备所使用的驱动信息：</label>
+				<div class="col-sm-8">
+					<input id="driverId" name="driverId" class="form-control" type="text">
+				</div>
+			</div>
+
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">名称：</label>
+				<div class="col-sm-8">
+					<input id="cnName" name="cnName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">编码：</label>
+				<div class="col-sm-8">
+					<input id="enName" name="enName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">状态：</label>
+				<div class="col-sm-8">
+					<input id="status" name="status" class="form-control" type="text">
+				</div>
+			</div>
+
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "wx/tTopoBases"
+		$("#form-tTopoBases-add").validate({
+			onkeyup: false,
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/addDo", $('#form-tTopoBases-add').serialize());
+	        }
+	    }
+
+        function selectDept() {
+            var options = {
+                title: '选择组织',
+                width: '380',
+                url: '/sys/dept/selectTree/100', //+ "/selectDept/100"),
+                callBack: function(index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    $('#deptId').val(body.find('#treeId').val());
+                    $('#deptName').val(body.find('#treeName').val());
+                    layer.close(index);
+                }
+            };
+            $.modal.openOptions(options);
+        }
+        function selectKind() {
+            var options = {
+                title: '选择组织',
+                width: '380',
+                url: '/iot/kind/selectTree/100', //+ "/selectDept/100"),
+                callBack: function(index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    $('#kindId').val(body.find('#treeId').val());
+                    $('#kindName').val(body.find('#treeName').val());
+                    layer.close(index);
+                }
+            };
+            $.modal.openOptions(options);
+        }
+        function selectLocation() {
+            var options = {
+                title: '选择组织',
+                width: '380',
+                url: '/iot/location/selectTree/100', //+ "/selectDept/100"),
+                callBack: function(index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    $('#locationId').val(body.find('#treeId').val());
+                    $('#locationName').val(body.find('#treeName').val());
+                    layer.close(index);
+                }
+            };
+            $.modal.openOptions(options);
+        }
+        function selectGateway() {
+            var options = {
+                title: '选择组织',
+                width: '380',
+                url: '/iot/gateway/selectTree/100', //+ "/selectDept/100"),
+                callBack: function(index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    $('#gatewayId').val(body.find('#treeId').val());
+                    $('#gatewayName').val(body.find('#treeName').val());
+                    layer.close(index);
+                }
+            };
+            $.modal.openOptions(options);
+        }
+
+	</script>
+</body>
+</html>

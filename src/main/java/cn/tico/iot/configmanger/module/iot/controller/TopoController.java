@@ -292,21 +292,16 @@ public class TopoController implements AdminKey {
 	public Object listTag(
 			@Param("deptid")String deptId
 			, @Param("check")String check
-
 			, @Param("pageNum")int pageNum
 			, @Param("pageSize")int pageSize
 			, @Param("name") String name
 			, @Param("orderByColumn") String orderByColumn
 			, @Param("isAsc") String isAsc
-
-
 			, HttpServletRequest req){
-
 
 		Cnd cnd = Cnd.NEW().and("tag.dept_id","=",deptId);
 		if(Strings.isNotBlank(check)){
 			cnd.and("t_topo_graphs.is_check","=",check);
-
 		}
 		if(Strings.isNotBlank(name)){
 			cnd.and("tag.cn_name","like","%"+name+"%");
@@ -317,7 +312,6 @@ public class TopoController implements AdminKey {
 			cnd.and(group);
 		}
 
-
 		List<Topo> topos = tagService.dao().queryByJoin(Topo.class,"tag",cnd);
 		List<String> tagids =topos.stream().map(topo -> topo.getTagId()).collect(Collectors.toList());
 		cnd = Cnd.NEW();
@@ -326,8 +320,10 @@ public class TopoController implements AdminKey {
 		cnd.and("delflag","=","false");
 		if(Strings.isNotBlank(orderByColumn)) {
 			cnd.orderBy(orderByColumn, isAsc);
-		}else{
+		}else if(Strings.equalsIgnoreCase("cnName",orderByColumn)){
 			cnd.orderBy("CONVERT(cn_name using gbk)","Asc");
+		}else {
+			cnd.orderBy("order_num","Asc");
 		}
 
 		if(pageSize==0){

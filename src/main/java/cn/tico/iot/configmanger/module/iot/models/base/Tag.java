@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.models.base;
 import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
+import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.nutz.dao.entity.annotation.*;
@@ -39,6 +40,14 @@ public class Tag extends I18NModel implements Comparable<Tag> {
     @ManyMany(from = "tag_id",relation = "t_tag_dev", to="dev_id")
     public List<Device> devices;
 
+    /**
+     * 排序
+     */
+    @Column("order_num")
+    @Comment("排序")
+    @ColDefine(type = ColType.INT ,width = 20 )
+    @GraphQLQuery(name = "order_num", description = "排序")
+    private long  orderNum ;
 
     @Override
     public int compareTo(Tag o) {
