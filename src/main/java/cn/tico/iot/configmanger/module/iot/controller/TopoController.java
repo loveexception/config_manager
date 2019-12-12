@@ -1,19 +1,17 @@
 package cn.tico.iot.configmanger.module.iot.controller;
 
 import cn.tico.iot.configmanger.common.base.Result;
-import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.models.Topo.Base;
 import cn.tico.iot.configmanger.module.iot.models.Topo.Topo;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
-import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
 import cn.tico.iot.configmanger.module.iot.services.TagService;
 import cn.tico.iot.configmanger.module.iot.services.TopoService;
-import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
-import com.google.common.base.Objects;
+import cn.tico.iot.configmanger.module.wx.services.TopoBasesService;
 import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.pager.Pager;
@@ -30,7 +28,6 @@ import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +60,9 @@ public class TopoController implements AdminKey {
 	@Inject
 	public KindService kindService;
 
+	@Inject
+    public TopoBasesService topoBasesService;
+
 	//
 	public static final String KEYS="adcode,dept_id,location,location_id,login_name,Referer,token,user_id";
 
@@ -77,7 +77,7 @@ public class TopoController implements AdminKey {
 			, "Origin, Content-Type, Accept, X-Requested-With"
 			+ KEYS
 			, "true"})})
-	public Object addTag(@Param("..")Tag tag , HttpServletRequest req){
+	public Object addTag(@Param("..")Tag tag,@Param("baseId")String baseId , HttpServletRequest req){
 		if(Lang.isEmpty(tag)){
 			return Result.error("system.error");
 		}
@@ -90,11 +90,10 @@ public class TopoController implements AdminKey {
 		}
 
 		tag.setDeptid(tag.getDeptid());
-
 		tag.setCreateBy("API");
 		tag.setCreateTime(new Date());
 		tagService.dao().insert(tag);
-		Topo topo =  makeTopo(tag);
+		Topo topo =  makeTopo(tag,baseId);
 		return Result.success("system.success",topo);
 	}
 	@At("/del_tag")
@@ -114,7 +113,7 @@ public class TopoController implements AdminKey {
 		return Result.success("system.success",delete);
 	}
 
-	private Topo makeTopo(Tag tag) {
+	private Topo makeTopo(Tag tag,String baseId) {
 		Topo topo = new Topo();
 		topo.setIsCheck("false");
 		topo.setTagId(tag.getId());
@@ -123,21 +122,40 @@ public class TopoController implements AdminKey {
 		topo.setDelFlag("false");
 		topo.setCreateTime(new Date());
 		topo.setCreateBy("API");
+		topo.setBaseId(baseId);
 		topo = tagService.dao().insert(topo);
-		tag = initTag(tag);
+		tag = initTag(tag,baseId);
 		topo.setTag(tag);
 
 		return topo;
 	}
-	private Tag initTag(Tag tag) {
-		List<String > snos = Arrays.asList("CR2160816028",
-				"CR2161207027",
-				"2102350DLSDMJB001611",
-				"2102359504DMK5001449",
-				"2102350DLSDMJB001614",
-				"2102359504DMK5001438",
-				"2102359504DMK5001523",
-				"2102359504DMK7002171");
+	private Tag initTag(Tag tag,String baseId) {
+		Base base = null;
+		if(Strings.isNotBlank(baseId)){
+			base = topoBasesService.fetch(baseId);
+		}
+
+		List<String > snos = Lists.newArrayList();
+		if(Lang.isNotEmpty(base)&&Strings.isNotBlank(base.getHideTagId())){
+			Tag hid = tagService.fetch(base.getHideTagId());
+			hid = tagService.fetchLinks(hid,"devices");
+			List<Device> hiddevice= hid.getDevices();
+			if(Lang.isNotEmpty(hiddevice)){
+				snos = hiddevice.stream().map(device -> device.getSno()).collect(Collectors.toList());
+			}
+		}
+
+		if(Lang.isEmpty(snos)){
+			snos  = Arrays.asList("CR2160816028",
+					"CR2161207027",
+					"2102350DLSDMJB001611",
+					"2102359504DMK5001449",
+					"2102350DLSDMJB001614",
+					"2102359504DMK5001438",
+					"2102359504DMK5001523",
+					"2102359504DMK7002171");
+		}
+
 
 		Cnd cnd = Cnd.NEW();
 
@@ -164,7 +182,7 @@ public class TopoController implements AdminKey {
 			, "Origin, Content-Type, Accept, X-Requested-With"
 			+ KEYS
 			, "true"})})
-	public Object checkTag(@Param("..")Tag tag,@Param("check")String check , HttpServletRequest req){
+	public Object checkTag(@Param("..")Tag tag,@Param("check")String check ,@Param("order_num")int ordernum , HttpServletRequest req){
 		Cnd cnd = Cnd.NEW();
 		cnd.and("tag_id","=",tag.getId());
 
@@ -174,7 +192,12 @@ public class TopoController implements AdminKey {
 			return Result.error("not have one topo in tag");
 		}
 		Topo topo = topos.get(0);
-		topo.setIsCheck(check);
+		if(Strings.isNotBlank(check)){
+			topo.setIsCheck(check);
+
+		}
+		topo.setOrderNum(ordernum);
+
 
 		topoService.update(topo);
 
@@ -311,20 +334,26 @@ public class TopoController implements AdminKey {
 					.or("tag.en_name", "like", "%" + name + "%");
 			cnd.and(group);
 		}
-
+		if(Strings.isNotBlank(orderByColumn)) {
+			cnd.orderBy(orderByColumn, isAsc);
+		}else if(Strings.equalsIgnoreCase("cnName",orderByColumn)){
+			cnd.orderBy("CONVERT(cn_name using gbk)","asc");
+		}else {
+			cnd.orderBy("t_topo_graphs.order_num","desc");
+		}
 		List<Topo> topos = tagService.dao().queryByJoin(Topo.class,"tag",cnd);
 		List<String> tagids =topos.stream().map(topo -> topo.getTagId()).collect(Collectors.toList());
 		cnd = Cnd.NEW();
 		cnd.and("id","in",tagids);
 		cnd.and("status","=","true");
 		cnd.and("delflag","=","false");
-		if(Strings.isNotBlank(orderByColumn)) {
-			cnd.orderBy(orderByColumn, isAsc);
-		}else if(Strings.equalsIgnoreCase("cnName",orderByColumn)){
-			cnd.orderBy("CONVERT(cn_name using gbk)","Asc");
-		}else {
-			cnd.orderBy("order_num","Asc");
-		}
+//		if(Strings.isNotBlank(orderByColumn)) {
+//			cnd.orderBy(orderByColumn, isAsc);
+//		}else if(Strings.equalsIgnoreCase("cnName",orderByColumn)){
+//			cnd.orderBy("CONVERT(cn_name using gbk)","Asc");
+//		}else {
+//			cnd.orderBy("t_topo_graphs.order_num","Asc");
+//		}
 
 		if(pageSize==0){
 			pageSize = 200;
@@ -335,13 +364,14 @@ public class TopoController implements AdminKey {
 
 		List<Tag> tags = tagService.dao().query(Tag.class,cnd,pager);
 		List<Topo> result = Lists.newArrayList();
-		for (Tag tag:tags) {
-			for (Topo topo:topos) {
+		for (Topo topo:topos) {
+			for (Tag tag:tags) {
 				if(Strings.equals(topo.getTagId(),tag.getId())){
 					topo.setTag(tag);
-					result.add(topo);
 				}
+
 			}
+			result.add(topo);
 		}
 
 
@@ -402,8 +432,17 @@ public class TopoController implements AdminKey {
 			, @Param("pageSize")int pageSize
 			, HttpServletRequest req){
 
-		tag = tagService.fetchLinks(tag,"devices");
-		List<Device> devices = tag.devices;
+
+		Topo topo = topoService.getToPoByTagId(tag.getId());
+
+		List<Device> showdev = topoBasesService.getShowDevids(topo.getBaseId());
+
+		List<String> showdevids = Lists.newArrayList();
+
+		if(Lang.isNotEmpty(showdev)){
+			showdevids = showdev.stream().map(device -> device.getId()).collect(Collectors.toList());
+		}
+
 
 
 
@@ -420,7 +459,13 @@ public class TopoController implements AdminKey {
 		if(Lang.isNotEmpty(kindids)){
 			cnd.and("kind_id","in",kindids);
 		}
+		if(Lang.isNotEmpty(showdevids)){
+			cnd.and("id","in",showdevids);
+		}
 
+		tag = tagService.fetchLinks(tag,"devices");
+
+		List<Device> devices = tag.devices;
 
 		if(Lang.isEmpty(devices)){
 
@@ -428,6 +473,9 @@ public class TopoController implements AdminKey {
 
 			return Result.success("system.success",obj);
 		}
+
+
+
 		List<String> list = devices.stream().map(device -> device.getId()).collect(Collectors.toList());
 		cnd.and("id","not in",list);
 
@@ -448,6 +496,22 @@ public class TopoController implements AdminKey {
 		return topoService.drawByAll(deptid);
 	}
 
+    @At("/dept_topo_base")
+    @Ok("json")
+    @Filters({@By(type=CrossOriginFilter.class, args={"*"
+            , "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+            , "Origin, Content-Type, Accept, X-Requested-With"
+            + KEYS
+            , "true"})})
+    public Object detpTopoBase(@Param("deptId") String deptid , HttpServletRequest req){
+	    Cnd cnd = Cnd.NEW();
+	    cnd.and("status","=","true");
+	    cnd.and("delflag","=","false");
+	    cnd.and("dept_id","=",deptid);
+	    List<Base> topos = topoBasesService.query(cnd);
+        return Result.success("system.success",topos);
+    }
+
     @Filters({@By(type=CrossOriginFilter.class, args={"*"
             , "GET, POST, PUT, DELETE, OPTIONS, PATCH"
             , "Origin, Content-Type, Accept, X-Requested-With"
@@ -455,12 +519,7 @@ public class TopoController implements AdminKey {
             , "true"})})
     @At(value = "/save_topo",methods = "OPTIONS")
     @GET
-    public void saveOPTIONS( ){
-
-	}
-
-
-
+    public void saveOPTIONS( ){ }
     @Filters({@By(type=CrossOriginFilter.class, args={"*"
             , "GET, POST, PUT, DELETE, OPTIONS, PATCH"
             , "Origin, Content-Type, Accept, X-Requested-With"
@@ -482,7 +541,7 @@ public class TopoController implements AdminKey {
 		String graph = topo.getGraph();
 		String hidemap=topo.getHideMap();
 		if(Lang.isEmpty(topos)){
-			topo=makeTopo(tag);
+			topo=makeTopo(tag,topo.getBaseId());
 			topo.setGraph(graph);
 			topo.setHideMap(hidemap);
 			topoService.insert(topo);
@@ -513,18 +572,12 @@ public class TopoController implements AdminKey {
 			+ KEYS
 			, "true"})})
 	public Object viewTopo(@Param("..")Tag tag , HttpServletRequest req){
-		List<Topo> topos = topoService.query(Cnd.NEW().and("tag_id","=",tag.getId()));
-		if(Lang.isEmpty(topos)){
-			return Result.error("not find topo by tag");
-		}
 
-		return topos.get(0);
+		return topoService.getToPoByTagId(tag.getId());
 	}
 
 	public void bellRing(Tag tag ){
-		tag = tagService.fetchLinks(tag,"devices");
-		final List<Device> devices = tag.devices;
-		deviceService.kafka(devices);
+		deviceService.kafka(tag);
 	}
 
 }

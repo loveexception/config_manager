@@ -9,6 +9,7 @@ import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
+import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
@@ -43,13 +44,18 @@ public class Base extends I18NModel{
     @One(field = "locationId",key = "id")
     public Location location;
 
+    @Column("hide_tag_id")
+    @Comment("隐藏的设备Tag")
+    public String hideTagId;
+    @One(field = "hideTagId",key = "id")
+    public Tag hide;
 
-    @Column("gateway_id")
-    @Comment("设备所在的GATEWAY信息")
-    public String gatewayId;
 
-    @One(field = "gatewayId",key = "id")
-    public Gateway gateway;
+    @Column("show_tag_id")
+    @Comment("用于选择的设备Tag")
+    public String showTagId;
+    @One(field = "showTagId",key = "id")
+    public Tag show;
 
 
     @Column("driver_id")
@@ -69,8 +75,7 @@ public class Base extends I18NModel{
     @Many(field = "baseId",key = "id")
     public List<Topo> topos;
 
-    @ManyMany(relation = "t_topo_dev",from = "base_id",to = "device_id")
-    public List<Device> devices;
-
+//    @ManyMany(relation = "t_topo_dev",from = "base_id",to = "device_id")
+//    public List<Device> devices;
 
 }

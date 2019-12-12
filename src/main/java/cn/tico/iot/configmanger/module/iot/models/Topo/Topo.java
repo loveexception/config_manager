@@ -47,10 +47,17 @@ public class Topo extends I18NModel{
     public List<Wire>  wires;
 
 
-
-
     @Column("is_check")
     @Comment("是否侦听系统信息")
     public String isCheck;
+
+    /**
+     * 排序
+     */
+    @Column("order_num")
+    @Comment("排序")
+    @ColDefine(type = ColType.INT ,width = 20 )
+   // @GraphQLQuery(name = "order_num", description = "排序")
+    private long  orderNum ;
 
 }

@@ -278,4 +278,22 @@ public class GatewayController implements AdminKey {
 	}
 
 
+	/**
+	 * 选择菜单树
+	 */
+	@At("/selectTree/?")
+	@Ok("th:/iot/kind/tree.html")
+	public void selectTree(String id, HttpServletRequest req) {
+		Gateway gateway = null;
+		if (Strings.isNotBlank(id)) {
+			gateway = gatewayService.fetch(id);
+		}
+		if (gateway ==null) {
+			gateway =new Gateway();
+			gateway.setCnName("");
+		}
+		req.setAttribute("gateway", gateway);
+	}
+
+
 }

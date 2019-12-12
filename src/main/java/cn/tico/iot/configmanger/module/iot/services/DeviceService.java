@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.controller.ApiController;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
+import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import org.nutz.dao.Dao;
@@ -29,6 +30,9 @@ public class DeviceService extends Service<Device> {
 
     @Inject
     ApiController api;
+
+    @Inject
+    TagService tagService;
 
     public DeviceService(Dao dao) {
         super(dao);
@@ -111,5 +115,10 @@ public class DeviceService extends Service<Device> {
 
 
 
+    }
+    public void kafka(Tag tag) {
+        tag = tagService.fetchLinks(tag,"devices");
+        final List<Device> devices = tag.devices;
+        kafka(devices);
     }
 }
