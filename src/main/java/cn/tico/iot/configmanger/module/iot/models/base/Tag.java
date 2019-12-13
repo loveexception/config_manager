@@ -40,14 +40,7 @@ public class Tag extends I18NModel implements Comparable<Tag> {
     @ManyMany(from = "tag_id",relation = "t_tag_dev", to="dev_id")
     public List<Device> devices;
 
-    /**
-     * 排序
-     */
-    @Column("order_num")
-    @Comment("排序")
-    @ColDefine(type = ColType.INT ,width = 20 )
-    @GraphQLQuery(name = "order_num", description = "排序")
-    private long  orderNum ;
+
 
     @Override
     public int compareTo(Tag o) {

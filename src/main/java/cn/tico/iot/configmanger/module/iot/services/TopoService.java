@@ -1,11 +1,16 @@
 package cn.tico.iot.configmanger.module.iot.services;
 
+import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.module.iot.models.Topo.Topo;
+import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
+import org.nutz.lang.Lang;
+
+import java.util.List;
 
 @IocBean(args = {"refer:dao"})
 public class TopoService extends Service<Topo> {
@@ -1930,5 +1935,16 @@ public class TopoService extends Service<Topo> {
 
     public Object drawByAll(String deptid) {
         return Json.fromJson(testtemp);
+    }
+
+    public Topo getToPoByTagId(String tagid) {
+        List<Topo> topos = query(Cnd.NEW().and("tag_id","=",tagid));
+        if(Lang.isEmpty(topos)){
+            return null;
+        }
+        Topo topo = topos.get(0);
+        topo = fetchLinks(topo,"^base|tag$");
+
+        return topo ;
     }
 }
