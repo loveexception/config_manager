@@ -198,6 +198,9 @@ public class KindService extends Service<Kind> {
     }
 
     public List<String> kindAllSonIds(String kindid) {
+        if(Strings.isEmpty(kindid)){
+            return Lists.newArrayList();
+        }
         Kind kind = fetch(kindid);
         Cnd cnd = Cnd.NEW()
                 .and("ancestors","like","%"+kindid+"%")

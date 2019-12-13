@@ -56,7 +56,7 @@ public class Topo extends I18NModel{
      */
     @Column("order_num")
     @Comment("排序")
-    @ColDefine(type = ColType.INT ,width = 20 )
+    @ColDefine(type = ColType.INT ,width = 50 )
    // @GraphQLQuery(name = "order_num", description = "排序")
     private long  orderNum ;
 

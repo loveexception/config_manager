@@ -6,90 +6,160 @@
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form class="form-horizontal m" id="form-tTopoBases-edit" >
             <input id="id" name="id"th:value="${tTopoBases.id}"  type="hidden">
-					<div class="form-group">
-					<label class="col-sm-3 control-label">对外显示拓扑图内容：</label>
-					<div class="col-sm-8">
-						<input id="graph" name="graph"th:value="${tTopoBases.graph}" class="form-control" type="text">
-					</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">名称：</label>
+				<div class="col-sm-8">
+					<input id="cnName" name="cnName" class="form-control" th:value="${tTopoBases.cnName}" type="text">
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">设备类型信息：</label>
-					<div class="col-sm-8">
-						<input id="kindId" name="kindId"th:value="${tTopoBases.kindId}" class="form-control" type="text">
-					</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">编码：</label>
+				<div class="col-sm-8">
+					<input id="enName" name="enName" class="form-control" th:value="${tTopoBases.enName}" type="text">
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">设备地址信息：</label>
-					<div class="col-sm-8">
-						<input id="locationId" name="locationId"th:value="${tTopoBases.locationId}" class="form-control" type="text">
-					</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">对外显示拓扑图内容：</label>
+				<div class="col-sm-8">
+					 <input id="graph" name="graph" th:value="${tTopoBases.graph}" class="form-control" type="text">
+
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">设备所在的GATEWAY信息：</label>
-					<div class="col-sm-8">
-						<input id="gatewayId" name="gatewayId"th:value="${tTopoBases.gatewayId}" class="form-control" type="text">
-					</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">显示用设备所使用的TAG：</label>
+				<div class="col-sm-8">
+					<label th:each="tag:${show}" class="check-box">
+						<input name="showTagId" type="radio" th:value="${tag.id}" th:text="${tag.cnName}" th:checked="${tag.show}" >
+					</label>
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">设备所使用的驱动信息：</label>
-					<div class="col-sm-8">
-						<input id="driverId" name="driverId"th:value="${tTopoBases.driverId}" class="form-control" type="text">
-					</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">初始化隐藏用设备所使用的TAG：</label>
+				<div class="col-sm-8">
+					<label th:each="tag:${hide}" class="check-box">
+						<input name="hideTagId" type="radio" th:value="${tag.id}" th:text="${tag.cnName}" th:checked="${tag.hide}">
+					</label>
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">公司信息：</label>
-					<div class="col-sm-8">
-						<input id="deptId" name="deptId"th:value="${tTopoBases.deptId}" class="form-control" type="text">
-					</div>
+			</div>
+
+
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">组织：</label>
+				<div class="col-sm-8">
+                    <span th:text="(${tTopoBases.dept}!=null) ? ${tTopoBases.dept.deptName} : '部门'"></span>
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">名称：</label>
-					<div class="col-sm-8">
-						<input id="cnName" name="cnName"th:value="${tTopoBases.cnName}" class="form-control" type="text">
-					</div>
+			</div>
+
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">状态：</label>
+				<div class="col-sm-8">
+					<input name="status" type="radio" th:value="true" th:text="正常" th:checked="${tTopoBases.status == 'true'}" />
+					<input name="status" type="radio" th:value="false" th:text="暂停" th:checked="${tTopoBases.status == 'false'}" />
 				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">编码：</label>
-					<div class="col-sm-8">
-						<input id="enName" name="enName"th:value="${tTopoBases.enName}" class="form-control" type="text">
-					</div>
-				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">状态：</label>
-					<div class="col-sm-8">
-						<input id="status" name="status"th:value="${tTopoBases.status}" class="form-control" type="text">
-					</div>
-				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">删除：</label>
-					<div class="col-sm-8">
-						<input id="delflag" name="delflag"th:value="${tTopoBases.delflag}" class="form-control" type="text">
-					</div>
-				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">创建者：</label>
-					<div class="col-sm-8">
-						<input id="createBy" name="createBy"th:value="${tTopoBases.createBy}" class="form-control" type="text">
-					</div>
-				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">建立时间：</label>
-					<div class="col-sm-8">
-						<input id="createTime" name="createTime"th:value="${tTopoBases.createTime}" class="form-control" type="text">
-					</div>
-				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">更新者：</label>
-					<div class="col-sm-8">
-						<input id="updateBy" name="updateBy"th:value="${tTopoBases.updateBy}" class="form-control" type="text">
-					</div>
-				</div>
-							<div class="form-group">
-					<label class="col-sm-3 control-label">更新时间：</label>
-					<div class="col-sm-8">
-						<input id="updateTime" name="updateTime"th:value="${tTopoBases.updateTime}" class="form-control" type="text">
-					</div>
-				</div>
+			</div>
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label "> 设备类型信息：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<input id="kindId" name="kindId" type="hidden" th:value="${tTopoBases.kindId}" />-->
+					<!--<input class="form-control" type="text" onclick="selectKind()" id="kindName" readonly="true"  th:value="${tTopoBases.kind.cnName}"/>-->
+				<!--</div>-->
+			<!--</div>-->
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label "> 地理位置信息：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<input id="locationId" name="locationId" type="hidden" th:value="${tTopoBases.locationId}" />-->
+					<!--<input class="form-control" type="text" onclick="selectLocation()" id="locationName" readonly="true" th:value="${tTopoBases.location}!=null) ? ${tTopoBases.location.cnName} : ''" />-->
+				<!--</div>-->
+			<!--</div>-->
+
+
+				<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">对外显示拓扑图内容：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="graph" name="graph"th:value="${tTopoBases.graph}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">设备类型信息：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="kindId" name="kindId"th:value="${tTopoBases.kindId}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">设备地址信息：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="locationId" name="locationId"th:value="${tTopoBases.locationId}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">设备所在的GATEWAY信息：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="gatewayId" name="gatewayId"th:value="${tTopoBases.gatewayId}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">设备所使用的驱动信息：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="driverId" name="driverId"th:value="${tTopoBases.driverId}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">公司信息：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="deptId" name="deptId"th:value="${tTopoBases.deptId}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">名称：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="cnName" name="cnName"th:value="${tTopoBases.cnName}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">编码：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="enName" name="enName"th:value="${tTopoBases.enName}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">状态：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="status" name="status"th:value="${tTopoBases.status}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">删除：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="delflag" name="delflag"th:value="${tTopoBases.delflag}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">创建者：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="createBy" name="createBy"th:value="${tTopoBases.createBy}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">建立时间：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="createTime" name="createTime"th:value="${tTopoBases.createTime}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">更新者：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="updateBy" name="updateBy"th:value="${tTopoBases.updateBy}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
+							<!--<div class="form-group">-->
+					<!--<label class="col-sm-3 control-label">更新时间：</label>-->
+					<!--<div class="col-sm-8">-->
+						<!--<input id="updateTime" name="updateTime"th:value="${tTopoBases.updateTime}" class="form-control" type="text">-->
+					<!--</div>-->
+				<!--</div>-->
 				</form>
     </div>
     <div th:include="include::footer"></div>

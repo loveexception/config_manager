@@ -2,10 +2,12 @@ package cn.tico.iot.configmanger.module.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+import cn.tico.iot.configmanger.module.iot.models.Topo.Topo;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
+import org.nutz.dao.sql.Sql;
 import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.IocBean;
 
@@ -42,4 +44,21 @@ public class TagService extends Service<Tag> {
 
 	}
 
+    public Topo createTopo(Tag tag, String baseId) {
+
+		Topo topo = new Topo();
+		topo.setIsCheck("false");
+		topo.setTagId(tag.getId());
+		topo.setCnName(tag.getCnName()+"拓扑图");
+		topo.setOrderNum(new Date().getTime());
+		topo.setStatus("true");
+		topo.setDelFlag("false");
+		topo.setCreateTime(new Date());
+		topo.setCreateBy("API");
+		topo.setBaseId(baseId);
+
+		
+
+		return topo;
+    }
 }

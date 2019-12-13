@@ -93,7 +93,12 @@ public class TopoController implements AdminKey {
 		tag.setCreateBy("API");
 		tag.setCreateTime(new Date());
 		tagService.dao().insert(tag);
-		Topo topo =  makeTopo(tag,baseId);
+
+		Topo topo = tagService.createTopo(tag, baseId);
+		topoService.insert(topo);
+		tag = topoService.initTag(tag, baseId);
+		topo.setTag(tag);
+
 		return Result.success("system.success",topo);
 	}
 	@At("/del_tag")
@@ -109,72 +114,10 @@ public class TopoController implements AdminKey {
 		tag = tagService.fetch(tag.getId());
 		tag.setDelFlag("true");
 		int delete = tagService.dao().update(tag);
-		bellRing(tag);
+		deviceService.kafka(tag);
 		return Result.success("system.success",delete);
 	}
 
-	private Topo makeTopo(Tag tag,String baseId) {
-		Topo topo = new Topo();
-		topo.setIsCheck("false");
-		topo.setTagId(tag.getId());
-		topo.setCnName(tag.getCnName()+"拓扑图");
-		topo.setStatus("true");
-		topo.setDelFlag("false");
-		topo.setCreateTime(new Date());
-		topo.setCreateBy("API");
-		topo.setBaseId(baseId);
-		topo = tagService.dao().insert(topo);
-		tag = initTag(tag,baseId);
-		topo.setTag(tag);
-
-		return topo;
-	}
-	private Tag initTag(Tag tag,String baseId) {
-		Base base = null;
-		if(Strings.isNotBlank(baseId)){
-			base = topoBasesService.fetch(baseId);
-		}
-
-		List<String > snos = Lists.newArrayList();
-		if(Lang.isNotEmpty(base)&&Strings.isNotBlank(base.getHideTagId())){
-			Tag hid = tagService.fetch(base.getHideTagId());
-			hid = tagService.fetchLinks(hid,"devices");
-			List<Device> hiddevice= hid.getDevices();
-			if(Lang.isNotEmpty(hiddevice)){
-				snos = hiddevice.stream().map(device -> device.getSno()).collect(Collectors.toList());
-			}
-		}
-
-		if(Lang.isEmpty(snos)){
-			snos  = Arrays.asList("CR2160816028",
-					"CR2161207027",
-					"2102350DLSDMJB001611",
-					"2102359504DMK5001449",
-					"2102350DLSDMJB001614",
-					"2102359504DMK5001438",
-					"2102359504DMK5001523",
-					"2102359504DMK7002171");
-		}
-
-
-		Cnd cnd = Cnd.NEW();
-
-		cnd.and("sno","in",snos);
-		cnd.and("status","=","true");
-		cnd.and("delflag","=","false");
-		cnd.and("asset_status","=","2");
-
-		List<Device> devices =  deviceService.query(cnd);
-
-		for (Device dev:devices) {
-			dev.setTags(Lists.newArrayList(tag));
-			deviceService.dao().insertRelation(dev, "tags");
-		}
-
-
-
-		return tag;
-	}
 	@At("/check_tag")
 	@Ok("json")
 	@Filters({@By(type=CrossOriginFilter.class, args={"*"
@@ -182,28 +125,32 @@ public class TopoController implements AdminKey {
 			, "Origin, Content-Type, Accept, X-Requested-With"
 			+ KEYS
 			, "true"})})
-	public Object checkTag(@Param("..")Tag tag,@Param("check")String check ,@Param("order_num")int ordernum , HttpServletRequest req){
-		Cnd cnd = Cnd.NEW();
-		cnd.and("tag_id","=",tag.getId());
+	public Object checkTag(
+			@Param("..")Tag tag
+			,@Param("check")String check
+			,@Param("order_num")long ordernum
+			, HttpServletRequest req){
+//		Cnd cnd = Cnd.NEW();
+//		cnd.and("tag_id","=",tag.getId());
+//		List<Topo> topos = topoService.dao().queryByJoin(Topo.class,"tag",cnd);
+//		if(Lang.isEmpty(topos)){
+//			return Result.error("not have one topo in tag");
+//		}
+		Topo topo = topoService.getToPoByTagId(tag.getId());
 
-		List<Topo> topos = topoService.dao().queryByJoin(Topo.class,"tag",cnd);
-
-		if(Lang.isEmpty(topos)){
-			return Result.error("not have one topo in tag");
-		}
-		Topo topo = topos.get(0);
 		if(Strings.isNotBlank(check)){
 			topo.setIsCheck(check);
-
 		}
-		topo.setOrderNum(ordernum);
-
-
-		topoService.update(topo);
-
-
+		if(ordernum>0){
+			topo.setOrderNum(ordernum);
+		}
+		topoService.updateEntity(topo);
 		return Result.success("system.success",topo);
 	}
+
+
+
+
 	@At("/push_device_tag")
 	@Ok("json")
 	@Filters({@By(type=CrossOriginFilter.class, args={"*"
@@ -212,8 +159,6 @@ public class TopoController implements AdminKey {
 			+ KEYS
 			, "true"})})
 	public Object pushTag(@Param("..")Tag tag ,@Param("deviceid") String deviceId , HttpServletRequest req){
-
-
 		Device device = deviceService.fetch(deviceId);
 		if(Lang.isEmpty(device)){
 			return Result.error("system.error");
@@ -251,7 +196,7 @@ public class TopoController implements AdminKey {
 
 		deviceService.update(device);
 
-		//deviceService.kafka(Lists.newArrayList(device));
+		deviceService.kafka(Lists.newArrayList(device));
 
 		return Result.success("system.success",device);
 	}
@@ -395,21 +340,41 @@ public class TopoController implements AdminKey {
 
 		tag = tagService.fetchLinks(tag,"devices");
 		List<Device> devices = tag.devices;
-
 		if(Lang.isEmpty(devices)){
 			return Result.success("system.success",Lists.newArrayList());
 		}
-		List<String> list = devices.stream().map(device -> device.getId()).collect(Collectors.toList());
+		Topo topo = topoService.getToPoByTagId(tag.getId());
+		if(Lang.isEmpty(topo)){
+			return Result.error("not have the topo in dept");
+		}
 		Cnd cnd = Cnd.NEW();
-		cnd.and("id","in",list);
+//		cnd.and("id","in",showdevids);
+//		cnd.and("id","not in",hidedevids);
 		cnd.and("status","=","true");
 		cnd.and("delflag","=","false");
 		cnd.and("asset_status","=","2");
 		cnd.and("dept_id","=",deptId);
-		List<String> kindids = Lists.newArrayList();
-		if(Strings.isNotBlank(kindid)){
-			kindids = kindService.kindAllSonIds(kindid);
+		List<Device> hidedev = topoBasesService.getHideDevids(topo.getBaseId());
+
+		//List<String> hidedevids = Lists.newArrayList();
+
+		if(Lang.isNotEmpty(hidedev)){
+			List<String> hidedevids = hidedev.stream().map(device -> device.getId()).collect(Collectors.toList());
+			if(Lang.isNotEmpty(hidedevids)){
+				cnd.and("id","not in",hidedevids);
+			}
 		}
+
+
+		if(Lang.isNotEmpty(devices)){
+			List<String> showdevids = devices.stream().map(device -> device.getId()).collect(Collectors.toList());
+			if(Lang.isNotEmpty(showdevids)){
+				cnd.and("id","in",showdevids);
+
+			}
+		}
+
+		List<String> kindids = kindService.kindAllSonIds(kindid);
 		if(Lang.isNotEmpty(kindids)){
 			cnd.and("kind_id","in",kindids);
 		}
@@ -434,6 +399,9 @@ public class TopoController implements AdminKey {
 
 
 		Topo topo = topoService.getToPoByTagId(tag.getId());
+		if(Lang.isEmpty(topo)){
+			return  Result.error("there hasn't  the  topo  ");
+		}
 
 		List<Device> showdev = topoBasesService.getShowDevids(topo.getBaseId());
 
@@ -492,8 +460,12 @@ public class TopoController implements AdminKey {
 			, "Origin, Content-Type, Accept, X-Requested-With"
 			+ KEYS
 			, "true"})})
-	public Object fullTopo(@Param("deptid") String deptid , HttpServletRequest req){
-		return topoService.drawByAll(deptid);
+	public Object fullTopo(@Param("baseId") String id , HttpServletRequest req){
+		Object result =  topoService.drawByAll(id);
+
+		return Result.success("system.success",result);
+
+
 	}
 
     @At("/dept_topo_base")
@@ -503,7 +475,8 @@ public class TopoController implements AdminKey {
             , "Origin, Content-Type, Accept, X-Requested-With"
             + KEYS
             , "true"})})
-    public Object detpTopoBase(@Param("deptId") String deptid , HttpServletRequest req){
+    public Object detpTopoBase(@Param("deptId") String deptid ,
+							   HttpServletRequest req){
 	    Cnd cnd = Cnd.NEW();
 	    cnd.and("status","=","true");
 	    cnd.and("delflag","=","false");
@@ -541,7 +514,12 @@ public class TopoController implements AdminKey {
 		String graph = topo.getGraph();
 		String hidemap=topo.getHideMap();
 		if(Lang.isEmpty(topos)){
-			topo=makeTopo(tag,topo.getBaseId());
+			String baseId = topo.getBaseId();
+
+			topo = tagService.createTopo(tag,baseId);
+			tag = topoService.initTag(tag,baseId);
+			topo.setTag(tag);
+
 			topo.setGraph(graph);
 			topo.setHideMap(hidemap);
 			topoService.insert(topo);
@@ -559,7 +537,7 @@ public class TopoController implements AdminKey {
         topo.setHideMap(hidemap);
 
 		topoService.update(topo);
-		bellRing(tag);
+		deviceService.kafka(tag);
 		return Result.success("system.success",topo);
 	}
 
@@ -574,10 +552,6 @@ public class TopoController implements AdminKey {
 	public Object viewTopo(@Param("..")Tag tag , HttpServletRequest req){
 
 		return topoService.getToPoByTagId(tag.getId());
-	}
-
-	public void bellRing(Tag tag ){
-		deviceService.kafka(tag);
 	}
 
 }
