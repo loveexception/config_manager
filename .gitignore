@@ -6,13 +6,9 @@
 src/main/resources/static/WEB-INF
 .properties
 velocity
-<<<<<<< HEAD
 *.log
-=======
 .log
-*.log
 *.iml
->>>>>>> fdf5d1db5b611a8c182600b2b421221c1a7f28b1
 
 eee
 target
