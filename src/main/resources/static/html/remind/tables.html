@@ -21,17 +21,43 @@
 		<link rel="stylesheet" type="text/css" href="/assets/react/antd/antd.min.css" />
 		<!-- antd.js -->
 		<script src="/assets/react/antd/antd.min.js"></script>
+		<!-- antv -->
+		<script src="/assets/react/antv/g2.min.js"></script>
+		<!-- dataSet  -->
+		<script src="/assets/react/antv/data-set.min.js"></script>
+		<!-- <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script> -->
 
 		<!-- less.js -->
-		<link rel="stylesheet/less" type="text/css" href="../drive/jsx/edit/index.less" />
+		<link rel="stylesheet/less" type="text/css" href="./jsx/index.less" />
 		<script src="/assets/react/less.min.js"></script>
-		<!-- lodash.js -->
-		<script src="/assets/react/lodash.js"></script>
 	</head>
-	<body class="gray-bg">
-		<div id="drive-edit-box"></div>
-		<script type="text/babel" src="../drive/jsx/edit/index.jsx" domId="drive-edit-box"></script>
+	<style>
+		.gray-bg .nav-box {
+			height: 60px;
+		}
+		.gray-bg .nav-pills {
+			width: 100%;
+			background: #fff;
+		}
+		.nav > li.active {
+			border-left: none;
+			background: #293846;
+		}
+		.nav > li {
+			border-radius: 6px;
+		}
 
+		.nav-pills > li.active > a {
+			background: linear-gradient(to top, #2796ff, #18d4ff);
+		}
+		.nav > li > a:hover {
+			text-decoration: none;
+			background-color: #ccc;
+		}
+	</style>
+	<body class="gray-bg">
+		<div id="tables-box"></div>
+		<script type="text/babel" src="./jsx/index.jsx" domId="drive-list-box"></script>
 		<script src="/assets/js/jquery.min.js"></script>
 		<!-- 遮罩层 -->
 		<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
