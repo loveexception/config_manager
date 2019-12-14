@@ -1,0 +1,47 @@
+package cn.tico.iot.configmanger;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.nutz.boot.NbApp;
+import org.nutz.boot.test.junit4.NbJUnit4Runner;
+import org.nutz.integration.jedis.JedisAgent;
+import org.nutz.ioc.loader.annotation.Inject;
+import org.nutz.ioc.loader.annotation.IocBean;
+import redis.clients.jedis.Jedis;
+
+
+@IocBean
+@RunWith(NbJUnit4Runner.class)
+public class JedisTest extends Assert {
+    @Inject
+    private JedisAgent jedisAgent;
+
+
+    @Inject
+    private Jedis jedis;
+
+    public static NbApp createNbApp() {
+
+        return new NbApp().setMainClass(MainLauncher.class).setPrintProcDoc(false);
+    }
+
+    public void init(){
+        System.out.println("init");
+    }
+
+
+    @Test
+    public void test1(){
+        String object;
+        jedis.del("maodajun");
+        object = jedis.get("maodajun");
+        System.out.println("null:"+object);
+        jedis.set("maodajun","test");
+        object = jedis.get("maodajun");
+        System.out.println("maodajun:"+object);
+
+
+    }
+
+}
