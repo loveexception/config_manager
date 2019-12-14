@@ -34,18 +34,17 @@ import java.util.List;
  * @date 2019-11-21
  */
 @IocBean
-@At("/wx/tOtherMessages") //
-public class TOtherMessagesController {
+@At("/wx/tOtherRemind") //
+public class TOtherRemind {
 	private static final Log log = Logs.get();
-
 	@Inject
 	private TOtherMessagesService tOtherMessagesService;
 	@Inject
 	public DeptService deptService;
 
-	@RequiresPermissions("wx:tOtherMessages:view")
+	// @RequiresPermissions("wx:tOtherRemind:view")
 	@At("")
-	@Ok("th:/wx/tOtherMessages/tOtherMessages.html")
+	@Ok("th:/wx/tOtherRemind/tOtherRemind.html")
 	public void index(HttpServletRequest req) {
 
 	}
@@ -53,118 +52,124 @@ public class TOtherMessagesController {
 	/**
 	 * 查询kafka的推送列表
 	 */
-	@RequiresPermissions("wx:tOtherMessages:list")
-	@At
-	@Ok("json")
-	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
-			@Param("beginTime") Date beginTime, @Param("endTime") Date endTime,
-			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
-		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)) {
-			// cnd.and("name", "like", "%" + name +"%");
-		}
-		if (Lang.isNotEmpty(beginTime)) {
-			cnd.and("create_time", ">=", beginTime);
-		}
-		if (Lang.isNotEmpty(endTime)) {
-			cnd.and("create_time", "<=", endTime);
-		}
-		return tOtherMessagesService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "dept");
-	}
+	// @RequiresPermissions("wx:tOtherMessages:list")
+	// @At
+	// @Ok("json")
+	// public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int
+	// pageSize, @Param("name") String name,
+	// @Param("beginTime") Date beginTime, @Param("endTime") Date endTime,
+	// @Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc,
+	// HttpServletRequest req) {
+	// Cnd cnd = Cnd.NEW();
+	// if (!Strings.isBlank(name)) {
+	// // cnd.and("name", "like", "%" + name +"%");
+	// }
+	// if (Lang.isNotEmpty(beginTime)) {
+	// cnd.and("create_time", ">=", beginTime);
+	// }
+	// if (Lang.isNotEmpty(endTime)) {
+	// cnd.and("create_time", "<=", endTime);
+	// }
+	// return tOtherMessagesService.tableList(pageNum, pageSize, cnd, orderByColumn,
+	// isAsc, "dept");
+	// }
 
 	/**
 	 * 新增kafka的推送
 	 */
-	@At("/add")
-	@Ok("th:/wx/tOtherMessages/add.html")
-	public void add(HttpServletRequest req) {
-		User user = ShiroUtils.getSysUser();
-		String deptid = user.getDeptId();
-		Dept dept = deptService.fetch(deptid);
-		req.setAttribute("dept", dept);
-	}
+	// @At("/add")
+	// @Ok("th:/wx/tOtherMessages/add.html")
+	// public void add(HttpServletRequest req) {
+	// User user = ShiroUtils.getSysUser();
+	// String deptid = user.getDeptId();
+	// Dept dept = deptService.fetch(deptid);
+	// req.setAttribute("dept", dept);
+	// }
 
 	/**
 	 * 新增保存kafka的推送
 	 */
-	@At
-	@POST
-	@Ok("json")
-	@RequiresPermissions("wx:tOtherMessages:add")
-	public Object addDo(@Param("..") TOtherMessages tOtherMessages, HttpServletRequest req) {
-		try {
-			tOtherMessagesService.insert(tOtherMessages);
-			return Result.success("system.success");
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
+	// @At
+	// @POST
+	// @Ok("json")
+	// @RequiresPermissions("wx:tOtherMessages:add")
+	// public Object addDo(@Param("..") TOtherMessages tOtherMessages,
+	// HttpServletRequest req) {
+	// try {
+	// tOtherMessagesService.insert(tOtherMessages);
+	// return Result.success("system.success");
+	// } catch (Exception e) {
+	// return Result.error("system.error");
+	// }
+	// }
 
 	/**
 	 * 修改kafka的推送
 	 */
-	@At("/edit/?")
-	@Ok("th://wx/tOtherMessages/edit.html")
-	public void edit(String id, HttpServletRequest req) {
-		TOtherMessages tOtherMessages = tOtherMessagesService.fetch(id);
-		tOtherMessages = tOtherMessagesService.fetchLinks(tOtherMessages, "dept");
+	// @At("/edit/?")
+	// @Ok("th://wx/tOtherMessages/edit.html")
+	// public void edit(String id, HttpServletRequest req) {
+	// TOtherMessages tOtherMessages = tOtherMessagesService.fetch(id);
+	// tOtherMessages = tOtherMessagesService.fetchLinks(tOtherMessages, "dept");
 
-		User user = ShiroUtils.getSysUser();
-		String deptid = user.getDeptId();
-		Dept dept = deptService.fetch(deptid);
-		//
-		req.setAttribute("tOtherMessages", tOtherMessages);
-	}
+	// User user = ShiroUtils.getSysUser();
+	// String deptid = user.getDeptId();
+	// Dept dept = deptService.fetch(deptid);
+	// //
+	// req.setAttribute("tOtherMessages", tOtherMessages);
+	// }
 
 	/**
 	 * 修改保存kafka的推送
 	 */
-	@At
-	@POST
-	@Ok("json")
-	@RequiresPermissions("wx:tOtherMessages:edit")
-	@Slog(tag = "kafka的推送", after = "修改保存kafka的推送")
-	public Object editDo(@Param("..") TOtherMessages tOtherMessages, HttpServletRequest req) {
-		try {
-			if (Lang.isNotEmpty(tOtherMessages)) {
-				tOtherMessages.setUpdateBy(ShiroUtils.getSysUserId());
-				tOtherMessages.setUpdateTime(new Date());
-				tOtherMessagesService.update(tOtherMessages);
-			}
-			return Result.success("system.success");
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
+	// @At
+	// @POST
+	// @Ok("json")
+	// @RequiresPermissions("wx:tOtherMessages:edit")
+	// @Slog(tag = "kafka的推送", after = "修改保存kafka的推送")
+	// public Object editDo(@Param("..") TOtherMessages tOtherMessages,
+	// HttpServletRequest req) {
+	// try {
+	// if (Lang.isNotEmpty(tOtherMessages)) {
+	// tOtherMessages.setUpdateBy(ShiroUtils.getSysUserId());
+	// tOtherMessages.setUpdateTime(new Date());
+	// tOtherMessagesService.update(tOtherMessages);
+	// }
+	// return Result.success("system.success");
+	// } catch (Exception e) {
+	// return Result.error("system.error");
+	// }
+	// }
 
 	/**
 	 * 删除kafka的推送
 	 */
-	@At("/remove")
-	@Ok("json")
-	@RequiresPermissions("wx:tOtherMessages:remove")
-	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
-		try {
-			tOtherMessagesService.delete(ids);
-			return Result.success("system.success");
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
+	// @At("/remove")
+	// @Ok("json")
+	// @RequiresPermissions("wx:tOtherMessages:remove")
+	// public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
+	// try {
+	// tOtherMessagesService.delete(ids);
+	// return Result.success("system.success");
+	// } catch (Exception e) {
+	// return Result.error("system.error");
+	// }
+	// }
 
-	@At("/change")
-	@Ok("json")
-	public Object count(@Param("..") TOtherMessages tOtherMessages, HttpServletRequest req) {
-		Cnd cnd = Cnd.NEW();
-		String deptid = ShiroUtils.getSysUser().getDeptId();
+	// @At("/change")
+	// @Ok("json")
+	// public Object count(@Param("..") TOtherMessages tOtherMessages,
+	// HttpServletRequest req) {
+	// Cnd cnd = Cnd.NEW();
+	// String deptid = ShiroUtils.getSysUser().getDeptId();
 
-		cnd.and("dept_id", "=", deptid);
-		Object obj = tOtherMessagesService.count(cnd);
-		// cnd.and("delflag", "=", "false");
-		// tOtherMessagesService.insert(tOtherMessages);
-		return Result.success("system.success", obj);
-		// return Result.error("system.error");
-	}
+	// cnd.and("dept_id", "=", deptid);
+	// Object obj = tOtherMessagesService.count(cnd);
+	// // cnd.and("delflag", "=", "false");
+	// // tOtherMessagesService.insert(tOtherMessages);
+	// return Result.success("system.success", obj);
+	// // return Result.error("system.error");
+	// }
 
 	// @At("/count") 资产个数
 	// @Ok("json")

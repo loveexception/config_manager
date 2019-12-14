@@ -6,35 +6,35 @@ import org.nutz.dao.impl.NutDao;
 import org.nutz.dao.impl.SimpleDataSource;
 
 public class MysqlTestDao {
-    public static Dao NEW() {
-        SimpleDataSource dataSource = new SimpleDataSource();
-		//dataSource.setUrl("jdbc:mysql://172.16.16.10/nutztest");
-         dataSource.setUrl("jdbc:mysql://localhost/zhihutest");
-        String mysqldriver ="com.mysql.cj.jdbc.Driver";
-        try {
-            dataSource.setDriverClassName(mysqldriver);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        dataSource.setUsername("root");
-        dataSource.setPassword("");
+	public static Dao NEW() {
+		SimpleDataSource dataSource = new SimpleDataSource();
+		// dataSource.setUrl("jdbc:mysql://172.16.16.10/nutztest");
+		dataSource.setUrl("jdbc:mysql://localhost/zhihutest");
+		String mysqldriver = "com.mysql.cj.jdbc.Driver";
+		try {
+			dataSource.setDriverClassName(mysqldriver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		dataSource.setUsername("root");
+		dataSource.setPassword("");
 
-        return  new NutDao(dataSource);
-    }
+		return new NutDao(dataSource);
+	}
 
-    public static Dao NEW2() {
-        SimpleDataSource dataSource = new SimpleDataSource();
-//        dataSource.setUrl("jdbc:mysql://172.16.16.6/nutzsite");
-        dataSource.setUrl("jdbc:mysql://localhost/nutztest");
-        String mysqldriver ="com.mysql.cj.jdbc.Driver";
-        try {
-            dataSource.setDriverClassName(mysqldriver);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        dataSource.setUsername("root");
-        //dataSource.setPassword("123456");
+	public static Dao NEW2() {
+		SimpleDataSource dataSource = new SimpleDataSource();
+		// dataSource.setUrl("jdbc:mysql://172.16.16.6/nutzsite");
+		dataSource.setUrl("jdbc:mysql://localhost/nutztest");
+		String mysqldriver = "com.mysql.cj.jdbc.Driver";
+		try {
+			dataSource.setDriverClassName(mysqldriver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		dataSource.setUsername("root");
+		// dataSource.setPassword("123456");
 
-        return  new NutDao(dataSource);
-    }
+		return new NutDao(dataSource);
+	}
 }

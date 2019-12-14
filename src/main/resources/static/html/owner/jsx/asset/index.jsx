@@ -61,7 +61,6 @@ class TitleBox extends React.PureComponent {
 			<div className="assets-title-box">
 				<div className="assets-container">
 					<img className="assets-title-img" src={titleImg ? '/assets/img/assetAll.png' : '/assets/img/money.png'} alt="photo"></img>
-					<img src="" alt="" />
 					<div className="assets-text-box">
 						<div className="assets-text-top">{titleText}</div>
 						<div className="assets-text-bottom">{titleImg ? count : '￥' + count}</div>
@@ -584,13 +583,6 @@ function AssetFooter(props) {
 	// }
 	return (
 		<div className="asset-footer-box">
-			<div className="option-box-left">
-				<img className="option-left-img" style={{ height: 50, marginTop: '23px' }} src="/assets/img/assetAll.png" alt="" />
-				<div className="option-left-text">{text.useCount}</div>
-				<div className="option-waring-box" style={{ color, left: '46%' }}>
-					{(props && props.useCounter) || 0}
-				</div>
-			</div>
 			<Frame reqFunc={props.reqFunc} isEdit={isEdit} leftHandleClick={leftHandleClick}></Frame>
 			<div className="option-box-left" onClick={leftHandleClick}>
 				<img className="option-left-img" height="70px" src="/assets/img/footer-setting.png" alt="" />
