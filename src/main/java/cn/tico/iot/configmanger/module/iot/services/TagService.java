@@ -44,21 +44,18 @@ public class TagService extends Service<Tag> {
 
 	}
 
-    public Topo createTopo(Tag tag, String baseId) {
+    public Topo createTopo(Tag tag, String baseId,long orderNum) {
 
 		Topo topo = new Topo();
 		topo.setIsCheck("false");
 		topo.setTagId(tag.getId());
 		topo.setCnName(tag.getCnName()+"拓扑图");
-		topo.setOrderNum(new Date().getTime());
+		topo.setOrderNum(orderNum);
 		topo.setStatus("true");
 		topo.setDelFlag("false");
 		topo.setCreateTime(new Date());
 		topo.setCreateBy("API");
 		topo.setBaseId(baseId);
-
-		
-
 		return topo;
     }
 }

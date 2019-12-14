@@ -77,7 +77,9 @@ public class TopoController implements AdminKey {
 			, "Origin, Content-Type, Accept, X-Requested-With"
 			+ KEYS
 			, "true"})})
-	public Object addTag(@Param("..")Tag tag,@Param("baseId")String baseId , HttpServletRequest req){
+	public Object addTag(@Param("..")Tag tag,@Param("baseId")String baseId ,
+						 @Param("order_num")long orderNum,
+						 HttpServletRequest req){
 		if(Lang.isEmpty(tag)){
 			return Result.error("system.error");
 		}
@@ -94,7 +96,7 @@ public class TopoController implements AdminKey {
 		tag.setCreateTime(new Date());
 		tagService.dao().insert(tag);
 
-		Topo topo = tagService.createTopo(tag, baseId);
+		Topo topo = tagService.createTopo(tag, baseId,orderNum);
 		topoService.insert(topo);
 		tag = topoService.initTag(tag, baseId);
 		topo.setTag(tag);
@@ -196,7 +198,7 @@ public class TopoController implements AdminKey {
 
 		deviceService.update(device);
 
-		deviceService.kafka(Lists.newArrayList(device));
+		//deviceService.kafka(Lists.newArrayList(device));
 
 		return Result.success("system.success",device);
 	}
@@ -516,7 +518,7 @@ public class TopoController implements AdminKey {
 		if(Lang.isEmpty(topos)){
 			String baseId = topo.getBaseId();
 
-			topo = tagService.createTopo(tag,baseId);
+			topo = tagService.createTopo(tag,baseId,0);
 			tag = topoService.initTag(tag,baseId);
 			topo.setTag(tag);
 
