@@ -57,4 +57,29 @@ public class TopoBasesService extends Service<Base> {
 
 
 	}
+
+	public List<Device> getHideDevids(String baseId) {
+
+		Base base = fetch(baseId);
+
+
+		if(Lang.isNotEmpty(base)){
+			base = fetchLinks(base,"^kind|location|hide|show|dept$");
+
+		}
+
+		Tag show = base.getHide();
+		if(Lang.isNotEmpty(show)){
+			show = tagService.fetchLinks(show,"devices");
+		}
+		List<Device> showdev=null;
+		if(Lang.isNotEmpty(show)){
+			showdev = show.getDevices();
+		}
+
+
+
+
+		return showdev;
+	}
 }

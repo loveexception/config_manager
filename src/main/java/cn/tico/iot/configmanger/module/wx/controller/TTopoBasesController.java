@@ -1,7 +1,10 @@
 package cn.tico.iot.configmanger.module.wx.controller;
 
 import cn.tico.iot.configmanger.module.iot.models.Topo.Base;
+import cn.tico.iot.configmanger.module.iot.models.base.Tag;
+import cn.tico.iot.configmanger.module.iot.services.TagService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
+import cn.tico.iot.configmanger.module.sys.models.Role;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -12,6 +15,7 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Lang;
+import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
@@ -23,6 +27,9 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 拓扑图存储 信息操作处理
  * 
@@ -38,6 +45,8 @@ public class TTopoBasesController {
 	private TopoBasesService tTopoBasesService;
 	@Inject
 	private DeptService deptService;
+	@Inject
+	private TagService tagService;
 
 	
 	@RequiresPermissions("wx:tTopoBases:view")
@@ -78,6 +87,10 @@ public class TTopoBasesController {
 		Dept dept = deptService.fetch(deptid);
 		req.setAttribute("dept", dept);
 
+		List<Tag> tags =tagService.query();
+		req.setAttribute("show",tags);
+		req.setAttribute("hide",tags);
+
 	}
 
 	/**
@@ -103,8 +116,36 @@ public class TTopoBasesController {
 	@At("/edit/?")
 	@Ok("th://wx/tTopoBases/edit.html")
 	public void edit(String id, HttpServletRequest req) {
-		Base tTopoBases = tTopoBasesService.fetch(id);
-		req.setAttribute("tTopoBases",tTopoBases);
+		Base base = tTopoBasesService.fetch(id);
+		base = tTopoBasesService.fetchLinks(base,"");
+
+		req.setAttribute("tTopoBases",base);
+		final  Base tTopoBases = base;
+		User user = ShiroUtils.getSysUser();
+		String deptid = user.getDeptId();
+
+		List<Tag> tags = tagService.query(
+				Cnd.where("status","=",true)
+				.and("delflag","=",false)
+				.and("dept_id","=",deptid)
+		);
+		List<NutMap> result =  tags.stream().map(tag -> {
+			NutMap map = NutMap.NEW()
+					.addv("id",tag.getId())
+					.addv("cnName",tag.getCnName())
+					.addv("enName",tag.getEnName())
+					.addv("deptId",tag.getDeptid())
+					;
+			if(Strings.equalsIgnoreCase(tTopoBases.getHideTagId(),tag.getId())){
+				map.addv("hide","true");
+			}
+			if(Strings.equalsIgnoreCase(tTopoBases.getShowTagId(),tag.getId())){
+				map.addv("show","true");
+			}
+			return map;
+		}).collect(Collectors.toList());
+		req.setAttribute("show",result);
+		req.setAttribute("hide",result);
 	}
 
 	/**

@@ -2,15 +2,25 @@ package cn.tico.iot.configmanger.module.iot.services;
 
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.base.Service;
+import cn.tico.iot.configmanger.module.iot.models.Topo.Base;
 import cn.tico.iot.configmanger.module.iot.models.Topo.Topo;
+import cn.tico.iot.configmanger.module.iot.models.base.Tag;
+import cn.tico.iot.configmanger.module.iot.models.device.Device;
+import cn.tico.iot.configmanger.module.wx.services.TopoBasesService;
+import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Strings;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @IocBean(args = {"refer:dao"})
 public class TopoService extends Service<Topo> {
@@ -22,14 +32,19 @@ public class TopoService extends Service<Topo> {
     @Inject
     TagService tagService;
 
+    @Inject
+    TopoBasesService topoBasesService;
+
+    @Inject
+    DeviceService deviceService;
+
+
     public Object drawByTag(String tag) {
 
         return Json.fromJson(testtemp);
     }
-    static  final  String testtemp = "{    " +
-            "   \"code\": 0,\n" +
-            "    \"msg\": \"操作成功\",\n" +
-            "    \"data\": {\n" +
+    static  final  String testtemp =
+            "{\n" +
             "\t\t\"nodes\": [\n" +
             "\t\t\t{\n" +
             "\t\t\t\t\"id\": \"0\",\n" +
@@ -1930,11 +1945,16 @@ public class TopoService extends Service<Topo> {
             "\t\t\t\t\"index\": 189\n" +
             "\t\t\t}\n" +
             "\t\t]\n" +
-            "\t}\n" +
-            "}";
+            "\t}\n"
+           ;
 
-    public Object drawByAll(String deptid) {
-        return Json.fromJson(testtemp);
+    public Object drawByAll(String id) {
+        if(Strings.isEmpty(id)){
+            return Json.fromJson(testtemp);
+
+        }else{
+            return topoBasesService.fetch(id);
+        }
     }
 
     public Topo getToPoByTagId(String tagid) {
@@ -1946,5 +1966,58 @@ public class TopoService extends Service<Topo> {
         topo = fetchLinks(topo,"^base|tag$");
 
         return topo ;
+    }
+
+    public Tag initTag(Tag tag,String baseId) {
+        Base base = null;
+        if(Strings.isNotBlank(baseId)){
+            base = topoBasesService.fetch(baseId);
+        }
+
+        List<String > snos = Lists.newArrayList();
+        if(Lang.isNotEmpty(base)&&Strings.isNotBlank(base.getHideTagId())){
+            Tag hid = tagService.fetch(base.getHideTagId());
+            hid = tagService.fetchLinks(hid,"devices");
+            List<Device> hiddevice= hid.getDevices();
+            if(Lang.isNotEmpty(hiddevice)){
+                snos = hiddevice.stream().map(device -> device.getSno()).collect(Collectors.toList());
+            }
+        }
+
+        if(Lang.isEmpty(snos)){
+//			snos  = Arrays.asList("CR2160816028",
+//					"CR2161207027",
+//					"2102350DLSDMJB001611",
+//					"2102359504DMK5001449",
+//					"2102350DLSDMJB001614",
+//					"2102359504DMK5001438",
+//					"2102359504DMK5001523",
+//					"2102359504DMK7002171");
+        }
+
+
+        Cnd cnd = Cnd.NEW();
+
+        cnd.and("sno","in",snos);
+        cnd.and("status","=","true");
+        cnd.and("delflag","=","false");
+        cnd.and("asset_status","=","2");
+
+        List<Device> devices =  deviceService.query(cnd);
+
+        for (Device dev:devices) {
+            dev.setTags(Lists.newArrayList(tag));
+            deviceService.dao().insertRelation(dev, "tags");
+        }
+
+
+
+        return tag;
+    }
+
+    public void updateEntity(Topo topo) {
+        topo.setUpdateTime(new Date());
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(),null,"^create_by|create_time$", true));
+        forup.update(topo);
     }
 }
