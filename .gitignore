@@ -15,3 +15,6 @@ target
 .classpath
 bin
 dependency-reduced-pom.xml
+application-pro.properties
+application.properties
+application-local.properties
