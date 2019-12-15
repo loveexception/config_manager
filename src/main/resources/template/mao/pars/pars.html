@@ -45,7 +45,7 @@
 </div>
 <div th:include="include :: footer"></div>
 <script th:inline="javascript">
-    var prefix = ctx + 'wx/tIotDevices';
+    var prefix = ctx + 'mao/pars';
 
     $(function() {
         var options = {
@@ -62,6 +62,11 @@
                     checkbox: true
                 },
                 {
+                    field : 'id',
+                    title : '编号',
+                    visible: false
+                },
+                {
                     field: 'cnName',
                     title: '设备名称',
                     sortable: true
@@ -73,24 +78,23 @@
                 },
                 {
                     field: 'ip',
-                    title: '设备ip',
+                    title: 'IP地址',
                     sortable: true
                 },
                 {
                     field: 'dept.deptName',
-                    title: '所述机构'
+                    title: '所属机构'
                 },
                 {
-                    field: 'kindmap',
+                    field: 'kindParents.1.cnName',
+                    title: '设备类型',
+                    sortable: true
+                },
+                {
+                    field: 'kindParents.3.cnName',
                     title: '生产厂家',
                     sortable: true
                 },
-                {
-                    title: '设备类型',
-                    field: 'locationState',
-                    sortable: true
-                },
-
                 {
                     field: 'kind.cnName',
                     title: '设备型号',
@@ -101,20 +105,23 @@
                     title: '投运日期',
                     sortable: true
                 },
-
                 {
-                    field: 'assetStatus',
+                    field: 'status',
                     title: '运行状态',
-                    sortable: true,
-                    align: 'center',
-                    formatter: function(value, row, index) {
-                        if (value == '2') {
-                            return '<span class=" text-primary"  onclick="change(this)">正常</span>';
-                        }
-                        return '<span class=" text-danger" onclick="change(this)" >停用</span>';
-                    }
+                    sortable: true
                 },
                 {
+                    field: 'total',
+                    title: '数量',
+                    sortable: true
+                },
+                {
+                    field: 'location.cnName',
+                    title: '存放地点',
+                    sortable: true
+                },
+                {
+                    field: 'version',
                     title: '软件版本',
                     sortable: true
                 },

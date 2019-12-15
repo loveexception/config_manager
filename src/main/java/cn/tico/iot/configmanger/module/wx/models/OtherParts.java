@@ -2,6 +2,9 @@ package cn.tico.iot.configmanger.module.wx.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
 import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
 import lombok.Data;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -10,6 +13,7 @@ import org.nutz.dao.entity.annotation.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static sun.misc.PerformanceLogger.getStartTime;
 
@@ -23,156 +27,60 @@ import static sun.misc.PerformanceLogger.getStartTime;
 @Data
 @Comment("备品备件")
 public class OtherParts extends I18NModel {
-	@Column("kind_id")
-	@Comment("类型")
-	@ColDefine(type = ColType.VARCHAR,width = 32)
-	private String kindId;
 
 	@Column("dept_id")
 	@Comment("组织")
 	@ColDefine(type=ColType.VARCHAR,width = 32)
 	private String deptId;
+	@One(field = "deptId",key = "id")
+	private Dept dept;
+
+	@Column("kind_id")
+	@Comment("类型")
+	@ColDefine(type = ColType.VARCHAR,width = 32)
+	private String kindId;
+	@One(field = "kindId",key = "id")
+	private Kind kind;
+	private Map<String,Kind> kindParents;
+	private List<Kind> kindChildren;
+
+
+
 
 	@Column("location_id")
 	@Comment("地址")
 	@ColDefine(type = ColType.VARCHAR,width = 32)
 	private String locationId;
+	@One(field = "locationId",key = "id")
+	private Location location;
+	private Map<String,Location> locationParents;
+	private List<Location> locationChildren;
 
 	@Column("order_time")
 	@Comment("购买时间")
-	@ColDefine(type = ColType.VARCHAR,width = 32)
 	private Date orderTime;
-	//	@Name
 
-//	@Column("cn_name")
-//	@Comment
-//	@Column("id")
-//	@Comment("id")
-//	@ColDefine(type = ColType.VARCHAR, width = 64)
-//	@Prev(els = { @EL("uuid()") })
-//	private String id;
-//
-//	/** 班组名子 */
-//	@Column("cn_name")
-//	@Comment("名子")
-//	private String cnName;
-//
-//	/** 班组编号 */
-//	@Column("en_name")
-//	@Comment("编号")
-//	private String enName;
-//
-//	@ManyMany(relation = "other_work_emp", from = "work_id", to = "emp_id")
-//	private List<OtherEmp> emps;
-//
-//	private String empIds;
-//
-//	/** 班组开始时间 */
-//	@Column("start_time")
-//	@Comment("班组计划开始时间")
-//	private Date startTime;
-//
-//	/** 结束时间 */
-//	@Column("end_time")
-//	@Comment("班组计划结束时间")
-//	private Date endTime;
-//
-//	/** 结束时间 */
-//	@Column("cycle")
-//	@Comment("循环周期第几周生效 值为 1-4 四周一轮换，本条目第一周生效 ，0 为不考虑周期")
-//	private Date cycle;
-//
-//	/** 周一 */
-//	@Column("on_mon")
-//	@Comment("周一上班时间")
-//	private String onMon;
-//	/** 周一 */
-//	@Column("off_mon")
-//	@Comment("周一下班时间")
-//	private String offMon;
-//
-//	/** 周二 */
-//	@Column("on_tue")
-//	@Comment("周二上班时间")
-//	private String onTue;
-//	/** 周二 */
-//	@Column("off_tue")
-//	@Comment("周二下班时间")
-//	private String offTue;
-//
-//	/** 周三 */
-//	@Column("on_wed")
-//	@Comment("周三上班时间")
-//	private String onWed;
-//	/** 周三 */
-//	@Column("off_wed")
-//	@Comment("周三下班时间")
-//	private String offWed;
-//
-//	/** 周四 */
-//	@Column("on_thu")
-//	@Comment("周四上班时间")
-//	private String onThu;
-//	/** 周四 */
-//	@Column("off_thu")
-//	@Comment("周四下班时间")
-//	private String offThu;
-//
-//	/** 周五 */
-//	@Column("on_fri")
-//	@Comment("周五上班时间")
-//	private String onFri;
-//	/** 周五 */
-//	@Column("off_fri")
-//	@Comment("周五下班时间")
-//	private String offFri;
-//
-//	/** 周六 */
-//	@Column("on_sat")
-//	@Comment("周六上班时间")
-//	private String onSat;
-//	/** 周六 */
-//	@Column("off_sat")
-//	@Comment("周六下班时间")
-//	private String offSat;
-//
-//	/** 周日 */
-//	@Column("on_sun")
-//	@Comment("周日上班时间")
-//	private String onSun;
-//	/** 周日 */
-//	@Column("off_sun")
-//	@Comment("周日下班时间")
-//	private String offSun;
-//
-//	/** 状态 */
-//	@Column("status")
-//	@Comment("状态")
-//	private String status;
-//
-//	/** 删除 */
-//	@Column("delflag")
-//	@Comment("删除")
-//	private String delflag;
-//
-//	/** 创建者 */
-//	@Column("create_by")
-//	@Comment("创建者")
-//	private String createBy;
-//
-//	/** 建立时间 */
-//	@Column("create_time")
-//	@Comment("建立时间")
-//	private Date createTime;
-//
-//	/** 更新者 */
-//	@Column("update_by")
-//	@Comment("更新者")
-//	private String updateBy;
-//
-//	/** 更新时间 */
-//	@Column("update_time")
-//	@Comment("更新时间")
-//	private Date updateTime;
+	@Column("ip")
+	@Comment("IP地址")
+	@ColDefine(type = ColType.VARCHAR,width = 255)	
+	private String ip;
+
+	@Column("sno")
+	@Comment("设备编号")
+	@ColDefine(type = ColType.VARCHAR,width = 64)	
+	private String sno;
+
+	@Column("total")
+	@Comment("总数量")
+	@ColDefine(type = ColType.INT ,width = 32)
+	private int total;
+
+	@Column("version")
+	@Comment("版本")
+	@ColDefine(type = ColType.VARCHAR,width = 255)
+	private String version;
+
+
+
 
 }

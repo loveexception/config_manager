@@ -3,22 +3,19 @@ package cn.tico.iot.configmanger.module.mao.controller;
 import cn.tico.iot.configmanger.common.page.TableDataInfo;
 import cn.tico.iot.configmanger.module.iot.controller.AdminKey;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
-import cn.tico.iot.configmanger.module.iot.models.device.Device;
-import cn.tico.iot.configmanger.module.iot.models.device.Owner;
-import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
-import cn.tico.iot.configmanger.module.wx.services.TIotOwnerService;
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.time.DateFormatUtils;
+import cn.tico.iot.configmanger.module.wx.models.OtherParts;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import cn.tico.iot.configmanger.module.mao.models.Pars;
 import cn.tico.iot.configmanger.module.mao.services.ParsService;
 import cn.tico.iot.configmanger.common.base.Result;;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
@@ -35,9 +32,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static cn.tico.iot.configmanger.module.iot.controller.AdminKey.ROLE_ADMIN;
 
 /**
  * 备品备件 信息操作处理
@@ -54,13 +49,12 @@ public class ParsController implements AdminKey {
 	private UserService userService;
 
 	@Inject
-	public DeviceService deviceService;
+	public ParsService parsService;
 	@Inject
 	public KindService kindService;
 	@Inject
 	public DeptService deptService;
-	@Inject
-	public TIotOwnerService tIotOwnerService;
+
 	
 	@RequiresPermissions("mao:pars:view")
 	@At("")
@@ -92,7 +86,7 @@ public class ParsController implements AdminKey {
 		return new Object();
 	}
 
-	@RequiresPermissions("wx:mao:pars:list")
+	//@RequiresPermissions("wx:mao:pars:list")
 	@At
 	@Ok("json")
 	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("enName") String enName,
@@ -105,9 +99,6 @@ public class ParsController implements AdminKey {
 		if (Strings.isNotBlank(cnName)) {
 			cnd.and("cn_name", "like", "%" + cnName + "%");
 		}
-		//if (Strings.isNotBlank(assetStatus)) {
-			cnd.and("assetStatus", "=", "0");
-		//}
 
 		if (!isAdmin()) {
 
@@ -117,13 +108,16 @@ public class ParsController implements AdminKey {
 		if (Strings.isNotBlank(orderByColumn)) {
 			cnd.orderBy(orderByColumn, isAsc);
 		} else {
-			cnd.orderBy("sno", "desc");
+			cnd.orderBy("update_time", "desc");
 		}
-		TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
-				"^dept|kind|owner|next$");
-		List<Device> list = (List<Device>) info.getRows();
-		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "in", Lists.newArrayList("3","1")));
+		TableDataInfo info = parsService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
+				"^dept|kind|location$");
+		List list =  info.getRows();
+		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false"));
+//		List<NutMap> listmap = kindService.appendKindList(list,kinds);
+//		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "in", Lists.newArrayList("3","1")));
 		myKindNameFind(list, kinds);
+//        info.setRows(listmap);
 
 		return info;
 	}
@@ -132,7 +126,7 @@ public class ParsController implements AdminKey {
 	 * 新增设备资本
 	 */
 	@At("/add")
-	@Ok("th:/wx/tIotDevices/add.html")
+	@Ok("th:/mao/pars/add.html")
 	public void add(HttpServletRequest req) {
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
@@ -148,20 +142,27 @@ public class ParsController implements AdminKey {
 	@Ok("json")
 	@RequiresPermissions("mao:pars:add")
 	@Slog(tag = "设备资本", after = "新增保存设备资本 id=${args[0].id}")
-	public Object addDo(@Param("..") Device tIotDevices, @Param("next.cycle") String cycle,
-						@Param("next.time") String time, HttpServletRequest req) {
-		try {
-			deviceService.insert(tIotDevices);
-			Owner owner = new Owner();
-			owner.setCycle(cycle);
-			owner.setTime(time);
-			owner.setDeviceid(tIotDevices.getId());
+	public Object addDo(@Param("..") OtherParts otherParts
+            , @Param("next.cycle") String cycle
+            , @Param("next.time") String time
+            , HttpServletRequest req) {
 
-			deviceService.dao().insert(owner);
-			return Result.success("system.success");
-		} catch (Exception e) {
+			if(Lang.isNotEmpty(otherParts)){
+				otherParts.setCreateTime(new Date());
+				otherParts.setUpdateTime(new Date());
+				otherParts.setCreateBy(ShiroUtils.getSysUserId());
+				otherParts.setUpdateBy(ShiroUtils.getSysUserId());
+				otherParts.setStatus("true");
+				otherParts.setDelFlag("false");
+				parsService.insert(otherParts);
+				return Result.success("system.success",otherParts);
+
+
+			}
 			return Result.error("system.error");
-		}
+
+
+
 	}
 	/**
 	 * 修改备品备件
@@ -170,33 +171,18 @@ public class ParsController implements AdminKey {
 	@Ok("th://mao/pars/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 
-		Device tIotDevices = deviceService.fetch(id);
-		deviceService.fetchLinks(tIotDevices, "^dept|next|kind$");
+		OtherParts tIotDevices = parsService.fetch(id);
+		parsService.fetchLinks(tIotDevices, "^dept|location|kind$");
 
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
 		Dept dept = deptService.fetch(deptid);
 
-		List<Owner> sets = tIotDevices.getNext();
-		Owner last = new Owner();
-		if (Lang.isEmpty(sets)) {
-			Owner owner = new Owner();
-			// owner.setCycle("365");
-			// Calendar cal = Calendar.getInstance();
-			// cal.add(Calendar.YEAR,1);
-			// String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-			// owner.setTime(day);
-			owner.setDeviceid(tIotDevices.getId());
-			last = owner;
-		} else {
-			last = sets.iterator().next();
-		}
 
-		tIotDevices.setNext(Lists.newArrayList(last));
 
 		req.setAttribute("dept", dept);
 
-		req.setAttribute("tIotDevices", tIotDevices);
+		req.setAttribute("pars", tIotDevices);
 	}
 
 	/**
@@ -206,45 +192,24 @@ public class ParsController implements AdminKey {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("mao:pars:edit")
-	@Slog(tag = "设备资本", after = "修改保存设备资本")
-	public Object editDo(@Param("..") Device tIotDevices, @Param("next.cycle") String cycle,
+	public Object editDo(@Param("..") OtherParts tIotDevices, @Param("next.cycle") String cycle,
 						 @Param("next.time") String time, HttpServletRequest req) {
-		try {
+
+	       // tIotDevices = parsService.fetch(tIotDevices.getId());
 			if (Lang.isNotEmpty(tIotDevices)) {
+				tIotDevices.setUpdateBy(ShiroUtils.getSysUserId());
+				tIotDevices.setUpdateTime(new Date());
+                Dao forup = Daos.ext(parsService.dao(), FieldFilter.create(tIotDevices.getClass(), true));
+                 forup.update(tIotDevices);
 
-				deviceService.insertUpdate(tIotDevices);
+                return Result.success("system.success",tIotDevices);
 
-				tIotDevices = deviceService.fetchLinks(tIotDevices, "next");
+            }else {
+                return Result.error("system.error");
 
-				List<Owner> owners = tIotDevices.getNext();
-				Owner owner = new Owner();
+            }
 
-				if (Lang.isEmpty(owners)) {
-					owner.setCycle(cycle);
 
-					owner.setTime(time);
-					owner.setDeviceid(tIotDevices.getId());
-					deviceService.dao().insert(owner);
-
-				} else {
-					Owner temp = owners.get(0);
-
-					temp.setCycle(cycle);
-					temp.setTime(time);
-
-					deviceService.dao().update(temp);
-
-				}
-				String id = tIotDevices.getId();
-				deviceService.kafka(Lists.newArrayList(new Device(){{
-					setId(id);
-				}}));
-			}
-
-			return Result.success("system.success");
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
 	}
 
 	/**
@@ -256,14 +221,7 @@ public class ParsController implements AdminKey {
 	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
 	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
-			deviceService.vDelete(ids);
-			List<Device> devices = Arrays.stream(ids).map(
-					id -> new Device(){{
-						this.setId(id);
-					}}).collect(Collectors.toList());
-
-
-			deviceService.kafka(devices);
+			parsService.vDelete(ids);
 
 			return Result.success("system.success");
 		} catch (Exception e) {
@@ -271,162 +229,16 @@ public class ParsController implements AdminKey {
 		}
 	}
 
-	/**
-	 * 设备延期
-	 */
-	@At("/change")
-	@Ok("json")
-	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
-	public Object change(@Param("id") String[] ids, HttpServletRequest req) {
-		try {
-			if (Lang.isEmpty(ids)) {
-				return Result.success("system.success");
 
-			}
 
-			for (String id : ids) {
-				Device device = deviceService.fetch(id);
-				if (Lang.isEmpty(device)) {
-					continue;
-				}
-				device = deviceService.fetchLinks(device, "next");
 
-				List<Owner> owners = device.getNext();
-				Owner owner = new Owner();
 
-				if (Lang.isEmpty(owners)) {
-					owner.setCycle("10");
-					Calendar cal = Calendar.getInstance();
-					cal.add(Calendar.DATE, 10);
-					String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
-					owner.setTime(day);
-					owner.setDeviceid(id);
-					deviceService.dao().insert(owner);
-
-				} else {
-					Owner temp = owners.get(0);
-
-					Calendar cal = Calendar.getInstance();
-					if (Lang.isEmpty(temp)) {
-						continue;
-					}
-					if (Strings.isBlank(temp.getCycle())) {
-						temp.setCycle("10");
-					}
-					int step = Lang.str2number(temp.cycle).intValue();
-					cal.add(Calendar.DATE, step);
-					String day = DateFormatUtils.format(cal, "yyyy-MM-dd");
-					temp.setTime(day);
-					deviceService.dao().update(temp);
-				}
-			}
-			return Result.success("system.success");
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-	/**
-	 * 过期设备资本
-	 */
-	@At("/count")
-	@Ok("json")
-	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
-	public Object count(@Param("next_time") String time, HttpServletRequest req) {
-		try {
-			String deptid = null;
-			if (!isAdmin()) {
-				deptid = ShiroUtils.getSysUser().getDeptId();
-			}
-			List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid, time);
-
-			NutMap map = NutMap.NEW();
-			map.addv("count", deviceIds.size());
-
-			return Result.success("system.success", map);
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
-	}
-
-	/**
-	 * 过期设备列表
-	 */
-	@At("/out_time")
-	@Ok("json")
-	@Slog(tag = "设备资本", after = "删除设备资本:${array2str(args[0])}")
-	public Object outTime(@Param("next_time") String time, @Param("pageNum") int pageNum,
-						  @Param("pageSize") int pageSize,
-
-						  @Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc,
-
-						  HttpServletRequest req) {
-
-		String deptid = null;
-		if (!isAdmin()) {
-			deptid = ShiroUtils.getSysUser().getDeptId();
-		}
-		List<Map> deviceIds = tIotOwnerService.queryCountTimeOutDeviceIds(deptid, time);
-
-		List<String> ids = deviceIds.stream().map(m -> m.get("id").toString()).collect(Collectors.toList());
-
-		Cnd cnd = Cnd.NEW();
-		cnd.and("id", "in", ids);
-
-		cnd.and("delflag", "=", "false");
-		cnd.and("status", "=", "true");
-		cnd.and("asset_status", "=", "2");
-		TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
-				"^dept|kind|owner|next$");
-		List<Device> list = (List<Device>) info.getRows();
-		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "=", "3"));
-		myKindNameFind(list, kinds);
-		return info;
-
-	}
-
-	/**
-	 * 设备资产统计
-	 */
-	@At("/money")
-	@Ok("json")
-	public Object money(HttpServletRequest req) {
-		String deptid = null;
-		if (!isAdmin()) {
-			deptid = ShiroUtils.getSysUser().getDeptId();
-		} else {
-
-		}
-
-		List<Map> list = tIotOwnerService.queryCountPrice(deptid);
-
-		return Result.success("system.success", list);
-
-	}
-
-	/**
-	 * 设备资产统计
-	 */
-	@At("/group")
-	@Ok("json")
-	public Object group(HttpServletRequest req) {
-		String deptid = null;
-		if (!isAdmin()) {
-			deptid = ShiroUtils.getSysUser().getDeptId();
-		} else {
-
-		}
-
-		List<Map> list = tIotOwnerService.queryCountGroup(deptid);
-
-		return Result.success("system.success", list);
-
-	}
 
 	// myKindNameFind
-	public void myKindNameFind(List<Device> list, List<Kind> kinds) {
-		for (Device device : list) {
+	public void myKindNameFind(List<OtherParts> list, List<Kind> kinds) {
+		for (OtherParts device : list) {
 			Kind kind = device.getKind();
+			device.setKindParents(new HashMap<String,Kind>());
 			if (Lang.isEmpty(kind)) {
 				continue;
 			}
@@ -436,23 +248,18 @@ public class ParsController implements AdminKey {
 			}
 			for (Kind k : kinds) {
 				if (Strings.equals(k.getLevel(),"3")&&fathers.contains(k.getId())) {
-					device.setKindmap(k.getCnName());
-
+					device.getKindParents().put("3",k);
+				}
+				if (Strings.equals(k.getLevel(),"2")&&fathers.contains(k.getId())) {
+					device.getKindParents().put("2",k);
 				}
 				if (Strings.equals(k.getLevel(),"1")&&fathers.contains(k.getId())) {
-					device.setLocationState(k.getCnName());
-
+					device.getKindParents().put("1",k);
 				}
 			}
-			List<Owner> lists = device.getNext();
-			if (Lang.isEmpty(lists)) {
-				continue;
-			}
-			TreeSet<Owner> sets = new TreeSet<>();
-			sets.addAll(lists);
-			Owner last = sets.iterator().next();
-			// device.setNext(Lists.newArrayList(last));
-			device.setGatewayExtsno(last.getTime());
+			//kinds.stream().map(kind1 -> kind1.getId()).collect(Collectors.toList())
+
+
 
 		}
 	}

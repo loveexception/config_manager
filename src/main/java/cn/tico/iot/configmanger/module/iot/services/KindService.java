@@ -11,11 +11,14 @@ import org.nutz.dao.FieldFilter;
 import org.nutz.dao.util.Daos;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.json.Json;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.lang.util.NutMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 /**
  * 类型service
@@ -214,5 +217,14 @@ public class KindService extends Service<Kind> {
             return Lists.newArrayList();
         }
         return list.stream().map(temp->temp.getId()).collect(Collectors.toList());
+    }
+
+    public List<NutMap> appendKindList(List list, List<Kind> kinds) {
+        List<NutMap> result =  new ArrayList<NutMap>();
+
+
+
+
+        return result;
     }
 }

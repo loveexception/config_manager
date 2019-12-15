@@ -7,6 +7,7 @@ import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public  class FatherModel extends I18NModel {
@@ -44,12 +45,10 @@ public  class FatherModel extends I18NModel {
 
 
 
-    @One(field = "parentId",key = "id")
-    private Location parent;
-
     private String parentName;
 
     private List children ;
+    private Map parents;
 
 
 }
