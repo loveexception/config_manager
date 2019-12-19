@@ -762,7 +762,7 @@ function Frame(props) {
 			width: 200
 		},
 		{
-			title: '类型',
+			title: '型号',
 			dataIndex: 'kind',
 			key: '类型'
 		},

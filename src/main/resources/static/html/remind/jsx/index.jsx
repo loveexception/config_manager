@@ -54,6 +54,7 @@ function App(props) {
 	return (
 		<div className="updata-box">
 			<Title needState={needState} />
+			{/* {btnState ? <iframe className="updata" src="/wx/tOtherMessages" /> : <iframe className="updata" src="/wx/tOtherRemind" />} */}
 			{btnState ? <iframe className="updata" src="/wx/tOtherMessages" /> : <iframe className="updata" src="/wx/tOtherRemind" />}
 		</div>
 	);
