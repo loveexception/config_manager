@@ -19,6 +19,7 @@ import org.nutz.log.Logs;
 import org.nutz.trans.Atom;
 import org.nutz.trans.Trans;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -69,16 +70,17 @@ public  class KafkaBlock  {
     }
     public void consume(Map<String,Block> map) {
         consumer.subscribe(map.keySet());
-        while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(1000);
-            for (ConsumerRecord<String, String> record : records) {
-                Block block= map.get(record.topic());
-                if(Lang.isNotEmpty(block)){
-                    block.exec(record.topic(),record.key(),record.value(),record.offset());
+        while ( true ) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1l));
+            try {
+                for (ConsumerRecord<String, String> record : records) {
+                    Block block= map.get(record.topic());
+                    if(Lang.isNotEmpty(block)){
+                        block.exec(record.topic(),record.key(),record.value(),record.offset());
+                    }
+
                 }
 
-            }
-            try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 Logs.get().error(e);

@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.UnsupportedCredentialItem;
 import org.eclipse.jgit.transport.CredentialItem;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.URIish;
 import org.nutz.castor.castor.String2File;
 import org.nutz.dao.Cnd;
@@ -24,6 +25,7 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
 import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
+import org.nutz.lang.random.R;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Logs;
 import org.nutz.mapl.Mapl;
@@ -187,8 +189,10 @@ public class GitBlock {
             env.putAll(device.getEnv());
             String newDriver = Json.toJson(device.getDriver());
             dri.putAll(Json.fromJsonAsMap(String.class,newDriver));
-            File file = Files.createFileIfNoExists2(dri.getString("path"));
-            dri.put("filename",file.getName());
+            if(Strings.isNotBlank(dri.getString("path",""))){
+                File file = Files.createFileIfNoExists2(dri.getString("path"));
+                dri.put("filename",file.getName());
+            }
 
 
             dev.put("env",env);
@@ -243,6 +247,8 @@ public class GitBlock {
         String target = path +"/py/";
 
         boolean ok = true;
+        Files.deleteDir(Files.checkFile(target));
+
         for(Driver src : drivers){
             File target_file = Files.createFileIfNoExists(target+"/"+Files.getName(src.getPath()));
 
@@ -303,9 +309,12 @@ public class GitBlock {
 
         Git g = Git.open(local);
         g.add().addFilepattern(".").call();
-        g.commit().setMessage("message").call();
-        g.push().call();
-        Logs.getLog(this.getClass()).infof("end:commit_push   no error ");
+        g.commit().setAll(true).setMessage("message"+ R.sg(0,99 ).next()).call();
+        Iterator it  = g.push().call().iterator();
+        while (it.hasNext()){
+            Logs.get().infof("commit:%s" ,it.next());
+        }
+        //Logs.getLog(this.getClass()).infof("end:commit_push   no error ");
 
 
         return git;

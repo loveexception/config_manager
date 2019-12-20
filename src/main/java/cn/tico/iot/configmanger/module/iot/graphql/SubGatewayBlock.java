@@ -37,7 +37,14 @@ public class SubGatewayBlock implements Block {
         if(Strings.isEmpty(value)){
             return null;
         }
-        SubGateway temp = Json.fromJson(SubGateway.class , value);
+        SubGateway temp ;
+
+        try{
+            temp = Json.fromJson(SubGateway.class , value);
+
+        }catch (Exception e){
+            return null;
+        }
         if(Lang.isEmpty(temp)){
             return null;
         }
