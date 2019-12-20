@@ -20,6 +20,7 @@
 										<option value="0">停用</option>
 									</select>
 								</li>
+								<li>设备区域位置：<input type="text" name="location" /></li>
 
 								<li>
 									<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -55,7 +56,7 @@
 					removeUrl: prefix + '/remove',
 					exportUrl: prefix + '/export',
 					modalName: '设备资本',
-					search: false,
+					search: true,
 					showExport: true,
 					columns: [
 						{
@@ -82,14 +83,14 @@
 						},
 						{
 							field: 'kindmap',
-							title: '生产厂家',
+							title: '品牌',
 							sortable: true
 						},
-						{
-							title: '设备类型',
-							field: 'locationState',
-							sortable: true
-						},
+						// {
+						// 	title: '型号',
+						// 	field: 'locationState',
+						// 	sortable: true
+						// },
 
 						{
 							field: 'kind.cnName',

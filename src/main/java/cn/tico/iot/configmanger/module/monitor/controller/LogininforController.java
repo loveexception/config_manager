@@ -3,7 +3,7 @@ package cn.tico.iot.configmanger.module.monitor.controller;
 import cn.tico.iot.configmanger.common.base.Result;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.monitor.services.LogininforService;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -30,7 +30,7 @@ public class LogininforController {
 
 	@Inject
 	private LogininforService logininforService;
-	
+
 	@RequiresPermissions("monitor:logininfor:view")
 	@At("")
 	@Ok("th:/monitor/logininfor/logininfor.html")
@@ -44,19 +44,14 @@ public class LogininforController {
 	@RequiresPermissions("monitor:logininfor:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
-					   HttpServletRequest req) {
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
+		if (!Strings.isBlank(name)) {
+			// cnd.and("name", "like", "%" + name +"%");
 		}
-		return logininforService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+		return logininforService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, null);
 	}
-
 
 	/**
 	 * 删除系统访问记录
@@ -64,8 +59,8 @@ public class LogininforController {
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("monitor:logininfor:remove")
-	@Slog(tag ="系统访问记录", after= "删除系统访问记录:${array2str(args[0])}")
-	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
+	@Slog(tag = "系统访问记录", after = "删除系统访问记录:${array2str(args[0])}")
+	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
 			logininforService.delete(ids);
 			return Result.success("system.success");
@@ -76,10 +71,9 @@ public class LogininforController {
 
 	@At("/clean")
 	@Ok("json")
-	@Slog(tag="系统访问记录", after="清除系统访问记录")
+	@Slog(tag = "系统访问记录", after = "清除系统访问记录")
 	@RequiresPermissions("monitor:logininfor:remove")
-	public Object clean()
-	{
+	public Object clean() {
 		logininforService.cleanLogininfor();
 		return Result.success("system.success");
 	}

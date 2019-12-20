@@ -3,7 +3,9 @@ package cn.tico.iot.configmanger.module.mao.controller;
 import cn.tico.iot.configmanger.common.page.TableDataInfo;
 import cn.tico.iot.configmanger.module.iot.controller.AdminKey;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
@@ -11,7 +13,7 @@ import cn.tico.iot.configmanger.module.sys.services.UserService;
 import cn.tico.iot.configmanger.module.wx.models.OtherParts;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.mao.services.ParsService;
-import cn.tico.iot.configmanger.common.base.Result;;
+import cn.tico.iot.configmanger.common.base.Result;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
@@ -33,7 +35,6 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-
 /**
  * 备品备件 信息操作处理
  * 
@@ -54,15 +55,15 @@ public class ParsController implements AdminKey {
 	public KindService kindService;
 	@Inject
 	public DeptService deptService;
+	@Inject
+	public LocationService LocationService;
 
-	
 	@RequiresPermissions("mao:pars:view")
 	@At("")
 	@Ok("th:/mao/pars/pars.html")
 	public void index(HttpServletRequest req) {
 
 	}
-
 
 	/**
 	 * 用户权限
@@ -86,12 +87,12 @@ public class ParsController implements AdminKey {
 		return new Object();
 	}
 
-	//@RequiresPermissions("wx:mao:pars:list")
+	// @RequiresPermissions("wx:mao:pars:list")
 	@At
 	@Ok("json")
 	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("enName") String enName,
-					   @Param("cnName") String cnName, @Param("assetStatus") String assetStatus,
-					   @Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
+			@Param("cnName") String cnName, @Param("assetStatus") String assetStatus,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		if (Strings.isNotBlank(enName)) {
 			cnd.and("en_name", "like", "%" + enName + "%");
@@ -112,12 +113,13 @@ public class ParsController implements AdminKey {
 		}
 		TableDataInfo info = parsService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
 				"^dept|kind|location$");
-		List list =  info.getRows();
+		List list = info.getRows();
 		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false"));
-//		List<NutMap> listmap = kindService.appendKindList(list,kinds);
-//		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "in", Lists.newArrayList("3","1")));
+		// List<NutMap> listmap = kindService.appendKindList(list,kinds);
+		// List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=",
+		// "false").and("level", "in", Lists.newArrayList("3","1")));
 		myKindNameFind(list, kinds);
-//        info.setRows(listmap);
+		// info.setRows(listmap);
 
 		return info;
 	}
@@ -142,28 +144,24 @@ public class ParsController implements AdminKey {
 	@Ok("json")
 	@RequiresPermissions("mao:pars:add")
 	@Slog(tag = "设备资本", after = "新增保存设备资本 id=${args[0].id}")
-	public Object addDo(@Param("..") OtherParts otherParts
-            , @Param("next.cycle") String cycle
-            , @Param("next.time") String time
-            , HttpServletRequest req) {
+	public Object addDo(@Param("..") OtherParts otherParts, @Param("next.cycle") String cycle,
+			@Param("next.time") String time, HttpServletRequest req) {
 
-			if(Lang.isNotEmpty(otherParts)){
-				otherParts.setCreateTime(new Date());
-				otherParts.setUpdateTime(new Date());
-				otherParts.setCreateBy(ShiroUtils.getSysUserId());
-				otherParts.setUpdateBy(ShiroUtils.getSysUserId());
-				otherParts.setStatus("true");
-				otherParts.setDelFlag("false");
-				parsService.insert(otherParts);
-				return Result.success("system.success",otherParts);
+		if (Lang.isNotEmpty(otherParts)) {
+			otherParts.setCreateTime(new Date());
+			otherParts.setUpdateTime(new Date());
+			otherParts.setCreateBy(ShiroUtils.getSysUserId());
+			otherParts.setUpdateBy(ShiroUtils.getSysUserId());
+			otherParts.setStatus("true");
+			otherParts.setDelFlag("false");
+			parsService.insert(otherParts);
+			return Result.success("system.success", otherParts);
 
-
-			}
-			return Result.error("system.error");
-
-
+		}
+		return Result.error("system.error");
 
 	}
+
 	/**
 	 * 修改备品备件
 	 */
@@ -178,8 +176,6 @@ public class ParsController implements AdminKey {
 		String deptid = user.getDeptId();
 		Dept dept = deptService.fetch(deptid);
 
-
-
 		req.setAttribute("dept", dept);
 
 		req.setAttribute("pars", tIotDevices);
@@ -193,22 +189,21 @@ public class ParsController implements AdminKey {
 	@Ok("json")
 	@RequiresPermissions("mao:pars:edit")
 	public Object editDo(@Param("..") OtherParts tIotDevices, @Param("next.cycle") String cycle,
-						 @Param("next.time") String time, HttpServletRequest req) {
+			@Param("next.time") String time, HttpServletRequest req) {
 
-	       // tIotDevices = parsService.fetch(tIotDevices.getId());
-			if (Lang.isNotEmpty(tIotDevices)) {
-				tIotDevices.setUpdateBy(ShiroUtils.getSysUserId());
-				tIotDevices.setUpdateTime(new Date());
-                Dao forup = Daos.ext(parsService.dao(), FieldFilter.create(tIotDevices.getClass(), true));
-                 forup.update(tIotDevices);
+		// tIotDevices = parsService.fetch(tIotDevices.getId());
+		if (Lang.isNotEmpty(tIotDevices)) {
+			tIotDevices.setUpdateBy(ShiroUtils.getSysUserId());
+			tIotDevices.setUpdateTime(new Date());
+			Dao forup = Daos.ext(parsService.dao(), FieldFilter.create(tIotDevices.getClass(), true));
+			forup.update(tIotDevices);
 
-                return Result.success("system.success",tIotDevices);
+			return Result.success("system.success", tIotDevices);
 
-            }else {
-                return Result.error("system.error");
+		} else {
+			return Result.error("system.error");
 
-            }
-
+		}
 
 	}
 
@@ -229,16 +224,11 @@ public class ParsController implements AdminKey {
 		}
 	}
 
-
-
-
-
-
 	// myKindNameFind
 	public void myKindNameFind(List<OtherParts> list, List<Kind> kinds) {
 		for (OtherParts device : list) {
 			Kind kind = device.getKind();
-			device.setKindParents(new HashMap<String,Kind>());
+			device.setKindParents(new HashMap<String, Kind>());
 			if (Lang.isEmpty(kind)) {
 				continue;
 			}
@@ -247,21 +237,23 @@ public class ParsController implements AdminKey {
 				continue;
 			}
 			for (Kind k : kinds) {
-				if (Strings.equals(k.getLevel(),"3")&&fathers.contains(k.getId())) {
-					device.getKindParents().put("3",k);
+				if (Strings.equals(k.getLevel(), "3") && fathers.contains(k.getId())) {
+					device.getKindParents().put("3", k);
 				}
-				if (Strings.equals(k.getLevel(),"2")&&fathers.contains(k.getId())) {
-					device.getKindParents().put("2",k);
+				if (Strings.equals(k.getLevel(), "2") && fathers.contains(k.getId())) {
+					device.getKindParents().put("2", k);
 				}
-				if (Strings.equals(k.getLevel(),"1")&&fathers.contains(k.getId())) {
-					device.getKindParents().put("1",k);
+				if (Strings.equals(k.getLevel(), "1") && fathers.contains(k.getId())) {
+					device.getKindParents().put("1", k);
 				}
 			}
-			//kinds.stream().map(kind1 -> kind1.getId()).collect(Collectors.toList())
-
-
+			// kinds.stream().map(kind1 -> kind1.getId()).collect(Collectors.toList())
 
 		}
+	}
+
+	public void myLocationsParentName(List<OtherParts> otherParts, List<Location> locations) {
+
 	}
 
 }

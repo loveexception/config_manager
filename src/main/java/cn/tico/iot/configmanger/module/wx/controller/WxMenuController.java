@@ -8,7 +8,7 @@ import cn.tico.iot.configmanger.module.wx.services.WxMenuService;
 import cn.tico.iot.configmanger.common.weixin.util.MenuUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.WxMenu;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Date;
+
 /**
  * 微信菜单 信息操作处理
  * 
@@ -41,7 +42,7 @@ public class WxMenuController {
 	private WxMenuService wxMenuService;
 	@Inject
 	private ConfigService configService;
-	
+
 	@RequiresPermissions("wx:menu:view")
 	@At("")
 	@Ok("th:/wx/menu/menu.html")
@@ -55,19 +56,17 @@ public class WxMenuController {
 	@At
 	@Ok("json")
 	@RequiresPermissions("wx:menu:list")
-	public Object list(@Param("name") String name,
-					   @Param("beginTime") Date beginTime,
-					   @Param("endTime") Date endTime,
-					   HttpServletRequest req) {
+	public Object list(@Param("name") String name, @Param("beginTime") Date beginTime, @Param("endTime") Date endTime,
+			HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
+		if (!Strings.isBlank(name)) {
+			// cnd.and("name", "like", "%" + name +"%");
 		}
-		if(Lang.isNotEmpty(beginTime)){
-			cnd.and("create_time",">=", beginTime);
+		if (Lang.isNotEmpty(beginTime)) {
+			cnd.and("create_time", ">=", beginTime);
 		}
-		if(Lang.isNotEmpty(endTime)){
-			cnd.and("create_time","<=", endTime);
+		if (Lang.isNotEmpty(endTime)) {
+			cnd.and("create_time", "<=", endTime);
 		}
 		return wxMenuService.query(cnd);
 	}
@@ -75,14 +74,14 @@ public class WxMenuController {
 	/**
 	 * 新增微信菜单
 	 */
-	@At({"/add/?","/add"})
+	@At({ "/add/?", "/add" })
 	@Ok("th:/wx/menu/add.html")
 	public void add(@Param("id") String id, HttpServletRequest req) {
-		List<WxMenu> list =this.wxMenuService.query(Cnd.NEW().and("parent_id","=","0"));
+		List<WxMenu> list = this.wxMenuService.query(Cnd.NEW().and("parent_id", "=", "0"));
 		req.setAttribute("menuList", list);
-		int menuSize =0;
-		if(Lang.isNotEmpty(list)){
-			menuSize =list.size();
+		int menuSize = 0;
+		if (Lang.isNotEmpty(list)) {
+			menuSize = list.size();
 		}
 		req.setAttribute("menuSize", menuSize);
 	}
@@ -95,7 +94,7 @@ public class WxMenuController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:menu:add")
-	@Slog(tag="微信菜单", after="新增保存微信菜单 id=${args[0].id}")
+	@Slog(tag = "微信菜单", after = "新增保存微信菜单 id=${args[0].id}")
 	public Object addDo(@Param("..") WxMenu wxMenu, HttpServletRequest req) {
 		try {
 			wxMenuService.insert(wxMenu);
@@ -113,11 +112,11 @@ public class WxMenuController {
 	public void edit(String id, HttpServletRequest req) {
 		WxMenu wxMenu = wxMenuService.fetch(id);
 		req.setAttribute("menu", wxMenu);
-		List<WxMenu> list =this.wxMenuService.query(Cnd.NEW().and("parent_id","=","0"));
+		List<WxMenu> list = this.wxMenuService.query(Cnd.NEW().and("parent_id", "=", "0"));
 		req.setAttribute("menuList", list);
-		int menuSize =0;
-		if(Lang.isNotEmpty(list)){
-			menuSize =list.size();
+		int menuSize = 0;
+		if (Lang.isNotEmpty(list)) {
+			menuSize = list.size();
 		}
 		req.setAttribute("menuSize", menuSize);
 	}
@@ -130,10 +129,10 @@ public class WxMenuController {
 	@POST
 	@Ok("json")
 	@RequiresPermissions("wx:menu:edit")
-	@Slog(tag="微信菜单", after="修改保存微信菜单")
+	@Slog(tag = "微信菜单", after = "修改保存微信菜单")
 	public Object editDo(@Param("..") WxMenu wxMenu, HttpServletRequest req) {
 		try {
-			if(Lang.isNotEmpty(wxMenu)){
+			if (Lang.isNotEmpty(wxMenu)) {
 				wxMenu.setUpdateBy(ShiroUtils.getSysUserId());
 				wxMenu.setUpdateTime(new Date());
 				wxMenuService.update(wxMenu);
@@ -150,7 +149,7 @@ public class WxMenuController {
 	@At("/remove/?")
 	@Ok("json")
 	@RequiresPermissions("wx:menu:remove")
-	@Slog(tag ="微信菜单", after= "删除微信菜单:${args[0]}")
+	@Slog(tag = "微信菜单", after = "删除微信菜单:${args[0]}")
 	public Object remove(String id, HttpServletRequest req) {
 		try {
 			wxMenuService.delete(id);
@@ -166,35 +165,36 @@ public class WxMenuController {
 	@At("/selectTree/?")
 	@Ok("th:/wx/menu/tree.html")
 	public void selectTree(String id, HttpServletRequest req) {
-        WxMenu wxMenu = null;
-        if(Strings.isNotBlank(id)) {
-            wxMenu = wxMenuService.fetch(id);
-        }
-        if (wxMenu ==null)  {
-            wxMenu =new WxMenu();
-            wxMenu.setId("");
-            wxMenu.setParentId("0");
-            wxMenu.setName("无");
-        }
-        req.setAttribute("menu", wxMenu);
+		WxMenu wxMenu = null;
+		if (Strings.isNotBlank(id)) {
+			wxMenu = wxMenuService.fetch(id);
+		}
+		if (wxMenu == null) {
+			wxMenu = new WxMenu();
+			wxMenu.setId("");
+			wxMenu.setParentId("0");
+			wxMenu.setName("无");
+		}
+		req.setAttribute("menu", wxMenu);
 	}
 
 	/**
-	* 获取树数据
-	* @param parentId
-	* @param name
-	* @return
-	*/
+	 * 获取树数据
+	 * 
+	 * @param parentId
+	 * @param name
+	 * @return
+	 */
 	@At
 	@Ok("json")
-	public List<Map<String, Object>> treeData( @Param("parentId") String parentId,
-											   @Param("name") String name) {
-		List<Map<String, Object>> tree = wxMenuService.selectTree(parentId,name);
+	public List<Map<String, Object>> treeData(@Param("parentId") String parentId, @Param("name") String name) {
+		List<Map<String, Object>> tree = wxMenuService.selectTree(parentId, name);
 		return tree;
 	}
 
 	/**
 	 * 同步菜单
+	 * 
 	 * @param req
 	 * @return
 	 */
@@ -202,8 +202,8 @@ public class WxMenuController {
 	@Ok("json")
 	public Object pushMenu(HttpServletRequest req) {
 		List<WxMenu> list = wxMenuService.query();
-		Config config =configService.fetch("token");
-		if(config!=null){
+		Config config = configService.fetch("token");
+		if (config != null) {
 			MenuUtils.menuCreate(list, config.getConfigValue());
 		}
 

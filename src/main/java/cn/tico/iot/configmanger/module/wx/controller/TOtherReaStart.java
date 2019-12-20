@@ -34,8 +34,8 @@ import java.util.List;
  * @date 2019-11-21
  */
 @IocBean
-@At("/wx/tOtherMessages") //
-public class TOtherMessagesController {
+@At("/wx/tOtherReaStart") //
+public class TOtherReaStart {
 	private static final Log log = Logs.get();
 
 	@Inject
@@ -43,9 +43,9 @@ public class TOtherMessagesController {
 	@Inject
 	public DeptService deptService;
 
-	// @RequiresPermissions("wx:tOtherMessages:view")
+	@RequiresPermissions("wx:tOtherReaStart:view")
 	@At("")
-	@Ok("th:/wx/tOtherMessages/tOtherMessages.html")
+	@Ok("th:/wx/tOtherReaStart/tOtherReaStart.html")
 	public void index(HttpServletRequest req) {
 
 	}
@@ -53,7 +53,7 @@ public class TOtherMessagesController {
 	/**
 	 * 查询kafka的推送列表
 	 */
-	// @RequiresPermissions("wx:tOtherMessages:list")
+	@RequiresPermissions("wx:tOtherMessages:list")
 	@At
 	@Ok("json")
 	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
