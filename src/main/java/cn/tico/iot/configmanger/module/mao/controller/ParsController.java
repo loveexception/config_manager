@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.module.mao.controller;
 
 import cn.tico.iot.configmanger.common.page.TableDataInfo;
+import cn.tico.iot.configmanger.common.utils.StringUtils;
 import cn.tico.iot.configmanger.module.iot.controller.AdminKey;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
@@ -14,6 +15,7 @@ import cn.tico.iot.configmanger.module.wx.models.OtherParts;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.mao.services.ParsService;
 import cn.tico.iot.configmanger.common.base.Result;
+import org.codehaus.groovy.util.StringUtil;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
@@ -34,6 +36,7 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 备品备件 信息操作处理
@@ -56,7 +59,7 @@ public class ParsController implements AdminKey {
 	@Inject
 	public DeptService deptService;
 	@Inject
-	public LocationService LocationService;
+	public LocationService locationService;
 
 	@RequiresPermissions("mao:pars:view")
 	@At("")
@@ -119,6 +122,8 @@ public class ParsController implements AdminKey {
 		// List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=",
 		// "false").and("level", "in", Lists.newArrayList("3","1")));
 		myKindNameFind(list, kinds);
+		List<Location> locations = locationService.query(cnd.NEW().and("delflag","=","false"));
+		myLocationsParentName(list,locations);
 		// info.setRows(listmap);
 
 		return info;
@@ -253,6 +258,38 @@ public class ParsController implements AdminKey {
 	}
 
 	public void myLocationsParentName(List<OtherParts> otherParts, List<Location> locations) {
+		Logs.get().debugf("otherparts:%s,location:%s",otherParts.size(),locations.size());
+
+		if(Lang.isEmpty(otherParts)){
+			return;
+		}
+		if(Lang.isEmpty(locations)){
+			return ;
+		}
+
+		otherParts.stream().forEach(part -> {
+			Location partLocal = part.getLocation();
+			if(Lang.isEmpty(partLocal)){
+				return ;
+			}
+			String father = partLocal.getAncestors();
+
+			String cnName = partLocal.getCnName();
+			if(Lang.isEmpty(partLocal)){
+				return;
+			}
+				List<String> names = locations.stream()
+						.filter(location -> StringUtils.contains(father,location.getId()))
+						.sorted(Comparator.comparing(location -> location.getLevel()))
+						.map(location -> location.getCnName())
+						.collect(Collectors.toList());
+				names.add(cnName);
+
+				partLocal.setCnName(Strings.join("-",names));
+				part.setLocation(partLocal);
+
+
+		});
 
 	}
 
