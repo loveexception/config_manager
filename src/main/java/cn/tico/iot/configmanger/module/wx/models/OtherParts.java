@@ -30,30 +30,27 @@ public class OtherParts extends I18NModel {
 
 	@Column("dept_id")
 	@Comment("组织")
-	@ColDefine(type=ColType.VARCHAR,width = 32)
-	private String deptId;
-	@One(field = "deptId",key = "id")
+	@ColDefine(type = ColType.VARCHAR, width = 32)
+	public String deptId;
+	@One(field = "deptId", key = "id")
 	private Dept dept;
 
 	@Column("kind_id")
 	@Comment("类型")
-	@ColDefine(type = ColType.VARCHAR,width = 32)
+	@ColDefine(type = ColType.VARCHAR, width = 32)
 	private String kindId;
-	@One(field = "kindId",key = "id")
+	@One(field = "kindId", key = "id")
 	private Kind kind;
-	private Map<String,Kind> kindParents;
+	private Map<String, Kind> kindParents;
 	private List<Kind> kindChildren;
-
-
-
 
 	@Column("location_id")
 	@Comment("地址")
-	@ColDefine(type = ColType.VARCHAR,width = 32)
+	@ColDefine(type = ColType.VARCHAR, width = 32)
 	private String locationId;
-	@One(field = "locationId",key = "id")
+	@One(field = "locationId", key = "id")
 	private Location location;
-	private Map<String,Location> locationParents;
+	private Map<String, Location> locationParents;
 	private List<Location> locationChildren;
 
 	@Column("order_time")
@@ -62,25 +59,22 @@ public class OtherParts extends I18NModel {
 
 	@Column("ip")
 	@Comment("IP地址")
-	@ColDefine(type = ColType.VARCHAR,width = 255)	
+	@ColDefine(type = ColType.VARCHAR, width = 255)
 	private String ip;
 
 	@Column("sno")
 	@Comment("设备编号")
-	@ColDefine(type = ColType.VARCHAR,width = 64)	
+	@ColDefine(type = ColType.VARCHAR, width = 64)
 	private String sno;
 
 	@Column("total")
 	@Comment("总数量")
-	@ColDefine(type = ColType.INT ,width = 32)
+	@ColDefine(type = ColType.INT, width = 32)
 	private int total;
 
 	@Column("version")
 	@Comment("版本")
-	@ColDefine(type = ColType.VARCHAR,width = 255)
+	@ColDefine(type = ColType.VARCHAR, width = 255)
 	private String version;
-
-
-
 
 }
