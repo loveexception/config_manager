@@ -9,6 +9,7 @@ import cn.tico.iot.configmanger.module.sys.models.Dept;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
+import org.nutz.integration.json4excel.annotation.J4EName;
 import org.nutz.lang.util.NutMap;
 
 import java.util.List;
@@ -26,13 +27,13 @@ public class DeviceEnvModel extends I18NModel {
     @Column("kind_id")
     @Comment("类型")
     @ColDefine(type = ColType.VARCHAR, width = 32)
-    @ExcelField(title = "型号")
     private String kindid;
 
     @Column("kind_map")
     @Comment("类型冗余用于查寻")
     @ColDefine(type = ColType.VARCHAR, width = 255)
     @GraphQLQuery(name = "kindmap", description = "全类图")
+    @J4EName( "型号")
     private String kindmap;
 
     @One(field = "kindid",key = "id")
@@ -56,7 +57,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("ip")
     @Comment("ip ")
     @ColDefine(type = ColType.VARCHAR, width = 32)
-    @ExcelField(title = "IP地址")
+    @J4EName( "IP地址")
     private String ip;
 
     /**
@@ -64,6 +65,8 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("cycle")
     @Comment("采集间隔")
+    @J4EName( "采集间隔")
+
     private int cycle;
 
     /**
@@ -71,7 +74,10 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("unit")
     @Comment("单位")
+
     @ColDefine(type = ColType.VARCHAR, width = 32)
+    @J4EName( "单位")
+
     private String unit="ms";
 
     /**
@@ -79,7 +85,10 @@ public class DeviceEnvModel extends I18NModel {
      */
     @Column("username")
     @Comment("用户名")
+
     @ColDefine(type = ColType.VARCHAR, width = 255)
+    @J4EName( "用户名")
+
     private String username;
 
     /**
@@ -88,6 +97,8 @@ public class DeviceEnvModel extends I18NModel {
     @Column("password")
     @Comment("密码")
     @ColDefine(type = ColType.VARCHAR, width = 64)
+    @J4EName( "密码")
+
     private String password;
     /**
      * 组织
@@ -95,7 +106,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("dept_id")
     @Comment("组织")
     @ColDefine(type = ColType.VARCHAR, width = 32)
-    @ExcelField(title = "所属组织")
+    @J4EName( "所属组织")
     private String deptid;
 
 
@@ -109,7 +120,6 @@ public class DeviceEnvModel extends I18NModel {
     @Column("location_id")
     @Comment("地域")
     @ColDefine(type = ColType.VARCHAR, width = 32)
-    @ExcelField(title = "位置信息")
     private String locationid;
 
     @Column("location_country")
@@ -142,6 +152,7 @@ public class DeviceEnvModel extends I18NModel {
     @Comment("地域ID 用于查寻")
     @ColDefine(type = ColType.TEXT, width = 255)
     @GraphQLQuery(name = "locationmap", description = "全类图")
+    @J4EName( "位置信息")
     private String locationMap;
 
 

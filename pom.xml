@@ -272,17 +272,17 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.9</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.9</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml-schemas</artifactId>
-            <version>3.9</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -290,6 +290,11 @@
             <version>1.20</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutz-integration-json4excel</artifactId>
+            <version>1.r.62</version>
+        </dependency>
         <!-- api token web server -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -361,6 +366,11 @@
             <artifactId>nutz-integration-jedis</artifactId>
             <version>1.r.65-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.1</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -406,7 +416,8 @@
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
-            <!-- <plugin>
+            <!--
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.3</version>
