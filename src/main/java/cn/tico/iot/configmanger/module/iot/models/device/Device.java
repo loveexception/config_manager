@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.*;
 import org.nutz.dao.entity.annotation.*;
+import org.nutz.integration.json4excel.annotation.J4EDateFormat;
 import org.nutz.integration.json4excel.annotation.J4EName;
 
 import java.io.Serializable;
@@ -42,6 +43,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "order_time", description = "购买日期")
     @J4EName("购买日期")
+    @J4EDateFormat(from = "yyyy-mm-dd",to = "yymmdd")
     private Long orderTime;
 
 
@@ -58,6 +60,8 @@ public class Device extends DeviceEnvModel implements Serializable {
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "discard_time", description = "报废时间")
     @J4EName("报废时间")
+    @J4EDateFormat(from = "yyyy-mm-dd",to = "yymmdd")
+
     private Long discardTime;
 
     @Column("asset_status")
@@ -72,7 +76,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("告警状态")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "alert_status", description = "告警状态")
-   @J4EName("告警状态")
+    @J4EName("告警状态")
     private String alertStatus="normal";
 
     /**

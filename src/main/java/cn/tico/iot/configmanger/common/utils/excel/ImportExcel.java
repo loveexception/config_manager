@@ -184,17 +184,17 @@ public class ImportExcel {
 		try{
 			Cell cell = row.getCell(column);
 			if (cell != null){
-				if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-					val = cell.getNumericCellValue();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_STRING){
-					val = cell.getStringCellValue();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA){
-					val = cell.getCellFormula();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN){
-					val = cell.getBooleanCellValue();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_ERROR){
-					val = cell.getErrorCellValue();
-				}
+//				if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+//					val = cell.getNumericCellValue();
+//				}else if (cell.getCellType() == Cell.CELL_TYPE_STRING){
+//					val = cell.getStringCellValue();
+//				}else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA){
+//					val = cell.getCellFormula();
+//				}else if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN){
+//					val = cell.getBooleanCellValue();
+//				}else if (cell.getCellType() == Cell.CELL_TYPE_ERROR){
+//					val = cell.getErrorCellValue();
+//				}
 			}
 		}catch (Exception e) {
 			return val;

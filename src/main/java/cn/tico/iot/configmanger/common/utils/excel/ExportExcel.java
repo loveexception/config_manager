@@ -221,60 +221,60 @@ public class ExportExcel {
 	private Map<String, CellStyle> createStyles(Workbook wb) {
 		Map<String, CellStyle> styles = new HashMap<String, CellStyle>();
 		
-		CellStyle style = wb.createCellStyle();
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		Font titleFont = wb.createFont();
-		titleFont.setFontName("Arial");
-		titleFont.setFontHeightInPoints((short) 16);
-		titleFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-		style.setFont(titleFont);
-		styles.put("title", style);
-
-		style = wb.createCellStyle();
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		style.setBorderRight(CellStyle.BORDER_THIN);
-		style.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-		style.setBorderLeft(CellStyle.BORDER_THIN);
-		style.setLeftBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-		style.setBorderTop(CellStyle.BORDER_THIN);
-		style.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-		style.setBorderBottom(CellStyle.BORDER_THIN);
-		style.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-		Font dataFont = wb.createFont();
-		dataFont.setFontName("Arial");
-		dataFont.setFontHeightInPoints((short) 10);
-		style.setFont(dataFont);
-		styles.put("data", style);
-		
-		style = wb.createCellStyle();
-		style.cloneStyleFrom(styles.get("data"));
-		style.setAlignment(CellStyle.ALIGN_LEFT);
-		styles.put("data1", style);
-
-		style = wb.createCellStyle();
-		style.cloneStyleFrom(styles.get("data"));
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		styles.put("data2", style);
-
-		style = wb.createCellStyle();
-		style.cloneStyleFrom(styles.get("data"));
-		style.setAlignment(CellStyle.ALIGN_RIGHT);
-		styles.put("data3", style);
-		
-		style = wb.createCellStyle();
-		style.cloneStyleFrom(styles.get("data"));
-//		style.setWrapText(true);
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		Font headerFont = wb.createFont();
-		headerFont.setFontName("Arial");
-		headerFont.setFontHeightInPoints((short) 10);
-		headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-		headerFont.setColor(IndexedColors.WHITE.getIndex());
-		style.setFont(headerFont);
-		styles.put("header", style);
+//		CellStyle style = wb.createCellStyle();
+//		style.setAlignment(CellStyle.ALIGN_CENTER);
+//		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+//		Font titleFont = wb.createFont();
+//		titleFont.setFontName("Arial");
+//		titleFont.setFontHeightInPoints((short) 16);
+//		titleFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+//		style.setFont(titleFont);
+//		styles.put("title", style);
+//
+//		style = wb.createCellStyle();
+//		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+//		style.setBorderRight(CellStyle.BORDER_THIN);
+//		style.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+//		style.setBorderLeft(CellStyle.BORDER_THIN);
+//		style.setLeftBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+//		style.setBorderTop(CellStyle.BORDER_THIN);
+//		style.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+//		style.setBorderBottom(CellStyle.BORDER_THIN);
+//		style.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+//		Font dataFont = wb.createFont();
+//		dataFont.setFontName("Arial");
+//		dataFont.setFontHeightInPoints((short) 10);
+//		style.setFont(dataFont);
+//		styles.put("data", style);
+//
+//		style = wb.createCellStyle();
+//		style.cloneStyleFrom(styles.get("data"));
+//		style.setAlignment(CellStyle.ALIGN_LEFT);
+//		styles.put("data1", style);
+//
+//		style = wb.createCellStyle();
+//		style.cloneStyleFrom(styles.get("data"));
+//		style.setAlignment(CellStyle.ALIGN_CENTER);
+//		styles.put("data2", style);
+//
+//		style = wb.createCellStyle();
+//		style.cloneStyleFrom(styles.get("data"));
+//		style.setAlignment(CellStyle.ALIGN_RIGHT);
+//		styles.put("data3", style);
+//
+//		style = wb.createCellStyle();
+//		style.cloneStyleFrom(styles.get("data"));
+////		style.setWrapText(true);
+//		style.setAlignment(CellStyle.ALIGN_CENTER);
+//		style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+//		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+//		Font headerFont = wb.createFont();
+//		headerFont.setFontName("Arial");
+//		headerFont.setFontHeightInPoints((short) 10);
+//		headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+//		headerFont.setColor(IndexedColors.WHITE.getIndex());
+//		style.setFont(headerFont);
+//		styles.put("header", style);
 		
 		return styles;
 	}

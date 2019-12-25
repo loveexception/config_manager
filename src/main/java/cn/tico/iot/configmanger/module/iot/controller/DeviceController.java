@@ -527,7 +527,8 @@ public class DeviceController implements AdminKey {
 		return  Result.success("system.success",result);
 	}
 
-	@At("/drivers_tags")
+	@At("/drivers_Y" +
+			"s")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
