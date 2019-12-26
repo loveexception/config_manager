@@ -9,6 +9,7 @@ import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Owner;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
@@ -21,7 +22,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.TIotDevices;
 import cn.tico.iot.configmanger.module.wx.services.TIotDevicesService;
-import cn.tico.iot.configmanger.common.base.Result;;
+import cn.tico.iot.configmanger.common.base.Result;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Sqls;
 import org.nutz.dao.sql.Sql;
@@ -68,6 +69,8 @@ public class TIotDevicesController implements AdminKey {
 	public DeptService deptService;
 	@Inject
 	public TIotOwnerService tIotOwnerService;
+	@Inject
+	public LocationService locationService;
 
 	@RequiresPermissions("wx:tIotDevices:view")
 	@At("")
@@ -126,9 +129,12 @@ public class TIotDevicesController implements AdminKey {
 			cnd.orderBy("sno", "desc");
 		}
 		TableDataInfo info = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
-				"^dept|kind|owner|next$");
+				"^dept|kind|owner|next|location$");
 		List<Device> list = (List<Device>) info.getRows();
-		List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=", "false").and("level", "in", Lists.newArrayList("3","1")));
+		List<Location> locations = locationService.query(cnd.NEW().and("delflag", "=", "false"));
+		myLocationsParentName(list, locations);
+		List<Kind> kinds = kindService
+				.query(Cnd.NEW().and("delflag", "=", "false").and("level", "in", Lists.newArrayList("3", "1")));
 		myKindNameFind(list, kinds);
 
 		return info;
@@ -177,7 +183,7 @@ public class TIotDevicesController implements AdminKey {
 	@Ok("th://wx/tIotDevices/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Device tIotDevices = deviceService.fetch(id);
-		deviceService.fetchLinks(tIotDevices, "^dept|next|kind$");
+		deviceService.fetchLinks(tIotDevices, "^dept|location|kind$");
 
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
@@ -217,7 +223,6 @@ public class TIotDevicesController implements AdminKey {
 			@Param("next.time") String time, HttpServletRequest req) {
 		try {
 			if (Lang.isNotEmpty(tIotDevices)) {
-
 				deviceService.insertUpdate(tIotDevices);
 
 				tIotDevices = deviceService.fetchLinks(tIotDevices, "next");
@@ -242,9 +247,12 @@ public class TIotDevicesController implements AdminKey {
 
 				}
 				String id = tIotDevices.getId();
-				deviceService.kafka(Lists.newArrayList(new Device(){{
-					setId(id);
-				}}));
+
+				deviceService.kafka(Lists.newArrayList(new Device() {
+					{
+						setId(id);
+					}
+				}));
 			}
 
 			return Result.success("system.success");
@@ -263,11 +271,11 @@ public class TIotDevicesController implements AdminKey {
 	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
 			deviceService.vDelete(ids);
-			List<Device> devices = Arrays.stream(ids).map(
-					id -> new Device(){{
-						this.setId(id);
-					}}).collect(Collectors.toList());
-
+			List<Device> devices = Arrays.stream(ids).map(id -> new Device() {
+				{
+					this.setId(id);
+				}
+			}).collect(Collectors.toList());
 
 			deviceService.kafka(devices);
 
@@ -441,11 +449,11 @@ public class TIotDevicesController implements AdminKey {
 				continue;
 			}
 			for (Kind k : kinds) {
-				if (Strings.equals(k.getLevel(),"3")&&fathers.contains(k.getId())) {
+				if (Strings.equals(k.getLevel(), "3") && fathers.contains(k.getId())) {
 					device.setKindmap(k.getCnName());
 
 				}
-				if (Strings.equals(k.getLevel(),"1")&&fathers.contains(k.getId())) {
+				if (Strings.equals(k.getLevel(), "1") && fathers.contains(k.getId())) {
 					device.setLocationState(k.getCnName());
 
 				}
@@ -461,6 +469,39 @@ public class TIotDevicesController implements AdminKey {
 			device.setGatewayExtsno(last.getTime());
 
 		}
+	}
+
+	public void myLocationsParentName(List<Device> device, List<Location> locations) {
+		Logs.get().debugf("otherparts:%s,location:%s", device.size(), locations.size());
+
+		if (Lang.isEmpty(device)) {
+			return;
+		}
+		if (Lang.isEmpty(locations)) {
+			return;
+		}
+
+		device.stream().forEach(part -> {
+			Location partLocal = part.getLocation();
+			if (Lang.isEmpty(partLocal)) {
+				return;
+			}
+			String father = partLocal.getAncestors();
+
+			String cnName = partLocal.getCnName();
+			if (Lang.isEmpty(partLocal)) {
+				return;
+			}
+			List<String> names = locations.stream().filter(location -> StringUtils.contains(father, location.getId()))
+					.sorted(Comparator.comparing(location -> location.getLevel())).map(location -> location.getCnName())
+					.collect(Collectors.toList());
+			names.add(cnName);
+
+			partLocal.setCnName(Strings.join("-", names));
+			part.setLocation(partLocal);
+
+		});
+
 	}
 
 }
