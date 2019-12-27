@@ -5,6 +5,7 @@ import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Comment;
+import org.nutz.integration.json4excel.annotation.J4EName;
 import org.nutz.lang.util.NutMap;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ public  class I18NModel extends CommonModel {
     @Column("cn_name")
     @Comment("名称")
     @GraphQLQuery(name = "cn_name", description = "中文名")
-    @ExcelField(title = "名称")
+    @J4EName( "名称")
     private String cnName;
     /**
      * 编码
@@ -25,6 +26,7 @@ public  class I18NModel extends CommonModel {
     @Column("en_name")
     @Comment("编码")
     @GraphQLQuery(name = "en_name", description = "english name")
+    @J4EName("英文名称")
     private String enName;
 
     @GraphQLQuery(name = "i18n", description = "组合名")

@@ -3,7 +3,6 @@ package cn.tico.iot.configmanger.module.open.api;
 import cn.tico.iot.configmanger.common.wxpay.util.WXPayUtil;
 import cn.tico.iot.configmanger.common.wxpay.util.WebChatUtil;
 import io.swagger.annotations.Api;
-import org.dom4j.DocumentException;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.POST;
@@ -112,8 +111,8 @@ public class OpenWeixinController {
             }
         } catch (IOException e) {
             log.error("获取输入流失败", e);
-        } catch (DocumentException e) {
-            log.error("读取XML失败", e);
+//        } catch (DocumentException e) {
+//            log.error("读取XML失败", e);
         } catch (Exception e) {
             e.printStackTrace();
         }

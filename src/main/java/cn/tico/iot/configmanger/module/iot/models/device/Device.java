@@ -1,11 +1,12 @@
 package cn.tico.iot.configmanger.module.iot.models.device;
 
-import cn.tico.iot.configmanger.common.utils.excel.annotation.ExcelField;
 import cn.tico.iot.configmanger.module.iot.models.DeviceEnvModel;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.*;
 import org.nutz.dao.entity.annotation.*;
+import org.nutz.integration.json4excel.annotation.J4EDateFormat;
+import org.nutz.integration.json4excel.annotation.J4EName;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Data
 @Table("t_iot_devices")
+@J4EName("设备")
 public class Device extends DeviceEnvModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,14 +26,14 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("机器码")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "sno", description = "机器码")
-    @ExcelField(title="sno",value="sno")
+    @J4EName("sno")
     private String sno;
 
     @Column("price")
     @Comment("价格")
     @ColDefine(type = ColType.FLOAT  )
     @GraphQLQuery(name = "price", description = "价格")
-    @ExcelField(title="价格",value = "")
+    @J4EName("价格")
 
     private Double price;
 
@@ -40,8 +42,10 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("购买日期")
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "order_time", description = "购买日期")
-    @ExcelField(title="购买日期")
-    private String orderTime;
+
+    @J4EName("购买日期")
+    @J4EDateFormat(from = "yyyy-mm-dd",to = "yymmdd")
+    private Long orderTime;
 
 
 
@@ -49,21 +53,23 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("使用年限")
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "quality", description = "使用年限")
-    @ExcelField(title="使用年限")
+    @J4EName("使用年限")
     private Integer quality;
 
     @Column("discard_time")
     @Comment("报废时间")
     @ColDefine(type = ColType.INT, width = 32)
     @GraphQLQuery(name = "discard_time", description = "报废时间")
-    @ExcelField(title="报废时间")
-    private String discardTime;
 
+    @J4EName("报废时间")
+    @J4EDateFormat(from = "yyyy-mm-dd",to = "yymmdd")
+
+    private Long discardTime;
     @Column("asset_status")
     @Comment("资产状态,0,1,2")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "asset_status", description = "资产状态")
-    @ExcelField(title="资产状态")
+    @J4EName("资产状态")
     private String assetStatus ="0";
 
 
@@ -71,7 +77,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("告警状态")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "alert_status", description = "告警状态")
-    @ExcelField(title="告警状态")
+    @J4EName("告警状态")
     private String alertStatus="normal";
 
     /**
@@ -79,7 +85,7 @@ public class Device extends DeviceEnvModel implements Serializable {
      */
     @Column("gateway_id")
     @Comment("网关")
-    @ExcelField(title="所属网关")
+    @J4EName("所属网关")
     private String gatewayid;
 
     /**
@@ -98,7 +104,7 @@ public class Device extends DeviceEnvModel implements Serializable {
      */
     @Column("driver_id")
     @Comment("驱动")
-    @ExcelField(title = "驱动名称")
+    @J4EName( "驱动名称")
     private String driverid;
 
 
