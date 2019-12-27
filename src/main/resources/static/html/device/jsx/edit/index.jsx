@@ -673,9 +673,9 @@ class BasicInformation extends React.PureComponent {
 								]
 							})(
 								<Select style={{ width: '100%' }} placeholder="请选择资产状态">
-									<Select.Option value={'0'}>闲置</Select.Option>
+									<Select.Option value={'2'}>闲置</Select.Option>
 									<Select.Option value={'1'}>使用中</Select.Option>
-									<Select.Option value={'2'}>报废</Select.Option>
+									<Select.Option value={'0'}>报废</Select.Option>
 								</Select>
 							)}
 						</Form.Item>

@@ -1,151 +1,141 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<meta charset="utf-8" />
-<head th:include="include :: header"></head>
-<body class="white-bg">
-<div class="wrapper wrapper-content animated fadeInRight ibox-content">
-	<form class="form-horizontal m" id="form-tIotDevices-edit">
-		<input id="id" name="id" th:value="${pars.id}" type="hidden" />
+	<meta charset="utf-8" />
+	<head th:include="include :: header"></head>
+	<body class="white-bg">
+		<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+			<form class="form-horizontal m" id="form-tIotDevices-edit">
+				<input id="id" name="id" th:value="${pars.id}" type="hidden" />
 
+				<div class="form-group">
+					<label class="col-sm-3 control-label">设备序列号：</label>
+					<div class="col-sm-8">
+						<input id="sno" name="sno" class="form-control" th:value="${pars.sno}" type="text" />
+					</div>
+				</div>
 
+				<div class="form-group">
+					<label class="col-sm-3 control-label">设备名称：</label>
+					<div class="col-sm-8">
+						<input id="cnName" name="cnName" class="form-control" th:value="${pars.cnName}" type="text" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">设备型号：</label>
+					<div class="col-sm-8">
+						<input id="kindId" name="kindId" type="hidden" th:value="${pars.kindId}" />
 
-        <div class="form-group">
-            <label class="col-sm-3 control-label">设备编码：</label>
-            <div class="col-sm-8">
-                <input id="sno" name="sno" class="form-control" th:value="${pars.sno}" type="text" />
-            </div>
-        </div>
+						<input id="kindName" name="kindName" class="form-control" th:value="${(pars.kind)?pars.kind.cnName:''}" type="text" onclick="selectKindTree()" readonly="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">IP地址：</label>
+					<div class="col-sm-8">
+						<input id="ip" name="ip" class="form-control" th:value="${pars.ip}" type="text" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label ">所属机构：</label>
+					<div class="col-sm-8">
+						<input id="deptId" name="deptId" type="hidden" th:value="${pars.dept.id}" />
+						<input class="form-control" type="text" onclick="selectDept()" id="deptName" readonly="true" th:value="${pars.dept.deptName}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">存放地点</label>
+					<div class="col-sm-8">
+						<input id="locationId" name="locationId" type="hidden" th:value="${pars.locationId}" />
+						<input id="locationName" name="locationName" th:value="${(pars.location)?pars.location.cnName:''}" class="form-control" type="text" onclick="selectLocationTree()" readonly="true" />
+					</div>
+				</div>
 
-        <div class="form-group">
-            <label class="col-sm-3 control-label">设备名称：</label>
-            <div class="col-sm-8">
-                <input id="cnName" name="cnName" class="form-control" th:value="${pars.cnName}" type="text" />
-            </div>
-        </div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">投运日期：</label>
+					<div class="col-sm-8">
+						<input id="orderTime" name="orderTime" class="time-input form-control" th:value="${#dates.format(pars.orderTime, 'yyyy-MM-dd')}" type="text" />
+					</div>
+				</div>
 
+				<div class="form-group">
+					<label class="col-sm-3 control-label">数量：</label>
+					<div class="col-sm-8">
+						<input id="total" name="total" class="form-control" th:value="${pars.total}" type="text" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">版本号：</label>
+					<div class="col-sm-8">
+						<input id="version" name="version" class="form-control" th:value="${pars.version}" type="text" />
+					</div>
+				</div>
 
-        <div class="form-group">
-            <label class="col-sm-3 control-label ">所属机构：</label>
-            <div class="col-sm-8">
-                <input id="deptId" name="deptId" type="hidden" th:value="${pars.dept.id}" />
-                <input class="form-control" type="text" onclick="selectDept()" id="deptName" readonly="true" th:value="${pars.dept.deptName}" />
-            </div>
-        </div>
+				<input type="hidden" name="status" value="true" />
+			</form>
+		</div>
+		<div th:include="include::footer"></div>
+		<script type="text/javascript">
+			var prefix = ctx + 'mao/pars';
+			$('#form-tIotDevices-edit').validate({
+				onkeyup: false,
+				rules: {
+					xxxx: {
+						required: true
+					}
+				}
+			});
 
-        <div class="form-group">
-            <label class="col-sm-3 control-label">投运日期：</label>
-            <div class="col-sm-8">
-                <input id="orderTime" name="orderTime" class="time-input form-control" th:value="${#dates.format(pars.orderTime, 'yyyy-MM-dd')}" type="text" />
-            </div>
-        </div>
+			function submitHandler() {
+				if ($.validate.form()) {
+					$.operate.save(prefix + '/editDo', $('#form-tIotDevices-edit').serialize());
+				}
+			}
 
+			/*选择组织*/
+			function selectDept() {
+				var options = {
+					title: '选择组织',
+					width: '380',
+					url: '/sys/dept/selectTree/100', //+ "/selectDept/100"),
+					callBack: function(index, layero) {
+						var body = layer.getChildFrame('body', index);
+						$('#deptid').val(body.find('#treeId').val());
+						$('#deptName').val(body.find('#treeName').val());
+						layer.close(index);
+					}
+				};
+				$.modal.openOptions(options);
+			}
 
-
-
-        <div class="form-group">
-            <label class="col-sm-3 control-label">设备型号：</label>
-            <div class="col-sm-8">
-                <input id="kindId" name="kindId" type="hidden" th:value="${pars.kindId}"  />
-
-                <input id="kindName" name="kindName" class="form-control" th:value="${(pars.kind)?pars.kind.cnName:''}" type="text" onclick="selectKindTree()" readonly="true" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">所在地址：</label>
-            <div class="col-sm-8">
-                <input id="locationId" name="locationId" type="hidden" th:value="${pars.locationId}" />
-                <input id="locationName" name="locationName" th:value="${(pars.location)?pars.location.cnName:''}" class="form-control"  type="text" onclick="selectLocationTree()" readonly="true" />
-            </div>
-        </div>
-
-
-        <div class="form-group">
-            <label class="col-sm-3 control-label">IP地址：</label>
-            <div class="col-sm-8">
-                <input id="ip" name="ip" class="form-control" th:value="${pars.ip}" type="text" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">数量：</label>
-            <div class="col-sm-8">
-                <input id="total" name="total" class="form-control" th:value="${pars.total}" type="text" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">版本号：</label>
-            <div class="col-sm-8">
-                <input id="version" name="version" class="form-control" th:value="${pars.version}" type="text" />
-            </div>
-        </div>
-
-
-		<input type="hidden" name="status" value="true" />
-	</form>
-</div>
-<div th:include="include::footer"></div>
-<script type="text/javascript">
-    var prefix = ctx + 'mao/pars';
-    $('#form-tIotDevices-edit').validate({
-        onkeyup: false,
-        rules: {
-            xxxx: {
-                required: true
-            }
-        }
-    });
-
-    function submitHandler() {
-        if ($.validate.form()) {
-            $.operate.save(prefix + '/editDo', $('#form-tIotDevices-edit').serialize());
-        }
-    }
-
-    /*选择组织*/
-    function selectDept() {
-        var options = {
-            title: '选择组织',
-            width: '380',
-            url: '/sys/dept/selectTree/100', //+ "/selectDept/100"),
-            callBack: function(index, layero) {
-                var body = layer.getChildFrame('body', index);
-                $('#deptid').val(body.find('#treeId').val());
-                $('#deptName').val(body.find('#treeName').val());
-                layer.close(index);
-            }
-        };
-        $.modal.openOptions(options);
-    }
-
-    /*地理管理-新增-选择父部门树*/
-    function selectKindTree() {
-        var options = {
-            title: '地区选择',
-            width: '380',
-            url: '/' + 'iot/kind' + '/selectTree/' + $('#kindId').val(),
-            callBack: function(index, layero) {
-                var body = layer.getChildFrame('body', index);
-                $('#kindId').val(body.find('#treeId').val());
-                $('#kindName').val(body.find('#treeName').val());
-                layer.close(index);
-            }
-        };
-        $.modal.openOptions(options);
-    }
-    /*地理管理-新增-选择父部门树*/
-    function selectLocationTree() {
-        var options = {
-            title: '地区选择',
-            width: '380',
-            url: ctx + "iot/location/selectTree/" + "10000",
-            callBack: function(index, layero) {
-                var body = layer.getChildFrame('body', index);
-                $('#locationId').val(body.find('#treeId').val());
-                $('#locationName').val(body.find('#treeName').val());
-                layer.close(index);
-            }
-        };
-        $.modal.openOptions(options);
-    }
-</script>
-</body>
+			/*地理管理-新增-选择父部门树*/
+			function selectKindTree() {
+				var options = {
+					title: '地区选择',
+					width: '380',
+					url: '/' + 'iot/kind' + '/selectTree/' + $('#kindId').val(),
+					callBack: function(index, layero) {
+						var body = layer.getChildFrame('body', index);
+						$('#kindId').val(body.find('#treeId').val());
+						$('#kindName').val(body.find('#treeName').val());
+						layer.close(index);
+					}
+				};
+				$.modal.openOptions(options);
+			}
+			/*地理管理-新增-选择父部门树*/
+			function selectLocationTree() {
+				var options = {
+					title: '地区选择',
+					width: '380',
+					url: ctx + 'iot/location/selectTree/' + '10000',
+					callBack: function(index, layero) {
+						var body = layer.getChildFrame('body', index);
+						$('#locationId').val(body.find('#treeId').val());
+						$('#locationName').val(body.find('#treeName').val());
+						layer.close(index);
+					}
+				};
+				$.modal.openOptions(options);
+			}
+		</script>
+	</body>
 </html>
