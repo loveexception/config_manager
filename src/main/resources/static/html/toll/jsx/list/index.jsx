@@ -278,6 +278,9 @@ function EditableFormTable(props) {
 	]);
 	let [strategy, setStrategy] = React.useState({ level: 0, upgrade: '', condition: '' });
 	const radio = ['紧急', '重要', '次要 ', '提示'];
+	function handleChange() {
+		console.log(1);
+	}
 	const columns = [
 		{
 			title: 'Name',
@@ -293,17 +296,9 @@ function EditableFormTable(props) {
 			render: data => {
 				if (data === '1') {
 					return (
-						<Radio.Group name="radiogroup" defaultValue={0}>
+						<Radio.Group name="radiogroup" onChange={handleChange} defaultValue={0}>
 							{radio.map((item, index) => (
-								<Radio
-									onClick={e => {
-										console.log(e.target.parent);
-									}}
-									key={index}
-									value={index}
-									size="large"
-									style={{ fontSize: '0.1rem', color: '#999' }}
-								>
+								<Radio key={index} value={index} checked={index == strategy.level ? true : false} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
 								</Radio>
 							))}
@@ -318,12 +313,12 @@ function EditableFormTable(props) {
 
 	useEffect(() => {
 		return () => {};
-	}, [strategy]);
+	}, [props, strategy]);
 	let handleClick = () => {
 		$.get();
 	};
 	let handleEdit = (mes, index, e) => {
-		setStrategy({ ...mes });
+		setStrategy({ ...mes, level: index });
 	};
 	let headerFn = () => {
 		let { isUpgradeFn } = props;
@@ -377,7 +372,6 @@ class Toll extends React.PureComponent {
 			isUpgrade: true
 		};
 	}
-
 	init = () => {};
 	handleClick = () => {};
 	isUpgradeFn = () => {
