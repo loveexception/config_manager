@@ -93,12 +93,12 @@ public class ParsController implements AdminKey {
 	// @RequiresPermissions("wx:mao:pars:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("enName") String enName,
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("sno") String sno,
 			@Param("cnName") String cnName, @Param("assetStatus") String assetStatus,
 			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (Strings.isNotBlank(enName)) {
-			cnd.and("en_name", "like", "%" + enName + "%");
+		if (Strings.isNotBlank(sno)) {
+			cnd.and("sno", "like", "%" + sno + "%");
 		}
 		if (Strings.isNotBlank(cnName)) {
 			cnd.and("cn_name", "like", "%" + cnName + "%");
@@ -122,8 +122,8 @@ public class ParsController implements AdminKey {
 		// List<Kind> kinds = kindService.query(Cnd.NEW().and("delflag", "=",
 		// "false").and("level", "in", Lists.newArrayList("3","1")));
 		myKindNameFind(list, kinds);
-		List<Location> locations = locationService.query(cnd.NEW().and("delflag","=","false"));
-		myLocationsParentName(list,locations);
+		List<Location> locations = locationService.query(cnd.NEW().and("delflag", "=", "false"));
+		myLocationsParentName(list, locations);
 		// info.setRows(listmap);
 
 		return info;
@@ -202,9 +202,7 @@ public class ParsController implements AdminKey {
 			tIotDevices.setUpdateTime(new Date());
 			Dao forup = Daos.ext(parsService.dao(), FieldFilter.create(tIotDevices.getClass(), true));
 			forup.update(tIotDevices);
-
 			return Result.success("system.success", tIotDevices);
-
 		} else {
 			return Result.error("system.error");
 
@@ -258,36 +256,33 @@ public class ParsController implements AdminKey {
 	}
 
 	public void myLocationsParentName(List<OtherParts> otherParts, List<Location> locations) {
-		Logs.get().debugf("otherparts:%s,location:%s",otherParts.size(),locations.size());
+		Logs.get().debugf("otherparts:%s,location:%s", otherParts.size(), locations.size());
 
-		if(Lang.isEmpty(otherParts)){
+		if (Lang.isEmpty(otherParts)) {
 			return;
 		}
-		if(Lang.isEmpty(locations)){
-			return ;
+		if (Lang.isEmpty(locations)) {
+			return;
 		}
 
 		otherParts.stream().forEach(part -> {
 			Location partLocal = part.getLocation();
-			if(Lang.isEmpty(partLocal)){
-				return ;
+			if (Lang.isEmpty(partLocal)) {
+				return;
 			}
 			String father = partLocal.getAncestors();
 
 			String cnName = partLocal.getCnName();
-			if(Lang.isEmpty(partLocal)){
+			if (Lang.isEmpty(partLocal)) {
 				return;
 			}
-				List<String> names = locations.stream()
-						.filter(location -> StringUtils.contains(father,location.getId()))
-						.sorted(Comparator.comparing(location -> location.getLevel()))
-						.map(location -> location.getCnName())
-						.collect(Collectors.toList());
-				names.add(cnName);
+			List<String> names = locations.stream().filter(location -> StringUtils.contains(father, location.getId()))
+					.sorted(Comparator.comparing(location -> location.getLevel())).map(location -> location.getCnName())
+					.collect(Collectors.toList());
+			names.add(cnName);
 
-				partLocal.setCnName(Strings.join("-",names));
-				part.setLocation(partLocal);
-
+			partLocal.setCnName(Strings.join("-", names));
+			part.setLocation(partLocal);
 
 		});
 

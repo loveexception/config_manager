@@ -1,5 +1,6 @@
 //适配方案10等份
 (function flexible(window, document) {
+	let id;
 	var docEl = document.documentElement;
 	var dpr = window.devicePixelRatio || 1;
 
@@ -15,8 +16,14 @@
 
 	// set 1rem = viewWidth / 10
 	function setRemUnit() {
-		var rem = docEl.clientWidth / 10;
-		docEl.style.fontSize = rem + 'px';
+		if (id) {
+			clearTimeout(id);
+		}
+		id = setTimeout(() => {
+			var rem = docEl.clientWidth / 10;
+			docEl.style.fontSize = rem + 'px';
+			id = null;
+		}, 500); //防抖
 	}
 
 	setRemUnit();

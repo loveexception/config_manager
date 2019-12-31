@@ -76,11 +76,6 @@
 							sortable: true
 						},
 						{
-							field: 'ip',
-							title: 'IP地址',
-							sortable: true
-						},
-						{
 							field: 'dept.deptName',
 							title: '所属机构'
 						},
@@ -101,20 +96,8 @@
 						},
 						{
 							field: 'orderTime',
-							title: '投运日期',
+							title: '入库日期',
 							sortable: true
-						},
-						{
-							field: 'status',
-							title: '运行状态',
-							sortable: true,
-							formatter: function(value, row, index) {
-								if (value) {
-									return '备用';
-								} else {
-									return '已用';
-								}
-							}
 						},
 						{
 							field: 'total',

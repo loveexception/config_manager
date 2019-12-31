@@ -93,14 +93,14 @@ public class CreateTableTest {
 
     }
 
-    @Test
-    public void allTable(){
-
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true );
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true );
-       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
-
-       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
-    }
+//    @Test
+//    public void allTable(){
+//
+//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true );
+//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true );
+//       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
+//
+//       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
+//    }
 
 }

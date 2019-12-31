@@ -104,12 +104,12 @@ public class TIotDevicesController implements AdminKey {
 	@RequiresPermissions("wx:tIotDevices:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("enName") String enName,
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("sno") String sno,
 			@Param("cnName") String cnName, @Param("assetStatus") String assetStatus,
 			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (Strings.isNotBlank(enName)) {
-			cnd.and("en_name", "like", "%" + enName + "%");
+		if (Strings.isNotBlank(sno)) {
+			cnd.and("sno", "like", "%" + sno + "%");
 		}
 		if (Strings.isNotBlank(cnName)) {
 			cnd.and("cn_name", "like", "%" + cnName + "%");

@@ -8,7 +8,7 @@ import cn.tico.iot.configmanger.module.wx.services.OtherEmpService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.OtherWorkflow;
 import cn.tico.iot.configmanger.module.wx.services.OtherWorkflowService;
-import cn.tico.iot.configmanger.common.base.Result;;
+import cn.tico.iot.configmanger.common.base.Result;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;

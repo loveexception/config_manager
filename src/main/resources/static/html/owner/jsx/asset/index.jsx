@@ -176,7 +176,7 @@ class ChartCircle extends React.PureComponent {
 					shadowColor: 'rgba(0, 0, 0, .45)'
 				},
 				formatter: function formatter(val) {
-					return (val - 0).toFixed(2) * 100 + '%';
+					return ((val - 0) * 100).toFixed(0) + '%';
 				}
 			});
 		chart.guide().html({
