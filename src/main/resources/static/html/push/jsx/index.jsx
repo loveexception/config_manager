@@ -38,10 +38,16 @@ class PushFrom extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: {
+			_data: {
 				text: ['取消告警', '紧急告警', '重要告警', '次要告警', '告警提示'],
 				numPar: [0, 25, 50, 75, 100],
-				numCol: ['弹窗', '响铃', '列表']
+				numCol: ['弹窗', '响铃', '列表'],
+				column: [],
+				dataSource: [
+					{
+						radio: '弹窗'
+					}
+				]
 			}
 		};
 	}
@@ -63,7 +69,7 @@ class PushFrom extends React.Component {
 	};
 
 	render() {
-		let { data } = this.state;
+		let { _data } = this.state;
 		const { getFieldDecorator } = this.props.form;
 		const formItemLayout = {
 			labelCol: { span: 6 },
@@ -71,61 +77,82 @@ class PushFrom extends React.Component {
 		};
 		return (
 			<Form {...formItemLayout} onSubmit={this.handleSubmit}>
-				<Row>
-					<Col span={5}>
-						<Form.Item label="checkbox">
-							{getFieldDecorator('checkbox', {
-								initialValue: [data.text[0]]
-							})(
-								<Checkbox.Group style={{ width: '100%' }}>
-									<Row>
-										{data.numCol.map((e, i) => {
-											return (
-												<Checkbox value={i} key={i}>
-													{e}
-												</Checkbox>
-											);
-										})}
-									</Row>
-								</Checkbox.Group>
-							)}
-						</Form.Item>
-					</Col>
-					<Col span={19}>
-						{data.numCol.map((e, i) => {
-							let config = {};
-							data.numPar.map((item, index) => {
-								config[item] = data.text[index];
-							});
-							return <FromItem key={i} label={i == 0 ? 'T' : i == 1 ? 'X' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
-						})}
-						{/* <Form.Item label="Slider3">
-							{getFieldDecorator('slider3')(
-								<Slider
-									marks={{
-										0: 'A',
-										20: 'B',
-										40: 'C',
-										100: 'F'
+				<MTable
+					config={{
+						pagination: false,
+						footerFn: () => (
+							<Form.Item wrapperCol={{ span: 24, offset: 20 }}>
+								<Button type="primary" htmlType="submit" style={{ marginRight: '0.2rem' }}>
+									保存
+								</Button>
+								<Button
+									onClick={() => {
+										this.props.form && this.props.form.resetFields();
 									}}
-								/>
-							)}
-						</Form.Item> */}
-					</Col>
-				</Row>
-
-				<Form.Item wrapperCol={{ span: 24, offset: 20 }}>
-					<Button type="primary" htmlType="submit" style={{ marginRight: '0.2rem' }}>
-						保存
-					</Button>
-					<Button
-						onClick={() => {
-							this.props.form && this.props.form.resetFields();
-						}}
-					>
-						重置
-					</Button>
-				</Form.Item>
+								>
+									重置
+								</Button>
+							</Form.Item>
+						),
+						columns: [
+							{
+								dataIndex: 'radio',
+								align: 'center',
+								width: '13%',
+								title: '通知方式',
+								render: (value, mes, i) => (
+									<Form.Item label="checkbox">
+										{getFieldDecorator('checkbox', {
+											initialValue: [_data.text[0]]
+										})(
+											<Checkbox.Group style={{ width: '100%' }}>
+												{
+													<Checkbox value={i} key={i}>
+														{value}
+													</Checkbox>
+												}
+												{/* {data.numCol.map((e, i) => {
+													return (
+														<Checkbox value={i} key={i}>
+															{e}
+														</Checkbox>
+													);
+												})} */}
+											</Checkbox.Group>
+										)}
+									</Form.Item>
+								)
+							},
+							{
+								dataIndex: 'level',
+								align: 'left',
+								className: 'polling-level',
+								title: `告警级别`,
+								render: (v, m, i) => {
+									let config = {};
+									_data.numPar.map((item, index) => {
+										config[item] = _data.text[index];
+									});
+									return <FromItem key={i} label={i == 0 ? 'T' : i == 1 ? 'X' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
+								}
+							}
+						],
+						data: [
+							{
+								radio: '弹窗',
+								level: 25
+							},
+							{
+								radio: '响铃',
+								level: 0
+							},
+							{
+								radio: '列表',
+								level: 0
+							}
+						] //data._dataa.dataSource
+					}}
+				/>
 			</Form>
 		);
 	}

@@ -11,6 +11,7 @@ const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
 
+let setInitValue = () => {};
 //demo TabList
 
 const FooterEditableContext = React.createContext();
@@ -194,16 +195,7 @@ class FooterEditableTable extends React.Component {
 
 		return (
 			<FooterEditableContext.Provider value={this.props.form}>
-				<Table
-					components={components}
-					bordered
-					dataSource={this.state.data}
-					columns={columns}
-					rowClassName="editable-row"
-					pagination={{
-						onChange: this.cancel
-					}}
-				/>
+				<Table components={components} bordered dataSource={this.state.data} columns={columns} rowClassName="editable-row" pagination={false} />
 			</FooterEditableContext.Provider>
 		);
 	}
@@ -248,6 +240,10 @@ let InputCom = function(props) {
 		</div>
 	);
 };
+InputCom = React.memo(InputCom, function(p, nextP) {
+	console.log(nextP, 'nextP', 'p', p);
+	return true;
+});
 function MyButton(props) {
 	return (
 		<a className="My-button-style" {...props}>
@@ -259,6 +255,7 @@ const FooterEditableFormTable = Form.create()(FooterEditableTable);
 
 // Tablist
 function EditableFormTable(props) {
+	let [initValue, setInitValue] = useState(0);
 	let [data, setData] = React.useState([
 		{
 			key: '1',
@@ -278,8 +275,8 @@ function EditableFormTable(props) {
 	]);
 	let [strategy, setStrategy] = React.useState({ level: 0, upgrade: '', condition: '' });
 	const radio = ['紧急', '重要', '次要 ', '提示'];
-	function handleChange() {
-		console.log(1);
+	function handleChange(e) {
+		setStrategy({ ...strategy, level: e.target.value });
 	}
 	const columns = [
 		{
@@ -296,9 +293,9 @@ function EditableFormTable(props) {
 			render: data => {
 				if (data === '1') {
 					return (
-						<Radio.Group name="radiogroup" onChange={handleChange} defaultValue={0}>
+						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.level}>
 							{radio.map((item, index) => (
-								<Radio key={index} value={index} checked={index == strategy.level ? true : false} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
+								<Radio key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
 								</Radio>
 							))}
@@ -318,6 +315,7 @@ function EditableFormTable(props) {
 		$.get();
 	};
 	let handleEdit = (mes, index, e) => {
+		setInitValue(index);
 		setStrategy({ ...mes, level: index });
 	};
 	let headerFn = () => {
@@ -356,7 +354,7 @@ function EditableFormTable(props) {
 	return (
 		<div className="middle-table">
 			<div className="middle-table-box">
-				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} />
+				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
 			<div className="footer-table-box">
 				<FooterEditableFormTable handleEdit={handleEdit} className="footer-table" />
