@@ -18,89 +18,87 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class CreateTableTest {
-    Dao dao ;
+	Dao dao;
 
+	@Before
+	public void setUp() throws Exception {
 
-    @Before
-    public void setUp() throws Exception {
+		dao = MysqlTestDao.NEW2();
+		// Daos.createTablesInPackage(dao, "cn.tico.iot.configmanger.module.iot.models",
+		// true);
 
+		// Daos.migration(dao, "cn.tico.iot.configmanger.module.iot.models", true,
+		// false, false);
 
-        dao = MysqlTestDao.NEW2();
-       // Daos.createTablesInPackage(dao, "cn.tico.iot.configmanger.module.iot.models", true);
+	}
 
-        //Daos.migration(dao, "cn.tico.iot.configmanger.module.iot.models", true, false, false);
+	@After
+	public void tearDown() throws Exception {
+		dao = null;
+	}
 
-    }
+	// @Test
+	public void getId() {
+		Kind kind = new Kind();
+		dao.create(Kind.class, true);
 
-    @After
-    public void tearDown() throws Exception {
-        dao = null;
-    }
+		dao.insert(kind);
+		assertNotNull(kind.getId());
 
+	}
 
-    //@Test
-    public void getId() {
-        Kind kind = new Kind();
-        dao.create(Kind.class,true);
+	// @Test
+	public void getModel() {
+		Device dev = new Device();
 
-        dao.insert(kind);
-        assertNotNull(kind.getId());
+		dao.create(Device.class, true);
+		dao.create(Dept.class, true);
+		Dept dept = new Dept();
+		dev.setDept(dept);
+		dao.insertWith(dev, "dept");
 
+	}
 
-    }
-    //@Test
-    public void getModel() {
-        Device dev = new Device();
+	// @Test
+	public void getJson() {
+		Device dev = new Device();
 
-        dao.create(Device.class,true);
-        dao.create(Dept.class,true);
-        Dept dept = new Dept();
-        dev.setDept(dept);
-        dao.insertWith(dev,"dept");
+		dev.setId("1001");
+		dev.setCnName("前门应急");
+		dev.setEnName("qianMen550");
 
+		dev.setSno("F0X4343345");
+		dev.setIp("192.168.7.55");
+		dev.setCycle(30000);
 
+		String json = Json.toJson(dev);
+		dev.getEnv();
 
-    }
+		System.out.println(json);
+	}
 
-    //@Test
-    public void getJson() {
-        Device dev = new Device();
+	// @Test
+	public void getTag() {
+		dao.create(Tag.class, true);
+	}
 
-        dev.setId("1001");
-        dev.setCnName("前门应急");
-        dev.setEnName("qianMen550");
+	// @Test
+	public void getKind() {
+		dao.create(Normal.class, true);
 
-        dev.setSno("F0X4343345");
-        dev.setIp("192.168.7.55");
-        dev.setCycle(30000);
+	}
 
-        String json = Json.toJson(dev);
-        dev.getEnv();
-
-        System.out.println(json);
-
-
-    }
-
-    //@Test
-    public  void getTag(){
-        dao.create(Tag.class,true);
-    }
-
-    //@Test
-    public  void getKind(){
-        dao.create(Normal.class,true);
-
-    }
-
-//    @Test
-//    public void allTable(){
-//
-//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true );
-//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true );
-//       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
-//
-//       // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
-//    }
+	// @Test
+	// public void allTable(){
+	//
+	// Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true
+	// );
+	// Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true
+	// );
+	// // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
+	//
+	// //
+	// Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true);
+	// }
 
 }
