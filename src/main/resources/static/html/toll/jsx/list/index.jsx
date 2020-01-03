@@ -370,7 +370,14 @@ class Toll extends React.PureComponent {
 			isUpgrade: true
 		};
 	}
-	init = () => {};
+	componentDidMount(){
+		this.init()
+	}
+	init = () => {
+		$.post('/mao/upgrades',(results)=>{
+			console.log(results,'results')
+		})
+	};
 	handleClick = () => {};
 	isUpgradeFn = () => {
 		this.setState({ isUpgrade: !this.isUpgradeFn });
