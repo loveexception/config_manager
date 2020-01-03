@@ -26,7 +26,7 @@ public class Device extends DeviceEnvModel implements Serializable {
     @Comment("机器码")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @GraphQLQuery(name = "sno", description = "机器码")
-    @J4EName("sno")
+    @J4EName("机器码")
     private String sno;
 
     @Column("price")
