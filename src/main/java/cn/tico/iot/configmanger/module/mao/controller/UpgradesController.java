@@ -62,10 +62,10 @@ public class UpgradesController {
 					   @Param("endTime") Date endTime,
 					   @Param("orderByColumn") String orderByColumn,
 					   @Param("isAsc") String isAsc,
+					   @Param("adress") String adress,
 					   HttpServletRequest req) {
-				
-
-		Cnd cnd = Cnd.NEW();
+						String deptid = ShiroUtils.getSysUser().getDeptId();
+						Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
 			cnd.and("cnName", "like", "%" + name +"%");
 		}
@@ -75,9 +75,15 @@ public class UpgradesController {
 		if(Lang.isNotEmpty(endTime)){
 			cnd.and("create_time","<=", endTime);
 		}
+		if(Strings.isNotBlank(adress)){
+			cnd.and("adress","like","%"+adress+"%");
+		}
+		if(Strings.isNotBlank(deptid)){
+			cnd.and("dept_id","=", deptid);
+			
+		}
 		return upgradesService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
-
 	/**
 	 * 新增告警升级
 	 */
@@ -87,6 +93,7 @@ public class UpgradesController {
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
 		Dept dept = deptService.fetch(deptid);
+		req.setAttribute("dept", dept);
 
 	}
 
@@ -99,6 +106,10 @@ public class UpgradesController {
 	@Slog(tag="告警升级", after="新增保存告警升级 id=${args[0].id}")
 	public Object addDo(@Param("..") Upgrades upgrades,HttpServletRequest req) {
 		try {
+			String deptid = ShiroUtils.getSysUser().getDeptId();
+			if(Strings.isNotBlank(deptid)){
+				upgrades.setDeptId(deptid);
+			}
 			upgradesService.insert(upgrades);
 			return Result.success("system.success");
 		} catch (Exception e) {
@@ -110,7 +121,7 @@ public class UpgradesController {
 	 * 修改告警升级
 	 */
 	@At("/edit/?")
-	@Ok("th://mao/upgrades/edit.html")
+	@Ok("th:/mao/upgrades/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Upgrades upgrades = upgradesService.fetch(id);
 		req.setAttribute("upgrades",upgrades);
@@ -124,16 +135,17 @@ public class UpgradesController {
 	@Ok("json")
 	@Slog(tag="告警升级", after="修改保存告警升级")
 	public Object editDo(@Param("..") Upgrades upgrades,HttpServletRequest req) {
-		try {
+		// try {
 			if(Lang.isNotEmpty(upgrades)){
 				upgrades.setUpdateBy(ShiroUtils.getSysUserId());
 				upgrades.setUpdateTime(new Date());
 				upgradesService.update(upgrades);
+				return Result.success("system.success");
+			}else{
+				return Result.error("system.error");
 			}
-			return Result.success("system.success");
-		} catch (Exception e) {
-			return Result.error("system.error");
-		}
+		// } catch (Exception e) {
+		// }
 	}
 
 	/**

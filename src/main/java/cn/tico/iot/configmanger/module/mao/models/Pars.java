@@ -25,6 +25,9 @@ public class Pars extends BaseModel implements Serializable {
 	@Prev(els = {@EL("uuid()")})
 	private String id;
 
+	@Column("adress")
+	@Comment("地址")
+	private String adress;
 			/** 类型 */
 	@Column("kind_id")
 	@Comment("类型")

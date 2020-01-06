@@ -309,6 +309,12 @@ function EditableFormTable(props) {
 	];
 
 	useEffect(() => {
+		$.post('/mao/upgrades/list',(results)=>{
+			if(results.rows){
+			console.log(results.rows,'results.rows')
+				console.log(strategy,'strategy')
+			}
+		})
 		return () => {};
 	}, [props, strategy]);
 	let handleClick = () => {
@@ -374,9 +380,7 @@ class Toll extends React.PureComponent {
 		this.init()
 	}
 	init = () => {
-		$.post('/mao/upgrades',(results)=>{
-			console.log(results,'results')
-		})
+	
 	};
 	handleClick = () => {};
 	isUpgradeFn = () => {
