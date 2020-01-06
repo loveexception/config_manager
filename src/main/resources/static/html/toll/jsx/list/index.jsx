@@ -327,11 +327,15 @@ function EditableFormTable(props) {
 		return () => {};
 	}, []);
 	let handleClick = () => {
-		console.log(strategy,'data数据')
+		// let data = 
+		console.log({...strategy,},'ddd')
+		$.post('/mao/upgrades/editDo',{...strategy},function(results){
+			console.log(results,'results')
+		})
 	};
 	let handleEdit = (mes, index, e) => {
 		setInitValue(index);
-		setStrategy({ ...mes, level: index });
+		setStrategy({ ...strategy,...mes, level: index });
 	};
 	let headerFn = () => {
 		let { isUpgradeFn } = props;
