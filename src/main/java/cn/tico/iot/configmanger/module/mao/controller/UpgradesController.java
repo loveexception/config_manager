@@ -63,10 +63,12 @@ public class UpgradesController {
 					   @Param("orderByColumn") String orderByColumn,
 					   @Param("isAsc") String isAsc,
 					   @Param("adress") String adress,
+					   @Param("countDown") int countDown,
 					   HttpServletRequest req) {
 						String deptid = ShiroUtils.getSysUser().getDeptId();
 						Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
+
 			cnd.and("cnName", "like", "%" + name +"%");
 		}
 		if(Lang.isNotEmpty(beginTime)){
@@ -80,7 +82,8 @@ public class UpgradesController {
 		}
 		if(Strings.isNotBlank(deptid)){
 			cnd.and("dept_id","=", deptid);
-			
+			// cnd.and("countDown","=", countDown);
+			//countDown
 		}
 		return upgradesService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
@@ -138,8 +141,8 @@ public class UpgradesController {
 		// try {
 			if(Lang.isNotEmpty(upgrades)){
 				upgrades.setUpdateBy(ShiroUtils.getSysUserId());
-				upgrades.setUpdateTime(new Date());
-				upgradesService.update(upgrades);
+				// upgrades.setUpdateTime(new Date());
+				// upgradesService.update(upgrades);
 				return Result.success("system.success");
 			}else{
 				return Result.error("system.error");

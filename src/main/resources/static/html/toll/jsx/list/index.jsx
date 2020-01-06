@@ -63,26 +63,26 @@ class FooterEditableTable extends React.Component {
 				{
 					index: '01',
 					level: '紧急告警',
-					condition: '',
-					upgrade: ''
+					condition: 0,
+					upgrade: 0
 				},
 				{
 					index: '02',
 					level: '重要告警',
-					condition: '',
-					upgrade: ''
+					condition: 0,
+					upgrade: 0
 				},
 				{
 					index: '03',
 					level: '次要告警',
-					condition: '',
-					upgrade: ''
+					condition: 0,
+					upgrade: 0
 				},
 				{
 					index: '04',
 					level: '告警提示',
-					condition: '',
-					upgrade: ''
+					condition: 0,
+					upgrade: 0
 				}
 			],
 			editingKey: ''
@@ -209,15 +209,16 @@ function myButton(props) {
 	return <a className="my-button-style">{props.text}</a>;
 }
 const commitTimeArr = [
-	[0, '无'],
+	[0, 0],
 	[5, '5分钟'],
 	[15, '15分钟'],
 	[30, '30分钟']
 ];
 //input
 let InputCom = function(props) {
-	let [value, setValue] = useState('无');
-	let { condition = '', upgrade = '', data = '' } = props;
+	let [value, setValue] = useState(0);
+	let { strategy , setStrategy,condition, upgrade , data } = props;
+	let key = data === '2'? 'condition':'upgrade';
 	useEffect(() => {
 		if (data === '2') {
 			setValue(condition);
@@ -226,11 +227,12 @@ let InputCom = function(props) {
 		}
 	}, [props]);
 	let handleChange = function(value) {
+		setStrategy({...strategy,[key]:value})
 		setValue(value);
 	};
 	return (
 		<div>
-			<Select style={{ width: '0.8rem' }} onChange={handleChange} value={value} defaultValue={0}>
+			<Select style={{ width: '0.8rem' }} onChange={handleChange} value={strategy[key] ? strategy[key]:0} defaultValue={0}>
 				{commitTimeArr.map(arr => (
 					<Option value={arr[0]} key={arr[1]}>
 						{arr[1]}
@@ -240,10 +242,10 @@ let InputCom = function(props) {
 		</div>
 	);
 };
-InputCom = React.memo(InputCom, function(p, nextP) {
-	console.log(nextP, 'nextP', 'p', p);
-	return true;
-});
+// InputCom = React.memo(InputCom, function(p, nextP) {
+// 	console.log(nextP, 'nextP', 'p', p);
+// 	return true;
+// });
 function MyButton(props) {
 	return (
 		<a className="My-button-style" {...props}>
@@ -276,7 +278,7 @@ function EditableFormTable(props) {
 	let [strategy, setStrategy] = React.useState({ level: 0, upgrade: '', condition: '' });
 	const radio = ['紧急', '重要', '次要 ', '提示'];
 	function handleChange(e) {
-		setStrategy({ ...strategy, level: e.target.value });
+		setStrategy({...strategy,level:e.target.value});
 	}
 	const columns = [
 		{
@@ -302,7 +304,7 @@ function EditableFormTable(props) {
 						</Radio.Group>
 					);
 				} else {
-					return <InputCom strategy={strategy} data={data}></InputCom>;
+					return <InputCom setStrategy={setStrategy} strategy={strategy} data={data}></InputCom>;
 				}
 			}
 		}
@@ -310,15 +312,22 @@ function EditableFormTable(props) {
 
 	useEffect(() => {
 		$.post('/mao/upgrades/list',(results)=>{
-			if(results.rows){
-			console.log(results.rows,'results.rows')
-				console.log(strategy,'strategy')
+			if(!_.isEmpty(results.rows)){
+				let suObj = results.rows[0];
+				let {grade,cycle,countDown }  = suObj 
+				let obj = {
+					...suObj,
+					level:grade,
+					condition:cycle,
+					upgrade:countDown
+				}
+				setStrategy({...strategy,...obj})
 			}
 		})
 		return () => {};
-	}, [props, strategy]);
+	}, []);
 	let handleClick = () => {
-		$.get();
+		console.log(strategy,'data数据')
 	};
 	let handleEdit = (mes, index, e) => {
 		setInitValue(index);
