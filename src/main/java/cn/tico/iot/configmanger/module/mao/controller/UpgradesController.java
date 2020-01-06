@@ -97,7 +97,6 @@ public class UpgradesController {
 		String deptid = user.getDeptId();
 		Dept dept = deptService.fetch(deptid);
 		req.setAttribute("dept", dept);
-
 	}
 
 	/**

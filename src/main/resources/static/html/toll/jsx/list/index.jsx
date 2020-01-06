@@ -62,27 +62,27 @@ class FooterEditableTable extends React.Component {
 			data: [
 				{
 					index: '01',
-					level: '紧急告警',
-					condition: 0,
-					upgrade: 0
+					grade: '紧急告警',
+					cycle: 0,
+					countDown: 0
 				},
 				{
 					index: '02',
-					level: '重要告警',
-					condition: 0,
-					upgrade: 0
+					grade: '重要告警',
+					cycle: 0,
+					countDown: 0
 				},
 				{
 					index: '03',
-					level: '次要告警',
-					condition: 0,
-					upgrade: 0
+					grade: '次要告警',
+					cycle: 0,
+					countDown: 0
 				},
 				{
 					index: '04',
-					level: '告警提示',
-					condition: 0,
-					upgrade: 0
+					grade: '告警提示',
+					cycle: 0,
+					countDown: 0
 				}
 			],
 			editingKey: ''
@@ -97,21 +97,21 @@ class FooterEditableTable extends React.Component {
 			},
 			{
 				title: '级别',
-				dataIndex: 'level',
+				dataIndex: 'grade',
 				width: '15%',
 				editable: true,
 				align: 'center'
 			},
 			{
 				title: '推送条件',
-				dataIndex: 'condition',
+				dataIndex: 'cycle',
 				width: '30%',
 				editable: true,
 				align: 'center'
 			},
 			{
 				title: '升级条件',
-				dataIndex: 'upgrade',
+				dataIndex: 'countDown',
 				width: '30%',
 				editable: true,
 				align: 'center'
@@ -217,13 +217,13 @@ const commitTimeArr = [
 //input
 let InputCom = function(props) {
 	let [value, setValue] = useState(0);
-	let { strategy , setStrategy,condition, upgrade , data } = props;
-	let key = data === '2'? 'condition':'upgrade';
+	let { strategy , setStrategy,cycle, countDown , data } = props;
+	let key = data === '2'? 'cycle':'countDown';
 	useEffect(() => {
 		if (data === '2') {
-			setValue(condition);
+			setValue(cycle);
 		} else if (data === '3') {
-			setValue(upgrade);
+			setValue(countDown);
 		}
 	}, [props]);
 	let handleChange = function(value) {
@@ -275,10 +275,10 @@ function EditableFormTable(props) {
 			money: '3'
 		}
 	]);
-	let [strategy, setStrategy] = React.useState({ level: 0, upgrade: '', condition: '' });
+	let [strategy, setStrategy] = React.useState({ grade: 0, countDown: '', cycle: '' });
 	const radio = ['紧急', '重要', '次要 ', '提示'];
 	function handleChange(e) {
-		setStrategy({...strategy,level:e.target.value});
+		setStrategy({...strategy,grade:e.target.value});
 	}
 	const columns = [
 		{
@@ -295,7 +295,7 @@ function EditableFormTable(props) {
 			render: data => {
 				if (data === '1') {
 					return (
-						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.level}>
+						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.grade}>
 							{radio.map((item, index) => (
 								<Radio key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
@@ -317,9 +317,9 @@ function EditableFormTable(props) {
 				let {grade,cycle,countDown }  = suObj 
 				let obj = {
 					...suObj,
-					level:grade,
-					condition:cycle,
-					upgrade:countDown
+					grade:grade,
+					cycle:cycle,
+					countDown:countDown
 				}
 				setStrategy({...strategy,...obj})
 			}
@@ -328,14 +328,22 @@ function EditableFormTable(props) {
 	}, []);
 	let handleClick = () => {
 		// let data = 
-		console.log({...strategy,},'ddd')
-		$.post('/mao/upgrades/editDo',{...strategy},function(results){
+		console.log('staregy' ,strategy)
+		$.post('/mao/upgrades/editDo',strategy,function(results){
 			console.log(results,'results')
 		})
+		if(strategy.id){
+			$.post('/mao/upgrades/editDo',strategy,function(results){
+				console.log(results,'results')
+			})
+		}else{
+
+		}
+		
 	};
 	let handleEdit = (mes, index, e) => {
 		setInitValue(index);
-		setStrategy({ ...strategy,...mes, level: index });
+		setStrategy({ ...strategy,...mes, grade: index });
 	};
 	let headerFn = () => {
 		let { isUpgradeFn } = props;
