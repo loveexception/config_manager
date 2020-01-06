@@ -9,6 +9,7 @@ import cn.tico.iot.configmanger.module.sys.models.Dept;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
+import org.nutz.integration.json4excel.annotation.J4EName;
 import org.nutz.lang.util.NutMap;
 
 import java.util.List;
@@ -17,145 +18,172 @@ import java.util.Map;
 @Data
 public class DeviceEnvModel extends I18NModel {
 
-	/**
-	 * 类型
-	 */
-	@Column("kind_id")
-	@Comment("类型")
-	@ColDefine(type = ColType.VARCHAR, width = 32)
-	@ExcelField(title = "型号")
-	private String kindid;
 
-	@Column("kind_map")
-	@Comment("类型冗余用于查寻")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	@GraphQLQuery(name = "kindmap", description = "全类图")
-	private String kindmap;
 
-	@One(field = "kindid", key = "id")
-	@GraphQLQuery(name = "kind", description = "类型")
-	private Kind kind;
 
-	private List<Kind> kinds;
+    /**
+     * 类型
+     */
+    @Column("kind_id")
+    @Comment("类型")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @J4EName( "型号")
+    private String kindid;
 
-	/**
-	 * 业务标签
-	 */
-	@ManyMany(relation = "t_tag_dev", from = "dev_id", to = "tag_id")
-	@GraphQLQuery(name = "tags", description = "全业务")
-	private List<Tag> tags;
+    @Column("kind_map")
+    @Comment("类型冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    @GraphQLQuery(name = "kindmap", description = "全类图")
+    @J4EName( "型号全长")
+    private String kindmap;
 
-	/**
-	 * ip
-	 */
-	@Column("ip")
-	@Comment("ip ")
-	@ColDefine(type = ColType.VARCHAR, width = 32)
-	@ExcelField(title = "IP地址")
-	private String ip;
+    @One(field = "kindid",key = "id")
+    @GraphQLQuery(name = "kind", description = "类型")
+    private Kind kind;
 
-	/**
-	 * 采集间隔
-	 */
-	@Column("cycle")
-	@Comment("采集间隔")
-	private int cycle;
 
-	/**
-	 * 单位 默认 ms
-	 */
-	@Column("unit")
-	@Comment("单位")
-	@ColDefine(type = ColType.VARCHAR, width = 32)
-	private String unit = "ms";
+    private List<Kind> kinds;
 
-	/**
-	 * 用户名
-	 */
-	@Column("username")
-	@Comment("用户名")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	private String username;
 
-	/**
-	 * 密码
-	 */
-	@Column("password")
-	@Comment("密码")
-	@ColDefine(type = ColType.VARCHAR, width = 64)
-	private String password;
-	/**
-	 * 组织
-	 */
-	@Column("dept_id")
-	@Comment("组织")
-	@ColDefine(type = ColType.VARCHAR, width = 32)
-	@ExcelField(title = "所属组织")
-	private String deptid;
+    /**
+     * 业务标签
+     */
+    @ManyMany(relation ="t_tag_dev",from = "dev_id",to="tag_id")
+    @GraphQLQuery(name = "tags", description = "全业务")
+    private List<Tag> tags ;
 
-	@One(field = "deptid", key = "id")
-	@GraphQLQuery(name = "dept", description = "所属公司")
-	private Dept dept;
+    /**
+     * ip
+     */
+    @Column("ip")
+    @Comment("ip ")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @J4EName( "IP地址")
+    private String ip;
 
-	/**
-	 * 地域
-	 */
-	@Column("location_id")
-	@Comment("地域")
-	@ColDefine(type = ColType.VARCHAR, width = 32)
-	@ExcelField(title = "位置信息")
-	private String locationid;
+    /**
+     * 采集间隔
+     */
+    @Column("cycle")
+    @Comment("采集间隔")
+    @J4EName( "采集间隔")
 
-	@Column("location_country")
-	@Comment("地域国 冗余用于查寻")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	private String locationCountry;
+    private int cycle;
 
-	@Column("location_state")
-	@Comment("地域 省冗余用于查寻")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	private String locationState;
+    /**
+     * 单位 默认 ms
+     */
+    @Column("unit")
+    @Comment("单位")
 
-	@Column("location_city")
-	@Comment("地域市余用于查寻")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	private String locationCity;
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @J4EName( "单位")
 
-	@Column("location_company")
-	@Comment("地域公司冗余用于查寻")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	private String locationCompany;
+    private String unit="ms";
 
-	@Column("location_room")
-	@Comment("地域 会议室 名冗余用于查寻")
-	@ColDefine(type = ColType.VARCHAR, width = 255)
-	private String locationRoom;
+    /**
+     * 用户名
+     */
+    @Column("username")
+    @Comment("用户名")
 
-	@Column("location_map")
-	@Comment("地域ID 用于查寻")
-	@ColDefine(type = ColType.TEXT, width = 255)
-	@GraphQLQuery(name = "locationmap", description = "全类图")
-	private String locationMap;
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    @J4EName( "用户名")
 
-	@One(field = "locationid", key = "id")
-	@GraphQLQuery(name = "location", description = "地理位置")
-	private Location location;
+    private String username;
 
-	private List<Location> locations;
+    /**
+     * 密码
+     */
+    @Column("password")
+    @Comment("密码")
+    @ColDefine(type = ColType.VARCHAR, width = 64)
+    @J4EName( "密码")
 
-	@GraphQLQuery(name = "env", description = "运行时数据")
-	public Map<String, Object> getEnv() {
-		DeviceEnvModel env = new DeviceEnvModel();
-		env.setIp(this.ip);
-		env.setCycle(this.cycle);
-		env.setUnit(this.unit);
-		env.setUsername(this.username);
-		env.setPassword(this.password);
-		NutMap result = NutMap.NEW();
-		result.addv("ip", this.ip).addv("cycle", this.cycle).addv("unit", this.unit).addv("username", this.username)
-				.addv("password", this.password);
+    private String password;
+    /**
+     * 组织
+     */
+    @Column("dept_id")
+    @Comment("组织")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @J4EName( "所属组织")
+    private String deptid;
 
-		return result;
-	}
+
+    @One(field = "deptid",key = "id")
+    @GraphQLQuery(name = "dept", description = "所属公司")
+    private Dept dept;
+
+    /**
+     * 地域
+     */
+    @Column("location_id")
+    @Comment("地域")
+    @ColDefine(type = ColType.VARCHAR, width = 32)
+    @J4EName("位置信息")
+    private String locationid;
+
+    @Column("location_country")
+    @Comment("地域国 冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationCountry;
+
+    @Column("location_state")
+    @Comment("地域 省冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationState;
+
+    @Column("location_city")
+    @Comment("地域市余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationCity;
+
+    @Column("location_company")
+    @Comment("地域公司冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationCompany;
+
+    @Column("location_room")
+    @Comment("地域 会议室 名冗余用于查寻")
+    @ColDefine(type = ColType.VARCHAR, width = 255)
+    private String locationRoom;
+
+
+    @Column("location_map")
+    @Comment("地域ID 用于查寻")
+    @ColDefine(type = ColType.TEXT, width = 255)
+    @GraphQLQuery(name = "locationmap", description = "全类图")
+    @J4EName( "位置信息")
+    private String locationMap;
+
+
+    @One(field = "locationid",key="id")
+    @GraphQLQuery(name = "location", description = "地理位置")
+    private Location location;
+
+
+    private List<Location> locations;
+
+    @GraphQLQuery(name = "env", description = "运行时数据")
+    public Map<String,Object> getEnv(){
+        DeviceEnvModel env =  new DeviceEnvModel();
+        env.setIp(this.ip);
+        env.setCycle(this.cycle);
+        env.setUnit(this.unit);
+        env.setUsername(this.username);
+        env.setPassword(this.password);
+        NutMap result = NutMap.NEW();
+        result
+            .addv("ip",this.ip)
+            .addv("cycle",this.cycle)
+            .addv("unit",this.unit)
+            .addv("username",this.username)
+            .addv("password",this.password);
+
+
+        return result;
+    }
+
 
 }

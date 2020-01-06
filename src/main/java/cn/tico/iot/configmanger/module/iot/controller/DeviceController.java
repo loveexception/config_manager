@@ -13,10 +13,12 @@ import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
 import cn.tico.iot.configmanger.module.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.module.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.module.iot.services.*;
+import cn.tico.iot.configmanger.module.mao.services.ExcelDeviceService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -25,13 +27,17 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
+import org.nutz.integration.json4excel.J4E;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
+import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mapl.Mapl;
 import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
 import org.nutz.mvc.upload.UploadAdaptor;
@@ -41,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 业务 信息操作处理
@@ -87,6 +94,9 @@ public class DeviceController implements AdminKey {
 
 	@Inject
 	private TagService tagService;
+
+	@Inject
+	private ExcelDeviceService excelDeviceService;
 
 	@RequiresPermissions("iot:device:view")
 	@At("")
@@ -220,13 +230,43 @@ public class DeviceController implements AdminKey {
 		try {
 			Object obj = null;
 
-			ImportExcel excel =new ImportExcel(f,1);
-			List<Device > devices =  excel.getDataList(Device.class);
-			for (int i = 0; i < devices.size(); i++) {
-				deviceService.insertUpdate(devices.get(i));
-			}
+//			ImportExcel excel =new ImportExcel(f,1);
+//			List<Device > devices =  excel.getDataList(Device.class);
 
-			return Result.success("system.success",devices);
+			InputStream is = Files.findFileAsStream(f.getAbsolutePath());
+			List<Device> deviceList =  J4E.fromExcel(is, Device.class, null);
+			List <Device> result  = deviceList.stream().map(
+					dev ->{
+					NutMap map = excelDeviceService.mapById(dev);
+					map = excelDeviceService.cnNamesChanges(map);
+					NutMap d = Lang.obj2nutmap(dev);
+					d.putAll(map);
+					return d;
+
+			}).map(
+					map -> Mapl.maplistToT(map,Device.class)
+
+			).collect(Collectors.toList());
+			result.stream().filter(device -> Strings.isNotBlank(device.getSno()))
+					.filter(device -> Strings.isBlank(device.getId()))
+					.map(device -> {
+						device.setAssetStatus("2");
+
+						return device;
+					})
+					.forEach(device -> deviceService.insertUpdate(device));
+			result.stream().filter(device -> Strings.isNotBlank(device.getSno()))
+					.filter(device -> Strings.isNotBlank(device.getId()))
+					.forEach(device -> deviceService.insertUpdate(device));
+
+			//excelDeviceService.cnNamesChanges(map);
+
+
+//			for (int i = 0; i < result.size(); i++) {
+//				deviceService.insertUpdate(devices.get(i));
+//			}
+
+			return Result.success("system.success",result);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
