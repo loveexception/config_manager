@@ -108,9 +108,11 @@ public class UpgradesController {
 	@Slog(tag="告警升级", after="新增保存告警升级 id=${args[0].id}")
 	public Object addDo(@Param("..") Upgrades upgrades,HttpServletRequest req) {
 		try {
+			
 			String deptid = ShiroUtils.getSysUser().getDeptId();
 			if(Strings.isNotBlank(deptid)){
 				upgrades.setDeptId(deptid);
+				
 			}
 			upgradesService.insert(upgrades);
 			return Result.success("system.success");
