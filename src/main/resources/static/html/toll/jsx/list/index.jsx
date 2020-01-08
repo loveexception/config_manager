@@ -1,9 +1,10 @@
-let { Select, Radio, Button, Icon, PageHeader, List, Avatar, Table, Input, InputNumber, Popconfirm, Form } = antd;
+let { Select, Radio, Button, Icon, PageHeader, List, Avatar, Table, Input, InputNumber, Popconfirm, Form,message } = antd;
 const { Option } = Select;
 let MIcon = function(props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
 	return <Icon style={{ fontSize: '0.12rem' }} {...props} />;
 };
+// let isAdd = true;
 
 // const data = [];
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
@@ -139,6 +140,10 @@ class FooterEditableTable extends React.Component {
 		];
 	}
 
+	componentWillReceiveProps=()=>{
+		this.handleProps()
+
+	}
 	isEditing = record => record.key === this.state.editingKey;
 
 	cancel = () => {
@@ -169,8 +174,22 @@ class FooterEditableTable extends React.Component {
 	edit(key) {
 		this.setState({ editingKey: key });
 	}
-
+	handleProps =()=>{
+		let p = this.props;
+		let data = this.state.data;
+		!_.isEmpty(p.rowData) & p.rowData.forEach(e=>{
+			//拿到数据 确定是几级告警;
+			let gra = data[e.grade]
+			gra.cycle = e.cycle ? e.cycle+"分钟" : 0;
+			gra.countDown = e.countDown ? e.countDown+"分钟" : 0;
+			
+		})
+		this.setState({
+			data
+		})
+	}
 	render() {
+		// console.log(this.props,"footer props")
 		const components = {
 			body: {
 				cell: EditableCell
@@ -232,7 +251,7 @@ let InputCom = function(props) {
 	};
 	return (
 		<div>
-			<Select style={{ width: '0.8rem' }} onChange={handleChange} value={strategy[key] ? strategy[key]:0} defaultValue={0}>
+			<Select style={{ width: '0.8rem' }} onChange={handleChange} value={strategy[key] ? strategy[key]+"分钟":0} defaultValue={0}>
 				{commitTimeArr.map(arr => (
 					<Option value={arr[0]} key={arr[1]}>
 						{arr[1]}
@@ -275,9 +294,13 @@ function EditableFormTable(props) {
 			money: '3'
 		}
 	]);
-	let [strategy, setStrategy] = React.useState({ grade: 0, countDown: '', cycle: '' });
+	let [strategy, setStrategy] = React.useState({ grade: 0, countDown: 0, cycle: 0 });
+	let [rowData,setRowData] = useState([])
+	let [isAdd,setIsAdd] = useState(true)
 	const radio = ['紧急', '重要', '次要 ', '提示'];
 	function handleChange(e) {
+		console.log(e.target.value,"选项发生改变了")
+
 		setStrategy({...strategy,grade:e.target.value});
 	}
 	const columns = [
@@ -309,10 +332,10 @@ function EditableFormTable(props) {
 			}
 		}
 	];
-
-	useEffect(() => {
+	function listReq(){
 		$.post('/mao/upgrades/list',(results)=>{
 			if(!_.isEmpty(results.rows)){
+				setRowData(results.rows);
 				let suObj = results.rows[0];
 				let {grade,cycle,countDown }  = suObj 
 				let obj = {
@@ -324,21 +347,39 @@ function EditableFormTable(props) {
 				setStrategy({...strategy,...obj})
 			}
 		})
+	}
+	useEffect(() => {
+		listReq()
 		return () => {};
 	}, []);
 	let handleClick = () => {
-		// let data = 
-		console.log('staregy' ,strategy)
-		$.post('/mao/upgrades/editDo',strategy,function(results){
-			console.log(results,'results')
-		})
-		if(strategy.id){
+		console.log(strategy,'strategy')
+		debugger 
+
+		let  reset  =()=>{this.props.listReq && this.props.listReq()}
+		if (isAdd){
+			$.post('/mao/upgrades/addDo',strategy,function(results){
+				if(results.code === 0){
+					message.success(results.msg,0.5)
+					reset()
+				}else{
+					message.error(results.msg,0.5)
+					reset()
+				}
+			})
+		}else{
 			$.post('/mao/upgrades/editDo',strategy,function(results){
 				console.log(results,'results')
 			})
-		}else{
-
 		}
+		// strategy.countDown ?
+		// let data = 
+		// if(strategy.){
+		// }
+		// console.log('strategy',strategy)
+		
+		return 
+
 		
 	};
 	let handleEdit = (mes, index, e) => {
@@ -369,7 +410,7 @@ function EditableFormTable(props) {
 			<div className="tab-footer-box">
 				<div className="tab-button-box">
 					<Button type="primary" shape="round" size={'large'} onClick={handleClick}>
-						添加
+						{isAdd ? "添加" : "修改"}
 					</Button>
 					{/* <Button shape="round" size={'large'}>
 						取消
@@ -384,7 +425,7 @@ function EditableFormTable(props) {
 				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
 			<div className="footer-table-box">
-				<FooterEditableFormTable handleEdit={handleEdit} className="footer-table" />
+				<FooterEditableFormTable listReq={listReq} rowData={rowData} handleEdit={handleEdit} className="footer-table" />
 			</div>
 		</div>
 	);

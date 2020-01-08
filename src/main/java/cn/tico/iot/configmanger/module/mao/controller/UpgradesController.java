@@ -68,7 +68,6 @@ public class UpgradesController {
 						String deptid = ShiroUtils.getSysUser().getDeptId();
 						Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
-
 			cnd.and("cnName", "like", "%" + name +"%");
 		}
 		if(Lang.isNotEmpty(beginTime)){
@@ -82,7 +81,8 @@ public class UpgradesController {
 		}
 		if(Strings.isNotBlank(deptid)){
 			cnd.and("dept_id","=", deptid);
-			cnd.and("countDown","=", countDown);
+			// cnd.and("dept_id","=", "105");
+			// cnd.and("countDown","=", countDown);
 			//countDown
 		}
 		return upgradesService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
