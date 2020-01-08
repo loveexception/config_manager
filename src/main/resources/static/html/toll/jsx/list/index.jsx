@@ -1,9 +1,11 @@
+
 let { Select, Radio, Button, Icon, PageHeader, List, Avatar, Table, Input, InputNumber, Popconfirm, Form,message } = antd;
 const { Option } = Select;
 let MIcon = function(props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
 	return <Icon style={{ fontSize: '0.12rem' }} {...props} />;
 };
+// console.log( jsmini_pubsub.name,'PubSub')
 // let isAdd = true;
 
 // const data = [];
@@ -11,7 +13,6 @@ const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
-
 let setInitValue = () => {};
 //demo TabList
 
@@ -53,12 +54,17 @@ class EditableCell extends React.Component {
 	}
 }
 
-class FooterEditableTable extends React.Component {
+class FooterEditableFormTable extends React.Component {
+	// static getDeriveStateFromProps(){
+	// 	console.log("======")
+	// }
 	constructor(props) {
 		super(props);
 		this.handleClick = (e, text, mes, index) => {
 			props.handleEdit && props.handleEdit(mes, index, e);
-		};
+			// props.listReq()
+		}
+		
 		this.state = {
 			data: [
 				{
@@ -108,14 +114,20 @@ class FooterEditableTable extends React.Component {
 				dataIndex: 'cycle',
 				width: '30%',
 				editable: true,
-				align: 'center'
+				align: 'center',
+				render:(d)=>{
+					return d+"分钟"
+				}
 			},
 			{
 				title: '升级条件',
 				dataIndex: 'countDown',
 				width: '30%',
 				editable: true,
-				align: 'center'
+				align: 'center',
+				render:(d)=>{
+					return d+'分钟'
+				}
 			},
 			{
 				title: '操作',
@@ -131,7 +143,26 @@ class FooterEditableTable extends React.Component {
 										this.handleClick(e, ...value);
 									}}
 								/>
-								<MIcon type="delete" />
+								<MIcon type="delete" onClick={
+									()=>{
+										if(!value[1].id){
+											return
+										}
+										$.post('/mao/upgrades/remove',{ids:value[1].id},(results)=>{
+											if(results.code === 0){
+												message.success(results.msg,0.5)
+												this.props.listReq&& this.props.listReq()
+												// console.log(this.props,'--------')
+												// this.props && this.props.listReq()
+											}else{
+												message.error(results.msg,0.5);
+												// this.setState({editingKey:''})
+												 this.props.listReq&& this.props.listReq()
+												// this.props && this.props.listReq()
+											}
+										})
+									}
+								} />
 							</div>
 						</div>
 					);
@@ -139,57 +170,81 @@ class FooterEditableTable extends React.Component {
 			}
 		];
 	}
-
-	componentWillReceiveProps=()=>{
-		this.handleProps()
-
+	componentDidMount(){
+		let d =  this.state.data;
 	}
+	componentWillReceiveProps(){
+		this.handleProps()
+	}
+	componentWillUpdate(p,s){
+		let d =  this.state.data;
+		// let isUpdata = false;
+		// !_.isEmpty(d) && d.forEach((e,i)=>{
+		// 	Object.keys(s.data).forEach((item,index)=>{
+		// 		if( !(s[item]== e[item]) ){
+		// 			isUpdata = true
+		// 		}
+		// 	})
+		// })
+		// console.log(d,s.data)
+		// // console.log(s,'value')
+		// if(isUpdata){
+			PubSub.publish('initData',d);
+		// }
+	}
+	
 	isEditing = record => record.key === this.state.editingKey;
 
 	cancel = () => {
 		this.setState({ editingKey: '' });
 	};
 
-	save(form, key) {
-		form.validateFields((error, row) => {
-			if (error) {
-				return;
-			}
-			const newData = [...this.state.data];
-			const index = newData.findIndex(item => key === item.key);
-			if (index > -1) {
-				const item = newData[index];
-				newData.splice(index, 1, {
-					...item,
-					...row
-				});
-				this.setState({ data: newData, editingKey: '' });
-			} else {
-				newData.push(row);
-				this.setState({ data: newData, editingKey: '' });
-			}
-		});
-	}
-
-	edit(key) {
-		this.setState({ editingKey: key });
-	}
 	handleProps =()=>{
 		let p = this.props;
-		let data = this.state.data;
+		let data = [
+			{
+				index: '01',
+				grade: '紧急告警',
+				cycle: 0,
+				countDown: 0
+			},
+			{
+				index: '02',
+				grade: '重要告警',
+				cycle: 0,
+				countDown: 0
+			},
+			{
+				index: '03',
+				grade: '次要告警',
+				cycle: 0,
+				countDown: 0
+			},
+			{
+				index: '04',
+				grade: '告警提示',
+				cycle: 0,
+				countDown: 0
+			}
+		]
 		!_.isEmpty(p.rowData) & p.rowData.forEach(e=>{
 			//拿到数据 确定是几级告警;
 			let gra = data[e.grade]
-			gra.cycle = e.cycle ? e.cycle+"分钟" : 0;
-			gra.countDown = e.countDown ? e.countDown+"分钟" : 0;
-			
+			if(gra===undefined ){
+				return	
+			}
+			gra.cycle = e.cycle ? e.cycle: 0;
+			gra.countDown = e.countDown ? e.countDown : 0;
+			gra.id =e.id;
 		})
+
 		this.setState({
 			data
 		})
+		// PubSub.publish('initData',data);
+
 	}
 	render() {
-		// console.log(this.props,"footer props")
 		const components = {
 			body: {
 				cell: EditableCell
@@ -272,7 +327,7 @@ function MyButton(props) {
 		</a>
 	);
 }
-const FooterEditableFormTable = Form.create()(FooterEditableTable);
+FooterEditableFormTable = Form.create()(FooterEditableFormTable); 
 
 // Tablist
 function EditableFormTable(props) {
@@ -294,14 +349,24 @@ function EditableFormTable(props) {
 			money: '3'
 		}
 	]);
-	let [strategy, setStrategy] = React.useState({ grade: 0, countDown: 0, cycle: 0 });
-	let [rowData,setRowData] = useState([])
+	let [strategy, setStrategy] = React.useState({ grade: '', countDown: 0, cycle: 0 });
+	let [rowData,setRowData] = useState([]);
 	let [isAdd,setIsAdd] = useState(true)
+	let [isRadio,setIsRadio] = useState([true,true,true,true])
 	const radio = ['紧急', '重要', '次要 ', '提示'];
 	function handleChange(e) {
-		console.log(e.target.value,"选项发生改变了")
-
-		setStrategy({...strategy,grade:e.target.value});
+		let grade= e.target.value;
+		// let cycle  = rowData[grade].cycle;
+		// let countDown  = rowData[grade].countDown;
+		PubSub.unsubscribe(window.PubSubx);
+		window.PubSubx = PubSub.subscribe('initData', function(m,d){
+			let target = d[grade];
+			if(isAdd === (target.cycle== 0 && target.countDown==0)){
+					return
+			}
+			setIsAdd(target.cycle== 0 && target.countDown==0); 
+		})
+		setStrategy({...strategy,grade});
 	}
 	const columns = [
 		{
@@ -320,7 +385,8 @@ function EditableFormTable(props) {
 					return (
 						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.grade}>
 							{radio.map((item, index) => (
-								<Radio key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
+								// 
+								<Radio disabled={!isRadio[index]} key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
 								</Radio>
 							))}
@@ -334,15 +400,23 @@ function EditableFormTable(props) {
 	];
 	function listReq(){
 		$.post('/mao/upgrades/list',(results)=>{
-			if(!_.isEmpty(results.rows)){
+			if(Array.isArray(results.rows)){
+				let isRadio = [true,true,true,true];
+				// console.log(results.rows,'xxxxxxxxxxxxx')
+				results.rows.forEach((e)=>{
+					isRadio[e.grade] = false
+				})
+				// debugger
 				setRowData(results.rows);
-				let suObj = results.rows[0];
-				let {grade,cycle,countDown }  = suObj 
+				setIsRadio(isRadio);
+				// let suObj = results.rows[0];
+				// let {grade,cycle,countDown }  = suObj;
+					// setIsAdd( countDown == 0 && cycle ==0)
 				let obj = {
-					...suObj,
-					grade:grade,
-					cycle:cycle,
-					countDown:countDown
+					...strategy,
+				// 	grade:grade,
+				// 	cycle:cycle,
+				// 	countDown:countDown
 				}
 				setStrategy({...strategy,...obj})
 			}
@@ -353,38 +427,46 @@ function EditableFormTable(props) {
 		return () => {};
 	}, []);
 	let handleClick = () => {
-		console.log(strategy,'strategy')
-		debugger 
-
-		let  reset  =()=>{this.props.listReq && this.props.listReq()}
+		if(!(typeof strategy.grade === 'number')){
+			message.error('没有grade')
+			return 
+		}
+		
+		// console.log(this)
+		// let  reset =()=>{props.listReq && props.listReq()}
 		if (isAdd){
 			$.post('/mao/upgrades/addDo',strategy,function(results){
 				if(results.code === 0){
 					message.success(results.msg,0.5)
-					reset()
+					// reset()
+					// console.log(props)
+					listReq()
 				}else{
 					message.error(results.msg,0.5)
-					reset()
+					// reset()
+					listReq()
 				}
 			})
 		}else{
 			$.post('/mao/upgrades/editDo',strategy,function(results){
-				console.log(results,'results')
+				if(results.code === 0){
+					message.success(results.msg,0.5)
+					listReq()
+					
+				}else{
+					message.error(results.msg,0.5)
+					listReq()
+				}
 			})
 		}
-		// strategy.countDown ?
-		// let data = 
-		// if(strategy.){
-		// }
-		// console.log('strategy',strategy)
-		
 		return 
-
-		
 	};
 	let handleEdit = (mes, index, e) => {
+		console.log({...mes},'msg')
 		setInitValue(index);
-		setStrategy({ ...strategy,...mes, grade: index });
+		let filterMes = {...mes};
+		setStrategy({ ...strategy,...filterMes, grade: index });
+		// console.log({ ...strategy,...filterMes, grade: index },'===')
 	};
 	let headerFn = () => {
 		let { isUpgradeFn } = props;
@@ -425,13 +507,13 @@ function EditableFormTable(props) {
 				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
 			<div className="footer-table-box">
-				<FooterEditableFormTable listReq={listReq} rowData={rowData} handleEdit={handleEdit} className="footer-table" />
+				<FooterEditableFormTable  setIsAdd={function(s){setIsAdd(s)}} listReq={listReq} rowData={rowData} handleEdit={handleEdit} className="footer-table" />
 			</div>
 		</div>
 	);
 }
 
-class Toll extends React.PureComponent {
+class Toll extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
