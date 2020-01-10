@@ -12,6 +12,9 @@ import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import org.nutz.dao.Cnd;
+import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
@@ -144,7 +147,9 @@ public class UpgradesController {
 				upgrades.setUpdateBy(ShiroUtils.getSysUserId());
 				upgrades.setUpdateTime(new Date());
 				upgradesService.update(upgrades);
-				return Result.success("system.success");
+				Dao forup = Daos.ext(upgradesService.dao(), FieldFilter.create(upgrades.getClass(), true));
+				forup.update(upgrades);
+				return Result.success("system.success",upgrades);
 			}else{
 				return Result.error("system.error");
 			}

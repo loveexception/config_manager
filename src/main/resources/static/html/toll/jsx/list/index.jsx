@@ -1,5 +1,5 @@
 
-let { Select, Radio, Button, Icon, PageHeader, List, Avatar, Table, Input, InputNumber, Popconfirm, Form,message } = antd;
+let { Select, Radio, Button, Icon,Popconfirm, PageHeader, List, Avatar, Table, Input, InputNumber, Form,message } = antd;
 const { Option } = Select;
 let MIcon = function(props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
@@ -54,7 +54,7 @@ class EditableCell extends React.Component {
 	}
 }
 
-class FooterEditableFormTable extends React.Component {
+class FooterEditableFormTable extends React.PureComponent {
 	// static getDeriveStateFromProps(){
 	// 	console.log("======")
 	// }
@@ -138,13 +138,12 @@ class FooterEditableFormTable extends React.Component {
 						<div className="table-edit-box">
 							<div className="table-icon-box">
 								<MIcon
-									type="form"
-									onClick={e => {
-										this.handleClick(e, ...value);
-									}}
-								/>
-								<MIcon type="delete" onClick={
-									()=>{
+										type="form"
+										onClick={e => {
+											this.handleClick(e, ...value);
+										}}
+									/>
+								<Popconfirm placement="top" title={"你确定要清楚这条数据吗?"} onConfirm={()=>{
 										if(!value[1].id){
 											return
 										}
@@ -152,17 +151,19 @@ class FooterEditableFormTable extends React.Component {
 											if(results.code === 0){
 												message.success(results.msg,0.5)
 												this.props.listReq&& this.props.listReq()
-												// console.log(this.props,'--------')
 												// this.props && this.props.listReq()
+												this.props.setIsAdd(true)
 											}else{
 												message.error(results.msg,0.5);
 												// this.setState({editingKey:''})
 												 this.props.listReq&& this.props.listReq()
-												// this.props && this.props.listReq()
-											}
+												 this.props.setIsAdd(false)
+												}
 										})
-									}
-								} />
+									}} okText="是的" cancelText="取消">
+									<MIcon type="delete"  />
+								</Popconfirm>
+
 							</div>
 						</div>
 					);
@@ -189,6 +190,7 @@ class FooterEditableFormTable extends React.Component {
 		// console.log(d,s.data)
 		// // console.log(s,'value')
 		// if(isUpdata){
+
 			PubSub.publish('initData',d);
 		// }
 	}
@@ -236,6 +238,7 @@ class FooterEditableFormTable extends React.Component {
 			gra.cycle = e.cycle ? e.cycle: 0;
 			gra.countDown = e.countDown ? e.countDown : 0;
 			gra.id =e.id;
+			gra.deptId = e.deptId;
 		})
 
 		this.setState({
@@ -283,7 +286,7 @@ function myButton(props) {
 	return <a className="my-button-style">{props.text}</a>;
 }
 const commitTimeArr = [
-	[0, 0],
+	[0, "0分钟"],
 	[5, '5分钟'],
 	[15, '15分钟'],
 	[30, '30分钟']
@@ -364,7 +367,7 @@ function EditableFormTable(props) {
 			if(isAdd === (target.cycle== 0 && target.countDown==0)){
 					return
 			}
-			setIsAdd(target.cycle== 0 && target.countDown==0); 
+			// setIsAdd(target.cycle== 0 && target.countDown==0); 
 		})
 		setStrategy({...strategy,grade});
 	}
@@ -407,6 +410,7 @@ function EditableFormTable(props) {
 					isRadio[e.grade] = false
 				})
 				// debugger
+				props.upDataIsPolling && props.upDataIsPolling(results.rows.length)
 				setRowData(results.rows);
 				setIsRadio(isRadio);
 				// let suObj = results.rows[0];
@@ -435,19 +439,38 @@ function EditableFormTable(props) {
 		// console.log(this)
 		// let  reset =()=>{props.listReq && props.listReq()}
 		if (isAdd){
+			if(!isRadio[strategy.grade]){
+				// console.log(strategy.grade,'strategy.grade')
+				// debugger
+				return 
+			}
 			$.post('/mao/upgrades/addDo',strategy,function(results){
 				if(results.code === 0){
 					message.success(results.msg,0.5)
 					// reset()
 					// console.log(props)
+					setIsAdd(false)
 					listReq()
 				}else{
 					message.error(results.msg,0.5)
-					// reset()
+					setIsAdd(true)
 					listReq()
 				}
 			})
 		}else{
+			// if(!strategy.id){
+			// 	strategy.grade
+			// }
+			if(!strategy.id || !strategy.deptId){
+				let obj = Array.isArray(rowData) && rowData.find(e=>e.grade ==strategy.grade)
+				if(!obj){
+					return
+				}
+				strategy.id = obj.id; 
+				strategy.deptId =obj.deptId;
+			}
+
+			// debugger
 			$.post('/mao/upgrades/editDo',strategy,function(results){
 				if(results.code === 0){
 					message.success(results.msg,0.5)
@@ -462,11 +485,15 @@ function EditableFormTable(props) {
 		return 
 	};
 	let handleEdit = (mes, index, e) => {
-		console.log({...mes},'msg')
-		setInitValue(index);
-		let filterMes = {...mes};
-		setStrategy({ ...strategy,...filterMes, grade: index });
-		// console.log({ ...strategy,...filterMes, grade: index },'===')
+		console.log({ ...strategy,...mes, grade: index, },'mes')
+		new Promise(async function(resolve,reject){
+			let r = await setInitValue(index);
+			resolve(r)
+		}).then((r)=>{
+			setStrategy({ ...strategy,...mes, grade: index, });
+		}).then(()=>{
+			 setIsAdd(!mes.id)
+		})
 	};
 	let headerFn = () => {
 		let { isUpgradeFn } = props;
@@ -516,16 +543,33 @@ function EditableFormTable(props) {
 class Toll extends React.Component {
 	constructor(props) {
 		super(props);
+		this.flag = true;
 		this.state = {
-			isUpgrade: true
+			isUpgrade: true,
+			isPolling:true
 		};
 	}
 	componentDidMount(){
 		this.init()
 	}
 	init = () => {
-	
+		  
 	};
+	upDataIsPolling =(rowLength)=>{
+		if(this.flag){
+			this.setState({
+				isUpgrade: rowLength > 0 ? true:false
+			})
+			this.flag= false;
+		}
+		if(rowLength > 0){
+			// this.setState({isUpgrade:true})
+			this.setState({isPolling:false})
+		}else{
+			// this.setState({isUpgrade:false})
+			this.setState({isPolling:true})
+		}
+	}
 	handleClick = () => {};
 	isUpgradeFn = () => {
 		this.setState({ isUpgrade: !this.isUpgradeFn });
@@ -548,12 +592,12 @@ class Toll extends React.Component {
 				</div>
 
 				<div>
-					<div className="bottom-margin">
+					{this.state.isPolling ? (<div className="bottom-margin">
 						<HeaderList />
-					</div>
+					</div>):""}
 					{isUpgrade ? (
 						<div className="bottom-margin">
-							<EditableFormTable isUpgradeFn={this.isUpgradeFn} />
+							<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgradeFn={this.isUpgradeFn} />
 						</div>
 					) : (
 						''
