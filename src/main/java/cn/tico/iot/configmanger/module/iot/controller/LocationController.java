@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.LocationService;
+import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
@@ -48,6 +49,9 @@ public class LocationController implements AdminKey {
     private DeptService deptService;
     @Inject
     private UserService userService;
+
+    @Inject
+    LocationManager locationManager;
 
     @RequiresPermissions("iot:location:view")
     @At("")
@@ -136,6 +140,7 @@ public class LocationController implements AdminKey {
     public Object addDo(@Param("..") Location location, HttpServletRequest req) {
         try {
             locationService.insertLocation(location);
+            locationManager.init();
             return Result.success("system.success");
         } catch (Exception e) {
             return Result.error("system.error");
@@ -174,6 +179,7 @@ public class LocationController implements AdminKey {
 
                 locationService.update(location);
             }
+            locationManager.init();
 
             return Result.success("system.success");
         } catch (Exception e) {
@@ -191,6 +197,8 @@ public class LocationController implements AdminKey {
     public Object remove(String id, HttpServletRequest req) {
         try {
             locationService.delete(id);
+            locationManager.init();
+
             return Result.success("system.success");
         } catch (Exception e) {
             return Result.error("system.error");

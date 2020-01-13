@@ -3,6 +3,8 @@ package cn.tico.iot.configmanger.module.iot.models.base;
 import cn.tico.iot.configmanger.module.iot.bean.FatherModel;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.nutz.dao.entity.annotation.*;
 
 import java.io.Serializable;
@@ -14,6 +16,8 @@ import java.io.Serializable;
  * @date 2019-04-11
  */
 @Data
+@EqualsAndHashCode
+@ToString
 @Table("t_iot_locations")
 public class Location extends FatherModel implements Serializable {
     private static final long serialVersionUID = 1L;
