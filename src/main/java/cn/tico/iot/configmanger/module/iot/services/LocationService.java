@@ -188,4 +188,14 @@ public class LocationService extends Service<Location> {
         }
         return result;
     }
+
+    public List<Location> findAllLocations() {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("status", "=", "true");
+        cnd.and("delflag","=","false");
+        return query(cnd);
+
+
+
+    }
 }
