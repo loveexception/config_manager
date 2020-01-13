@@ -1,9 +1,16 @@
 package cn.tico.iot.configmanger.module.mao.controller;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+
 import cn.tico.iot.configmanger.module.mao.models.Pushs;
 import cn.tico.iot.configmanger.module.mao.services.PushsService;
-import cn.tico.iot.configmanger.common.base.Result;;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
+import cn.tico.iot.configmanger.module.sys.models.User;
+import cn.tico.iot.configmanger.module.sys.services.DeptService;
+import cn.tico.iot.configmanger.common.base.Result;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
+
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -16,7 +23,6 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.plugins.slog.annotation.Slog;
-import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -31,10 +37,12 @@ import java.util.Date;
 public class PushsController {
 	private static final Log log = Logs.get();
 
+	
 	@Inject
 	private PushsService pushsService;
+	@Inject DeptService deptService;
 	
-	@RequiresPermissions("mao:pushs:view")
+	// @RequiresPermissions("mao:pushs:view")
 	@At("")
 	@Ok("th:/mao/pushs/pushs.html")
 	public void index(HttpServletRequest req) {
@@ -44,7 +52,7 @@ public class PushsController {
 	/**
 	 * 查询推送方式列表
 	 */
-	@RequiresPermissions("mao:pushs:list")
+	// @RequiresPermissions("mao:pushs:list")
 	@At
 	@Ok("json")
 	public Object list(@Param("pageNum")int pageNum,
@@ -55,6 +63,7 @@ public class PushsController {
 					   @Param("orderByColumn") String orderByColumn,
 					   @Param("isAsc") String isAsc,
 					   HttpServletRequest req) {
+		String deptid = ShiroUtils.getSysUser().getDeptId();
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
 			//cnd.and("name", "like", "%" + name +"%");
@@ -65,6 +74,9 @@ public class PushsController {
 		if(Lang.isNotEmpty(endTime)){
 			cnd.and("create_time","<=", endTime);
 		}
+		if(Strings.isNotBlank(deptid)){
+			cnd.and("dept_id","=",deptid);
+		}
 		return pushsService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
 	}
 
@@ -74,7 +86,10 @@ public class PushsController {
 	@At("/add")
 	@Ok("th:/mao/pushs/add.html")
 	public void add( HttpServletRequest req) {
-
+		User user = ShiroUtils.getSysUser();
+		String deptid = user.getDeptId();
+		Dept dept = deptService.fetch(deptid);
+		req.setAttribute("dept", dept);
 	}
 
 	/**
@@ -83,7 +98,7 @@ public class PushsController {
 	@At
 	@POST
 	@Ok("json")
-	@RequiresPermissions("mao:pushs:add")
+	// @RequiresPermissions("mao:pushs:add")
 	@Slog(tag="推送方式", after="新增保存推送方式 id=${args[0].id}")
 	public Object addDo(@Param("..") Pushs pushs,HttpServletRequest req) {
 		try {
@@ -110,7 +125,7 @@ public class PushsController {
 	@At
 	@POST
 	@Ok("json")
-	@RequiresPermissions("mao:pushs:edit")
+	// @RequiresPermissions("mao:pushs:edit")
 	@Slog(tag="推送方式", after="修改保存推送方式")
 	public Object editDo(@Param("..") Pushs pushs,HttpServletRequest req) {
 		try {
@@ -130,7 +145,7 @@ public class PushsController {
 	 */
 	@At("/remove")
 	@Ok("json")
-	@RequiresPermissions("mao:pushs:remove")
+	// @RequiresPermissions("mao:pushs:remove")
 	@Slog(tag ="推送方式", after= "删除推送方式:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {

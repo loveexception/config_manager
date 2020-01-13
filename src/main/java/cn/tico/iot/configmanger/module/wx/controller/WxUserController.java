@@ -7,7 +7,7 @@ import cn.tico.iot.configmanger.module.wx.services.WxUserService;
 import cn.tico.iot.configmanger.common.weixin.bean.User_info_list;
 import cn.tico.iot.configmanger.common.weixin.util.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-;
+
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;

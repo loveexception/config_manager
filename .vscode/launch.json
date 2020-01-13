@@ -1,0 +1,75 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-HelloWorld<configmanger>",
+            "request": "launch",
+            "mainClass": "cn.tico.iot.configmanger.HelloWorld",
+            "projectName": "configmanger"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-MainLauncher<configmanger>",
+            "request": "launch",
+            "mainClass": "cn.tico.iot.configmanger.MainLauncher",
+            "projectName": "configmanger"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-GenConfig<configmanger>",
+            "request": "launch",
+            "mainClass": "cn.tico.iot.configmanger.common.config.GenConfig",
+            "projectName": "configmanger"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Base64Utils<configmanger>",
+            "request": "launch",
+            "mainClass": "cn.tico.iot.configmanger.common.utils.Base64Utils",
+            "projectName": "configmanger"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-DateUtils<configmanger>",
+            "request": "launch",
+            "mainClass": "cn.tico.iot.configmanger.common.utils.DateUtils",
+            "projectName": "configmanger"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-JsoupUtil<configmanger>",
+            "request": "launch",
+            "mainClass": "cn.tico.iot.configmanger.common.utils.JsoupUtil",
+            "projectName": "configmanger"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Demo1Value",
+            "request": "launch",
+            "mainClass": "Demo1Value"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Demo2DataType",
+            "request": "launch",
+            "mainClass": "Demo2DataType"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Hellow",
+            "request": "launch",
+            "mainClass": "Hellow"
+        }
+    ]
+}

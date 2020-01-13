@@ -2,6 +2,8 @@ package cn.tico.iot.configmanger.module.mao.services;
 
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.IocBean;
+
+import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.module.mao.models.Pushs;
 
 /**

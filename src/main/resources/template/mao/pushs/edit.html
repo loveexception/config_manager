@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-pushs-edit" >
+            <input id="id" name="id"th:value="${pushs.id}"  type="hidden">
+					<div class="form-group">
+					<label class="col-sm-3 control-label">公司：</label>
+					<div class="col-sm-8">
+						<input id="deptId" name="deptId"th:value="${pushs.deptId}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">通知方式：</label>
+					<div class="col-sm-8">
+						<input id="type" name="type"th:value="${pushs.type}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">指标级别：</label>
+					<div class="col-sm-8">
+						<input id="level" name="level"th:value="${pushs.level}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">名称：</label>
+					<div class="col-sm-8">
+						<input id="cnName" name="cnName"th:value="${pushs.cnName}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">编码：</label>
+					<div class="col-sm-8">
+						<input id="enName" name="enName"th:value="${pushs.enName}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">状态：</label>
+					<div class="col-sm-8">
+						<input id="status" name="status"th:value="${pushs.status}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">删除：</label>
+					<div class="col-sm-8">
+						<input id="delflag" name="delflag"th:value="${pushs.delflag}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">创建者：</label>
+					<div class="col-sm-8">
+						<input id="createBy" name="createBy"th:value="${pushs.createBy}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">建立时间：</label>
+					<div class="col-sm-8">
+						<input id="createTime" name="createTime"th:value="${pushs.createTime}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">更新者：</label>
+					<div class="col-sm-8">
+						<input id="updateBy" name="updateBy"th:value="${pushs.updateBy}" class="form-control" type="text">
+					</div>
+				</div>
+							<div class="form-group">
+					<label class="col-sm-3 control-label">更新时间：</label>
+					<div class="col-sm-8">
+						<input id="updateTime" name="updateTime"th:value="${pushs.updateTime}" class="form-control" type="text">
+					</div>
+				</div>
+				</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "mao/pushs";
+		$("#form-pushs-edit").validate({
+			onkeyup: false,
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/editDo", $('#form-pushs-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

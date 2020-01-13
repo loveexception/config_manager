@@ -3,6 +3,24 @@ let { Select, Radio, Button, Icon, Switch, PageHeader, List, Slider, Checkbox, A
 const { Option } = Select;
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
+
+// filterFn 
+let filterFn = (possible,_this,before)=>{
+	let arr = [];
+	if(!before){
+		arr.push({type:"list",level:possible.L})
+		for(let i = 0;i<2;i++){
+			if(_this.state[i]===false){
+				continue
+			}
+			i == 0 ? arr.push({type:"window",level:possible.W}) :arr.push({type:"audio",level:possible.A})
+		}
+	}else{
+	 ///优化处理	
+	}
+	
+	return arr
+}
 // title
 function MTitle(props) {
 	return (
@@ -24,12 +42,11 @@ function MTable(props) {
 function TopTable(props) {}
 // form Iten
 function FromItem(props) {
-	console.log(props);
 	return (
 		<Form.Item label={props.label}>
 			{props.getFieldDecorator(props.label, {
-				initialValue: ['0']
-			})(<Slider marks={props.config} step={null} />)}
+				initialValue: 0
+			})(<Slider min={1} max={4} marks={props.config} step={null} />)}
 		</Form.Item>
 	);
 }
@@ -38,9 +55,11 @@ class PushFrom extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			0:false,
+			1:true,
 			_data: {
-				text: ['取消告警', '紧急告警', '重要告警', '次要告警', '告警提示'],
-				numPar: [0, 25, 50, 75, 100],
+				text: [ '紧急告警', '重要告警', '次要告警', '告警提示'],
+				numPar: [1,2,3,4],
 				numCol: ['弹窗', '响铃', '列表'],
 				column: [],
 				dataSource: [
@@ -54,14 +73,17 @@ class PushFrom extends React.Component {
 	handleSubmit = e => {
 		e.preventDefault();
 		this.props.form.validateFields((err, values) => {
+		let arrData = filterFn(values,this)
+			$.post("/mao/pushs/addDo",arrData,(r)=>{
+				console.log(r,'rrr')
+			})
 			if (!err) {
-				console.log('Received values of form: ', values);
+				// console.log('Received values of form: ', values);
 			}
 		});
 	};
 
 	normFile = e => {
-		console.log('Upload event:', e);
 		if (Array.isArray(e)) {
 			return e;
 		}
@@ -100,28 +122,21 @@ class PushFrom extends React.Component {
 								align: 'center',
 								width: '13%',
 								title: '通知方式',
-								render: (value, mes, i) => (
-									<Form.Item label="checkbox">
-										{getFieldDecorator('checkbox', {
-											initialValue: [_data.text[0]]
-										})(
-											<Checkbox.Group style={{ width: '100%' }}>
-												{
-													<Checkbox value={i} key={i}>
-														{value}
-													</Checkbox>
-												}
-												{/* {data.numCol.map((e, i) => {
-													return (
-														<Checkbox value={i} key={i}>
-															{e}
-														</Checkbox>
-													);
-												})} */}
-											</Checkbox.Group>
-										)}
-									</Form.Item>
-								)
+								render: (value, mes, i) =>{
+									if(i ==2){
+									    return value
+									}
+									return (
+										<div className="center-box">
+											<Checkbox  
+											onClick={()=>{
+												return this.setState({
+													[i]:!this.state[i]
+												})}} checked ={this.state[i]} value={i} key={i}>
+												{value}
+											</Checkbox>
+										</div>	
+								)}
 							},
 							{
 								dataIndex: 'level',
@@ -133,7 +148,7 @@ class PushFrom extends React.Component {
 									_data.numPar.map((item, index) => {
 										config[item] = _data.text[index];
 									});
-									return <FromItem key={i} label={i == 0 ? 'T' : i == 1 ? 'X' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
+									return <FromItem key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
 								}
 							}
 						],

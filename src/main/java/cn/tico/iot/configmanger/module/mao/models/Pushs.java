@@ -18,9 +18,9 @@ import java.util.Date;
  * @date 2019-12-14
  */
 @Data
-@Table("sys_upgrades")
+@Table("sys_pushs")
 @Comment("告警升级")
-public class Push extends I18NModel implements Serializable {
+public class Pushs extends I18NModel implements Serializable {
 
     @Column("dept_id")
     @Comment("公司")

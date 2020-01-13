@@ -435,15 +435,11 @@ function EditableFormTable(props) {
 			message.error('没有grade')
 			return 
 		}
-		
-		// console.log(this)
-		// let  reset =()=>{props.listReq && props.listReq()}
 		if (isAdd){
 			if(!isRadio[strategy.grade]){
-				// console.log(strategy.grade,'strategy.grade')
-				// debugger
 				return 
 			}
+			
 			$.post('/mao/upgrades/addDo',strategy,function(results){
 				if(results.code === 0){
 					message.success(results.msg,0.5)

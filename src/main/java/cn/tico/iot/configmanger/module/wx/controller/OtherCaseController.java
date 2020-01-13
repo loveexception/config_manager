@@ -3,7 +3,7 @@ package cn.tico.iot.configmanger.module.wx.controller;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import cn.tico.iot.configmanger.module.wx.models.OtherCase;
 import cn.tico.iot.configmanger.module.wx.services.OtherCaseService;
-import cn.tico.iot.configmanger.common.base.Result;;
+import cn.tico.iot.configmanger.common.base.Result;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
