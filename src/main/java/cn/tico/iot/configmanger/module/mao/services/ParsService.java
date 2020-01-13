@@ -12,11 +12,10 @@ import cn.tico.iot.configmanger.module.mao.models.Pars;
  * @author maodajun
  * @date 2019-12-14
  */
-@IocBean(args = {"refer:dao"})
+@IocBean(args = { "refer:dao" })
 public class ParsService extends Service<OtherParts> {
 	public ParsService(Dao dao) {
 		super(dao);
 	}
-
 
 }

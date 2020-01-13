@@ -50,7 +50,7 @@ public class TagController implements AdminKey {
 		Dept dept = new Dept();
 		dept.setId(user.getDeptId());
 
-		req.setAttribute("dept",dept);
+		req.setAttribute("dept", dept);
 	}
 
 	/**
@@ -59,75 +59,64 @@ public class TagController implements AdminKey {
 	@RequiresPermissions("iot:tag:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
-					   HttpServletRequest req) {
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
+		if (!Strings.isBlank(name)) {
+			// cnd.and("name", "like", "%" + name +"%");
+			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like",
+					"%" + name + "%");
 			cnd.and(group);
 		}
-		cnd.and("status","=","true");
-		cnd.and("delflag","=","false");
-		if(!isAdmin()){
-			SqlExpressionGroup
-					group = Cnd
-					.exps("dept_id", "=", DEPT_ADMIN)
-					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+		cnd.and("status", "=", "true");
+		cnd.and("delflag", "=", "false");
+		if (!isAdmin()) {
+			SqlExpressionGroup group = Cnd.exps("dept_id", "=", DEPT_ADMIN).or("dept_id", "=",
+					ShiroUtils.getSysUser().getDeptId());
 			cnd.and(group);
 		}
-		//cnd.and("del_flag","=",false);
-		return tagService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
+		// cnd.and("del_flag","=",false);
+		return tagService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, null);
 	}
+
 	/**
 	 * 查询业务列表
 	 */
 	@At
 	@Ok("json")
-	public Object tags(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
-					   HttpServletRequest req) {
-		Object obj = list(pageNum,pageSize,name,orderByColumn,isAsc,req);
-		return Result.success("system.success",obj);
+	public Object tags(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
+		Object obj = list(pageNum, pageSize, name, orderByColumn, isAsc, req);
+		return Result.success("system.success", obj);
 	}
+
 	/**
 	 * 查询业务列表
 	 */
 
 	@At("/tag_page")
 	@Ok("json")
-	public Object page(@Param("pageNum")int pageNum,
-					   @Param("pageSize")int pageSize,
-					   @Param("name") String name,
-					   @Param("orderByColumn") String orderByColumn,
-					   @Param("isAsc") String isAsc,
-					   HttpServletRequest req) {
+	public Object page(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
+			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)){
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like", "%" + name + "%");
+		if (!Strings.isBlank(name)) {
+			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%").or("en_name", "like",
+					"%" + name + "%");
 			cnd.and(group);
 		}
 
-		if(!isAdmin()){
-			SqlExpressionGroup
-					group = Cnd
-					.exps("dept_id", "=", DEPT_ADMIN)
-					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+		if (!isAdmin()) {
+			SqlExpressionGroup group = Cnd.exps("dept_id", "=", DEPT_ADMIN).or("dept_id", "=",
+					ShiroUtils.getSysUser().getDeptId());
 			cnd.and(group);
 		}
-		Object obj =  tagService.tableList(pageNum,pageSize,cnd,orderByColumn,isAsc,null);
-		return Result.success("system.success",obj);
+		Object obj = tagService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, null);
+		return Result.success("system.success", obj);
 	}
 
 	/**
 	 * 用户权限
+	 * 
 	 * @return
 	 */
 	private boolean isAdmin() {
@@ -144,7 +133,7 @@ public class TagController implements AdminKey {
 	 */
 	@At("/add")
 	@Ok("th:/iot/tag/add.html")
-	public void add( HttpServletRequest req) {
+	public void add(HttpServletRequest req) {
 
 	}
 
@@ -155,8 +144,8 @@ public class TagController implements AdminKey {
 	@At
 	@POST
 	@Ok("json")
-	@Slog(tag="业务", after="新增保存业务id=${args[0].id}")
-	public Object addDo(@Param("..") Tag tag,HttpServletRequest req) {
+	@Slog(tag = "业务", after = "新增保存业务id=${args[0].id}")
+	public Object addDo(@Param("..") Tag tag, HttpServletRequest req) {
 		try {
 			tagService.insertTag(tag);
 			return Result.success("system.success");
@@ -172,7 +161,7 @@ public class TagController implements AdminKey {
 	@Ok("th://iot/tag/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Tag tag = tagService.fetch(id);
-		req.setAttribute("tag",tag);
+		req.setAttribute("tag", tag);
 	}
 
 	/**
@@ -182,10 +171,10 @@ public class TagController implements AdminKey {
 	@At
 	@POST
 	@Ok("json")
-	@Slog(tag="业务类型", after="修改保存业务类型")
+	@Slog(tag = "业务类型", after = "修改保存业务类型")
 	public Object editDo(@Param("..") Tag tag, HttpServletRequest req) {
 		try {
-			if(Lang.isNotEmpty(tag)){
+			if (Lang.isNotEmpty(tag)) {
 
 				tagService.updateTag(tag);
 			}
@@ -201,10 +190,17 @@ public class TagController implements AdminKey {
 	@At("/remove")
 	@Ok("json")
 	@RequiresPermissions("iot:tag:remove")
-	@Slog(tag ="业务", after= "删除业务:${array2str(args[0])}")
-	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
+	@Slog(tag = "业务", after = "删除业务:${array2str(args[0])}")
+	public Object remove(@Param("ids") String[] ids, HttpServletRequest req) {
 		try {
-			tagService.deletex(ids);
+			// tagService.deletex(ids);
+			if (Lang.isNotEmpty(ids)) {
+				for (int i = 0; i < ids.length; i++) {
+					Tag temp = tagService.fetch(ids[i]);
+					temp.setDelFlag("true");
+					tagService.updateTag(temp);
+				}
+			}
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");

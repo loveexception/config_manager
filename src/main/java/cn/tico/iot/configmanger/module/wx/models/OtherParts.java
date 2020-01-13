@@ -35,6 +35,9 @@ public class OtherParts extends I18NModel {
 	@One(field = "deptId", key = "id")
 	private Dept dept;
 
+	@Column("adress")
+	@Comment("地址")
+	private String adress;
 	@Column("kind_id")
 	@Comment("类型")
 	@ColDefine(type = ColType.VARCHAR, width = 32)

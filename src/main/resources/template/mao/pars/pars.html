@@ -11,15 +11,15 @@
 							<ul>
 								<li>设备名称：<input type="text" name="cnName" /></li>
 
-								<li>设备编码：<input type="text" name="enName" /></li>
+								<li>设备序列号：<input type="text" name="sno" /></li>
 
-								<li>
+								<!-- <li>
 									设备状态：<select name="assetStatus">
 										<option value="">所有</option>
 										<option value="2">正常</option>
 										<option value="0">停用</option>
 									</select>
-								</li>
+								</li> -->
 
 								<li>
 									<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -76,11 +76,6 @@
 							sortable: true
 						},
 						{
-							field: 'ip',
-							title: 'IP地址',
-							sortable: true
-						},
-						{
 							field: 'dept.deptName',
 							title: '所属机构'
 						},
@@ -101,31 +96,24 @@
 						},
 						{
 							field: 'orderTime',
-							title: '投运日期',
+							title: '入库日期',
 							sortable: true
 						},
 						{
-							field: 'status',
-							title: '运行状态',
-							sortable: true,
-							formatter: function(value, row, index) {
-								if (value) {
-									return '备用';
-								} else {
-									return '已用';
-								}
-							}
+							field: 'adress',
+							title: '地址',
+							sortable: true
 						},
 						{
 							field: 'total',
 							title: '数量',
 							sortable: true
 						},
-						{
-							field: 'location.cnName',
-							title: '存放地点',
-							sortable: true
-						},
+						// {
+						// 	field: 'location.cnName',
+						// 	title: '存放地点',
+						// 	sortable: true
+						// },
 						{
 							field: 'version',
 							title: '软件版本',

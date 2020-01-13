@@ -123,9 +123,9 @@ class ListBox extends React.PureComponent {
 			{ title: '购入日期', dataIndex: 'orderTime' }, //--
 			{ title: '使用年限', dataIndex: 'quality' }, //--
 			{ title: '报废日期', dataIndex: 'discardTime' }, //--
-			{ title: '资产状态', dataIndex: 'assetStatus', render: (text, record) => (text == '0' ? '使用中' : '未使用') }, //--
+			{ title: '资产状态', dataIndex: 'assetStatus', render: (text, record) => (text == '0' ? '未使用' : '使用中') }, //--
 			{ title: '激活状态', dataIndex: 'status', render: (text, record) => (text == 'true' ? '激活' : '停用') },
-			{ title: '告警状态', dataIndex: 'alertStatus', render: (text, record) => (text == 'critical' ? '紧急告警' : text == 'major' ? '重要告警' : text == 'minor' ? '次要告警' : '告警提示') }, //--
+			// { title: '告警状态', dataIndex: 'alertStatus', render: (text, record) => (text == 'critical' ? '紧急告警' : text == 'major' ? '重要告警' : text == 'minor' ? '次要告警' : '告警提示') }, //--
 			// {
 			// 	title: '更新时间',
 			// 	dataIndex: 'updateTime'
@@ -451,7 +451,7 @@ class ListBox extends React.PureComponent {
 									placeholder="请输入搜索内容"
 									onInput={event => {
 										this.setState({
-											searchValue: event.target.value && event.target.value.trim() || ''
+											searchValue: (event.target.value && event.target.value.trim()) || ''
 										});
 									}}
 								></Input>
