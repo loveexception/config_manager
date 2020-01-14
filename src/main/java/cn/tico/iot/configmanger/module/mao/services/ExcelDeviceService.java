@@ -5,6 +5,7 @@ import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -31,6 +32,8 @@ import java.util.stream.Collectors;
 public class ExcelDeviceService extends Device{
     @Inject
     public Dao dao;
+    @Inject
+    LocationManager locationManager;
 
     static final NutMap K2B = new NutMap()
             
@@ -79,8 +82,13 @@ public class ExcelDeviceService extends Device{
     }
 
     public  String cnNametoId(Class object,String cnName){
+        if(object.getClass().getName().equals("Location")){
+            return locationName(cnName);
+        }
         Mirror mirror = Mirror.me(object);
         Field[] fields =  mirror.getFields(J4EName.class);
+
+
         String[] names = Strings.splitIgnoreBlank(cnName,"-");
         String lastName = cnName;
 
@@ -112,6 +120,12 @@ public class ExcelDeviceService extends Device{
 
 
         return ""+ Mapl.cell(Mapl.toMaplist(records), "[0].id");
+    }
+
+    private String locationName(String cnName) {
+        List<Location> all = locationManager.all();
+        return locationManager.byName(cnName,all).getId();
+
     }
 
 

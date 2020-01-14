@@ -9,6 +9,7 @@ import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.module.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.DriverService;
+import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import io.leangen.graphql.annotations.GraphQLArgument;
 import io.leangen.graphql.annotations.GraphQLContext;
 import io.leangen.graphql.annotations.GraphQLQuery;
@@ -17,12 +18,16 @@ import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.json.Json;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.log.Logs;
+import org.nutz.mapl.Mapl;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @IocBean
@@ -32,6 +37,9 @@ public class ApiService {
 
     @Inject
     private DriverService driver;
+
+    @Inject
+    LocationManager locationManager;
 
     @Inject
     private Dao dao;
@@ -97,6 +105,14 @@ public class ApiService {
         cnd.orderBy("level", "asc");
         List<Location> result = dao.query(Location.class, cnd);
         result.add(location);
+//        Location location = locationManager.get(device.getLocationid());
+//        Map map =location.getParents();
+//        List<Location> result = (List<Location>) map
+//                .values()
+//                .stream()
+//                .map( item -> (Location)Mapl.maplistToObj( Lang.obj2map(item),Location.class))
+//                .collect(Collectors.toList());
+//        result.add(location);
         return result;
     }
 

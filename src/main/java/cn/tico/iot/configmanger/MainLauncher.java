@@ -8,6 +8,7 @@ import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.OtherMessageBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.SubGatewayBlock;
+import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
 import cn.tico.iot.configmanger.module.sys.models.User;
@@ -21,6 +22,7 @@ import org.nutz.conf.NutConf;
 import org.nutz.dao.Dao;
 import org.nutz.el.opt.RunMethod;
 import org.nutz.el.opt.custom.CustomMake;
+import org.nutz.integration.quartz.QuartzManager;
 import org.nutz.ioc.Ioc;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.*;
@@ -144,8 +146,11 @@ public class MainLauncher {
 	 * @param ioc
 	 */
 	private void initSysTask(Ioc ioc) {
-		// QuartzManager quartzManager = ioc.get(QuartzManager.class);
-		// TaskService taskService = ioc.get(TaskService.class);
+		LocationManager locationManager = ioc.get(LocationManager.class);
+		locationManager.init();
+
+//		 QuartzManager quartzManager = ioc.get(QuartzManager.class);
+//		 TaskService taskService = ioc.get(TaskService.class);
 		// quartzManager.clear();
 		// List<Task> taskList = taskService.query( Cnd.where("status", "=", true));
 		// for (Task sysTask : taskList) {

@@ -5,6 +5,7 @@
     <artifactId>configmanger</artifactId>
     <version>1.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
+
     <properties>
         <nutzboot.version>2.3.8-SNAPSHOT</nutzboot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -406,6 +407,7 @@
         </pluginRepository>
     </pluginRepositories>
     <build>
+        <finalName>configmanger</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

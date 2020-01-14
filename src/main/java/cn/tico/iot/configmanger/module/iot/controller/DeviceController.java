@@ -228,11 +228,8 @@ public class DeviceController implements AdminKey {
 	@AdaptBy(type = UploadAdaptor.class, args = { "${app.root}/WEB-INF/tmp" })
 	public Object deviceUpload(@Param("devices") File f, HttpServletRequest req) {
 		try {
-			Object obj = null;
-
-//			ImportExcel excel =new ImportExcel(f,1);
-//			List<Device > devices =  excel.getDataList(Device.class);
-
+			User user =	ShiroUtils.getSysUser();
+			String deptid = user.getDeptId();
 			InputStream is = Files.findFileAsStream(f.getAbsolutePath());
 			List<Device> deviceList =  J4E.fromExcel(is, Device.class, null);
 			List <Device> result  = deviceList.stream().map(
@@ -247,24 +244,26 @@ public class DeviceController implements AdminKey {
 					map -> Mapl.maplistToT(map,Device.class)
 
 			).collect(Collectors.toList());
+			//新增项目
 			result.stream().filter(device -> Strings.isNotBlank(device.getSno()))
 					.filter(device -> Strings.isBlank(device.getId()))
 					.map(device -> {
 						device.setAssetStatus("2");
-
+						device.setAlertStatus("normal");
+						if(!isAdmin()){
+							device.setDeptid(deptid);
+						}
 						return device;
 					})
 					.forEach(device -> deviceService.insertUpdate(device));
+			//修改
 			result.stream().filter(device -> Strings.isNotBlank(device.getSno()))
 					.filter(device -> Strings.isNotBlank(device.getId()))
-					.forEach(device -> deviceService.insertUpdate(device));
+					.forEach(
+							device -> deviceService.insertUpdate(device)
+					);
 
-			//excelDeviceService.cnNamesChanges(map);
 
-
-//			for (int i = 0; i < result.size(); i++) {
-//				deviceService.insertUpdate(devices.get(i));
-//			}
 
 			return Result.success("system.success",result);
 		} catch (Exception e) {
