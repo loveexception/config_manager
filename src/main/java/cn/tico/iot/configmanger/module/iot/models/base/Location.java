@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.module.iot.models.base;
 
 import cn.tico.iot.configmanger.module.iot.bean.FatherModel;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
+import groovy.transform.Sortable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -17,7 +18,8 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode
-@ToString
+@ToString(includeFieldNames = true,callSuper = true,doNotUseGetters = false,exclude = "id")
+@Sortable(includes = "level")
 @Table("t_iot_locations")
 public class Location extends FatherModel implements Serializable {
     private static final long serialVersionUID = 1L;

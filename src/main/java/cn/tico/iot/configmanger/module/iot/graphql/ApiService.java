@@ -46,7 +46,7 @@ public class ApiService {
 
     @GraphQLQuery(name = "device")
     public Device getDeviceBySno(@GraphQLArgument(name = "sno") String sno) {
-        System.out.println("maodajun ---> sno:" + sno);
+        Logs.get().infof("maodajun ---> sno:%s" + sno);
         if (Strings.isBlank(sno)) {
             return null;
         }
@@ -95,24 +95,18 @@ public class ApiService {
 
     @GraphQLQuery(name = "locations")
     public List<Location> getlocations(@GraphQLContext Device device) {
-        Location location = dao.fetch(Location.class, device.getLocationid());
-        String ids[] = location.getAncestors().split(",");
-        Cnd cnd = Cnd.NEW();
-        cnd.and("id", "in", ids);
-        cnd.and("level", ">", "0");
-        cnd.and("delflag","=","false");
-
-        cnd.orderBy("level", "asc");
-        List<Location> result = dao.query(Location.class, cnd);
-        result.add(location);
-//        Location location = locationManager.get(device.getLocationid());
-//        Map map =location.getParents();
-//        List<Location> result = (List<Location>) map
-//                .values()
-//                .stream()
-//                .map( item -> (Location)Mapl.maplistToObj( Lang.obj2map(item),Location.class))
-//                .collect(Collectors.toList());
+//        Location location = dao.fetch(Location.class, device.getLocationid());
+//        String ids[] = location.getAncestors().split(",");
+//        Cnd cnd = Cnd.NEW();
+//        cnd.and("id", "in", ids);
+//        cnd.and("level", ">", "0");
+//        cnd.and("delflag","=","false");
+//
+//        cnd.orderBy("level", "asc");
+//        List<Location> result = dao.query(Location.class, cnd);
 //        result.add(location);
+        List<Location> result = locationManager.getAllByLocation(device.getLocationid());
+
         return result;
     }
 
