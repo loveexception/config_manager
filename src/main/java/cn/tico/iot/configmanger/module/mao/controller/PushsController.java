@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.mao.controller;
 
+import com.google.common.collect.Lists;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import cn.tico.iot.configmanger.module.mao.models.Pushs;
@@ -18,14 +19,16 @@ import org.nutz.lang.Strings;
 import org.nutz.lang.Lang;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mvc.annotation.At;
-import org.nutz.mvc.annotation.Ok;
-import org.nutz.mvc.annotation.POST;
-import org.nutz.mvc.annotation.Param;
+import org.nutz.mvc.adaptor.JsonAdaptor;
+import org.nutz.mvc.annotation.*;
 import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 推送方式 信息操作处理
  * 
@@ -98,11 +101,39 @@ public class PushsController {
 	@At
 	@POST
 	@Ok("json")
+	// @AdaptBy(type = JsonAdaptor.class)
 	// @RequiresPermissions("mao:pushs:add")
 	@Slog(tag="推送方式", after="新增保存推送方式 id=${args[0].id}")
 	public Object addDo(@Param("..") Pushs pushs,HttpServletRequest req) {
 		try {
 			pushsService.insert(pushs);
+			return Result.success("system.success");
+		} catch (Exception e) {
+			return Result.error("system.error");
+		}
+	}
+	/**
+	 * 新增保存推送方式
+	 */
+	@At("/list_all")
+	@POST
+	@Ok("json")
+	@AdaptBy(type = JsonAdaptor.class)
+	@Slog(tag="推送方式", after="新增保存推送方式 id=${args[0].id}")
+	public Object addListDo(@Param("data") Pushs[] pushs,HttpServletRequest req) {
+		try {
+			User user = ShiroUtils.getSysUser();
+			String deptId = user.getDeptId();
+			List list = Lists.newArrayList();
+			if(Lang.isNotEmpty(pushs)){
+				list = Lists.newArrayList(pushs)
+						.stream()
+						.map(push->{
+							push.setDeptId(deptId);
+							return push;
+						}).collect(Collectors.toList());
+			}
+			pushsService.insertAll(list);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -116,6 +147,7 @@ public class PushsController {
 	@Ok("th://mao/pushs/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Pushs pushs = pushsService.fetch(id);
+
 		req.setAttribute("pushs",pushs);
 	}
 
@@ -127,13 +159,17 @@ public class PushsController {
 	@Ok("json")
 	// @RequiresPermissions("mao:pushs:edit")
 	@Slog(tag="推送方式", after="修改保存推送方式")
-	public Object editDo(@Param("..") Pushs pushs,HttpServletRequest req) {
+	@AdaptBy(type = JsonAdaptor.class)
+	public Object editDo(@Param("data") Pushs[] pushs,@Param("type") String type,HttpServletRequest req) {
 		try {
-			if(Lang.isNotEmpty(pushs)){
-				pushs.setUpdateBy(ShiroUtils.getSysUserId());
-				pushs.setUpdateTime(new Date());
-				pushsService.update(pushs);
-			}
+			User user = ShiroUtils.getSysUser();
+			String deptid = user.getDeptId();
+//			Dept dept = deptService.fetch(deptid);
+			Cnd cnd = Cnd.NEW()
+					.and("dept_id","=",deptid).and("type","=",type);
+			pushsService.dao().clear(Pushs.class,cnd);
+
+			pushsService.insertAll(Arrays.asList(pushs));
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -145,7 +181,9 @@ public class PushsController {
 	 */
 	@At("/remove")
 	@Ok("json")
+
 	// @RequiresPermissions("mao:pushs:remove")
+	@AdaptBy(type = JsonAdaptor.class)
 	@Slog(tag ="推送方式", after= "删除推送方式:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {

@@ -1,5 +1,5 @@
 let { useEffect, useState, PureComponent } = React;
-let { Select, Radio, Button, Icon, Switch, PageHeader, List, Slider, Checkbox, Avatar, Table, Input, InputNumber, Rate, Upload, Popconfirm, Form, Row, Col } = antd;
+let { Select, Radio, Button, Icon, Switch, PageHeader, List, Slider, Checkbox, Avatar, Table, Input, InputNumber, Rate, Upload, Popconfirm, Form, Row, Col, message } = antd;
 const { Option } = Select;
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
@@ -21,6 +21,30 @@ let filterFn = (possible,_this,before)=>{
 	
 	return arr
 }
+// filterListFn
+let filterListFn = (data =[],that) =>{
+
+}
+// dataConfig 
+
+const dataConfig = {
+	warning:1,
+	major:2,
+	minor:3,
+	point:4
+}
+const sliderStr = [
+	"紧急",
+	"重要",
+	"次要",
+	"提示"
+]
+const levelConfig = {
+	warning:"紧急",
+	major:  "重要",
+	minor:  "次要",
+	point:  "提示"
+}
 // title
 function MTitle(props) {
 	return (
@@ -34,6 +58,7 @@ function MTitle(props) {
 function MTable(props) {
 	let { titleFn = false, data = [], columns = [], footerFn = false, pagination = true } = props.config;
 	useEffect(() => {
+
 		return () => {};
 	}, []);
 	return <div className="component-table-box">{props.config ? <Table bordered dataSource={data} pagination={pagination} columns={columns} title={titleFn} footer={footerFn}></Table> : ''}</div>;
@@ -42,11 +67,17 @@ function MTable(props) {
 function TopTable(props) {}
 // form Iten
 function FromItem(props) {
+	useEffect(()=>{
+	},[])
 	return (
 		<Form.Item label={props.label}>
 			{props.getFieldDecorator(props.label, {
-				initialValue: 0
-			})(<Slider min={1} max={4} marks={props.config} step={null} />)}
+				initialValue:props.initValue
+			})(<Slider
+				//  range={false}
+				  min={1} max={4} marks={props.config} 
+			// defaultValue={2}
+			 step={null} />)}
 		</Form.Item>
 	);
 }
@@ -54,6 +85,7 @@ function FromItem(props) {
 class PushFrom extends React.Component {
 	constructor(props) {
 		super(props);
+		this.flag =true;
 		this.state = {
 			0:false,
 			1:true,
@@ -67,8 +99,34 @@ class PushFrom extends React.Component {
 						radio: '弹窗'
 					}
 				]
+			},
+			initData:{
+				window:1,
+				audio:1,
+				list:1
 			}
 		};
+	}
+	componentDidMount(){
+	}
+	componentDidUpdate(){
+		if(this.flag){
+			let {dataList}  =this.props;
+			console.log(this.props,'props===')
+			this.flag  = false;
+			let initData = this.state.initData;
+			Array.isArray(dataList) &&  dataList.forEach((e,i)=>{
+				let t = e.type; 
+				let l = e.level;
+				initData[t] > dataConfig[l] ? '' : initData[t] = dataConfig[l] 
+			})
+			// this.props.dataList
+			// dataConfig
+			this.setState({
+				initData
+			})
+		}
+
 	}
 	handleSubmit = e => {
 		e.preventDefault();
@@ -145,10 +203,25 @@ class PushFrom extends React.Component {
 								title: `告警级别`,
 								render: (v, m, i) => {
 									let config = {};
+									let  { initData  } = this.state;
+									let initValue = 0;
+									switch (i) {
+										case 0:
+											initValue = initData && initData.window 
+											break;
+										case 1:
+											initValue = initData && initData.audio 
+											break;
+										case 2:
+											initValue = initData && initData.list 
+											break;
+											default:0
+											break;
+									}
 									_data.numPar.map((item, index) => {
 										config[item] = _data.text[index];
 									});
-									return <FromItem key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
+									return <FromItem initValue ={initValue} key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config} ></FromItem>;
 								}
 							}
 						],
@@ -173,7 +246,7 @@ class PushFrom extends React.Component {
 	}
 }
 
-const WrappedDemo = Form.create({ name: 'pushfrom' })(PushFrom);
+PushFrom = Form.create({ name: 'pushfrom' })(PushFrom);
 
 function FooterTable(props) {}
 
@@ -182,6 +255,7 @@ class UpgradeBox extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
+			dataList:[],
 			data: [
 				{
 					key: '0',
@@ -192,13 +266,13 @@ class UpgradeBox extends PureComponent {
 				{
 					key: '1',
 					index: '02',
-					pushWay: '弹窗',
+					pushWay: '响铃',
 					level: '无'
 				},
 				{
 					key: '2',
 					index: '03',
-					pushWay: '弹窗',
+					pushWay: '列表',
 					level: '无'
 				}
 			],
@@ -209,14 +283,62 @@ class UpgradeBox extends PureComponent {
 			]
 		};
 	}
+	reqListFn = ()=>{
+		$.post("http://localhost:8090/mao/pushs/list",(results)=>{
+			if(results.code ==0 ){
+				let dataList = results.rows;
+				let obj = {
+					window:'',
+					audio:'',
+					list:''
+				};
+				let initData = {
+					window:0,
+					audio:0,
+					list:0
+				}
+				Array.isArray(dataList) &&  dataList.forEach((e,i)=>{
+					let t = e.type; 
+					let l = e.level;
+					initData[t] > dataConfig[l] ? '' : initData[t] = dataConfig[l] 
+				})
+				for(let key in initData ){
+					for(let i = initData[key]; i>0;i--){
+							obj[key] += sliderStr[initData[key]]
+						} 
+						obj[key] = obj[key] ? obj[key] : '无';
+				}	
+				// Array.isArray(dataList) && dataList.forEach((e,i)=>{
+						
+				// })
+				// levelConfig
+				this.setState({
+					dataList,
+				})
+			}else{
+				message.error("接口错误",0.5)
+			}
+		})
+	}
+	init = ()=>{
+		this.reqListFn();
+
+	}
+	// 版本太低 无法使用 static getDerivedStateFromProps(){
+	// 		console.log("===");
+	// 	}
+
+	componentDidMount(){
+		this.init()
+	}
 	render() {
-		let { data, columns } = this.state;
+		let { data, columns,dataList=[] } = this.state;
 		return (
 			<div className="push-list-box">
 				<MTitle text="设置推送策略" />
-				<WrappedDemo />
+				<PushFrom dataList={dataList} />
 				<MTitle text="推送策略列表" />
-				<MTable config={{ data, columns, pagination: false }}></MTable>
+				<MTable dataList = {dataList} config={{ data, columns, pagination: false }}></MTable>
 			</div>
 		);
 	}

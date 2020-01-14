@@ -432,14 +432,13 @@ function EditableFormTable(props) {
 	}, []);
 	let handleClick = () => {
 		if(!(typeof strategy.grade === 'number')){
-			message.error('没有grade')
+			message.error('没有升级项')
 			return 
 		}
 		if (isAdd){
 			if(!isRadio[strategy.grade]){
 				return 
 			}
-			
 			$.post('/mao/upgrades/addDo',strategy,function(results){
 				if(results.code === 0){
 					message.success(results.msg,0.5)

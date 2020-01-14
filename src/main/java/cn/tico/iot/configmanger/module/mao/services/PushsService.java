@@ -1,5 +1,7 @@
 package cn.tico.iot.configmanger.module.mao.services;
 
+import java.util.List;
+
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.IocBean;
 
@@ -17,4 +19,8 @@ public class PushsService extends Service<Pushs> {
 	public PushsService(Dao dao) {
 		super(dao);
 	}
+	public Object insertAll(List<Pushs> pushs) {
+
+        return this.dao().insert(pushs);
+    }
 }

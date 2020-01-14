@@ -52,6 +52,7 @@ public class OtherMessageBlock implements Block {
 	public Object exec(String topic, String key, String value, long offset) {
 		System.out.println("topic" + topic + "key:" + key + "value" + value);
 		TOtherMessages tOtherMessages = new TOtherMessages();
+		value.replace("运维提醒", "更换提醒");
 		Map map = Json.fromJson(Map.class, value);
 		tOtherMessages.setMessage("" + map.get("message"));
 		tOtherMessages.setDeptId("" + map.get("dept"));
