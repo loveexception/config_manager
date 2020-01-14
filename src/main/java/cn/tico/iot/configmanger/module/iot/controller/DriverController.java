@@ -3,14 +3,12 @@ package cn.tico.iot.configmanger.module.iot.controller;
 import cn.tico.iot.configmanger.common.base.Globals;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.utils.UpLoadUtil;
+import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.module.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
-import cn.tico.iot.configmanger.module.iot.services.DriverService;
-import cn.tico.iot.configmanger.module.iot.services.GradeService;
-import cn.tico.iot.configmanger.module.iot.services.NormalService;
-import cn.tico.iot.configmanger.module.iot.services.RulerService;
+import cn.tico.iot.configmanger.module.iot.services.*;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.nutz.dao.Cnd;
@@ -53,6 +51,10 @@ public class DriverController implements AdminKey {
 
 	@Inject
     private RulerService rulerService;
+
+
+	@Inject
+	private DeviceService deviceService;
 
 	@RequiresPermissions("iot:driver:view")
 	@At("")
@@ -261,6 +263,10 @@ public class DriverController implements AdminKey {
 			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals),obj1.size());
             Normal normal = new Normal();
             normal.setDriverid(driverid);
+            List<Device> devices =  deviceService.query(Cnd.where("driver_id","=",driverid));
+            deviceService.kafka(devices);
+
+
             return allNormals(normal,req);
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -425,6 +431,8 @@ public class DriverController implements AdminKey {
 			List obj2 = normalService.updateAllNormal(Arrays.asList(upnormals),obj1.size());
 			Normal normal = new Normal();
 			normal.setDriverid(driverid);
+
+
 			return allNormals(normal,req);
 		} catch (Exception e) {
 			return Result.error("system.error");
