@@ -183,7 +183,8 @@ public class TIotDevicesController implements AdminKey {
 	@Ok("th://wx/tIotDevices/edit.html")
 	public void edit(String id, HttpServletRequest req) {
 		Device tIotDevices = deviceService.fetch(id);
-		deviceService.fetchLinks(tIotDevices, "^dept|location|kind$");
+		deviceService.fetchLinks(tIotDevices, "^dept|location|kind|next$");
+
 
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();

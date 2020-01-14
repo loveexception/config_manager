@@ -4,7 +4,7 @@ import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
-import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
+//import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import org.junit.After;
 import org.junit.Before;
@@ -25,8 +25,8 @@ public class CreateTableTest {
     public void setUp() throws Exception {
 
 
-        dao = MysqlTestDao.NEW2();
-       // Daos.createTablesInPackage(dao, "cn.tico.iot.configmanger.module.iot.models", true);
+//        dao = MysqlTestDao.NEW2();
+       // Daos.createTablesInPackage(dao0, "cn.tico.iot.configmanger.module.iot.models", true);
 
         //Daos.migration(dao, "cn.tico.iot.configmanger.module.iot.models", true, false, false);
 
