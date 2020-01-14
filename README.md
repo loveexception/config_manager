@@ -55,6 +55,7 @@ mvn clean package nutzboot:shade
 ```
 mvn clean package nutzboot:shade -o
 ```
+mvn clean package nutzboot:shade -o -DskipTests 
 请注意,当前需要 package + nutzboot:shade, 单独执行 package 或者 nutzboot:shade 是不行的
 
 ## start 命令:

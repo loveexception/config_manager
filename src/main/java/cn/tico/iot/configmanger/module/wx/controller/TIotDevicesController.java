@@ -193,11 +193,11 @@ public class TIotDevicesController implements AdminKey {
 		Owner last = new Owner();
 		if (Lang.isEmpty(sets)) {
 			Owner owner = new Owner();
-			 owner.setCycle("365");
-			 Calendar cal = Calendar.getInstance();
-			 cal.add(Calendar.YEAR,1);
-			 String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
-			 owner.setTime(day);
+//			 owner.setCycle("365");
+//			 Calendar cal = Calendar.getInstance();
+//			 cal.add(Calendar.YEAR,1);
+//			 String day =DateFormatUtils.format(cal,"yyyy-MM-dd");
+//			 owner.setTime(day);
 			owner.setDeviceid(tIotDevices.getId());
 			last = owner;
 		} else {
