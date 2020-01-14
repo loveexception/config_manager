@@ -57,18 +57,25 @@ public class LocationManager {
 
     /**
      * 补完所有的祖节点
-     * @param l
+     * @param me
      * @param all
      * @return
      */
-    public  Location findAncestors(Location l ,List<Location> all) {
-       Map<String,Location> parents = all
+    public  Location findAncestors(Location me ,List<Location> all) {
+        List<Location> list = getAncestorsLocationsByMe(me,all);
+        Map<String,Location> parents = list
                .stream()
-               .filter(location -> l.getAncestors().indexOf(location.getId())>=0 )
-               .collect(Collectors.toMap(location -> location.getLevel(),location->location));
+               .collect(Collectors.toMap(
+                       location-> location.getLevel(),
+                       location->location)
+               );
+//               all
+//               .stream()
+//               .filter(location -> me.getAncestors().indexOf(location.getId())>=0 )
+//               .collect(Collectors.toMap(location -> location.getLevel(),location->location));
 
-       l.setParents(parents);
-       return l;
+       me.setParents(parents);
+       return me;
     }
 
     /**
@@ -143,11 +150,11 @@ public class LocationManager {
 
 
           List<Location> ones = all.stream()
-                  .filter(one-> Strings.isMatch(Pattern.compile(REG_STAT+last+REG_END),one.getCnName()))
+                  .filter(one-> isMatchByKey(last, one.getCnName()))
                   .filter(one ->{
 
                       String langName = Strings.sBlank(one.getParentName(),"")+SPLIT+one.getCnName();
-                      boolean b =  names.stream().allMatch(name ->  Strings.isMatch(Pattern.compile(REG_STAT+name+REG_END),langName));
+                      boolean b =  names.stream().allMatch(name -> isMatchByKey(name, langName));
                         return b;
                         }).collect(Collectors.toList());
           if(Lang.isEmpty(ones)){
@@ -163,6 +170,10 @@ public class LocationManager {
 
         //return ones.get(0);
 
+    }
+
+    public static boolean isMatchByKey(String last, String cnName) {
+        return Strings.isMatch(Pattern.compile(REG_STAT + last + REG_END), cnName);
     }
 
     /**
@@ -192,5 +203,28 @@ public class LocationManager {
         String fatherName = Strings.join(SPLIT,list);
         location.setParentName(fatherName);
         return location;
+    }
+
+
+    /**
+     * 跟据 LOCATION 得到所有的 Location 父数据
+     * @param locationId
+     * @return
+     */
+    public List<Location> getAllByLocation(String locationId) {
+        Location me = get(locationId);
+        List<Location> result = getAncestorsLocationsByMe(me,all());
+        result.add(me);
+        return result ;
+    }
+
+    public List<Location> getAncestorsLocationsByMe(Location me,List<Location> all) {
+        return all
+                    .stream()
+                    .filter(location ->isMatchByKey(
+                            location.getId()
+                            ,me.getAncestors()))
+
+                    .collect(Collectors.toList());
     }
 }

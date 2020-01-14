@@ -200,10 +200,30 @@ public class LocationManagerTest extends Assert {
 
         //locationManager.get("");
     }
+    @Test
+    public void byLocationB座二层会议室(){
 
+        locationManager.init();
+
+
+        Location me=locationManager.get("387095cd13d94497b7666ed1a65e1712");
+        List<Location> list = locationManager.getAllByLocation("387095cd13d94497b7666ed1a65e1712");
+        assertNotNull(me);
+        assertFalse(Lang.isEmpty(list));
+        Logs.get().debug(list);
+        List p = list.stream().filter(one->one.getId().equals("387095cd13d94497b7666ed1a65e1712") )
+                .collect(Collectors.toList());
+
+
+        assertNotNull(p.get(0));
+
+
+
+        //locationManager.get("");
+    }
 
     @Test
-    public void byNa国网北京密云供电公司会议室(){
+    public void byName国网北京密云供电公司会议室(){
 
         locationManager.init();
 
