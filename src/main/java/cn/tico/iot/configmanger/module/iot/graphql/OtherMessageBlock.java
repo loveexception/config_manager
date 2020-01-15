@@ -55,6 +55,7 @@ public class OtherMessageBlock implements Block {
 		}catch (Exception e){
 			Logs.get().errorf("exception: %s",e);
 		}
+		return null;
 	}
 
 	public Object getObject(String topic, String key, String value) {

@@ -9,11 +9,13 @@ import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.SubGateway;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.iot.services.TopoService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.Dict;
 import cn.tico.iot.configmanger.module.sys.services.DictService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
+import com.google.gson.Gson;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
@@ -24,6 +26,8 @@ import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
+import org.nutz.ioc.aop.Aop;
+import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
@@ -34,12 +38,15 @@ import org.nutz.lang.segment.Segment;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mapl.Mapl;
 import org.nutz.mvc.annotation.*;
 import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.nutz.integration.jedis.RedisInterceptor.jedis;
 
 /**
  * 业务 信息操作处理
@@ -51,6 +58,17 @@ import java.util.stream.Collectors;
 @At("/api/")
 public class ApiController implements AdminKey {
 	private static final Log log = Logs.get();
+
+
+	@Inject
+	PropertiesProxy conf;
+	@Inject
+	LocationService locationService;
+
+	String KEY_PATH  ;
+//	static final String REG_STAT = ".*(";
+//	static final String REG_END = ").*";
+	static final String SPLIT =":";
 
 	@Inject
 	private UserService userService;
@@ -73,14 +91,16 @@ public class ApiController implements AdminKey {
 	private Dao dao;
 
 
-	public static LRUCache<String ,Object> LRU = new LRUCache<>(50);
+	//public static LRUCache<String ,Object> LRU = new LRUCache<>(50);
 
 	static GraphQLSchema schema = null;
 
 	public GraphQLSchema init(){
+		KEY_PATH = conf.get("redis.pre.key.device");
 		if(schema!=null){
 			return schema;
 		}
+
 		schema =new GraphQLSchemaGenerator()
 				.withBasePackages("io.leangen")
 				.withOperationsFromSingleton(apiService) //register the service
@@ -92,20 +112,35 @@ public class ApiController implements AdminKey {
 	 */
 	@At("/device")
 	@Ok("json")
+	@Aop("redis")
 	public Object device(
 			@Param("sno") String sno,
 			HttpServletRequest req
 	) {
-		Object json = LRU.get(sno);
+		String json = jedis().get(KEY_PATH+sno);
 		if(Lang.isNotEmpty(json)){
-			return json;
+			return new Gson().fromJson(json,Object.class);
 		}
 		Segment seg = new CharSegment(this.GRAPH_DEVICE);
 		seg.set("sno",sno);
 		String sql =seg.toString();
-		Object obj  =  graphql( sql,req ) ;
-		LRU.put(sno, obj);
-		return obj;
+		Object temp  =  graphql( sql,req ) ;
+		if(Lang.isNotEmpty(temp)){
+			Object obj = Mapl.cell(temp,"data.device");
+			if(Lang.isNotEmpty(obj)){
+				jedis().set(KEY_PATH+sno,new Gson().toJson(temp));
+				return temp;
+			}else{
+				jedis().del(KEY_PATH+sno);
+			}
+		}
+
+		return temp;
+
+	}
+	@Aop("redis")
+	public void change(String sno) {
+		jedis().del(KEY_PATH+sno);
 
 	}
 	/**
@@ -256,5 +291,7 @@ public class ApiController implements AdminKey {
 
 	static final String GRAPH_DEVICE=
 			"query{device(sno:\"${sno}\")  {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},driver{id,i18n,cn_name,en_name,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,status,person(sno:\"${sno}\"){id,i18n,cn_name,en_name,status,grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}},grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}}}}}";
-		//"query{device(sno:\"${sno}\")  {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},driver{id,i18n,cn_name,en_name,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,status,person(sno:\"${sno}\"){id,i18n,cn_name,en_name,status,grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}},grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}}}}}";
+
+
+	//"query{device(sno:\"${sno}\")  {id,sno,order_time,quality,discard_time,asset_status,alert_status,i18n,cn_name,en_name,price,gateway{id,i18n,cn_name,en_name,env,sno,git_path,desription,subgateway{id,ext_sno,sno,ext_ip},i18n,env,dept{id,dept_name,order_num,leader,phone,email},tags{i18n,cn_name,en_name},kind{i18n,cn_name,en_name},location{i18n,cn_name,en_name}},env,tags{id,i18n,cn_name,en_name,dept{id,dept_name}},kinds{id,i18n,cn_name,en_name,level,order_num},locations{id,i18n,cn_name,en_name,level,order_num},dept{id,dept_name,order_num,leader,phone,email},driver{id,i18n,cn_name,en_name,normals{id,i18n,cn_name,en_name,operate_key,unit,order_num,status,person(sno:\"${sno}\"){id,i18n,cn_name,en_name,status,grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}},grades{id,i18n,cn_name,en_name,grade,order_num,rulers{id,i18n,logic,val,symble,order_num,normal{id,i18n,cn_name,en_name,unit,operate_key}}}}}}}";
 	}

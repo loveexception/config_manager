@@ -108,7 +108,13 @@
 			function submitHandler() {
 				if ($.validate.form()) {
 					var obj = $('#form-tIotDevices-add').serialize();
+					var time = obj.orderTime();
+					if(time ){
+                        obj.orderTime = formatTime(time);
 
+					}else{
+					    obj.orderTime = Date.now();
+					}
 					$.operate.save(prefix + '/addDo', obj);
 				}
 			}
@@ -160,5 +166,24 @@
 				$.modal.openOptions(options);
 			}
 		</script>
+	<script type="javascript">
+        function formatTime(time,type){
+            var temp_time=new Number(time);
+            var temp_date=new Date(temp_time);
+            var temp_year1="";
+            var temp_month1="";
+            var temp_day1="";
+            if(type==1){
+                temp_year1=temp_date.getFullYear();
+                temp_month1=(temp_date.getMonth()+1)>9?(temp_date.getMonth()+1):"0"+(temp_date.getMonth()+1);
+                temp_day1=(temp_date.getDate())>9?(temp_date.getDate()):"0"+(temp_date.getDate());
+                return temp_year1.toString()+temp_month1.toString()+temp_day1.toString();
+            }else if(type==2){
+                temp_year1=temp_date.getFullYear();
+                temp_month1=(temp_date.getMonth()+1)>9?(temp_date.getMonth()+1):"0"+(temp_date.getMonth()+1);
+                return temp_year1.toString()+temp_month1.toString();
+            }
+        }
+	</script>
 	</body>
 </html>
