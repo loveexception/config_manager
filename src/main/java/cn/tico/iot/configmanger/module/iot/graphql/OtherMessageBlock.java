@@ -50,6 +50,14 @@ public class OtherMessageBlock implements Block {
 
 	@Override
 	public Object exec(String topic, String key, String value, long offset) {
+		try{
+			getObject(topic, key, value);
+		}catch (Exception e){
+			Logs.get().errorf("exception: %s",e);
+		}
+	}
+
+	public Object getObject(String topic, String key, String value) {
 		System.out.println("topic" + topic + "key:" + key + "value" + value);
 		TOtherMessages tOtherMessages = new TOtherMessages();
 		value.replace("运维提醒", "更换提醒");
