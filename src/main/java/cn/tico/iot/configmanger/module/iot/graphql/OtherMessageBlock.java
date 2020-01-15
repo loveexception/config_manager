@@ -61,13 +61,14 @@ public class OtherMessageBlock implements Block {
 	public Object getObject(String topic, String key, String value) {
 		System.out.println("topic" + topic + "key:" + key + "value" + value);
 		TOtherMessages tOtherMessages = new TOtherMessages();
-		value.replace("运维提醒", "更换提醒");
+		value = value.replace("运维提醒", "更换提醒");
 		Map map = Json.fromJson(Map.class, value);
 		tOtherMessages.setMessage("" + map.get("message"));
 		tOtherMessages.setDeptId("" + map.get("dept"));
 		tOtherMessages.setSno("" + map.get("sno"));
 		tOtherMessages.setCnName("" + map.get("cnname"));
 		String message = ("" + map.get("message"));
+
 		String deptId = ("" + map.get("dept"));
 		String sno = ("" + map.get("sno"));
 		String cnname = ("" + map.get("cnname"));

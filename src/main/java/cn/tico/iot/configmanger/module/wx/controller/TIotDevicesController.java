@@ -220,8 +220,11 @@ public class TIotDevicesController implements AdminKey {
 	@Ok("json")
 	@RequiresPermissions("wx:tIotDevices:edit")
 	@Slog(tag = "设备资本", after = "修改保存设备资本")
-	public Object editDo(@Param("..") Device tIotDevices, @Param("next.cycle") String cycle,
-			@Param("next.time") String time, HttpServletRequest req) {
+	public Object editDo(@Param("..") Device tIotDevices,
+
+						 @Param("next.cycle") String cycle,
+//						 @Param("orderTime") String ordertime,
+				@Param("next.time") String time, HttpServletRequest req) {
 		try {
 			if (Lang.isNotEmpty(tIotDevices)) {
 				deviceService.insertUpdate(tIotDevices);

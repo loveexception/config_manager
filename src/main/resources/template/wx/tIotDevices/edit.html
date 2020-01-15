@@ -61,7 +61,8 @@
 				<div class="form-group">
 					<label class="col-sm-3 control-label">入库日期：</label>
 					<div class="col-sm-8">
-						<input id="orderTime" name="orderTime" class="time-input form-control" type="text" th:value="${tIotDevices.orderTime}" />
+						
+						<input id="orderTime" name="orderTime" class="time-input form-control" type="text" th:value="${tIotDevices.orderTime && #dates.format(new java.util.Date(tIotDevices.orderTime), 'yyyy-MM-dd ')}" />
 					</div>
 				</div>
 
@@ -106,8 +107,22 @@
 			});
 
 			function submitHandler() {
+				let o =  $('#form-tIotDevices-edit').serialize();
+				let T = document.getElementById('orderTime')
+				let v = T.value;
 				if ($.validate.form()) {
-					$.operate.save(prefix + '/editDo', $('#form-tIotDevices-edit').serialize());
+				if(v){
+					v = new Date(v).getTime()
+				}else{
+					v = Date.now()
+				}
+					let r = o.split('&').map(function(e){
+						if(e.indexOf('orderTime')!= -1){
+							return "orderTime="+v
+						}
+						return e 
+					}).join('&')
+					$.operate.save(prefix + '/editDo',r);
 				}
 			}
 
@@ -142,6 +157,7 @@
 				};
 				$.modal.openOptions(options);
 			}
+			
 			function selectLocationTree() {
 				var options = {
 					title: '地区选择',
