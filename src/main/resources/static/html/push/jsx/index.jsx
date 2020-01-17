@@ -3,30 +3,6 @@ let { Select, Radio, Button, Icon, Switch, PageHeader, List, Slider, Checkbox, A
 const { Option } = Select;
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
-
-// filterFn 
-let filterFn = (possible,_this,before)=>{
-	let arr = [];
-	if(!before){
-		arr.push({type:"list",level:possible.L})
-		for(let i = 0;i<2;i++){
-			if(_this.state[i]===false){
-				continue
-			}
-			i == 0 ? arr.push({type:"window",level:possible.W}) :arr.push({type:"audio",level:possible.A})
-		}
-	}else{
-	 ///优化处理	
-	}
-	
-	return arr
-}
-// filterListFn
-let filterListFn = (data =[],that) =>{
-
-}
-// dataConfig 
-
 const dataConfig = {
 	warning:1,
 	major:2,
@@ -34,11 +10,84 @@ const dataConfig = {
 	point:4
 }
 const sliderStr = [
+	"无",
 	"紧急",
 	"重要",
 	"次要",
 	"提示"
 ]
+const reqConfig = ['',
+"warning",
+"major",
+"minor",
+"point",
+]
+// filterFn 
+let filterFn = (possible,_this,props,before)=>{
+	let arr = [];
+	if(!before){
+		//list 必填项 
+		// arr.push({type:"list",level:possible.L})
+		for(let i = 0;i<3;i++){
+			if(_this.state[i]===false){
+				continue
+			}
+			
+			if( i == 0){
+				for(let j  = possible.W ;  j > 0; j--){
+					arr.push({type:"window",level:reqConfig[j]})
+				}
+			}else if(i == 1){
+				for(let j  = possible.A ;  j > 0; j--){
+					arr.push({type:"audio",level:reqConfig[j]})
+				}
+			}else{
+				for(let j  = possible.L ;  j > 0; j--){
+					arr.push({type:"list",level:reqConfig[j]})
+				}
+			}	
+		}
+	}else{
+	 ///优化处理	
+	}
+	// $.ajax({
+	// 	url:"/mao/pushs/editDo",
+	// 	data:{
+	// 		data:arr
+	// 	},
+	// 	success:function(results){
+	// 		console.log(results,'results')
+	// 	},
+	// 	type:"POST"
+	// })
+	$.ajax({
+		cache: true,
+		type: 'POST',
+		url: '/mao/pushs/editDo',
+		data: JSON.stringify({
+			data:arr
+		}),
+		dataType: 'json',
+		async: false,
+		success: results => {
+			if (results.code != 0) {
+				message.error('接口错误');
+				return;
+			}
+			// console.log(_this.props.reqListFn,'_this.props.reqListFn')
+			props.resetReq && props.resetReq() 
+			message.info(results.msg);
+		}
+	})
+	return 
+}
+// filterListFn
+let filterListFn = (data =[],that) =>{
+
+}
+// dataConfig 
+
+
 const levelConfig = {
 	warning:"紧急",
 	major:  "重要",
@@ -58,7 +107,7 @@ function MTitle(props) {
 function MTable(props) {
 	let { titleFn = false, data = [], columns = [], footerFn = false, pagination = true } = props.config;
 	useEffect(() => {
-
+			
 		return () => {};
 	}, []);
 	return <div className="component-table-box">{props.config ? <Table bordered dataSource={data} pagination={pagination} columns={columns} title={titleFn} footer={footerFn}></Table> : ''}</div>;
@@ -120,8 +169,6 @@ class PushFrom extends React.Component {
 				let l = e.level;
 				initData[t] > dataConfig[l] ? '' : initData[t] = dataConfig[l] 
 			})
-			// this.props.dataList
-			// dataConfig
 			this.setState({
 				initData
 			})
@@ -131,10 +178,9 @@ class PushFrom extends React.Component {
 	handleSubmit = e => {
 		e.preventDefault();
 		this.props.form.validateFields((err, values) => {
-		let arrData = filterFn(values,this)
-			$.post("/mao/pushs/addDo",arrData,(r)=>{
-				console.log(r,'rrr')
-			})
+		let arrData = filterFn(values,this,this.props) // <=  
+		// arrData 是 过滤后的数组 （发送请求的数组）   4个 数据 级别对应 下标 
+	
 			if (!err) {
 				// console.log('Received values of form: ', values);
 			}
@@ -258,19 +304,19 @@ class UpgradeBox extends PureComponent {
 			dataList:[],
 			data: [
 				{
-					key: '0',
+					key: 'window',
 					index: '01',
 					pushWay: '弹窗',
 					level: '无'
 				},
 				{
-					key: '1',
+					key: 'audio',
 					index: '02',
 					pushWay: '响铃',
 					level: '无'
 				},
 				{
-					key: '2',
+					key: 'list',
 					index: '03',
 					pushWay: '列表',
 					level: '无'
@@ -284,7 +330,7 @@ class UpgradeBox extends PureComponent {
 		};
 	}
 	reqListFn = ()=>{
-		$.post("http://localhost:8090/mao/pushs/list",(results)=>{
+		$.post("/mao/pushs/list",(results)=>{
 			if(results.code ==0 ){
 				let dataList = results.rows;
 				let obj = {
@@ -303,17 +349,22 @@ class UpgradeBox extends PureComponent {
 					initData[t] > dataConfig[l] ? '' : initData[t] = dataConfig[l] 
 				})
 				for(let key in initData ){
+					let flag = false;
 					for(let i = initData[key]; i>0;i--){
-							obj[key] += sliderStr[initData[key]]
-						} 
-						obj[key] = obj[key] ? obj[key] : '无';
-				}	
-				// Array.isArray(dataList) && dataList.forEach((e,i)=>{
+						obj[key] += flag ?  '/'+sliderStr[i] : sliderStr[i];
 						
-				// })
-				// levelConfig
+						flag = true
+						} 
+						obj[key] = obj[key] ? obj[key] : sliderStr[0];
+				}	
+				let data = this.state.data;
+				data = data.map((e)=>{
+					e.level = obj[e.key]
+					return e
+				});
 				this.setState({
 					dataList,
+					data
 				})
 			}else{
 				message.error("接口错误",0.5)
@@ -336,9 +387,9 @@ class UpgradeBox extends PureComponent {
 		return (
 			<div className="push-list-box">
 				<MTitle text="设置推送策略" />
-				<PushFrom dataList={dataList} />
+				<PushFrom  resetReq = {this.reqListFn}   dataList={dataList} />
 				<MTitle text="推送策略列表" />
-				<MTable dataList = {dataList} config={{ data, columns, pagination: false }}></MTable>
+				<MTable  dataList = {dataList} config={{ data, columns, pagination: false }}></MTable>
 			</div>
 		);
 	}

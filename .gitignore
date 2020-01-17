@@ -12,6 +12,8 @@ velocity
 
 eee
 target
+webapp
+vscode
 .classpath
 bin
 dependency-reduced-pom.xml

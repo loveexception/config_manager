@@ -110,17 +110,6 @@
 				let T = document.getElementById('orderTime')
 				let v = T.value;
 				if ($.validate.form()) {
-<<<<<<< Updated upstream
-					var obj = $('#form-tIotDevices-add').serialize();
-					var time = obj.orderTime();
-					if(time ){
-                        obj.orderTime = formatTime(time);
-
-					}else{
-					    obj.orderTime = Date.now();
-					}
-					$.operate.save(prefix + '/addDo', obj);
-=======
 				if(v){
 					v = new Date(v).getTime()
 				}else{
@@ -133,7 +122,6 @@
 						return e 
 					}).join('&')
 					$.operate.save(prefix + '/editDo',r);
->>>>>>> Stashed changes
 				}
 			}
 

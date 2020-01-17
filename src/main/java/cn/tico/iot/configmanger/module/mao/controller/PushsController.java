@@ -115,7 +115,7 @@ public class PushsController {
 	/**
 	 * 新增保存推送方式
 	 */
-	@At("/list_all")
+	@At("/add_list_do")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
@@ -125,13 +125,23 @@ public class PushsController {
 			User user = ShiroUtils.getSysUser();
 			String deptId = user.getDeptId();
 			List list = Lists.newArrayList();
+			String by = user.getId();
+			// Date d = d
+			
 			if(Lang.isNotEmpty(pushs)){
 				list = Lists.newArrayList(pushs)
 						.stream()
 						.map(push->{
 							push.setDeptId(deptId);
+							push.setDelFlag("false");
+							push.setStatus("true");
+							push.setCreateTime(new Date());
+							push.setCreateBy(by);
+							push.setUpdateBy(by);
+							push.setUpdateTime(new Date());
 							return push;
 						}).collect(Collectors.toList());
+						
 			}
 			pushsService.insertAll(list);
 			return Result.success("system.success");
@@ -164,12 +174,30 @@ public class PushsController {
 		try {
 			User user = ShiroUtils.getSysUser();
 			String deptid = user.getDeptId();
+			List list = Lists.newArrayList();
+			String by = user.getId();
 //			Dept dept = deptService.fetch(deptid);
-			Cnd cnd = Cnd.NEW()
-					.and("dept_id","=",deptid).and("type","=",type);
-			pushsService.dao().clear(Pushs.class,cnd);
+			
+			if(Lang.isNotEmpty(pushs)){
+				list = Lists.newArrayList(pushs)
+						.stream()
+						.map(push->{
+							String Stype = push.getType();
 
-			pushsService.insertAll(Arrays.asList(pushs));
+							push.setDeptId(deptid);
+							push.setDelFlag("false");
+							push.setStatus("true");
+							push.setCreateTime(new Date());
+							push.setCreateBy(by);
+							push.setUpdateBy(by);
+							push.setUpdateTime(new Date());
+							Cnd cnd = Cnd.NEW()
+							.and("dept_id","=",deptid).and("type","=",Stype);
+							pushsService.dao().clear(Pushs.class,cnd);
+							return push;
+						}).collect(Collectors.toList());
+			}
+			pushsService.insertAll(list);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -195,3 +223,5 @@ public class PushsController {
 	}
 
 }
+
+
