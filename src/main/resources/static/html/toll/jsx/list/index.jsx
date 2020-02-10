@@ -5,7 +5,6 @@ let MIcon = function(props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
 	return <Icon style={{ fontSize: '0.12rem' }} {...props} />;
 };
-// console.log( jsmini_pubsub.name,'PubSub')
 // let isAdd = true;
 
 // const data = [];
@@ -61,6 +60,8 @@ class FooterEditableFormTable extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.handleClick = (e, text, mes, index) => {
+			// debugger
+			// console.log(mes,'mes')
 			props.handleEdit && props.handleEdit(mes, index, e);
 			// props.listReq()
 		}
@@ -116,7 +117,27 @@ class FooterEditableFormTable extends React.PureComponent {
 				editable: true,
 				align: 'center',
 				render:(d)=>{
-					return d+"分钟"
+					/*
+					[
+						[-1, "不推送", "不升级"],
+						[0, "立刻", "立刻"],
+						[2*60, "2分钟", "2分钟"],
+						[5*60, "5分钟", "5分钟"],
+						[10*60, "10分钟", "10分钟"],
+						[15*60, "15分钟", "15分钟"],
+						[30*60, "30分钟", "30分钟"],
+						[8*60*60, '8小时后', '8小时后'],
+						[24*60*60, '24小时后', '24小时后'],
+						[1*60, '1分钟后', '1分钟后'],
+					];
+										
+					*/
+					
+					let result = commitTimeArr.find((e)=>{
+						return e[0] == d
+					}) ;
+					result = result === undefined  ?  "无" : result[1];
+					return  result
 				}
 			},
 			{
@@ -126,7 +147,11 @@ class FooterEditableFormTable extends React.PureComponent {
 				editable: true,
 				align: 'center',
 				render:(d)=>{
-					return d+'分钟'
+					let result = commitTimeArr.find((e)=>{
+						return e[0] == d
+					}) ;
+					result = result === undefined  ?  "无" : result[2];
+					return  result
 				}
 			},
 			{
@@ -143,7 +168,7 @@ class FooterEditableFormTable extends React.PureComponent {
 											this.handleClick(e, ...value);
 										}}
 									/>
-								<Popconfirm placement="top" title={"你确定要清楚这条数据吗?"} onConfirm={()=>{
+								<Popconfirm placement="top" title={"你确定要清除这条数据吗?"} onConfirm={()=>{
 										if(!value[1].id){
 											return
 										}
@@ -207,26 +232,26 @@ class FooterEditableFormTable extends React.PureComponent {
 			{
 				index: '01',
 				grade: '紧急告警',
-				cycle: 0,
-				countDown: 0
+				cycle: '不升级',
+				countDown: '不升级'
 			},
 			{
 				index: '02',
 				grade: '重要告警',
-				cycle: 0,
-				countDown: 0
+				cycle: '不升级',
+				countDown: '不升级'
 			},
 			{
 				index: '03',
 				grade: '次要告警',
-				cycle: 0,
-				countDown: 0
+				cycle: '不升级',
+				countDown: '不升级'
 			},
 			{
 				index: '04',
 				grade: '告警提示',
-				cycle: 0,
-				countDown: 0
+				cycle: '不升级',
+				countDown: '不升级'
 			}
 		]
 		!_.isEmpty(p.rowData) & p.rowData.forEach(e=>{
@@ -286,10 +311,16 @@ function myButton(props) {
 	return <a className="my-button-style">{props.text}</a>;
 }
 const commitTimeArr = [
-	[0, "0分钟"],
-	[5, '5分钟'],
-	[15, '15分钟'],
-	[30, '30分钟']
+	[-1, "不推送", "不升级"],
+	[0, "立刻", "立刻"],
+	[2*60, "2分钟", "2分钟"],
+	[5*60, "5分钟", "5分钟"],
+	[10*60, "10分钟", "10分钟"],
+	[15*60, "15分钟", "15分钟"],
+	[30*60, "30分钟", "30分钟"],
+	[8*60*60, '8小时后', '8小时后'],
+	[24*60*60, '24小时后', '24小时后'],
+	[1*60, '1分钟后', '1分钟后'],
 ];
 //input
 let InputCom = function(props) {
@@ -304,25 +335,25 @@ let InputCom = function(props) {
 		}
 	}, [props]);
 	let handleChange = function(value) {
+		// console.log({[key]:value},'!!!!!!!!!!!!!!!!!')
 		setStrategy({...strategy,[key]:value})
 		setValue(value);
 	};
 	return (
 		<div>
-			<Select style={{ width: '0.8rem' }} onChange={handleChange} value={strategy[key] ? strategy[key]+"分钟":0} defaultValue={0}>
-				{commitTimeArr.map(arr => (
-					<Option value={arr[0]} key={arr[1]}>
-						{arr[1]}
+			<Select style={{ width: '0.8rem' }} onChange={handleChange}
+			 value={ strategy[key] ? strategy[key]
+				:0} 
+				defaultValue={0}>
+				{commitTimeArr.map((arr,i) => (
+					<Option value={arr[0]} key={i+key}>
+						{arr[data-1]}
 					</Option>
 				))}
 			</Select>
 		</div>
 	);
 };
-// InputCom = React.memo(InputCom, function(p, nextP) {
-// 	console.log(nextP, 'nextP', 'p', p);
-// 	return true;
-// });
 function MyButton(props) {
 	return (
 		<a className="My-button-style" {...props}>
@@ -352,7 +383,7 @@ function EditableFormTable(props) {
 			money: '3'
 		}
 	]);
-	let [strategy, setStrategy] = React.useState({ grade: '', countDown: 0, cycle: 0 });
+	let [strategy, setStrategy] = React.useState({ grade: '', countDown: "不升级", cycle: "不推送" });
 	let [rowData,setRowData] = useState([]);
 	let [isAdd,setIsAdd] = useState(true)
 	let [isRadio,setIsRadio] = useState([true,true,true,true])
@@ -369,6 +400,8 @@ function EditableFormTable(props) {
 			}
 			// setIsAdd(target.cycle== 0 && target.countDown==0); 
 		})
+
+
 		setStrategy({...strategy,grade});
 	}
 	const columns = [
@@ -396,7 +429,7 @@ function EditableFormTable(props) {
 						</Radio.Group>
 					);
 				} else {
-					return <InputCom setStrategy={setStrategy} strategy={strategy} data={data}></InputCom>;
+						return <InputCom setStrategy={setStrategy} strategy={strategy} data={data}></InputCom>;
 				}
 			}
 		}
@@ -431,6 +464,7 @@ function EditableFormTable(props) {
 		return () => {};
 	}, []);
 	let handleClick = () => {
+		// console.log(strategy,'===!!!!!!!!!!!!!!!!')
 		if(!(typeof strategy.grade === 'number')){
 			message.error('没有升级项')
 			return 
@@ -480,12 +514,15 @@ function EditableFormTable(props) {
 		return 
 	};
 	let handleEdit = (mes, index, e) => {
-		console.log({ ...strategy,...mes, grade: index, },'mes')
+		// debugger
 		new Promise(async function(resolve,reject){
 			let r = await setInitValue(index);
 			resolve(r)
 		}).then((r)=>{
-			setStrategy({ ...strategy,...mes, grade: index, });
+			console.log({ ...strategy,...mes, grade: index, },'----------------')
+			let obj = { ...strategy,...mes, grade: index, }
+			obj.countDown = String(obj.countDown);
+			setStrategy(obj);
 		}).then(()=>{
 			 setIsAdd(!mes.id)
 		})
