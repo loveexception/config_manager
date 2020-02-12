@@ -23,4 +23,5 @@ public class PushsService extends Service<Pushs> {
 
         return this.dao().insert(pushs);
     }
+
 }
