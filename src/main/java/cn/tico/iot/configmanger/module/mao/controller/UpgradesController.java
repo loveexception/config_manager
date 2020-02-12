@@ -1,5 +1,7 @@
 package cn.tico.iot.configmanger.module.mao.controller;
 
+import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
+import com.google.gson.Gson;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import cn.tico.iot.configmanger.module.mao.models.Upgrades;
@@ -44,6 +46,8 @@ public class UpgradesController {
 
 	@Inject
 	private UpgradesService upgradesService;
+	@Inject
+	private KafkaBlock kafkaBlock;
 
 	@Inject DeptService deptService;
 	
@@ -118,6 +122,8 @@ public class UpgradesController {
 				
 			}
 			upgradesService.insert(upgrades);
+			Dept dept =  upgradesService.findDeptByAllUpgrades(deptid);
+			upgradesService.kafkaDept(dept);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -144,11 +150,14 @@ public class UpgradesController {
 	public Object editDo(@Param("..") Upgrades upgrades,HttpServletRequest req) {
 		// try {
 			if(Lang.isNotEmpty(upgrades)){
+				String deptid = ShiroUtils.getSysUser().getDeptId();
 				upgrades.setUpdateBy(ShiroUtils.getSysUserId());
 				upgrades.setUpdateTime(new Date());
 				upgradesService.update(upgrades);
 				Dao forup = Daos.ext(upgradesService.dao(), FieldFilter.create(upgrades.getClass(), true));
 				forup.update(upgrades);
+				Dept dept =  upgradesService.findDeptByAllUpgrades(deptid);
+				upgradesService.kafkaDept(dept);
 				return Result.success("system.success",upgrades);
 			}else{
 				return Result.error("system.error");
@@ -165,7 +174,11 @@ public class UpgradesController {
 	@Slog(tag ="告警升级", after= "删除告警升级:${array2str(args[0])}")
 	public Object remove(@Param("ids")String[] ids, HttpServletRequest req) {
 		try {
+			String deptid = ShiroUtils.getSysUser().getDeptId();
+
 			upgradesService.delete(ids);
+			Dept dept =  upgradesService.findDeptByAllUpgrades(deptid);
+			upgradesService.kafkaDept(dept);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");

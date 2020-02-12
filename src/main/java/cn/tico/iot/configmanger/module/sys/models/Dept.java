@@ -1,11 +1,14 @@
 package cn.tico.iot.configmanger.module.sys.models;
 
 import cn.tico.iot.configmanger.common.base.BaseModel;
+import cn.tico.iot.configmanger.module.mao.models.Pushs;
+import cn.tico.iot.configmanger.module.mao.models.Upgrades;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import org.nutz.dao.entity.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 部门
@@ -80,7 +83,6 @@ public class Dept extends BaseModel implements Serializable {
     @Column("email")
     @Comment("邮箱")
     @GraphQLQuery(name = "email", description = "邮箱")
-
     private String email;
 
     /**
@@ -94,6 +96,28 @@ public class Dept extends BaseModel implements Serializable {
     @Comment("删除标记")
     @ColDefine(type = ColType.BOOLEAN)
     private boolean delFlag;
+
+
+    private List<Upgrades> upgrades;
+
+    private List<Pushs> pushs;
+
+
+    public List<Upgrades> getUpgrades() {
+        return upgrades;
+    }
+
+    public void setUpgrades(List<Upgrades> upgrades) {
+        this.upgrades = upgrades;
+    }
+
+    public List<Pushs> getPushs() {
+        return pushs;
+    }
+
+    public void setPushs(List<Pushs> pushs) {
+        this.pushs = pushs;
+    }
 
 
 

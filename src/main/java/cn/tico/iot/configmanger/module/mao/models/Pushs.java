@@ -31,19 +31,12 @@ public class Pushs extends I18NModel implements Serializable {
     @Comment("通知方式")
     private String type;
 
-    // @Column("cycle")
-    // @Comment("压制周期")
-    // private String cycle;
-
-    // @Column("countDown")
-    // @Comment("升级时间")
-    // private Long countDown;
 
     @Column("level")
     @Comment("指标级别")
     private String level;
 
-//    @One(field = "deptid", key = "id")
-//    private Dept dept;
+    @One(field = "deptId", key = "id")
+    private Dept dept;
 
 }

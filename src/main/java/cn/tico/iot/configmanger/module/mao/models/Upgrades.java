@@ -42,6 +42,6 @@ public class Upgrades extends I18NModel implements Serializable {
     @Comment("指标级别")
     private String level;
 
-//    @One(field = "deptid", key = "id")
-//    private Dept dept;
+    @One(field = "deptId", key = "id")
+    private Dept dept;
 }

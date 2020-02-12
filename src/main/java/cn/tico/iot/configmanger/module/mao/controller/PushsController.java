@@ -1,5 +1,6 @@
 package cn.tico.iot.configmanger.module.mao.controller;
 
+import cn.tico.iot.configmanger.module.mao.services.UpgradesService;
 import com.google.common.collect.Lists;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
@@ -43,8 +44,11 @@ public class PushsController {
 	
 	@Inject
 	private PushsService pushsService;
-	@Inject DeptService deptService;
-	
+	@Inject
+	DeptService deptService;
+
+	@Inject
+	UpgradesService upgradesService;
 	// @RequiresPermissions("mao:pushs:view")
 	@At("")
 	@Ok("th:/mao/pushs/pushs.html")
@@ -144,6 +148,8 @@ public class PushsController {
 						
 			}
 			pushsService.insertAll(list);
+			Dept dept = upgradesService.findDeptByAllUpgrades(deptId);
+			upgradesService.kafkaDept(dept);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");
@@ -173,18 +179,17 @@ public class PushsController {
 	public Object editDo(@Param("data") Pushs[] pushs,@Param("type") String type,HttpServletRequest req) {
 		try {
 			User user = ShiroUtils.getSysUser();
-			String deptid = user.getDeptId();
+			String deptId = user.getDeptId();
 			List list = Lists.newArrayList();
 			String by = user.getId();
-//			Dept dept = deptService.fetch(deptid);
-			
+
 			if(Lang.isNotEmpty(pushs)){
 				list = Lists.newArrayList(pushs)
 						.stream()
 						.map(push->{
 							String Stype = push.getType();
 
-							push.setDeptId(deptid);
+							push.setDeptId(deptId);
 							push.setDelFlag("false");
 							push.setStatus("true");
 							push.setCreateTime(new Date());
@@ -192,12 +197,14 @@ public class PushsController {
 							push.setUpdateBy(by);
 							push.setUpdateTime(new Date());
 							Cnd cnd = Cnd.NEW()
-							.and("dept_id","=",deptid).and("type","=",Stype);
+							.and("dept_id","=",deptId).and("type","=",Stype);
 							pushsService.dao().clear(Pushs.class,cnd);
 							return push;
 						}).collect(Collectors.toList());
 			}
 			pushsService.insertAll(list);
+			Dept dept = upgradesService.findDeptByAllUpgrades(deptId);
+			upgradesService.kafkaDept(dept);
 			return Result.success("system.success");
 		} catch (Exception e) {
 			return Result.error("system.error");

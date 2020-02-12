@@ -36,6 +36,7 @@ public  class KafkaBlock  {
     public  KafkaConsumer<String, String> consumer;
 
     public static final String TOPIC ="config";
+    public static final String TOPIC_DEPT="dept_config";
     public static final String KEY_SNO="sno";
     public static final String KEY_EXT_SNO ="extsno";
 

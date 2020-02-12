@@ -18,7 +18,7 @@ import java.util.Date;
 public class Pars extends BaseModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-		@Name
+	@Name
 	@Column("id")
 	@Comment("id")
 	@ColDefine(type = ColType.VARCHAR, width = 64)
