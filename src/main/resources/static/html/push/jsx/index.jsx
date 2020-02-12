@@ -167,7 +167,6 @@ class PushFrom extends React.Component {
 		this.props.form.validateFields((err, values) => {
 			let arrData = filterFn(values, this, this.props); // <=
 			// arrData 是 过滤后的数组 （发送请求的数组）   4个 数据 级别对应 下标
-			debugger;
 			if (!err) {
 				// console.log('Received values of form: ', values);
 			}
