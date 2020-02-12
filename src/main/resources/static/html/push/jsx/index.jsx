@@ -10,7 +10,7 @@ const dataConfig = {
 	point: 4
 };
 const sliderStr = ['无', '紧急', '重要', '次要', '提示'];
-const reqConfig = ['', 'warning', 'major', 'minor', 'point'];
+const reqConfig = ['', 'critical', 'major', 'minor', 'warning'];
 // filterFn
 let filterFn = (possible, _this, props, before) => {
 	let arr = [];
@@ -49,6 +49,7 @@ let filterFn = (possible, _this, props, before) => {
 	// 	},
 	// 	type:"POST"
 	// })
+	console.log(arr, 'data=======!');
 	$.ajax({
 		cache: true,
 		type: 'POST',
