@@ -1,5 +1,4 @@
-
-let { Select, Radio, Button, Icon,Popconfirm, PageHeader, List, Avatar, Table, Input, InputNumber, Form,message } = antd;
+let { Select, Radio, Button, Icon, Popconfirm, PageHeader, List, Avatar, Table, Input, InputNumber, Form, message } = antd;
 const { Option } = Select;
 let MIcon = function(props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
@@ -9,7 +8,7 @@ let MIcon = function(props) {
 
 // const data = [];
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
-
+const reqConfig = ['warning', 'major', 'minor', 'point'];
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
 let setInitValue = () => {};
@@ -55,17 +54,14 @@ class EditableCell extends React.Component {
 
 class FooterEditableFormTable extends React.PureComponent {
 	// static getDeriveStateFromProps(){
-	// 	console.log("======")
 	// }
 	constructor(props) {
 		super(props);
 		this.handleClick = (e, text, mes, index) => {
-			// debugger
-			// console.log(mes,'mes')
 			props.handleEdit && props.handleEdit(mes, index, e);
 			// props.listReq()
-		}
-		
+		};
+
 		this.state = {
 			data: [
 				{
@@ -116,7 +112,7 @@ class FooterEditableFormTable extends React.PureComponent {
 				width: '30%',
 				editable: true,
 				align: 'center',
-				render:(d)=>{
+				render: d => {
 					/*
 					[
 						[-1, "不推送", "不升级"],
@@ -132,12 +128,12 @@ class FooterEditableFormTable extends React.PureComponent {
 					];
 										
 					*/
-					
-					let result = commitTimeArr.find((e)=>{
-						return e[0] == d
-					}) ;
-					result = result === undefined  ?  "无" : result[1];
-					return  result
+
+					let result = commitTimeArr.find(e => {
+						return e[0] == d;
+					});
+					result = result === undefined ? '无' : result[1];
+					return result;
 				}
 			},
 			{
@@ -146,12 +142,12 @@ class FooterEditableFormTable extends React.PureComponent {
 				width: '30%',
 				editable: true,
 				align: 'center',
-				render:(d)=>{
-					let result = commitTimeArr.find((e)=>{
-						return e[0] == d
-					}) ;
-					result = result === undefined  ?  "无" : result[2];
-					return  result
+				render: d => {
+					let result = commitTimeArr.find(e => {
+						return e[0] == d;
+					});
+					result = result === undefined ? '无' : result[2];
+					return result;
 				}
 			},
 			{
@@ -163,32 +159,37 @@ class FooterEditableFormTable extends React.PureComponent {
 						<div className="table-edit-box">
 							<div className="table-icon-box">
 								<MIcon
-										type="form"
-										onClick={e => {
-											this.handleClick(e, ...value);
-										}}
-									/>
-								<Popconfirm placement="top" title={"你确定要清除这条数据吗?"} onConfirm={()=>{
-										if(!value[1].id){
-											return
+									type="form"
+									onClick={e => {
+										this.handleClick(e, ...value);
+									}}
+								/>
+								<Popconfirm
+									placement="top"
+									title={'你确定要清除这条数据吗?'}
+									onConfirm={() => {
+										if (!value[1].id) {
+											return;
 										}
-										$.post('/mao/upgrades/remove',{ids:value[1].id},(results)=>{
-											if(results.code === 0){
-												message.success(results.msg,0.5)
-												this.props.listReq&& this.props.listReq()
+										$.post('/mao/upgrades/remove', { ids: value[1].id }, results => {
+											if (results.code === 0) {
+												message.success(results.msg, 0.5);
+												this.props.listReq && this.props.listReq();
 												// this.props && this.props.listReq()
-												this.props.setIsAdd(true)
-											}else{
-												message.error(results.msg,0.5);
+												this.props.setIsAdd(true);
+											} else {
+												message.error(results.msg, 0.5);
 												// this.setState({editingKey:''})
-												 this.props.listReq&& this.props.listReq()
-												 this.props.setIsAdd(false)
-												}
-										})
-									}} okText="是的" cancelText="取消">
-									<MIcon type="delete"  />
+												this.props.listReq && this.props.listReq();
+												this.props.setIsAdd(false);
+											}
+										});
+									}}
+									okText="是的"
+									cancelText="取消"
+								>
+									<MIcon type="delete" />
 								</Popconfirm>
-
 							</div>
 						</div>
 					);
@@ -196,14 +197,14 @@ class FooterEditableFormTable extends React.PureComponent {
 			}
 		];
 	}
-	componentDidMount(){
-		let d =  this.state.data;
+	componentDidMount() {
+		let d = this.state.data;
 	}
-	componentWillReceiveProps(){
-		this.handleProps()
+	componentWillReceiveProps() {
+		this.handleProps();
 	}
-	componentWillUpdate(p,s){
-		let d =  this.state.data;
+	componentWillUpdate(p, s) {
+		let d = this.state.data;
 		// let isUpdata = false;
 		// !_.isEmpty(d) && d.forEach((e,i)=>{
 		// 	Object.keys(s.data).forEach((item,index)=>{
@@ -212,21 +213,19 @@ class FooterEditableFormTable extends React.PureComponent {
 		// 		}
 		// 	})
 		// })
-		// console.log(d,s.data)
-		// // console.log(s,'value')
 		// if(isUpdata){
 
-			PubSub.publish('initData',d);
+		PubSub.publish('initData', d);
 		// }
 	}
-	
+
 	isEditing = record => record.key === this.state.editingKey;
 
 	cancel = () => {
 		this.setState({ editingKey: '' });
 	};
 
-	handleProps =()=>{
+	handleProps = () => {
 		let p = this.props;
 		let data = [
 			{
@@ -253,25 +252,25 @@ class FooterEditableFormTable extends React.PureComponent {
 				cycle: '不升级',
 				countDown: '不升级'
 			}
-		]
-		!_.isEmpty(p.rowData) & p.rowData.forEach(e=>{
-			//拿到数据 确定是几级告警;
-			let gra = data[e.grade]
-			if(gra===undefined ){
-				return	
-			}
-			gra.cycle = e.cycle ? e.cycle: 0;
-			gra.countDown = e.countDown ? e.countDown : 0;
-			gra.id =e.id;
-			gra.deptId = e.deptId;
-		})
+		];
+		!_.isEmpty(p.rowData) &
+			p.rowData.forEach(e => {
+				//拿到数据 确定是几级告警;
+				let gra = data[e.grade];
+				if (gra === undefined) {
+					return;
+				}
+				gra.cycle = e.cycle ? e.cycle : 0;
+				gra.countDown = e.countDown ? e.countDown : 0;
+				gra.id = e.id;
+				gra.deptId = e.deptId;
+			});
 
 		this.setState({
 			data
-		})
+		});
 		// PubSub.publish('initData',data);
-
-	}
+	};
 	render() {
 		const components = {
 			body: {
@@ -311,22 +310,33 @@ function myButton(props) {
 	return <a className="my-button-style">{props.text}</a>;
 }
 const commitTimeArr = [
-	[-1, "不推送", "不升级"],
-	[0, "立刻", "立刻"],
-	[2*60, "2分钟", "2分钟"],
-	[5*60, "5分钟", "5分钟"],
-	[10*60, "10分钟", "10分钟"],
-	[15*60, "15分钟", "15分钟"],
-	[30*60, "30分钟", "30分钟"],
-	[8*60*60, '8小时后', '8小时后'],
-	[24*60*60, '24小时后', '24小时后'],
-	[1*60, '1分钟后', '1分钟后'],
+	[-1, '不推送', '不升级'],
+	[0, '立刻', '立刻'],
+	[2 * 60, '2分钟', '2分钟'],
+	[5 * 60, '5分钟', '5分钟'],
+	[10 * 60, '10分钟', '10分钟'],
+	[15 * 60, '15分钟', '15分钟'],
+	[30 * 60, '30分钟', '30分钟'],
+	[8 * 60 * 60, '8小时后', '8小时后'],
+	[24 * 60 * 60, '24小时后', '24小时后'],
+	[1 * 60, '1分钟后', '1分钟后']
 ];
+function isValue(str) {
+	let res = 0;
+	commitTimeArr.forEach((e, i) => {
+		let f = e.forEach((item, index) => {
+			if (item == str) {
+				res = commitTimeArr[i][0];
+			}
+		});
+	});
+	return res;
+}
 //input
 let InputCom = function(props) {
 	let [value, setValue] = useState(0);
-	let { strategy , setStrategy,cycle, countDown , data } = props;
-	let key = data === '2'? 'cycle':'countDown';
+	let { strategy, setStrategy, cycle, countDown, data } = props;
+	let key = data === '2' ? 'cycle' : 'countDown';
 	useEffect(() => {
 		if (data === '2') {
 			setValue(cycle);
@@ -335,19 +345,15 @@ let InputCom = function(props) {
 		}
 	}, [props]);
 	let handleChange = function(value) {
-		// console.log({[key]:value},'!!!!!!!!!!!!!!!!!')
-		setStrategy({...strategy,[key]:value})
+		setStrategy({ ...strategy, [key]: value });
 		setValue(value);
 	};
 	return (
 		<div>
-			<Select style={{ width: '0.8rem' }} onChange={handleChange}
-			 value={ strategy[key] ? strategy[key]
-				:0} 
-				defaultValue={0}>
-				{commitTimeArr.map((arr,i) => (
-					<Option value={arr[0]} key={i+key}>
-						{arr[data-1]}
+			<Select style={{ width: '0.8rem' }} onChange={handleChange} value={Number(strategy[key]) ? Number(strategy[key]) : isValue(strategy[key])} defaultValue={0}>
+				{commitTimeArr.map((arr, i) => (
+					<Option value={arr[0]} key={i + key}>
+						{arr[data - 1]}
 					</Option>
 				))}
 			</Select>
@@ -361,7 +367,7 @@ function MyButton(props) {
 		</a>
 	);
 }
-FooterEditableFormTable = Form.create()(FooterEditableFormTable); 
+FooterEditableFormTable = Form.create()(FooterEditableFormTable);
 
 // Tablist
 function EditableFormTable(props) {
@@ -383,26 +389,27 @@ function EditableFormTable(props) {
 			money: '3'
 		}
 	]);
-	let [strategy, setStrategy] = React.useState({ grade: '', countDown: "不升级", cycle: "不推送" });
-	let [rowData,setRowData] = useState([]);
-	let [isAdd,setIsAdd] = useState(true)
-	let [isRadio,setIsRadio] = useState([true,true,true,true])
+	let [strategy, setStrategy] = React.useState({ grade: '', countDown: '不升级', cycle: '不推送' });
+	let [rowData, setRowData] = useState([]);
+	let [isAdd, setIsAdd] = useState(true);
+	let [isRadio, setIsRadio] = useState([true, true, true, true]);
 	const radio = ['紧急', '重要', '次要 ', '提示'];
 	function handleChange(e) {
-		let grade= e.target.value;
+		let grade = e.target.value;
 		// let cycle  = rowData[grade].cycle;
 		// let countDown  = rowData[grade].countDown;
+		console.log(isRadio, '=========', grade, 'grade==');
+
 		PubSub.unsubscribe(window.PubSubx);
-		window.PubSubx = PubSub.subscribe('initData', function(m,d){
+		window.PubSubx = PubSub.subscribe('initData', function(m, d) {
 			let target = d[grade];
-			if(isAdd === (target.cycle== 0 && target.countDown==0)){
-					return
+			if (isAdd === (target.cycle == 0 && target.countDown == 0)) {
+				return;
 			}
-			// setIsAdd(target.cycle== 0 && target.countDown==0); 
-		})
+		});
 
-
-		setStrategy({...strategy,grade});
+		setIsAdd(isRadio[grade] === true);
+		setStrategy({ ...strategy, grade });
 	}
 	const columns = [
 		{
@@ -421,7 +428,7 @@ function EditableFormTable(props) {
 					return (
 						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.grade}>
 							{radio.map((item, index) => (
-								// 
+								//
 								<Radio disabled={!isRadio[index]} key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
 								</Radio>
@@ -429,103 +436,100 @@ function EditableFormTable(props) {
 						</Radio.Group>
 					);
 				} else {
-						return <InputCom setStrategy={setStrategy} strategy={strategy} data={data}></InputCom>;
+					return <InputCom setStrategy={setStrategy} strategy={strategy} data={data}></InputCom>;
 				}
 			}
 		}
 	];
-	function listReq(){
-		$.post('/mao/upgrades/list',(results)=>{
-			if(Array.isArray(results.rows)){
-				let isRadio = [true,true,true,true];
-				// console.log(results.rows,'xxxxxxxxxxxxx')
-				results.rows.forEach((e)=>{
-					isRadio[e.grade] = false
-				})
+	function listReq() {
+		$.post('/mao/upgrades/list', results => {
+			if (Array.isArray(results.rows)) {
+				let isRadio = [true, true, true, true];
+				results.rows.forEach(e => {
+					isRadio[e.grade] = false;
+				});
 				// debugger
-				props.upDataIsPolling && props.upDataIsPolling(results.rows.length)
+				props.upDataIsPolling && props.upDataIsPolling(results.rows.length);
 				setRowData(results.rows);
 				setIsRadio(isRadio);
 				// let suObj = results.rows[0];
 				// let {grade,cycle,countDown }  = suObj;
-					// setIsAdd( countDown == 0 && cycle ==0)
+				// setIsAdd( countDown == 0 && cycle ==0)
 				let obj = {
-					...strategy,
-				// 	grade:grade,
-				// 	cycle:cycle,
-				// 	countDown:countDown
-				}
-				setStrategy({...strategy,...obj})
+					...strategy
+					// 	grade:grade,
+					// 	cycle:cycle,
+					// 	countDown:countDown
+				};
+				setStrategy({ ...strategy, ...obj });
 			}
-		})
+		});
 	}
 	useEffect(() => {
-		listReq()
+		listReq();
 		return () => {};
 	}, []);
 	let handleClick = () => {
-		// console.log(strategy,'===!!!!!!!!!!!!!!!!')
-		if(!(typeof strategy.grade === 'number')){
-			message.error('没有升级项')
-			return 
+		if (!(typeof strategy.grade === 'number')) {
+			message.error('没有升级项');
+			return;
 		}
-		if (isAdd){
-			if(!isRadio[strategy.grade]){
-				return 
+		if (isAdd) {
+			if (!isRadio[strategy.grade]) {
+				return;
 			}
-			$.post('/mao/upgrades/addDo',strategy,function(results){
-				if(results.code === 0){
-					message.success(results.msg,0.5)
+			let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
+			$.post('/mao/upgrades/addDo', data, function(results) {
+				if (results.code === 0) {
+					message.success(results.msg, 0.5);
 					// reset()
-					// console.log(props)
-					setIsAdd(false)
-					listReq()
-				}else{
-					message.error(results.msg,0.5)
-					setIsAdd(true)
-					listReq()
+					setIsAdd(false);
+					listReq();
+				} else {
+					message.error(results.msg, 0.5);
+					setIsAdd(true);
+					listReq();
 				}
-			})
-		}else{
+			});
+		} else {
 			// if(!strategy.id){
 			// 	strategy.grade
 			// }
-			if(!strategy.id || !strategy.deptId){
-				let obj = Array.isArray(rowData) && rowData.find(e=>e.grade ==strategy.grade)
-				if(!obj){
-					return
+			if (!strategy.id || !strategy.deptId) {
+				let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
+				if (!obj) {
+					return;
 				}
-				strategy.id = obj.id; 
-				strategy.deptId =obj.deptId;
+				strategy.id = obj.id;
+				strategy.deptId = obj.deptId;
 			}
-
-			// debugger
-			$.post('/mao/upgrades/editDo',strategy,function(results){
-				if(results.code === 0){
-					message.success(results.msg,0.5)
-					listReq()
-					
-				}else{
-					message.error(results.msg,0.5)
-					listReq()
+			let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
+			$.post('/mao/upgrades/editDo', data, function(results) {
+				if (results.code === 0) {
+					message.success(results.msg, 0.5);
+					listReq();
+				} else {
+					message.error(results.msg, 0.5);
+					listReq();
 				}
-			})
+			});
 		}
-		return 
+		return;
 	};
 	let handleEdit = (mes, index, e) => {
 		// debugger
-		new Promise(async function(resolve,reject){
+		new Promise(async function(resolve, reject) {
 			let r = await setInitValue(index);
-			resolve(r)
-		}).then((r)=>{
-			console.log({ ...strategy,...mes, grade: index, },'----------------')
-			let obj = { ...strategy,...mes, grade: index, }
-			obj.countDown = String(obj.countDown);
-			setStrategy(obj);
-		}).then(()=>{
-			 setIsAdd(!mes.id)
+			resolve(r);
 		})
+			.then(r => {
+				let obj = { ...strategy, ...mes, grade: index };
+				obj.countDown = String(obj.countDown);
+				setStrategy(obj);
+			})
+			.then(() => {
+				setIsAdd(!mes.id);
+			});
 	};
 	let headerFn = () => {
 		let { isUpgradeFn } = props;
@@ -551,7 +555,7 @@ function EditableFormTable(props) {
 			<div className="tab-footer-box">
 				<div className="tab-button-box">
 					<Button type="primary" shape="round" size={'large'} onClick={handleClick}>
-						{isAdd ? "添加" : "修改"}
+						{isAdd ? '添加' : '修改'}
 					</Button>
 					{/* <Button shape="round" size={'large'}>
 						取消
@@ -566,7 +570,15 @@ function EditableFormTable(props) {
 				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
 			<div className="footer-table-box">
-				<FooterEditableFormTable  setIsAdd={function(s){setIsAdd(s)}} listReq={listReq} rowData={rowData} handleEdit={handleEdit} className="footer-table" />
+				<FooterEditableFormTable
+					setIsAdd={function(s) {
+						setIsAdd(s);
+					}}
+					listReq={listReq}
+					rowData={rowData}
+					handleEdit={handleEdit}
+					className="footer-table"
+				/>
 			</div>
 		</div>
 	);
@@ -578,30 +590,28 @@ class Toll extends React.Component {
 		this.flag = true;
 		this.state = {
 			isUpgrade: true,
-			isPolling:true
+			isPolling: true
 		};
 	}
-	componentDidMount(){
-		this.init()
+	componentDidMount() {
+		this.init();
 	}
-	init = () => {
-		  
-	};
-	upDataIsPolling =(rowLength)=>{
-		if(this.flag){
+	init = () => {};
+	upDataIsPolling = rowLength => {
+		if (this.flag) {
 			this.setState({
-				isUpgrade: rowLength > 0 ? true:false
-			})
-			this.flag= false;
+				isUpgrade: rowLength > 0 ? true : false
+			});
+			this.flag = false;
 		}
-		if(rowLength > 0){
+		if (rowLength > 0) {
 			// this.setState({isUpgrade:true})
-			this.setState({isPolling:false})
-		}else{
+			this.setState({ isPolling: false });
+		} else {
 			// this.setState({isUpgrade:false})
-			this.setState({isPolling:true})
+			this.setState({ isPolling: true });
 		}
-	}
+	};
 	handleClick = () => {};
 	isUpgradeFn = () => {
 		this.setState({ isUpgrade: !this.isUpgradeFn });
@@ -624,9 +634,13 @@ class Toll extends React.Component {
 				</div>
 
 				<div>
-					{this.state.isPolling ? (<div className="bottom-margin">
-						<HeaderList />
-					</div>):""}
+					{this.state.isPolling ? (
+						<div className="bottom-margin">
+							<HeaderList />
+						</div>
+					) : (
+						''
+					)}
 					{isUpgrade ? (
 						<div className="bottom-margin">
 							<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgradeFn={this.isUpgradeFn} />
