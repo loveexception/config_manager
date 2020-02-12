@@ -58,7 +58,7 @@ public class UpgradesService extends Service<Upgrades> {
 		Gson gson = gsonBuilder.create();
 		String json = gson.toJson(dept);
 
-		json = Json.toJson(Json.fromJson(json), JsonFormat.full().setActived("^(id|dept_name|upgrades|grad|cycle|count_down|level|dept_id|type)$")); // 不输出location,其他key正常输出
+		json = Json.toJson(Json.fromJson(json), JsonFormat.full().setActived("^(id|dept_name|upgrades|pushs|grade|cycle|count_down|level|dept_id|type)$")); // 不输出location,其他key正常输出
 
 
 		kafkaBlock.produce(KafkaBlock.TOPIC_DEPT,dept.getDeptName(),json);
