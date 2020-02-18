@@ -4,13 +4,28 @@ const { Option } = Select;
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
 const dataConfig = {
-	warning: 1,
+	critical: 1,
 	major: 2,
 	minor: 3,
-	point: 4
+	warning: 4
 };
 const sliderStr = ['无', '紧急', '重要', '次要', '提示'];
 const reqConfig = ['', 'critical', 'major', 'minor', 'warning'];
+//remove Fn
+function removePushs(type, dataList) {
+	let ids = [];
+	Array.isArray(dataList) &&
+		dataList.forEach(e => {
+			e.type === type ? ids.push(e.id) : '';
+		});
+	$.post('/mao/pushs/remove', JSON.stringify({ ids }), results => {
+		if (results.code === 0) {
+			// message.success(results.msg, 0.5);
+		} else {
+			message.error(results.msg, 0.5);
+		}
+	});
+}
 // filterFn
 let filterFn = (possible, _this, props, before) => {
 	let arr = [];
@@ -18,15 +33,19 @@ let filterFn = (possible, _this, props, before) => {
 		//list 必填项
 		// arr.push({type:"list",level:possible.L})
 		for (let i = 0; i < 3; i++) {
-			if (_this.state[i] === false) {
-				continue;
-			}
-
 			if (i == 0) {
+				if (_this.state[i] === false) {
+					removePushs('window', props.dataList);
+					continue;
+				}
 				for (let j = possible.W; j > 0; j--) {
 					arr.push({ type: 'window', level: reqConfig[j] });
 				}
 			} else if (i == 1) {
+				if (_this.state[i] === false) {
+					removePushs('audio', props.dataList);
+					continue;
+				}
 				for (let j = possible.A; j > 0; j--) {
 					arr.push({ type: 'audio', level: reqConfig[j] });
 				}
@@ -49,7 +68,6 @@ let filterFn = (possible, _this, props, before) => {
 	// 	},
 	// 	type:"POST"
 	// })
-	console.log(arr, 'data=======!');
 	$.ajax({
 		cache: true,
 		type: 'POST',
@@ -76,10 +94,10 @@ let filterListFn = (data = [], that) => {};
 // dataConfig
 
 const levelConfig = {
-	warning: '紧急',
+	critical: '紧急',
 	major: '重要',
 	minor: '次要',
-	point: '提示'
+	warning: '提示'
 };
 // title
 function MTitle(props) {
@@ -127,7 +145,7 @@ class PushFrom extends React.Component {
 		this.flag = true;
 		this.state = {
 			0: false,
-			1: true,
+			1: false,
 			_data: {
 				text: ['紧急告警', '重要告警', '次要告警', '告警提示'],
 				numPar: [1, 2, 3, 4],
@@ -140,8 +158,8 @@ class PushFrom extends React.Component {
 				]
 			},
 			initData: {
-				window: 1,
-				audio: 1,
+				window: 0,
+				audio: 0,
 				list: 1
 			}
 		};
@@ -158,7 +176,10 @@ class PushFrom extends React.Component {
 					let l = e.level;
 					initData[t] > dataConfig[l] ? '' : (initData[t] = dataConfig[l]);
 				});
+			console.log(initData, 'initData=');
 			this.setState({
+				0: !!initData.window,
+				1: !!initData.audio,
 				initData
 			});
 		}
@@ -341,13 +362,12 @@ class UpgradeBox extends PureComponent {
 					dataList.forEach((e, i) => {
 						let t = e.type;
 						let l = e.level;
-						initData[t] > dataConfig[l] ? '' : (initData[t] = dataConfig[l]);
+						initData[t] == dataConfig[l] ? '' : initData[t] < dataConfig[l] ? (initData[t] = dataConfig[l]) : '';
 					});
 				for (let key in initData) {
 					let flag = false;
 					for (let i = initData[key]; i > 0; i--) {
 						obj[key] += flag ? '/' + sliderStr[i] : sliderStr[i];
-
 						flag = true;
 					}
 					obj[key] = obj[key] ? obj[key] : sliderStr[0];
@@ -369,10 +389,15 @@ class UpgradeBox extends PureComponent {
 	init = () => {
 		this.reqListFn();
 	};
+	checkBoxState = p_this => {
+		p_this.setState({
+			0: this[0],
+			1: this[1]
+		});
+	};
 	// 版本太低 无法使用 static getDerivedStateFromProps(){
 	// 		console.log("===");
 	// 	}
-
 	componentDidMount() {
 		this.init();
 	}

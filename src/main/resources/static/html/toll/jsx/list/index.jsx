@@ -8,7 +8,7 @@ let MIcon = function(props) {
 
 // const data = [];
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
-const reqConfig = ['critical', 'major', 'minor', 'warning'];
+const reqConfig = ['warning', 'major', 'minor', 'critical'];
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
 let setInitValue = () => {};
@@ -398,7 +398,7 @@ function EditableFormTable(props) {
 		let grade = e.target.value;
 		// let cycle  = rowData[grade].cycle;
 		// let countDown  = rowData[grade].countDown;
-		console.log(isRadio, '=========', grade, 'grade==');
+		// console.log(isRadio, '=========', grade, 'grade==');
 
 		PubSub.unsubscribe(window.PubSubx);
 		window.PubSubx = PubSub.subscribe('initData', function(m, d) {
