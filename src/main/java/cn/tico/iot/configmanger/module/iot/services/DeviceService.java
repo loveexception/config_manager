@@ -102,7 +102,6 @@ public class DeviceService extends Service<Device> {
             public void run() {
                 for (int i = 0; i < result.size(); i++) {
                     String sno =result.get(i).getSno();
-                    api.change(sno);
                     api.device(sno,null);
                 }
 

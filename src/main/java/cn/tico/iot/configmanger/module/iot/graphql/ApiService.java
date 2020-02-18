@@ -9,7 +9,6 @@ import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.module.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.module.iot.services.DeviceService;
 import cn.tico.iot.configmanger.module.iot.services.DriverService;
-import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import io.leangen.graphql.annotations.GraphQLArgument;
 import io.leangen.graphql.annotations.GraphQLContext;
 import io.leangen.graphql.annotations.GraphQLQuery;
@@ -38,8 +37,7 @@ public class ApiService {
     @Inject
     private DriverService driver;
 
-    @Inject
-    LocationManager locationManager;
+
 
     @Inject
     private Dao dao;
@@ -95,17 +93,16 @@ public class ApiService {
 
     @GraphQLQuery(name = "locations")
     public List<Location> getlocations(@GraphQLContext Device device) {
-//        Location location = dao.fetch(Location.class, device.getLocationid());
-//        String ids[] = location.getAncestors().split(",");
-//        Cnd cnd = Cnd.NEW();
-//        cnd.and("id", "in", ids);
-//        cnd.and("level", ">", "0");
-//        cnd.and("delflag","=","false");
-//
-//        cnd.orderBy("level", "asc");
-//        List<Location> result = dao.query(Location.class, cnd);
-//        result.add(location);
-        List<Location> result = locationManager.getAllByLocation(device.getLocationid());
+        Location location = dao.fetch(Location.class, device.getLocationid());
+        String ids[] = location.getAncestors().split(",");
+        Cnd cnd = Cnd.NEW();
+        cnd.and("id", "in", ids);
+        cnd.and("level", ">", "0");
+        cnd.and("delflag","=","false");
+
+        cnd.orderBy("level", "asc");
+        List<Location> result = dao.query(Location.class, cnd);
+        result.add(location);
 
         return result;
     }

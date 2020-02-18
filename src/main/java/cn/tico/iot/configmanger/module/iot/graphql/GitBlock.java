@@ -24,6 +24,8 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
 import org.nutz.lang.Files;
+import org.nutz.lang.Lang;
+import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
 import org.nutz.lang.random.R;
 import org.nutz.lang.util.NutMap;
@@ -61,7 +63,8 @@ public class GitBlock {
         try {
             git = createProject(git);
             git = createLocal(git);
-
+            git = createLog(git);
+            git = commit_push(git );
         } catch (Exception e) {
             e.printStackTrace();
             Logs.get().errorf("create git error %s ;git_bean:%s",e,git);
@@ -72,6 +75,21 @@ public class GitBlock {
 
 
         return gateway;
+    }
+
+    /**
+     * 加入日志
+     * @param git
+     * @return
+     */
+    public  GitBean createLog(GitBean git) throws IOException {
+        String path = git.getLocalPath();
+        String target = path +"/ReadMe.md";
+        File file =  Files.createFileIfNoExists(target);
+        Files.appendWrite(file,new Date());
+        Files.appendWrite(file,"create log");
+
+        return git;
     }
 
     /**
@@ -158,12 +176,15 @@ public class GitBlock {
             throw new IOException("Could not delete temporary file " + git.getGitPath());
         }
 
-        Logs.getLog(this.getClass()).infof("start:%s","git build");
+        Logs.getLog(this.getClass()).infof("start:%s,%s","git build",gitfile);
 
-        Git.init()
-                .setGitDir(gitfile)
-                .setDirectory(gitfile.getParentFile())
+        Git mygit = Git.init()
+                .setBare(true)
+                .setGitDir(Files.createDirIfNoExists(git.getGitPath()))
+                .setDirectory(Files.createDirIfNoExists(git.getGitPath()))
                 .call();
+
+
         Logs.getLog(this.getClass()).infof("end:%s","git build");
 
         return git;
@@ -190,8 +211,14 @@ public class GitBlock {
             String newDriver = Json.toJson(device.getDriver());
             dri.putAll(Json.fromJsonAsMap(String.class,newDriver));
             if(Strings.isNotBlank(dri.getString("path",""))){
-                File file = Files.createFileIfNoExists2(dri.getString("path"));
-                dri.put("filename",file.getName());
+                try{
+                    String p = dri.getString("path");
+                    File file = Files.createFileIfNoExists2(p);
+                    dri.put("filename",file.getName());
+                }catch (Exception e){
+                    Logs.get().debugf("path:%s, is unchecked ",dri.getString("path"));
+                }
+
             }
 
 
@@ -247,7 +274,10 @@ public class GitBlock {
         String target = path +"/py/";
 
         boolean ok = true;
-        Files.deleteDir(Files.checkFile(target));
+        File file = Files.findFile(target);
+        if(Lang.isNotEmpty(file)&&Files.isDirectory(file)){
+            Files.deleteDir(file);
+        }
 
         for(Driver src : drivers){
             File target_file = Files.createFileIfNoExists(target+"/"+Files.getName(src.getPath()));

@@ -1,7 +1,6 @@
 package cn.tico.iot.configmanger.module.sys.services;
 
-import cn.tico.iot.configmanger.module.iot.models.base.Location;
-import cn.tico.iot.configmanger.module.iot.services.LocationService;
+
 import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -11,7 +10,6 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.json.Json;
 import org.nutz.lang.util.NutMap;
 
-import static org.junit.Assert.*;
 @Slf4j
 public class ConfigServiceTest {
     Dao dao ;

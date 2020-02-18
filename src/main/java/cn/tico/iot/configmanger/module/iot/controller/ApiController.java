@@ -46,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.nutz.integration.jedis.RedisInterceptor.jedis;
 
 /**
  * 业务 信息操作处理
@@ -96,7 +95,6 @@ public class ApiController implements AdminKey {
 	static GraphQLSchema schema = null;
 
 	public GraphQLSchema init(){
-		KEY_PATH = conf.get("redis.pre.key.device");
 		if(schema!=null){
 			return schema;
 		}
@@ -112,37 +110,21 @@ public class ApiController implements AdminKey {
 	 */
 	@At("/device")
 	@Ok("json")
-	@Aop("redis")
 	public Object device(
 			@Param("sno") String sno,
 			HttpServletRequest req
 	) {
-		String json = jedis().get(KEY_PATH+sno);
-		if(Lang.isNotEmpty(json)){
-			return new Gson().fromJson(json,Object.class);
-		}
+
 		Segment seg = new CharSegment(this.GRAPH_DEVICE);
 		seg.set("sno",sno);
 		String sql =seg.toString();
 		Object temp  =  graphql( sql,req ) ;
-		if(Lang.isNotEmpty(temp)){
-			Object obj = Mapl.cell(temp,"data.device");
-			if(Lang.isNotEmpty(obj)){
-				jedis().set(KEY_PATH+sno,new Gson().toJson(temp));
-				return temp;
-			}else{
-				jedis().del(KEY_PATH+sno);
-			}
-		}
+
 
 		return temp;
 
 	}
-	@Aop("redis")
-	public void change(String sno) {
-		jedis().del(KEY_PATH+sno);
 
-	}
 	/**
 	 * 查询业务列表
 	 */

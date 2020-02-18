@@ -58,7 +58,6 @@ public class SubGatewayBlock implements Block {
             return null;
         }
 
-        
 
         /**
          * 2。	sub 已绑  删一个
@@ -252,7 +251,8 @@ public class SubGatewayBlock implements Block {
 
 
     public void isNullAndLengthZero(Cnd cnd, String subgateway_id, Boolean not_null) {
-        if(not_null){           cnd.and(subgateway_id,"is not ",null);
+        if(not_null){
+            cnd.and(subgateway_id,"is not ",null);
             cnd.and("length("+subgateway_id+")",">",0);
         }else{
             SqlExpressionGroup ors = Cnd.exps(subgateway_id,"is  ",null)

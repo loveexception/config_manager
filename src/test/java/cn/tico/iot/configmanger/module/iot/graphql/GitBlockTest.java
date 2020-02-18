@@ -26,9 +26,9 @@ import static org.junit.Assert.*;
 
 public class GitBlockTest {
     GitBlock block ;
-    public static  String GIT_HOME="~/IdeaProjects/testproject/git/";
-    private static String LOCAL_HOME="~/IdeaProjects/testproject/local/";
-    private static String TEST_HOME="~/IdeaProjects/testproject/test/";
+    public static  String GIT_HOME="~/IdeaProjects/maodajuntest/git/";
+    private static String LOCAL_HOME="~/IdeaProjects/maodajuntest/local/";
+    private static String TEST_HOME="~/IdeaProjects/maodajuntest/test/";
     private static String SSH_HOME="localhost";
 
     @Before
@@ -79,7 +79,7 @@ public class GitBlockTest {
 
         git = block .createProject(git);
         System.out.println(git.getGitPath());
-        assertEquals(git.getGitPath().length(),45);
+        assertEquals(git.getGitPath().length(),46);
 
     }
 
@@ -97,7 +97,7 @@ public class GitBlockTest {
         System.out.println(git.getGitPath());
 
 
-        assertEquals(git.getGitPath().length(),45);
+        assertEquals(git.getGitPath().length(),46);
         File file = Files.findFile(git.getGitPath());
 
         System.out.println("find:"+file.exists());
@@ -117,12 +117,12 @@ public class GitBlockTest {
 
         git = block .createLocal(git);
         System.out.println(git.getLocalPath());
-        assertEquals(git.getLocalPath().length(),43);
+        assertEquals(git.getLocalPath().length(),44);
 
         File file = Files.checkFile(git.getLocalPath());
         System.out.println(file.getAbsolutePath());
 
-        assertEquals(file.getAbsolutePath().length(),51);
+        assertEquals(file.getAbsolutePath().length(),52);
 
     }
 
