@@ -1,21 +1,17 @@
 package cn.tico.iot.configmanger.module.wx.models;
 
-import cn.tico.iot.configmanger.common.base.BaseModel;
 import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import lombok.Data;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+
 import org.nutz.dao.entity.annotation.*;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static sun.misc.PerformanceLogger.getStartTime;
 
 /**
  * 运维表 other_parts

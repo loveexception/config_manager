@@ -1,9 +1,10 @@
 package cn.tico.iot.configmanger.common.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.nutz.lang.Lang;
 import org.nutz.mvc.upload.TempFile;
-import sun.misc.BASE64Decoder;
+//import sun.misc.BASE64Decoder;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
@@ -97,24 +98,27 @@ public class Base64Utils {
             // 图像数据为空
             return false;
         }
-        BASE64Decoder decoder = new BASE64Decoder();
-        try (OutputStream out = new FileOutputStream(imgFilePath)){
-            // Base64解码
-            byte[] b = decoder.decodeBuffer(base64);
-            long length = b.length;
-            for (int i = 0; i < length; ++i) {
-                // 调整异常数据
-                if (b[i] < 0) {
-                    b[i] += 256;
-                }
-            }
-            out.write(b);
-            out.flush();
-            out.close();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+
+
+        return false;
+//        BASE64Decoder decoder = new BASE64Decoder();
+//        try (OutputStream out = new FileOutputStream(imgFilePath)){
+//            // Base64解码
+//            byte[] b = decoder.decodeBuffer(base64);
+//            long length = b.length;
+//            for (int i = 0; i < length; ++i) {
+//                // 调整异常数据
+//                if (b[i] < 0) {
+//                    b[i] += 256;
+//                }
+//            }
+//            out.write(b);
+//            out.flush();
+//            out.close();
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
 
     }
     /**
