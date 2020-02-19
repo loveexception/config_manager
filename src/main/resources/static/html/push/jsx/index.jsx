@@ -4,51 +4,59 @@ const { Option } = Select;
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
 const dataConfig = {
-	warning:1,
-	major:2,
-	minor:3,
-	point:4
-}
-const sliderStr = [
-	"无",
-	"紧急",
-	"重要",
-	"次要",
-	"提示"
-]
-const reqConfig = ['',
-"warning",
-"major",
-"minor",
-"point",
-]
-// filterFn 
-let filterFn = (possible,_this,props,before)=>{
-	let arr = [];
-	if(!before){
-		//list 必填项 
-		// arr.push({type:"list",level:possible.L})
-		for(let i = 0;i<3;i++){
-			if(_this.state[i]===false){
-				continue
-			}
-			
-			if( i == 0){
-				for(let j  = possible.W ;  j > 0; j--){
-					arr.push({type:"window",level:reqConfig[j]})
-				}
-			}else if(i == 1){
-				for(let j  = possible.A ;  j > 0; j--){
-					arr.push({type:"audio",level:reqConfig[j]})
-				}
-			}else{
-				for(let j  = possible.L ;  j > 0; j--){
-					arr.push({type:"list",level:reqConfig[j]})
-				}
-			}	
+	critical: 1,
+	major: 2,
+	minor: 3,
+	warning: 4
+};
+const sliderStr = ['无', '紧急', '重要', '次要', '提示'];
+const reqConfig = ['', 'critical', 'major', 'minor', 'warning'];
+//remove Fn
+function removePushs(type, dataList) {
+	let ids = [];
+	Array.isArray(dataList) &&
+		dataList.forEach(e => {
+			e.type === type ? ids.push(e.id) : '';
+		});
+	$.post('/mao/pushs/remove', JSON.stringify({ ids }), results => {
+		if (results.code === 0) {
+			// message.success(results.msg, 0.5);
+		} else {
+			message.error(results.msg, 0.5);
 		}
-	}else{
-	 ///优化处理	
+	});
+}
+// filterFn
+let filterFn = (possible, _this, props, before) => {
+	let arr = [];
+	if (!before) {
+		//list 必填项
+		// arr.push({type:"list",level:possible.L})
+		for (let i = 0; i < 3; i++) {
+			if (i == 0) {
+				if (_this.state[i] === false) {
+					removePushs('window', props.dataList);
+					continue;
+				}
+				for (let j = possible.W; j > 0; j--) {
+					arr.push({ type: 'window', level: reqConfig[j] });
+				}
+			} else if (i == 1) {
+				if (_this.state[i] === false) {
+					removePushs('audio', props.dataList);
+					continue;
+				}
+				for (let j = possible.A; j > 0; j--) {
+					arr.push({ type: 'audio', level: reqConfig[j] });
+				}
+			} else {
+				for (let j = possible.L; j > 0; j--) {
+					arr.push({ type: 'list', level: reqConfig[j] });
+				}
+			}
+		}
+	} else {
+		///优化处理
 	}
 	// $.ajax({
 	// 	url:"/mao/pushs/editDo",
@@ -65,7 +73,7 @@ let filterFn = (possible,_this,props,before)=>{
 		type: 'POST',
 		url: '/mao/pushs/editDo',
 		data: JSON.stringify({
-			data:arr
+			data: arr
 		}),
 		dataType: 'json',
 		async: false,
@@ -75,25 +83,22 @@ let filterFn = (possible,_this,props,before)=>{
 				return;
 			}
 			// console.log(_this.props.reqListFn,'_this.props.reqListFn')
-			props.resetReq && props.resetReq() 
+			props.resetReq && props.resetReq();
 			message.info(results.msg);
 		}
-	})
-	return 
-}
+	});
+	return;
+};
 // filterListFn
-let filterListFn = (data =[],that) =>{
-
-}
-// dataConfig 
-
+let filterListFn = (data = [], that) => {};
+// dataConfig
 
 const levelConfig = {
-	warning:"紧急",
-	major:  "重要",
-	minor:  "次要",
-	point:  "提示"
-}
+	critical: '紧急',
+	major: '重要',
+	minor: '次要',
+	warning: '提示'
+};
 // title
 function MTitle(props) {
 	return (
@@ -107,7 +112,6 @@ function MTitle(props) {
 function MTable(props) {
 	let { titleFn = false, data = [], columns = [], footerFn = false, pagination = true } = props.config;
 	useEffect(() => {
-			
 		return () => {};
 	}, []);
 	return <div className="component-table-box">{props.config ? <Table bordered dataSource={data} pagination={pagination} columns={columns} title={titleFn} footer={footerFn}></Table> : ''}</div>;
@@ -116,17 +120,21 @@ function MTable(props) {
 function TopTable(props) {}
 // form Iten
 function FromItem(props) {
-	useEffect(()=>{
-	},[])
+	useEffect(() => {}, []);
 	return (
 		<Form.Item label={props.label}>
 			{props.getFieldDecorator(props.label, {
-				initialValue:props.initValue
-			})(<Slider
-				//  range={false}
-				  min={1} max={4} marks={props.config} 
-			// defaultValue={2}
-			 step={null} />)}
+				initialValue: props.initValue
+			})(
+				<Slider
+					//  range={false}
+					min={1}
+					max={4}
+					marks={props.config}
+					// defaultValue={2}
+					step={null}
+				/>
+			)}
 		</Form.Item>
 	);
 }
@@ -134,13 +142,13 @@ function FromItem(props) {
 class PushFrom extends React.Component {
 	constructor(props) {
 		super(props);
-		this.flag =true;
+		this.flag = true;
 		this.state = {
-			0:false,
-			1:true,
+			0: false,
+			1: false,
 			_data: {
-				text: [ '紧急告警', '重要告警', '次要告警', '告警提示'],
-				numPar: [1,2,3,4],
+				text: ['紧急告警', '重要告警', '次要告警', '告警提示'],
+				numPar: [1, 2, 3, 4],
 				numCol: ['弹窗', '响铃', '列表'],
 				column: [],
 				dataSource: [
@@ -149,38 +157,38 @@ class PushFrom extends React.Component {
 					}
 				]
 			},
-			initData:{
-				window:1,
-				audio:1,
-				list:1
+			initData: {
+				window: 0,
+				audio: 0,
+				list: 1
 			}
 		};
 	}
-	componentDidMount(){
-	}
-	componentDidUpdate(){
-		if(this.flag){
-			let {dataList}  =this.props;
-			console.log(this.props,'props===')
-			this.flag  = false;
+	componentDidMount() {}
+	componentDidUpdate() {
+		if (this.flag) {
+			let { dataList } = this.props;
+			this.flag = false;
 			let initData = this.state.initData;
-			Array.isArray(dataList) &&  dataList.forEach((e,i)=>{
-				let t = e.type; 
-				let l = e.level;
-				initData[t] > dataConfig[l] ? '' : initData[t] = dataConfig[l] 
-			})
+			Array.isArray(dataList) &&
+				dataList.forEach((e, i) => {
+					let t = e.type;
+					let l = e.level;
+					initData[t] > dataConfig[l] ? '' : (initData[t] = dataConfig[l]);
+				});
+			console.log(initData, 'initData=');
 			this.setState({
+				0: !!initData.window,
+				1: !!initData.audio,
 				initData
-			})
+			});
 		}
-
 	}
 	handleSubmit = e => {
 		e.preventDefault();
 		this.props.form.validateFields((err, values) => {
-		let arrData = filterFn(values,this,this.props) // <=  
-		// arrData 是 过滤后的数组 （发送请求的数组）   4个 数据 级别对应 下标 
-	
+			let arrData = filterFn(values, this, this.props); // <=
+			// arrData 是 过滤后的数组 （发送请求的数组）   4个 数据 级别对应 下标
 			if (!err) {
 				// console.log('Received values of form: ', values);
 			}
@@ -226,21 +234,27 @@ class PushFrom extends React.Component {
 								align: 'center',
 								width: '13%',
 								title: '通知方式',
-								render: (value, mes, i) =>{
-									if(i ==2){
-									    return value
+								render: (value, mes, i) => {
+									if (i == 2) {
+										return value;
 									}
 									return (
 										<div className="center-box">
-											<Checkbox  
-											onClick={()=>{
-												return this.setState({
-													[i]:!this.state[i]
-												})}} checked ={this.state[i]} value={i} key={i}>
+											<Checkbox
+												onClick={() => {
+													return this.setState({
+														[i]: !this.state[i]
+													});
+												}}
+												checked={this.state[i]}
+												value={i}
+												key={i}
+											>
 												{value}
 											</Checkbox>
-										</div>	
-								)}
+										</div>
+									);
+								}
 							},
 							{
 								dataIndex: 'level',
@@ -249,25 +263,26 @@ class PushFrom extends React.Component {
 								title: `告警级别`,
 								render: (v, m, i) => {
 									let config = {};
-									let  { initData  } = this.state;
+									let { initData } = this.state;
 									let initValue = 0;
 									switch (i) {
 										case 0:
-											initValue = initData && initData.window 
+											initValue = initData && initData.window;
 											break;
 										case 1:
-											initValue = initData && initData.audio 
+											initValue = initData && initData.audio;
 											break;
 										case 2:
-											initValue = initData && initData.list 
+											initValue = initData && initData.list;
 											break;
-											default:0
+										default:
+											0;
 											break;
 									}
 									_data.numPar.map((item, index) => {
 										config[item] = _data.text[index];
 									});
-									return <FromItem initValue ={initValue} key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config} ></FromItem>;
+									return <FromItem initValue={initValue} key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
 								}
 							}
 						],
@@ -301,7 +316,7 @@ class UpgradeBox extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dataList:[],
+			dataList: [],
 			data: [
 				{
 					key: 'window',
@@ -329,67 +344,71 @@ class UpgradeBox extends PureComponent {
 			]
 		};
 	}
-	reqListFn = ()=>{
-		$.post("/mao/pushs/list",(results)=>{
-			if(results.code ==0 ){
+	reqListFn = () => {
+		$.post('/mao/pushs/list', results => {
+			if (results.code == 0) {
 				let dataList = results.rows;
 				let obj = {
-					window:'',
-					audio:'',
-					list:''
+					window: '',
+					audio: '',
+					list: ''
 				};
 				let initData = {
-					window:0,
-					audio:0,
-					list:0
-				}
-				Array.isArray(dataList) &&  dataList.forEach((e,i)=>{
-					let t = e.type; 
-					let l = e.level;
-					initData[t] > dataConfig[l] ? '' : initData[t] = dataConfig[l] 
-				})
-				for(let key in initData ){
+					window: 0,
+					audio: 0,
+					list: 0
+				};
+				Array.isArray(dataList) &&
+					dataList.forEach((e, i) => {
+						let t = e.type;
+						let l = e.level;
+						initData[t] == dataConfig[l] ? '' : initData[t] < dataConfig[l] ? (initData[t] = dataConfig[l]) : '';
+					});
+				for (let key in initData) {
 					let flag = false;
-					for(let i = initData[key]; i>0;i--){
-						obj[key] += flag ?  '/'+sliderStr[i] : sliderStr[i];
-						
-						flag = true
-						} 
-						obj[key] = obj[key] ? obj[key] : sliderStr[0];
-				}	
+					for (let i = initData[key]; i > 0; i--) {
+						obj[key] += flag ? '/' + sliderStr[i] : sliderStr[i];
+						flag = true;
+					}
+					obj[key] = obj[key] ? obj[key] : sliderStr[0];
+				}
 				let data = this.state.data;
-				data = data.map((e)=>{
-					e.level = obj[e.key]
-					return e
+				data = data.map(e => {
+					e.level = obj[e.key];
+					return e;
 				});
 				this.setState({
 					dataList,
 					data
-				})
-			}else{
-				message.error("接口错误",0.5)
+				});
+			} else {
+				message.error('接口错误', 0.5);
 			}
-		})
-	}
-	init = ()=>{
+		});
+	};
+	init = () => {
 		this.reqListFn();
-
-	}
+	};
+	checkBoxState = p_this => {
+		p_this.setState({
+			0: this[0],
+			1: this[1]
+		});
+	};
 	// 版本太低 无法使用 static getDerivedStateFromProps(){
 	// 		console.log("===");
 	// 	}
-
-	componentDidMount(){
-		this.init()
+	componentDidMount() {
+		this.init();
 	}
 	render() {
-		let { data, columns,dataList=[] } = this.state;
+		let { data, columns, dataList = [] } = this.state;
 		return (
 			<div className="push-list-box">
 				<MTitle text="设置推送策略" />
-				<PushFrom  resetReq = {this.reqListFn}   dataList={dataList} />
+				<PushFrom resetReq={this.reqListFn} dataList={dataList} />
 				<MTitle text="推送策略列表" />
-				<MTable  dataList = {dataList} config={{ data, columns, pagination: false }}></MTable>
+				<MTable dataList={dataList} config={{ data, columns, pagination: false }}></MTable>
 			</div>
 		);
 	}
