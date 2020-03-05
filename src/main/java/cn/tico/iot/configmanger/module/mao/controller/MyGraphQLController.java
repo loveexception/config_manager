@@ -40,7 +40,7 @@ import java.util.Map;
  */
 @At(value = "/graph/")
 @IocBean(create = "init")
-public class MyGraphQLController  extends BaseController {
+public class MyGraphQLController  {
 	private static final Log log = Logs.get();
 
 
@@ -119,16 +119,12 @@ public class MyGraphQLController  extends BaseController {
 		return result;
 	}
 
-    @At(value = "/sql",methods = "OPTIONS")
-    @GET
-    public void sql( ){ }
+
 
 	@At
     @Ok("json")
     @GET
-
     public Object device(@Param("sno")String sno){
-		ActionInvoker c;
         String cache = findCache(sno);
         if (Strings.isNotBlank(cache)) {
             return Json.fromJson(cache);

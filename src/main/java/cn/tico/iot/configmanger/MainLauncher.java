@@ -8,6 +8,7 @@ import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.OtherMessageBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.SubGatewayBlock;
+import cn.tico.iot.configmanger.module.mao.common.MyActionChainMaker;
 import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
@@ -15,14 +16,12 @@ import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.ConfigService;
 import cn.tico.iot.configmanger.module.sys.services.MenuService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.nutz.boot.NbApp;
 import org.nutz.conf.NutConf;
 import org.nutz.dao.Dao;
 import org.nutz.el.opt.RunMethod;
 import org.nutz.el.opt.custom.CustomMake;
-import org.nutz.integration.quartz.QuartzManager;
 import org.nutz.ioc.Ioc;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.*;
@@ -41,7 +40,7 @@ import java.util.Map;
  * @author haiming
  */
 @IocBean(create = "init", depose = "depose")
-@Filters({@By(type=CrossOriginFilter.class)})
+@ChainBy(type=MyActionChainMaker.class, args={})
 public class MainLauncher {
 	private static final Log log = Logs.get();
 
@@ -71,12 +70,6 @@ public class MainLauncher {
 
 	@Inject
 	private MenuService menuService;
-
-	@At(value = {"/*"},methods = "OPTIONS")
-	public Object crox(){
-		return null;
-
-	}
 
 	@At({ "/", "/index" })
 	@Ok("re")
