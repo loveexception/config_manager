@@ -429,7 +429,7 @@ function EditableFormTable(props) {
 						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.grade}>
 							{radio.map((item, index) => (
 								//
-								<Radio disabled={!isRadio[index]} key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
+								<Radio key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
 								</Radio>
 							))}
@@ -470,6 +470,19 @@ function EditableFormTable(props) {
 		return () => {};
 	}, []);
 	let handleClick = () => {
+		let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
+		$.post('/mao/upgrades/addDo', data, function(results) {
+			if (results.code === 0) {
+				message.success(results.msg, 0.5);
+				// reset()
+				setIsAdd(false);
+				listReq();
+			} else {
+				message.error(results.msg, 0.5);
+				setIsAdd(true);
+				listReq();
+			}
+		});
 		if (!(typeof strategy.grade === 'number')) {
 			message.error('没有升级项');
 			return;
@@ -478,19 +491,6 @@ function EditableFormTable(props) {
 			if (!isRadio[strategy.grade]) {
 				return;
 			}
-			let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
-			$.post('/mao/upgrades/addDo', data, function(results) {
-				if (results.code === 0) {
-					message.success(results.msg, 0.5);
-					// reset()
-					setIsAdd(false);
-					listReq();
-				} else {
-					message.error(results.msg, 0.5);
-					setIsAdd(true);
-					listReq();
-				}
-			});
 		} else {
 			// if(!strategy.id){
 			// 	strategy.grade
@@ -532,19 +532,19 @@ function EditableFormTable(props) {
 			});
 	};
 	let headerFn = () => {
-		let { isUpgradeFn } = props;
+		let { isUpgradeFn, isUpgrade } = props;
 		return (
 			<div className="table-title-content">
-				<div className="table-title-text">{textFormat}添加升级策略</div>
+				<div className="table-title-text">{textFormat}编辑升级策略</div>
 				<MIcon
 					onClick={
 						isUpgradeFn &&
 						function() {
-							isUpgradeFn(arguments);
+							isUpgradeFn();
 						}
 					}
 					style={{ fontSize: '0.2rem' }}
-					type="close-circle"
+					type={isUpgrade ? 'down-circle' : 'up-circle'}
 					theme="twoTone"
 				/>
 			</div>
@@ -555,7 +555,8 @@ function EditableFormTable(props) {
 			<div className="tab-footer-box">
 				<div className="tab-button-box">
 					<Button type="primary" shape="round" size={'large'} onClick={handleClick}>
-						{isAdd ? '添加' : '修改'}
+						{/* {isAdd ? '添加' : '修改'} */}
+						提交
 					</Button>
 					{/* <Button shape="round" size={'large'}>
 						取消
@@ -569,17 +570,22 @@ function EditableFormTable(props) {
 			<div className="middle-table-box">
 				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
-			<div className="footer-table-box">
-				<FooterEditableFormTable
-					setIsAdd={function(s) {
-						setIsAdd(s);
-					}}
-					listReq={listReq}
-					rowData={rowData}
-					handleEdit={handleEdit}
-					className="footer-table"
-				/>
-			</div>
+
+			{props.isUpgrade ? (
+				<div className="footer-table-box">
+					<FooterEditableFormTable
+						setIsAdd={function(s) {
+							setIsAdd(s);
+						}}
+						listReq={listReq}
+						rowData={rowData}
+						handleEdit={handleEdit}
+						className="footer-table"
+					/>
+				</div>
+			) : (
+				''
+			)}
 		</div>
 	);
 }
@@ -614,25 +620,12 @@ class Toll extends React.Component {
 	};
 	handleClick = () => {};
 	isUpgradeFn = () => {
-		this.setState({ isUpgrade: !this.isUpgradeFn });
+		this.setState({ isUpgrade: !this.state.isUpgrade });
 	};
 	render() {
 		let { isUpgrade } = this.state;
 		return (
 			<div>
-				<div className="bottom-margin">
-					<Button
-						className="title-button"
-						onClick={() => {
-							this.setState({
-								isUpgrade: true
-							});
-						}}
-					>
-						+添加升级策略
-					</Button>
-				</div>
-
 				<div>
 					{this.state.isPolling ? (
 						<div className="bottom-margin">
@@ -641,13 +634,9 @@ class Toll extends React.Component {
 					) : (
 						''
 					)}
-					{isUpgrade ? (
-						<div className="bottom-margin">
-							<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgradeFn={this.isUpgradeFn} />
-						</div>
-					) : (
-						''
-					)}
+					<div className="bottom-margin">
+						<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgrade={isUpgrade} isUpgradeFn={this.isUpgradeFn} />
+					</div>
 				</div>
 			</div>
 		);
