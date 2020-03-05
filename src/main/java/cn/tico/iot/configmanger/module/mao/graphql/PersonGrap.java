@@ -23,14 +23,14 @@ public class PersonGrap extends BaseGrap {
 
 
     @GraphQLQuery
-    public Person person(@GraphQLContext Device device) {
+    public List<Person> persons(@GraphQLContext Device device) {
         Cnd cnd = useNormalCnd("");
         cnd.and("device_id","=",device.getId());
         List<Person> people =  dao.query(Person.class,cnd);
         if(Lang.isEmpty(people)){
             return null;
         }
-        return people.iterator().next();
+        return people;
     }
 
     public Cnd useNormalCnd(String tableName) {

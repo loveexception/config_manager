@@ -21,6 +21,7 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.log.Logs;
 
 import java.util.Date;
 import java.util.List;
@@ -114,10 +115,14 @@ public class DeviceService extends Service<Device> {
                 for (int i = 0; i < devices.size(); i++) {
                     String sno =devices.get(i).getSno();
                     api.device(sno,null);
+                    Logs.get().infof("cach kill :%s",sno);
                     graphql.killCache(sno);
+                    Logs.get().infof("sno cacheing:%s",sno);
                     graphql.device(sno);
+                    Logs.get().infof("cache over");
                 }
                 for (Device device:devices) {
+                    Logs.get().infof("kafka sno ring :%s" ,device.getSno());
                     kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_SNO,device.getSno());
 
                     try {

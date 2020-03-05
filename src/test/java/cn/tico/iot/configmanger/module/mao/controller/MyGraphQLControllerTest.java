@@ -250,14 +250,14 @@ public class MyGraphQLControllerTest {
     @Test
     public void 打开级连驱动下的告警规则列表(){
         String sql = "{deviceBySno ( sno :\"FD161330CE93D7\" ) {  " +
-                "sno, cn_name , driver {  grades{ rulers{ val }  } } " +
+                "sno, cn_name , driver {  grades{ subRulers{ val }  } } " +
                 "}}";
         Map<String,Object> obj = controller.sql(sql);
         Logs.get().debug(obj);
         assertNotNull(obj);
         assertTrue(Lang.isEmpty(obj.get("errors")));
         assertEquals("FD161330CE93D7", Mapl.cell(obj,"data.deviceBySno.sno"));
-        Object result = Mapl.cell(obj,"data.deviceBySno.driver.grades[0].rulers");
+        Object result = Mapl.cell(obj,"data.deviceBySno.driver.grades[0].subRulers");
         assertTrue( Lang.isNotEmpty( result));
         assertEquals( 2, Collections.size((Collection) result));
         Logs.get().debug(result);
@@ -265,14 +265,14 @@ public class MyGraphQLControllerTest {
     @Test
     public void 打开级连驱动下的告警规则名子列表(){
         String sql = "{deviceBySno ( sno :\"FD161330CE93D7\" ) {  " +
-                "sno, cn_name , driver { normals {cn_name, grades{ rulers{ normal{ cn_name } }  } }  } " +
+                "sno, cn_name , driver { normals {cn_name, grades{ subRulers{ normal{ cn_name } }  } }  } " +
                 "}}";
         Map<String,Object> obj = controller.sql(sql);
         Logs.get().debug(obj);
         assertNotNull(obj);
         assertTrue(Lang.isEmpty(obj.get("errors")));
         assertEquals("FD161330CE93D7", Mapl.cell(obj,"data.deviceBySno.sno"));
-        Object result = Mapl.cell(obj,"data.deviceBySno.driver.normals[0].grades[0].rulers[0].normal.cn_name");
+        Object result = Mapl.cell(obj,"data.deviceBySno.driver.normals[0].grades[0].subRulers[0].normal.cn_name");
         assertTrue( Lang.isNotEmpty( result));
         assertEquals( "音频接收丢包数", result);
         Logs.get().debug(result);
@@ -280,14 +280,14 @@ public class MyGraphQLControllerTest {
     @Test
     public void 打开级连个性化告警列表(){
         String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
-                "sno,  person {  grades { cn_name } } " +
+                "sno,  persons {  grades { cn_name } } " +
                 "}}";
         Map<String,Object> obj = controller.sql(sql);
         Logs.get().debug(obj);
         assertNotNull(obj);
         assertTrue(Lang.isEmpty(obj.get("errors")));
         assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
-        Object result = Mapl.cell(obj,"data.deviceBySno.person.grades");
+        Object result = Mapl.cell(obj,"data.deviceBySno.persons[0].grades");
         assertTrue( Lang.isNotEmpty( result));
         assertEquals( "端口14已断开", Mapl.cell(((List) result).get(0),"cn_name") );
 
@@ -298,14 +298,14 @@ public class MyGraphQLControllerTest {
     @Test
     public void 打开级连个性化告警规则列表(){
         String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
-                "sno,  person {  grades { rulers{ val } } } " +
+                "sno,  persons {  grades { subRulers{ val } } } " +
                 "}}";
         Map<String,Object> obj = controller.sql(sql);
         Logs.get().debug(obj);
         assertNotNull(obj);
         assertTrue(Lang.isEmpty(obj.get("errors")));
         assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
-        Object result = Mapl.cell(obj,"data.deviceBySno.person.grades[0].rulers");
+        Object result = Mapl.cell(obj,"data.deviceBySno.persons[0].grades[0].subRulers");
         assertTrue( Lang.isNotEmpty( result));
         assertEquals( "false", Mapl.cell(((List) result).get(0),"val") );
 
@@ -315,14 +315,14 @@ public class MyGraphQLControllerTest {
     @Test
     public void 打开级连个性化告警规则列名列表(){
         String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
-                "sno,  person {  grades { rulers{ normal{ cn_name} } } } " +
+                "sno,  persons {  grades { subRulers{ normal{ cn_name} } } } " +
                 "}}";
         Map<String,Object> obj = controller.sql(sql);
         Logs.get().debug(obj);
         assertNotNull(obj);
         assertTrue(Lang.isEmpty(obj.get("errors")));
         assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
-        Object result = Mapl.cell(obj,"data.deviceBySno.person.grades[0].rulers[0].normal");
+        Object result = Mapl.cell(obj,"data.deviceBySno.persons[0].grades[0].subRulers[0].normal");
         assertTrue( Lang.isNotEmpty( result));
         assertEquals( "端口14连接状态", Mapl.cell(result,"cn_name") );
 
@@ -348,154 +348,121 @@ public class MyGraphQLControllerTest {
         Logs.get().debug(result);
     }
     @Test
-    public void 打开列表测试速度(){
-        Stopwatch sw = Stopwatch.begin();
-
-        String sql = bigestSQL();
-        CharSegment seg = new CharSegment(sql);
-        seg.set("sno","BJ-GWYTH-B6JR-Cisco-3560-1");
-
-
-        Map<String,Object> obj = controller.sql(seg.toString());
+    public void 打开所有的规则列列(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  driver { rulers { val , normal_id} } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
         Logs.get().debug(obj);
         assertNotNull(obj);
         assertTrue(Lang.isEmpty(obj.get("errors")));
         assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
-        String json = Json.toJson(obj);
+        Object result = Mapl.cell(obj,"data.deviceBySno.driver.rulers");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( 26, ((List)result).size() );
 
 
-        sw.stop();
-        System.out.println(sw.getDuration());
-
+        Logs.get().debug(result);
     }
-
-     @Test
-    public void 测试速度() throws InterruptedException {
-        Stopwatch sw = Stopwatch.begin();
-
-
-       Object
-               obj = controller.cache((String) "11");
-
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        assertTrue(sw.getDuration() - 1000 > 0);
-
-
-        sw = Stopwatch.begin();
-        obj = controller.cache((String) "11");
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        assertTrue(sw.getDuration() - 1000 < 0);
-
-
-        sw = Stopwatch.begin();
-        obj = controller.cache((String) "22");
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        assertTrue(sw.getDuration() - 1000 > 0);
-
-
-        sw = Stopwatch.begin();
-        obj = controller.cache((String) "11");
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        assertTrue(sw.getDuration() - 1000 < 0);
-
-
-    }
-
-
 
     @Test
-    public void 打开device缓存速度(){
+    public void 打开所有的规则列tie名(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  driver { rulers { tie { cn_name}  } } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
+        Logs.get().debug(obj);
+        assertNotNull(obj);
+        assertTrue(Lang.isEmpty(obj.get("errors")));
+        assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
+        Object result = Mapl.cell(obj,"data.deviceBySno.driver.rulers[0].tie.cn_name");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( "端口16连接状态",result );
 
 
-        controller.SQL = bigestSQL();
-
-        Object obj =null;
-        List<Device> devices = dao.query(Device.class, Cnd.NEW());
-        //先缓存完再发TOPIC
-        devices.stream().forEach(device -> controller.device(device.getSno()));
-        Stopwatch sw = Stopwatch.begin();
-
-        for (Device device : devices) {
-             obj = controller.device(device.getSno());
-        }
-        sw.stop();
-        System.out.println(sw.getDuration());
-        assertTrue(sw.getDuration() - 1000 < 0);
-
-
+        Logs.get().debug(result);
     }
     @Test
-    public void 打开device测试速度(){
-        Stopwatch sw = Stopwatch.begin();
+    public void 打开个性化规则名(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  personRulers {   val  } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
+        Logs.get().debug(obj);
+        assertNotNull(obj);
+        assertTrue(Lang.isEmpty(obj.get("errors")));
+        assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
+        Object result = Mapl.cell(obj,"data.deviceBySno.personRulers[0].val");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( "false",result );
 
 
-        controller.SQL = bigestSQL();
-        Object obj =null;
-        List<Device> devices = dao.query(Device.class, Cnd.NEW());
-       // devices.stream().forEach(device -> controller.device(device.getSno()));
-
-        //先缓存完再发TOPIC
-
-        devices.stream().forEach(device -> controller.device(device.getSno()));
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        assertTrue(sw.getDuration() > 30000 );
-
-
+        Logs.get().debug(result);
     }
     @Test
-    public void 删除缓存(){
-        Object obj =null;
+    public void 打开个性化规则tie名(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  personRulers {   tie{cn_name}  } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
+        Logs.get().debug(obj);
+        assertNotNull(obj);
+        assertTrue(Lang.isEmpty(obj.get("errors")));
+        assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
+        Object result = Mapl.cell(obj,"data.deviceBySno.personRulers[0].tie.cn_name");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( "端口26连接状态",result );
 
-        controller.SQL = "{deviceBySno ( sno :\"${sno}\" ) {  " +
-                " sno }}";
 
-        //先缓存完再发TOPIC
-        Stopwatch sw = Stopwatch.begin();
-
-
-        obj = controller.device("BJ-GWYTH-B6JR-Cisco-3560-1");
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        System.out.println(obj);
-        assertTrue(sw.getDuration() - 10 > 0);
-
-        sw = Stopwatch.begin();
-        obj = controller.device("BJ-GWYTH-B6JR-Cisco-3560-1");
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        System.out.println(obj);
-        assertTrue(sw.getDuration() - 10 < 0);
-
-        controller.killCache("BJ-GWYTH-B6JR-Cisco-3560-1");
-
-        sw = Stopwatch.begin();
-        obj = controller.device("BJ-GWYTH-B6JR-Cisco-3560-1");
-
-        sw.stop();
-        System.out.println(sw.getDuration());
-        System.out.println(obj);
-        assertTrue(sw.getDuration() - 10 > 0);
-
+        Logs.get().debug(result);
     }
+    @Test
+    public void 打开个性化规则grade名(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  personRulers {   level {grade}  } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
+        Logs.get().debug(obj);
+        assertNotNull(obj);
+        assertTrue(Lang.isEmpty(obj.get("errors")));
+        assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
+        Object result = Mapl.cell(obj,"data.deviceBySno.personRulers[0].level.grade");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( "critical",result );
+
+
+        Logs.get().debug(result);
+    }
+    @Test
+    public void 打开所有的规则列级别名(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  driver { rulers { level { cn_name,grade}  } } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
+        Logs.get().debug(obj);
+        assertNotNull(obj);
+        assertTrue(Lang.isEmpty(obj.get("errors")));
+        assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
+        Object result = Mapl.cell(obj,"data.deviceBySno.driver.rulers[0].level.grade");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( "critical",result );
+
+
+        Logs.get().debug(result);
+    }
+
+
+
+
+
+
 
     public String bigestSQL() {
         return  "{deviceBySno ( sno :\"${sno}\" ) {  " +
                 "sno,  " +
                 "   person {  " +
                 "       grades { " +
-                "           rulers{ " +
+                "           subRulers{ " +
                 "               normal{ " +
                 "                   cn_name" +
                 "               } " +
@@ -505,7 +472,7 @@ public class MyGraphQLControllerTest {
                 "   ,driver { " +
                 "       cn_name " +
                 "       grades { " +
-                "           rulers{ " +
+                "           subRulers{ " +
                 "               normal { " +
                 "                   cn_name " +
                 "               } " +

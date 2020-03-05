@@ -21,6 +21,7 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.*;
 import org.nutz.mvc.filter.CrossOriginFilter;
+import org.nutz.mvc.impl.ActionInvoker;
 
 import javax.annotation.PostConstruct;
 
@@ -37,9 +38,8 @@ import java.util.Map;
  * @author maodajun
  * @date 2020-02-16
  */
-@At("/graph/")
+@At(value = "/graph/")
 @IocBean(create = "init")
-
 public class MyGraphQLController  extends BaseController {
 	private static final Log log = Logs.get();
 
@@ -68,6 +68,8 @@ public class MyGraphQLController  extends BaseController {
 	private PersonRulerGrap personRulerGrap;
 	@Inject
             private  DeptGrap deptGrap;
+
+
 
 
 
@@ -124,8 +126,9 @@ public class MyGraphQLController  extends BaseController {
 	@At
     @Ok("json")
     @GET
-    public Object device(@Param("sno")String sno){
 
+    public Object device(@Param("sno")String sno){
+		ActionInvoker c;
         String cache = findCache(sno);
         if (Strings.isNotBlank(cache)) {
             return Json.fromJson(cache);
@@ -190,51 +193,57 @@ public class MyGraphQLController  extends BaseController {
 
     public static   String SQL = "{\n" +
             "  deviceBySno(sno:\"${sno}\"){\n" +
-            "\tid,sno,order_time,quality,discard_time\n" +
-            "\t,asset_status,alert_status\n" +
-            "\t,i18n,cn_name,en_name,price,env\n" +
-            "\t,gateway{\n" +
-            "\t  \tid,i18n,cn_name,en_name,env\n" +
-            "\t  \t,sno,git_path,desription,i18n,env\n" +
-            "\t\t,subgateway{id,ext_sno,sno,ext_ip}\n" +
-            "\t\t,dept{id,dept_name,order_num,leader,phone,email}\n" +
-            "\t\t,tags{i18n,cn_name,en_name}\n" +
-            "\t\t,kind{i18n,cn_name,en_name}\t\n" +
-            "\t\t,location{i18n,cn_name,en_name}\n" +
-            "\t}\n" +
-            "\t,tags{id,i18n,cn_name,en_name,dept{id,dept_name} }\n" +
-            "\t,dept{id,dept_name,order_num,leader,phone,email}\n" +
-            "\t,kinds{id,i18n,cn_name,en_name,level,order_num}\n" +
-            "\t,locations{id,i18n,cn_name,en_name,level,order_num}\n" +
-            "\t,driver{\n" +
-            "\t\tid,i18n,cn_name,en_name\n" +
-            "\t\t,normals{\n" +
-            "\t\t\tid,i18n,cn_name,en_name,operate_key,unit,order_num,status\n" +
-            "\t\t}\n" +
-            "\t\t,grades{\n" +
-            "\t\t\tid,i18n,cn_name,en_name,grade,order_num\n" +
-            "\t\t\t,rulers{\n" +
-            "\t\t\t\tid,i18n,logic,val,symble,order_num\n" +
-            "\t\t\t\t,normal{\n" +
-            "\t\t\t\t\tid,i18n,cn_name,en_name,unit,operate_key\n" +
-            "\t\t\t\t}\n" +
-            "\t\t\t}\n" +
-            "\t\t}\n" +
-            "\t}\n" +
-            "\t,person{\n" +
-            "\t\tid,i18n,cn_name,en_name,status\n" +
-            "\t\t,grades{\n" +
-            "\t\t\tid,i18n,cn_name,en_name,grade,order_num\n" +
-            "\t\t\t,rulers{\n" +
-            "\t\t\t\tid,i18n,logic,val,symble,order_num\n" +
-            "\t\t\t\t,normal{\n" +
-            "\t\t\t\t\tid,i18n,cn_name,en_name,unit,operate_key\n" +
-            "\t\t\t\t}\n" +
-            "\t\t\t}\n" +
-            "\t\t}\n" +
-            "\t}\t\t\n" +
-            "  }\n" +
-            "}";
+			"\tid,sno,order_time,quality,discard_time\n" +
+			"\t,asset_status,alert_status\n" +
+			"\t,i18n,cn_name,en_name,price,env\n" +
+			"\t,gateway{\n" +
+			"\t  \tid,i18n,cn_name,en_name,env\n" +
+			"\t  \t,sno,git_path,desription,i18n,env\n" +
+			"\t\t,subgateway{id,ext_sno,sno,ext_ip}\n" +
+			"\t\t,dept{id,dept_name,order_num,leader,phone,email}\n" +
+			"\t\t,tags{i18n,cn_name,en_name}\n" +
+			"\t\t,kind{i18n,cn_name,en_name}\t\n" +
+			"\t\t,location{i18n,cn_name,en_name}\n" +
+			"\t}\n" +
+			"\t,tags{id,i18n,cn_name,en_name,dept{id,dept_name} }\n" +
+			"\t,dept{id,dept_name,order_num,leader,phone,email}\n" +
+			"\t,kinds{id,i18n,cn_name,en_name,level,order_num}\n" +
+			"\t,locations{id,i18n,cn_name,en_name,level,order_num}\n" +
+			"\t,driver{\n" +
+			"\t\tid,i18n,cn_name,en_name\n" +
+			"\t\t,normals{\n" +
+			"\t\t\tid,i18n,cn_name,en_name,operate_key,unit,order_num,status\n" +
+			"\t\t}\n" +
+			"\t\trulers{\n" +
+			"\t\t\tid,i18n,logic,val,symble,order_num\n" +
+			"\t\t\t,normal{\n" +
+			"\t\t\t\tid,i18n,cn_name,en_name,unit,operate_key\n" +
+			"\t\t\t}\n" +
+			"\t\t\t,tie{\n" +
+			"\t\t\t\tid,i18n,cn_name,en_name,unit,operate_key\n" +
+			"\t\t\t}\n" +
+			"\t\t\t,level{\n" +
+			"\t\t\t\tid,i18n,cn_name,en_name,grade,order_num\n" +
+			"\t\t\t}\n" +
+			"\t\t}\n" +
+			"\t\t\n" +
+			"\t}\n" +
+			"\tpersonRulers{\n" +
+			"\t\tid,i18n,logic,val,symble,order_num\n" +
+			"\t\t,normal{\n" +
+			"\t\t\tid,i18n,cn_name,en_name,unit,operate_key\n" +
+			"\t\t}\n" +
+			"\t\t,tie{\n" +
+			"\t\t\tid,i18n,cn_name,en_name,unit,operate_key\n" +
+			"\t\t}\n" +
+			"\t\t,level{\n" +
+			"\t\t\tid,i18n,cn_name,en_name,grade,order_num\n" +
+			"\t\t}\n" +
+			"\t\t\n" +
+			"\t}\t\t\n" +
+			"  }\n" +
+			"}"
+           ;
 
 
 }

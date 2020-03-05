@@ -31,6 +31,7 @@ import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.*;
+import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.Map;
  * @author haiming
  */
 @IocBean(create = "init", depose = "depose")
+@Filters({@By(type=CrossOriginFilter.class)})
 public class MainLauncher {
 	private static final Log log = Logs.get();
 
@@ -69,6 +71,12 @@ public class MainLauncher {
 
 	@Inject
 	private MenuService menuService;
+
+	@At(value = {"/*"},methods = "OPTIONS")
+	public Object crox(){
+		return null;
+
+	}
 
 	@At({ "/", "/index" })
 	@Ok("re")
