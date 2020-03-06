@@ -28,7 +28,6 @@ public class MyProcessor extends AbstractProcessor {
                 ac.getResponse().setHeader("Access-Control-Allow-Origin","*");
                 ac.getResponse().setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
                 ac.getResponse().setHeader("Access-Control-Allow-Methods","GET, POST, PUT,DELETE,OPTIONS");
-
             }
 
             doNext(ac);
