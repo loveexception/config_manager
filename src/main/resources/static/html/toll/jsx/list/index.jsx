@@ -197,14 +197,13 @@ class FooterEditableFormTable extends React.PureComponent {
 			}
 		];
 	}
-	componentDidMount() {
-		let d = this.state.data;
-	}
+	componentDidMount() {}
 	componentWillReceiveProps() {
 		this.handleProps();
 	}
 	componentWillUpdate(p, s) {
 		let d = this.state.data;
+		PubSub.publish('initData', d);
 		// let isUpdata = false;
 		// !_.isEmpty(d) && d.forEach((e,i)=>{
 		// 	Object.keys(s.data).forEach((item,index)=>{
@@ -214,8 +213,6 @@ class FooterEditableFormTable extends React.PureComponent {
 		// 	})
 		// })
 		// if(isUpdata){
-
-		PubSub.publish('initData', d);
 		// }
 	}
 
@@ -483,37 +480,37 @@ function EditableFormTable(props) {
 				listReq();
 			}
 		});
-		if (!(typeof strategy.grade === 'number')) {
-			message.error('没有升级项');
-			return;
-		}
-		if (isAdd) {
-			if (!isRadio[strategy.grade]) {
-				return;
-			}
-		} else {
-			// if(!strategy.id){
-			// 	strategy.grade
-			// }
-			if (!strategy.id || !strategy.deptId) {
-				let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
-				if (!obj) {
-					return;
-				}
-				strategy.id = obj.id;
-				strategy.deptId = obj.deptId;
-			}
-			let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
-			$.post('/mao/upgrades/editDo', data, function(results) {
-				if (results.code === 0) {
-					message.success(results.msg, 0.5);
-					listReq();
-				} else {
-					message.error(results.msg, 0.5);
-					listReq();
-				}
-			});
-		}
+		// if (!(typeof strategy.grade === 'number')) {
+		// 	message.error('没有升级项');
+		// 	return;
+		// }
+		// if (isAdd) {
+		// 	if (!isRadio[strategy.grade]) {
+		// 		return;
+		// 	}
+		// } else {
+		// 	// if(!strategy.id){
+		// 	// 	strategy.grade
+		// 	// }
+		// 	if (!strategy.id || !strategy.deptId) {
+		// 		let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
+		// 		if (!obj) {
+		// 			return;
+		// 		}
+		// 		strategy.id = obj.id;
+		// 		strategy.deptId = obj.deptId;
+		// 	}
+		// 	let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
+		// 	$.post('/mao/upgrades/editDo', data, function(results) {
+		// 		if (results.code === 0) {
+		// 			message.success(results.msg, 0.5);
+		// 			listReq();
+		// 		} else {
+		// 			message.error(results.msg, 0.5);
+		// 			listReq();
+		// 		}
+		// 	});
+		// }
 		return;
 	};
 	let handleEdit = (mes, index, e) => {
@@ -571,25 +568,22 @@ function EditableFormTable(props) {
 				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
 
-			{props.isUpgrade ? (
-				<div className="footer-table-box">
+			{
+				<div style={{ display: props.isUpgrade === false ? 'none' : 'block' }} className="footer-table-box">
 					<FooterEditableFormTable
+						className="footer-table"
 						setIsAdd={function(s) {
 							setIsAdd(s);
 						}}
 						listReq={listReq}
 						rowData={rowData}
 						handleEdit={handleEdit}
-						className="footer-table"
 					/>
 				</div>
-			) : (
-				''
-			)}
+			}
 		</div>
 	);
 }
-
 class Toll extends React.Component {
 	constructor(props) {
 		super(props);

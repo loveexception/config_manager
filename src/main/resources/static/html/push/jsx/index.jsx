@@ -34,8 +34,9 @@ function removePushs(type, dataList) {
 // filterFn
 let filterFn = (possible, _this, props, before) => {
 	let arr = [];
+	let { initData = {} } = _this.state;
 	if (!before) {
-		//list 必填项
+		//list 必填项.
 		// arr.push({type:"list",level:possible.L})
 		for (let i = 0; i < 3; i++) {
 			if (i == 0) {
@@ -43,7 +44,7 @@ let filterFn = (possible, _this, props, before) => {
 					removePushs('window', props.dataList);
 					continue;
 				}
-				for (let j = possible.W; j > 0; j--) {
+				for (let j = initData.window; j > 0; j--) {
 					arr.push({ type: 'window', level: reqConfig[j] });
 				}
 			} else if (i == 1) {
@@ -51,28 +52,16 @@ let filterFn = (possible, _this, props, before) => {
 					removePushs('audio', props.dataList);
 					continue;
 				}
-				for (let j = possible.A; j > 0; j--) {
+				for (let j = initData.audio; j > 0; j--) {
 					arr.push({ type: 'audio', level: reqConfig[j] });
 				}
 			} else {
-				for (let j = possible.L; j > 0; j--) {
+				for (let j = initData.list; j > 0; j--) {
 					arr.push({ type: 'list', level: reqConfig[j] });
 				}
 			}
 		}
-	} else {
-		///优化处理
 	}
-	// $.ajax({
-	// 	url:"/mao/pushs/editDo",
-	// 	data:{
-	// 		data:arr
-	// 	},
-	// 	success:function(results){
-	// 		console.log(results,'results')
-	// 	},
-	// 	type:"POST"
-	// })
 	$.ajax({
 		cache: true,
 		type: 'POST',
@@ -200,6 +189,7 @@ class PushFrom extends React.Component {
 	}
 	handleSubmit = e => {
 		e.preventDefault();
+		console.log(this.state, this.props, 'aaaaaaaaaa');
 		this.props.form.validateFields((err, values) => {
 			let arrData = filterFn(values, this, this.props); // <=
 			// arrData 是 过滤后的数组 （发送请求的数组）   4个 数据 级别对应 下标
