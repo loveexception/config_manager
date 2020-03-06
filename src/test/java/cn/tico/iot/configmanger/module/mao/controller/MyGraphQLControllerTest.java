@@ -451,7 +451,23 @@ public class MyGraphQLControllerTest {
         Logs.get().debug(result);
     }
 
+    @Test
+    public void 打开所有的列级别名(){
+        String sql = "{deviceBySno ( sno :\"BJ-GWYTH-B6JR-Cisco-3560-1\" ) {  " +
+                "sno,  driver { grades { grade  } } " +
+                "}}";
+        Map<String,Object> obj = controller.sql(sql);
+        Logs.get().debug(obj);
+        assertNotNull(obj);
+        assertTrue(Lang.isEmpty(obj.get("errors")));
+        assertEquals("BJ-GWYTH-B6JR-Cisco-3560-1", Mapl.cell(obj,"data.deviceBySno.sno"));
+        Object result = Mapl.cell(obj,"data.deviceBySno.driver.grades[0].grade");
+        assertTrue( Lang.isNotEmpty( result));
+        assertEquals( "critical",result );
 
+
+        Logs.get().debug(result);
+    }
 
 
 

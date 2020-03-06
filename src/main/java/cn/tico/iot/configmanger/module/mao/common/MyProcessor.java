@@ -22,15 +22,17 @@ public class MyProcessor extends AbstractProcessor {
         Stopwatch sw = Stopwatch.begin();
         try {
             ac.getResponse().setHeader("Access-Control-Allow-Origin","*");
-            ac.getResponse().setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
-            ac.getResponse().setHeader("Access-Control-Allow-Methods","GET, POST, PUT,DELETE,OPTIONS");
-            if ("OPTIONS".equals(ac.getRequest().getMethod())) {
-                    log.debugf("DO CROS OPTIONs -- [%s] [%s] [%s] [%s]",ac.getPath(),ac.getResponse().getHeaderNames(),ac.getRequest().getQueryString(),ac.getRequest().getMethod());
+            ac.getResponse().setHeader("Access-Control-Allow-Credentials","true");
 
-                return ;
+            if ("OPTIONS".equals(ac.getRequest().getMethod())) {
+                ac.getResponse().setHeader("Access-Control-Allow-Origin","*");
+                ac.getResponse().setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
+                ac.getResponse().setHeader("Access-Control-Allow-Methods","GET, POST, PUT,DELETE,OPTIONS");
+
             }
 
             doNext(ac);
+
 
         } finally {
             sw.stop();

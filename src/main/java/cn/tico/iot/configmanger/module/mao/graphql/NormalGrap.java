@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.module.mao.graphql;
 
 import cn.tico.iot.configmanger.module.iot.models.device.PersonRuler;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.module.iot.models.driver.Grade;
 import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
 import cn.tico.iot.configmanger.module.iot.models.driver.Ruler;
 import cn.tico.iot.configmanger.module.mao.common.BaseGrap;
@@ -57,5 +58,14 @@ public class NormalGrap extends BaseGrap {
 
         return normal(ruler.getNormalid());
     }
+    @GraphQLQuery
+    public Normal normal(@GraphQLContext Grade grade) {
 
+        return normal(grade.getNormalid());
+    }
+//    @GraphQLQuery
+//    public Normal normal(@GraphQLContext PersonGrade grade) {
+//
+//        return normal(grade.getNormalid());
+//    }
 }
