@@ -33,7 +33,8 @@ import java.util.Set;
  */
 @IocBean
 @At("/iot/tag")
-public class TagController implements AdminKey {
+public class
+TagController implements AdminKey {
 	private static final Log log = Logs.get();
 
 	@Inject
@@ -122,6 +123,9 @@ public class TagController implements AdminKey {
 	private boolean isAdmin() {
 
 		User user = ShiroUtils.getSysUser();
+		if(Lang.isEmpty(user)){
+			return false;
+		}
 
 		Set roles = userService.getRoleCodeList(user);
 

@@ -338,6 +338,7 @@
             <version>1.r.60</version>
             <scope>test</scope>
         </dependency>
+
         <!-- 可选, 安利一下mockito,模拟mock对象很方便 -->
         <dependency>
             <groupId>org.mockito</groupId>
