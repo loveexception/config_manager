@@ -1,6 +1,7 @@
 package cn.tico.iot.configmanger.module.mao.common;
 
 import cn.tico.iot.configmanger.common.annotation.AccessToken;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -54,11 +55,14 @@ public class MyTokenProcessor extends AbstractProcessor {
             token = "";
         }
         if(Strings.isNotBlank(token)){
-            Subject subject = SecurityUtils.getSubject();
+            Subject subject = ShiroUtils.getSubject();
             subject.login(new SimpleShiroToken(token));
 
+            boolean islogin = subject.isAuthenticated();
+            Logs.get().debug(islogin);
+            Logs.get().debug(subject.getPrincipal());
+
         }
-        Logs.get().debug(SecurityUtils.getSubject());
         doNext(ac);
 
     }

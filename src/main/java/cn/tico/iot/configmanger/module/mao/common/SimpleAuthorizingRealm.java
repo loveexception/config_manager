@@ -71,7 +71,7 @@ public class SimpleAuthorizingRealm extends AbstractSimpleAuthorizingRealm {
 		User user = dao().fetch(User.class, (String)upToken.getPrincipal());
 		if (user == null)
 			return null;
-		return new SimpleAccount(user.getId(), user.getPassword(), getName());
+		return new SimpleAccount(user, user.getPassword(), getName());
 	}
 
 	public SimpleAuthorizingRealm() {
