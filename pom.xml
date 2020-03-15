@@ -414,7 +414,7 @@
         </pluginRepository>
     </pluginRepositories>
     <build>
-        <finalName>configmanger</finalName>
+        <finalName>configmanager</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
