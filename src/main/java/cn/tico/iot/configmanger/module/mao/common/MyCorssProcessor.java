@@ -5,6 +5,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
+import org.nutz.boot.starter.WebEventListenerFace;
+import org.nutz.boot.starter.shiro.ShiroEnvStarter;
 import org.nutz.integration.shiro.SimpleShiroToken;
 import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -46,9 +48,8 @@ public class MyCorssProcessor extends AbstractProcessor {
                 ac.getResponse().setHeader("Access-Control-Allow-Methods","GET, POST, PUT,DELETE,OPTIONS");
                 ac.getRequest().setAttribute("","");
             }
-
+            ShiroEnvStarter s;
             doNext(ac);
-
 
         } finally {
             sw.stop();
