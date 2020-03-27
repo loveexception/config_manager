@@ -207,7 +207,7 @@ public class LocationManagerTest extends Assert {
 
 
         Location me=locationManager.get("387095cd13d94497b7666ed1a65e1712");
-        List<Location> list = locationManager.getAllByLocation("387095cd13d94497b7666ed1a65e1712");
+        List<Location> list = locationManager.allFamilyWithMe("387095cd13d94497b7666ed1a65e1712");
         assertNotNull(me);
         assertFalse(Lang.isEmpty(list));
         Logs.get().debug(list);

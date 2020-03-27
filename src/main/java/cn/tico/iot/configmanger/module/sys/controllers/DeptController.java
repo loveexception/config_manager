@@ -10,6 +10,7 @@ import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -71,7 +72,6 @@ public class DeptController {
         if (Strings.isNotBlank(deptName)) {
             cnd.and("dept_name", "like", "%" + deptName + "%");
         }
-
         User user = ShiroUtils.getSysUser();
 
         user =userService.fetchLinks(user,"dept|image");

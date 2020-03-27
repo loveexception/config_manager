@@ -11,6 +11,11 @@ const dataConfig = {
 };
 const sliderStr = ['无', '紧急', '重要', '次要', '提示'];
 const reqConfig = ['', 'critical', 'major', 'minor', 'warning'];
+const strConfig = {
+	L: 'list',
+	W: 'window',
+	A: 'audio'
+};
 //remove Fn
 function removePushs(type, dataList) {
 	let ids = [];
@@ -29,8 +34,9 @@ function removePushs(type, dataList) {
 // filterFn
 let filterFn = (possible, _this, props, before) => {
 	let arr = [];
+	let { initData = {} } = _this.state;
 	if (!before) {
-		//list 必填项
+		//list 必填项.
 		// arr.push({type:"list",level:possible.L})
 		for (let i = 0; i < 3; i++) {
 			if (i == 0) {
@@ -38,7 +44,7 @@ let filterFn = (possible, _this, props, before) => {
 					removePushs('window', props.dataList);
 					continue;
 				}
-				for (let j = possible.W; j > 0; j--) {
+				for (let j = initData.window; j > 0; j--) {
 					arr.push({ type: 'window', level: reqConfig[j] });
 				}
 			} else if (i == 1) {
@@ -46,28 +52,16 @@ let filterFn = (possible, _this, props, before) => {
 					removePushs('audio', props.dataList);
 					continue;
 				}
-				for (let j = possible.A; j > 0; j--) {
+				for (let j = initData.audio; j > 0; j--) {
 					arr.push({ type: 'audio', level: reqConfig[j] });
 				}
 			} else {
-				for (let j = possible.L; j > 0; j--) {
+				for (let j = initData.list; j > 0; j--) {
 					arr.push({ type: 'list', level: reqConfig[j] });
 				}
 			}
 		}
-	} else {
-		///优化处理
 	}
-	// $.ajax({
-	// 	url:"/mao/pushs/editDo",
-	// 	data:{
-	// 		data:arr
-	// 	},
-	// 	success:function(results){
-	// 		console.log(results,'results')
-	// 	},
-	// 	type:"POST"
-	// })
 	$.ajax({
 		cache: true,
 		type: 'POST',
@@ -120,22 +114,31 @@ function MTable(props) {
 function TopTable(props) {}
 // form Iten
 function FromItem(props) {
+	let { disableConfig, label } = props;
 	useEffect(() => {}, []);
 	return (
-		<Form.Item label={props.label}>
-			{props.getFieldDecorator(props.label, {
-				initialValue: props.initValue
-			})(
-				<Slider
-					//  range={false}
-					min={1}
-					max={4}
-					marks={props.config}
-					// defaultValue={2}
-					step={null}
-				/>
-			)}
-		</Form.Item>
+		// <Form.Item label={props.label}>
+		// 	{props.getFieldDecorator(props.label, {
+		// 		initialValue: props.key || props.value
+		// 	})(
+		<div style={{ width: '50%' }}>
+			<Slider
+				disabled={label === 'W' ? !disableConfig[0] : label === 'A' ? !disableConfig[1] : false}
+				onChange={value => {
+					// console.log(props, 'props');
+					props.handleRadio(value, props.label);
+				}}
+				min={1}
+				max={4}
+				// defaultValue={props && props.initValue}
+				marks={props.config}
+				// defaultValue={2}
+				step={null}
+				value={props.initValue}
+			/>
+		</div>
+		// 	)}
+		// </Form.Item>
 	);
 }
 
@@ -146,6 +149,7 @@ class PushFrom extends React.Component {
 		this.state = {
 			0: false,
 			1: false,
+			_initValue: false,
 			_data: {
 				text: ['紧急告警', '重要告警', '次要告警', '告警提示'],
 				numPar: [1, 2, 3, 4],
@@ -176,7 +180,6 @@ class PushFrom extends React.Component {
 					let l = e.level;
 					initData[t] > dataConfig[l] ? '' : (initData[t] = dataConfig[l]);
 				});
-			console.log(initData, 'initData=');
 			this.setState({
 				0: !!initData.window,
 				1: !!initData.audio,
@@ -186,6 +189,7 @@ class PushFrom extends React.Component {
 	}
 	handleSubmit = e => {
 		e.preventDefault();
+		console.log(this.state, this.props, 'aaaaaaaaaa');
 		this.props.form.validateFields((err, values) => {
 			let arrData = filterFn(values, this, this.props); // <=
 			// arrData 是 过滤后的数组 （发送请求的数组）   4个 数据 级别对应 下标
@@ -195,6 +199,14 @@ class PushFrom extends React.Component {
 		});
 	};
 
+	handleRadio = (value, label) => {
+		this.setState({
+			initData: {
+				...this.state.initData,
+				[strConfig[label]]: value
+			}
+		});
+	};
 	normFile = e => {
 		if (Array.isArray(e)) {
 			return e;
@@ -221,7 +233,15 @@ class PushFrom extends React.Component {
 								</Button>
 								<Button
 									onClick={() => {
-										this.props.form && this.props.form.resetFields();
+										this.setState({
+											0: false,
+											1: false,
+											initData: {
+												window: 1,
+												audio: 1,
+												list: 1
+											}
+										});
 									}}
 								>
 									重置
@@ -282,7 +302,7 @@ class PushFrom extends React.Component {
 									_data.numPar.map((item, index) => {
 										config[item] = _data.text[index];
 									});
-									return <FromItem initValue={initValue} key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
+									return <FromItem disableConfig={{ 0: this.state[0], 1: this.state[1] }} handleRadio={this.handleRadio} initValue={initValue} key={i} label={i == 0 ? 'W' : i == 1 ? 'A' : 'L'} getFieldDecorator={getFieldDecorator} config={config}></FromItem>;
 								}
 							}
 						],

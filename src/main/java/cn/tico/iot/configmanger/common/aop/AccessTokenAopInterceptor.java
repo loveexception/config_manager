@@ -27,6 +27,7 @@ public class AccessTokenAopInterceptor implements MethodInterceptor {
     protected Ioc ioc;
 
     public AccessTokenAopInterceptor(Ioc ioc, AccessToken token, Method method) {
+
         this.ioc = ioc;
     }
 
