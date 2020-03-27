@@ -35,7 +35,6 @@ MainLauncher 是入口,启动即可
 
 仅供测试用,使用 mvn 命令即可
 
-
 ```
 // for windows
 set MAVEN_OPTS="-Dfile.encoding=UTF-8"
@@ -51,12 +50,16 @@ mvn compile nutzboot:run
 ```
 mvn clean package nutzboot:shade
 ```
- 不去服务上查看新包版本。
+
+不去服务上查看新包版本。
+
 ```
-mvn clean package nutzboot:shade -o -DskipTests -Dmaven.test.skip=true
+mvn clean package nutzboot:shade -o -DskipTests -Dmaven.test.skip=true  ios
+
 mvn clean package nutzboot:shade -o -DskipTests
 ```
-mvn clean package nutzboot:shade -o -DskipTests 
+
+mvn clean package nutzboot:shade  -DskipTests
 请注意,当前需要 package + nutzboot:shade, 单独执行 package 或者 nutzboot:shade 是不行的
 
 ## start 命令:

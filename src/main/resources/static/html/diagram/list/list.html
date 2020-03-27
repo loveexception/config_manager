@@ -8,6 +8,16 @@
 	<title></title>
 	<meta name="keywords" content="" />
 	<meta name="description" content="" />
+	<style>
+		#diagram-box {
+			padding: 0.15rem;
+		}
+
+		ul li {
+			list-style: none;
+			padding: 0;
+		}
+	</style>
 	<link rel="shortcut icon" href="favicon.ico" />
 
 	<link href="/assets/css/style.css" rel="stylesheet" />
@@ -18,26 +28,32 @@
 	<script src="/assets/react/babel.min.js"></script>
 	<!-- moment.js -->
 	<script src="/assets/react/moment/moment.js"></script>
+	<script src="/assets/react/moment/locale/zh-cn.js"></script>
 	<!-- antd.css -->
 	<link rel="stylesheet" type="text/css" href="/assets/react/antd/antd.min.css" />
 	<!-- antd.js -->
 	<script src="/assets/react/antd/antd.min.js"></script>
-	<!-- antv -->
-	<script src="/assets/react/antv/g2.min.js"></script>
-	<!-- dataSet  -->
-	<script src="/assets/react/antv/data-set.min.js"></script>
-	<script src="/assets/Adaptive/index.js"></script>
-
-	<!-- <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script> -->
 
 	<!-- less.js -->
-	<link rel="stylesheet/less" type="text/css" href="./jsx/asset/index.less" />
+	<link rel="stylesheet/less" type="text/css" href="./list.less" />
 	<script src="/assets/react/less.min.js"></script>
+	<script src="/assets/js/jszip.js"></script>
+	<script src="/assets/js/pubSub.js"></script>
+	<script src="/assets/Adaptive/index.js"></script>
+	<!-- lodash.js -->
+	<script src="/assets/react/lodash.js"></script>
+	<!-- antd.js -->
+	<script src="/assets/react/react-custom-scrollbars.min.js"></script>
+	<script src="reqlist.js"></script>
 </head>
 
 <body class="gray-bg">
-	<div id="drive-list-box"></div>
-	<script type="text/babel" src="./jsx/asset/index.jsx" domId="drive-list-box"></script>
+	<div id="diagram-box"></div>
+	<script>
+		window.rootNode = document.getElementById('diagram-box')
+	</script>
+	<script type="text/babel" src="./list.jsx"></script>
+
 	<script src="/assets/js/jquery.min.js"></script>
 	<!-- 遮罩层 -->
 	<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
@@ -46,6 +62,8 @@
 	<script src="/assets/plugins/layui/layui.js"></script>
 	<script src="/assets/js/common.js?v=3.1.0"></script>
 	<script src="/assets/js/ui.js?v=3.1.0"></script>
+	<script src="/assets/js/FileSaver.js"></script>
+
 	<script>
 		var ctx = '\/';
 	</script>

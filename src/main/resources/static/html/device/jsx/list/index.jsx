@@ -6,7 +6,7 @@ for (var i = 0; i < scripts.length; i++) {
 		domId = script.getAttribute('domId');
 	}
 }
-$.modal.openFull = function(title, url, width, height) {
+$.modal.openFull = function (title, url, width, height) {
 	//如果是移动端，就使用自适应大小弹窗
 	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
 		width = 'auto';
@@ -36,11 +36,11 @@ $.modal.openFull = function(title, url, width, height) {
 		// btn: ['确定', '关闭'],
 		// 弹层外区域关闭
 		shadeClose: false,
-		yes: function(index, layero) {
+		yes: function (index, layero) {
 			var iframeWin = layero.find('iframe')[0];
 			iframeWin.contentWindow.submitHandler();
 		},
-		cancel: function(index, layero) {
+		cancel: function (index, layero) {
 			var iframeWin = layero.find('iframe')[0];
 			return iframeWin.contentWindow.cancelHandler();
 			// return true;
@@ -49,10 +49,10 @@ $.modal.openFull = function(title, url, width, height) {
 	layer.full(index);
 };
 
-var xhrOnProgress = function(fun) {
+var xhrOnProgress = function (fun) {
 	xhrOnProgress.onprogress = fun; //绑定监听
 	//使用闭包实现监听绑
-	return function() {
+	return function () {
 		//通过$.ajaxSettings.xhr();获得XMLHttpRequest对象
 		var xhr = $.ajaxSettings.xhr();
 		//判断监听函数是否为函数
@@ -404,9 +404,9 @@ class ListBox extends React.PureComponent {
 						<div className="search-content">
 							<div
 								className="content-li"
-								// style={{
-								// 	marginBottom: 20
-								// }}
+							// style={{
+							// 	marginBottom: 20
+							// }}
 							>
 								<Select
 									placeholder="请选择组织"
@@ -520,7 +520,7 @@ class ListBox extends React.PureComponent {
 						>
 							导入
 						</Button>
-						<Button onClick={() => {}}>模版下载</Button>
+						<Button onClick={() => { }}>模版下载</Button>
 
 						<Dropdown className="content-li-dropdown" overlay={menu}>
 							<div>
@@ -755,7 +755,7 @@ class ImportFile extends React.PureComponent {
 									// contentType: 'multipart/form-data',
 									processData: false,
 									type: 'POST',
-									xhr: xhrOnProgress(function(evt) {
+									xhr: xhrOnProgress(function (evt) {
 										var percent = Math.floor((evt.loaded / evt.total) * 100); //计算百分比
 										console.log('上传进度：', percent);
 									}),

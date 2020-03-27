@@ -1,0 +1,130 @@
+.diagram-view-box {
+
+	.diagram-view-name {
+		font-family: MicrosoftYaHei;
+		// font-size: 16px;
+		// font-weight: normal;
+		// font-stretch: normal;
+		// line-height: 35px;
+		// letter-spacing: 0px;
+		// color: #2e3c49;
+		font-size: 0.16rem;
+		font-weight: normal;
+		font-stretch: normal;
+		line-height: 0.24rem;
+		letter-spacing: 0rem;
+		color: #272727;
+		margin: 0.1rem 0 0.07rem 
+	}
+			.diagram-view-container{
+				position: relative;
+				overflow: auto;
+				background-image: url('/assets/img/back-img.png') ;
+				img{
+					display:  block;
+					margin:  auto;
+					width: auto;
+				}
+				}
+
+	.view-btn-container {
+		float: right;
+		margin-top: 0.1rem;
+		display: flex;
+	.handle-hover{
+		&:hover{
+			color: blue;
+			// opacity: 0.6;
+		}
+	}
+		> div {
+			margin-left: 0.1rem;
+			span{
+				cursor: pointer;
+				font-size: 0.21rem;
+				color: #c9c9c9;
+				&:hover{
+					color: #4b72fe
+				}
+			}
+		}
+		.view-btn-adapt{
+			cursor: pointer;
+			width: 1.04rem;
+			height: 0.31rem;
+			background-color: #ffffff;
+			box-shadow: 0rem 0.02rem 0.06rem 0rem 
+				rgba(0, 0, 0, 0.17);
+				// width: 0.85rem;
+				// height: 0.15rem;
+				font-family: MicrosoftYaHei;
+				font-size: 0.14rem;
+				font-weight: normal;
+				font-stretch: normal;
+				line-height: 0.31rem;
+				letter-spacing: 0rem;
+				color: #979797;
+				text-align: center;
+		}
+		.view-btn {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 0.31rem;
+			height: 0.31rem;
+			background-color: #ffffff;
+			box-shadow: 0rem 0.02rem 0.06rem 0rem rgba(0, 0, 0, 0.17);
+			svg {
+				cursor: pointer;
+				width: 0.25rem;
+				height: 0.25rem;
+				// background-color: rgba(0, 0, 0, 0.17);
+				//
+				&:hover {
+					use {
+						opacity: 0.7;
+					}
+				}
+				use {
+					opacity: 0.3;
+				}
+			}
+		}
+		.view-select {
+			position: relative;
+			height: 0.31rem;
+			overflow: hidden;
+			width: 0.73rem;
+			background-color: #ffffff;
+			border: none;
+			box-shadow: 0rem 0.02rem 0.06rem 0rem rgba(0, 0, 0, 0.17);
+			font-family: MicrosoftYaHei;
+			font-size: 0.14rem;
+			font-weight: normal;
+			font-stretch: normal;
+			line-height: 0.24rem;
+			letter-spacing: 0rem;
+			color: #979797;
+			text-indent: 0.05rem;
+			// text-indet: 0.01rem;
+			.view-select-input {
+				line-height: 0;
+				border: none;
+				height: 0.31rem;
+				width: 0.73rem;
+				background-color: #ffffff;
+				box-shadow: 0rem 0.02rem 0.06rem 0rem rgba(0, 0, 0, 0.17);
+			}
+		}
+		.son {
+			box-shadow: none;
+			display: block;
+			position: relative;
+			z-index: 2;
+			background: transparent;
+			cursor: pointer;
+			// margin-left: 0.1rem;
+			// margin-left: ;
+		}
+	}
+}
