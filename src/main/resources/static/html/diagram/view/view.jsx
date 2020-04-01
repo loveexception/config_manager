@@ -14,7 +14,6 @@ window.location.search.slice(1).split('&').map((e) => {
 	urlData[e[0]] = e[1]
 	// urlData[e] = arr[i + 1]
 });
-console.log(urlData, 'url')
 let { id, name } = urlData;
 // urlData = 
 // let id = urlData.find((e)=>{ 
@@ -52,16 +51,26 @@ function Topo(props) {
 	let DiagramAction = window.DiagramAction;
 	// let { id = '', name = '' } = props.location.query;
 	// zoomInBtn.current.onClick
+	function handleImgPx(width, height) {
+		let selfImg = refImg.current;
+		selfImg.style.width = width == false ? "auto" : width;
+		selfImg.style.height = height == false ? "auto" : height
+
+	}
 	let handleChange = e => {
 		if (selecetRef.current.value === 'auto') {
 			autoValue()
 
 		} else {
-			handleImgWidth(selecetRef.current.value);
+			handleImgHeight(selecetRef.current.value);
 		}
+		resetImgMargin()
 	};
-	function handleImgWidth(scale, boolean) {
-
+	//  重置img  margin
+	function resetImgMargin() {
+		setImgReset((500 - refImg.current.height) > 0 ? (500 - refImg.current.height) / 2 + 'px' : '0');
+	}
+	function handleImgHeight(scale, boolean) {
 		let selfImg = refImg.current;
 		let resultIndex = scaleArr.findIndex((element) => {
 			return selfImg.initObj.scale == element
@@ -70,52 +79,97 @@ function Topo(props) {
 		let resultValueW = '';
 
 		if (boolean === undefined) {
-			resultValueW = selfImg.initObj.width * scale;
-			// console.log(Number(scaleArr[resultIndex]).toFixed(1), 'xx')
-			// setSelectValue(Number(scaleArr[resultIndex]).toFixed(1))
-			setSelectValue(scale)
-			selfImg.initObj.scale = scale;
-			selfImg.style.width = resultValueW + 'px';
-			return
+			if (scale === 'auto') {
+				selfImg.style.height = contentImg.current.style.height;  //容器高度
+				selfImg.style.width = "auto";
+				resultValueH = selfImg.initObj.containerHeightPx / selfImg.initObj.height;
+				// resultValueH
+				let scale = scaleArr.find((e) => {
+					return resultValueH.toFixed(1) === e
+				})
+				// scale = -1
+				if (scale !== undefined) {
+					selfImg.initObj.scale = scale
+				} else {
+					// 大于 2倍 下标等于length  
+					//  小于等于 -1；
+					// scale
+					selfImg.initObj.scale = resultValueH.toFixed(1) > 2 ? scaleArr.length : -1;
+					// console.log(resultValueH.toFixed(1))
+					// selfImg.initObj.scale = scaleArr.length;
+					// selfImg.initObj.scale = -1
+					// console.log(selfImg.initObj.scale, resultValueH.toFixed(1), 'xx')
+				}
+				setSelectValue('auto')
+				// 处理自适应 传入 auto  记录 scale   
+				// 高度为容器高度
+				// setSelectValue(Number(scaleArr[resultIndex]).toFixed(1))
+
+				// selfImg.initObj.scale = scaleArr[resultIndex]
+				handleImgPx(false, selfImg.initObj.containerHeight);
+				resetImgMargin()
+				return
+			} else {
+				resultValueW = selfImg.initObj.width * scale;
+				// console.log(Number(scaleArr[resultIndex]).toFixed(1), 'xx')
+				// setSelectValue(Number(scaleArr[resultIndex]).toFixed(1))
+				setSelectValue(scale)
+				selfImg.initObj.scale = scale;
+				handleImgPx(resultValueW + 'px')
+				return
+			}
+
 		} else {
+			// -1
 			if (boolean) {
+				// 2.5
+				if (selfImg.initObj.scale === scaleArr.length) {
+					// 最大不处理
+
+					return
+				}
 				if (scaleArr[resultIndex + 1] === undefined) {
-					resultValueW = selfImg.initObj.width * scaleArr[resultIndex];
 					// resultValueH = selfImg.initObj.height * scaleArr[resultIndex];
 
 				} else {
 					++resultIndex
-					resultValueW = selfImg.initObj.width * scaleArr[resultIndex];
 					// resultValueH = selfImg.initObj.height * scaleArr[resultIndex];
 				}
+				resultValueW = (selfImg.initObj.width * scaleArr[resultIndex]).toFixed(1);
+
 			} else {
+				if (selfImg.initObj.scale === -1) {
+					return
+					// 最小不处理
+				}
+				if (selfImg.initObj.scale === scaleArr.length) {
+					resultIndex = scaleArr.length
+				}
 				if (scaleArr[resultIndex - 1] === undefined) {
 					// resultValueH = selfImg.initObj.height * scaleArr[resultIndex];
-					resultValueW = selfImg.initObj.width * scaleArr[resultIndex];
 				} else {
 					resultIndex--;
 					// resultValueH = selfImg.initObj.height * scaleArr[resultIndex];
-					resultValueW = selfImg.initObj.width * scaleArr[resultIndex];
 
 				}
+				resultValueW = (selfImg.initObj.width * scaleArr[resultIndex]).toFixed(1);
 				// resultValue = scaleArr[--resultIndex] === undefined ? selfImg.initObj.width * scaleArr[resultIndex] : selfImg.initObj.width * scaleArr[--resultIndex];
 
 			}
 		}
 		setSelectValue(Number(scaleArr[resultIndex]).toFixed(1))
 		selfImg.initObj.scale = scaleArr[resultIndex]
-		// console.log(resultIndex, '--------------xx')
-		selfImg.style.width = resultValueW + 'px';
-		selfImg.style.height = resultValueH + 'px';
+		handleImgPx(resultValueW ? resultValueW + 'px' : false, resultValueH ? resultValueH + 'px' : false)
+		resetImgMargin()
+		// selfImg.style.width = resultValueW + 'px';
+		// selfImg.style.height = resultValueH + 'px';
 	}
 	function handleScale(boolean) {
-		handleImgWidth(null, boolean)
+		handleImgHeight(null, boolean);
+
 	}
 	function autoValue() {
-		let selfImg = refImg.current;
-		// selfImg.style.height = contentImg.current.style.height;
-		selfImg.style.width = contentImg.current.style.width;
-		setSelectValue('auto')
+		handleImgHeight("auto")
 	}
 	React.useEffect(
 		function () {
@@ -130,12 +184,14 @@ function Topo(props) {
 								width: refImg.current.width,
 								height: refImg.current.height,
 								scale: 1,
-								containerHeight: '5rem',
+								containerHeight: '4.9rem', //防止 出现滚动条  
+								containerHeightPx: '500',
+
 							};
 							refImg.current.initObj = iO;
 							setImgWidth(iO.width)
 							imgInitValue.current = iO;
-							setImgReset((500 - imgInitValue.current.height) > 0 ? (500 - imgInitValue.current.height) / 2 + 'px' : '0');
+							resetImgMargin()
 						};
 					} else {
 						Message.error('图片加载失败', 0.5);

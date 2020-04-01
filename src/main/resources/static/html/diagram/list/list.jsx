@@ -241,7 +241,7 @@ class EditableTable extends React.Component {
 							<li>
 								<div className="svg-content" disabled={editingKey !== ''}>
 									<Icon type="eye" onClick={() => {
-										$.modal.openFull(record.name + '查看', `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`)
+										$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`)
 										// $.modal.open(record.name + '查看', `/html / diagram / view / view.html ? id = ${ record.id } & name= ${ record.name } `)
 										// router.push(`view ? id = ${ record.id }& name=${record.name}`);
 									}} />
@@ -459,6 +459,7 @@ function ButtonList(props) {
 		<div className="button-list-container">
 			<div className="button-list-box" style={{ ...props.style }}>
 				<Upload
+					className="upload-btn"
 					onChange={info => {
 						// console.log(info, 'info');
 						if (info.file.response && info.file.response.success) {

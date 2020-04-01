@@ -1,6 +1,6 @@
 let { Select, Radio, Button, Icon, Popconfirm, PageHeader, List, Avatar, Table, Input, InputNumber, Form, message } = antd;
 const { Option } = Select;
-let MIcon = function(props) {
+let MIcon = function (props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
 	return <Icon style={{ fontSize: '0.12rem' }} {...props} />;
 };
@@ -11,7 +11,7 @@ const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 const reqConfig = ['warning', 'major', 'minor', 'critical'];
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
-let setInitValue = () => {};
+let setInitValue = () => { };
 //demo TabList
 
 const FooterEditableContext = React.createContext();
@@ -41,8 +41,8 @@ class EditableCell extends React.Component {
 						})(this.getInput())}
 					</Form.Item>
 				) : (
-					children
-				)}
+						children
+					)}
 			</td>
 		);
 	};
@@ -197,14 +197,13 @@ class FooterEditableFormTable extends React.PureComponent {
 			}
 		];
 	}
-	componentDidMount() {
-		let d = this.state.data;
-	}
+	componentDidMount() { }
 	componentWillReceiveProps() {
 		this.handleProps();
 	}
 	componentWillUpdate(p, s) {
 		let d = this.state.data;
+		PubSub.publish('initData', d);
 		// let isUpdata = false;
 		// !_.isEmpty(d) && d.forEach((e,i)=>{
 		// 	Object.keys(s.data).forEach((item,index)=>{
@@ -214,8 +213,6 @@ class FooterEditableFormTable extends React.PureComponent {
 		// 	})
 		// })
 		// if(isUpdata){
-
-		PubSub.publish('initData', d);
 		// }
 	}
 
@@ -333,7 +330,7 @@ function isValue(str) {
 	return res;
 }
 //input
-let InputCom = function(props) {
+let InputCom = function (props) {
 	let [value, setValue] = useState(0);
 	let { strategy, setStrategy, cycle, countDown, data } = props;
 	let key = data === '2' ? 'cycle' : 'countDown';
@@ -344,7 +341,7 @@ let InputCom = function(props) {
 			setValue(countDown);
 		}
 	}, [props]);
-	let handleChange = function(value) {
+	let handleChange = function (value) {
 		setStrategy({ ...strategy, [key]: value });
 		setValue(value);
 	};
@@ -391,6 +388,7 @@ function EditableFormTable(props) {
 	]);
 	let [strategy, setStrategy] = React.useState({ grade: '', countDown: '不升级', cycle: '不推送' });
 	let [rowData, setRowData] = useState([]);
+	let [isDisplay, setIsDisplay] = useState(true);
 	let [isAdd, setIsAdd] = useState(true);
 	let [isRadio, setIsRadio] = useState([true, true, true, true]);
 	const radio = ['紧急', '重要', '次要 ', '提示'];
@@ -401,7 +399,7 @@ function EditableFormTable(props) {
 		// console.log(isRadio, '=========', grade, 'grade==');
 
 		PubSub.unsubscribe(window.PubSubx);
-		window.PubSubx = PubSub.subscribe('initData', function(m, d) {
+		window.PubSubx = PubSub.subscribe('initData', function (m, d) {
 			let target = d[grade];
 			if (isAdd === (target.cycle == 0 && target.countDown == 0)) {
 				return;
@@ -429,7 +427,7 @@ function EditableFormTable(props) {
 						<Radio.Group name="radiogroup" onChange={handleChange} value={strategy.grade}>
 							{radio.map((item, index) => (
 								//
-								<Radio disabled={!isRadio[index]} key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
+								<Radio key={index} value={index} size="large" style={{ fontSize: '0.1rem', color: '#999' }}>
 									{item}
 								</Radio>
 							))}
@@ -467,58 +465,59 @@ function EditableFormTable(props) {
 	}
 	useEffect(() => {
 		listReq();
-		return () => {};
+		return () => { };
 	}, []);
 	let handleClick = () => {
-		if (!(typeof strategy.grade === 'number')) {
-			message.error('没有升级项');
-			return;
-		}
-		if (isAdd) {
-			if (!isRadio[strategy.grade]) {
-				return;
+		let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
+		$.post('/mao/upgrades/addDo', data, function (results) {
+			if (results.code === 0) {
+				message.success(results.msg, 0.5);
+				// reset()
+				setIsAdd(false);
+				listReq();
+			} else {
+				message.error(results.msg, 0.5);
+				setIsAdd(true);
+				listReq();
 			}
-			let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
-			$.post('/mao/upgrades/addDo', data, function(results) {
-				if (results.code === 0) {
-					message.success(results.msg, 0.5);
-					// reset()
-					setIsAdd(false);
-					listReq();
-				} else {
-					message.error(results.msg, 0.5);
-					setIsAdd(true);
-					listReq();
-				}
-			});
-		} else {
-			// if(!strategy.id){
-			// 	strategy.grade
-			// }
-			if (!strategy.id || !strategy.deptId) {
-				let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
-				if (!obj) {
-					return;
-				}
-				strategy.id = obj.id;
-				strategy.deptId = obj.deptId;
-			}
-			let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
-			$.post('/mao/upgrades/editDo', data, function(results) {
-				if (results.code === 0) {
-					message.success(results.msg, 0.5);
-					listReq();
-				} else {
-					message.error(results.msg, 0.5);
-					listReq();
-				}
-			});
-		}
+		});
+		// if (!(typeof strategy.grade === 'number')) {
+		// 	message.error('没有升级项');
+		// 	return;
+		// }
+		// if (isAdd) {
+		// 	if (!isRadio[strategy.grade]) {
+		// 		return;
+		// 	}
+		// } else {
+		// 	// if(!strategy.id){
+		// 	// 	strategy.grade
+		// 	// }
+		// 	if (!strategy.id || !strategy.deptId) {
+		// 		let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
+		// 		if (!obj) {
+		// 			return;
+		// 		}
+		// 		strategy.id = obj.id;
+		// 		strategy.deptId = obj.deptId;
+		// 	}
+		// 	let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
+		// 	$.post('/mao/upgrades/editDo', data, function(results) {
+		// 		if (results.code === 0) {
+		// 			message.success(results.msg, 0.5);
+		// 			listReq();
+		// 		} else {
+		// 			message.error(results.msg, 0.5);
+		// 			listReq();
+		// 		}
+		// 	});
+		// }
 		return;
 	};
 	let handleEdit = (mes, index, e) => {
+		setIsDisplay(false)
 		// debugger
-		new Promise(async function(resolve, reject) {
+		new Promise(async function (resolve, reject) {
 			let r = await setInitValue(index);
 			resolve(r);
 		})
@@ -532,19 +531,18 @@ function EditableFormTable(props) {
 			});
 	};
 	let headerFn = () => {
-		let { isUpgradeFn } = props;
+		let { isUpgradeFn, isUpgrade } = props;
 		return (
 			<div className="table-title-content">
-				<div className="table-title-text">{textFormat}添加升级策略</div>
+				<div className="table-title-text">{textFormat}编辑升级策略</div>
 				<MIcon
 					onClick={
-						isUpgradeFn &&
-						function() {
-							isUpgradeFn(arguments);
+						() => {
+							setIsDisplay(!isDisplay)
 						}
 					}
 					style={{ fontSize: '0.2rem' }}
-					type="close-circle"
+					type={isUpgrade ? 'down-circle' : 'up-circle'}
 					theme="twoTone"
 				/>
 			</div>
@@ -555,7 +553,8 @@ function EditableFormTable(props) {
 			<div className="tab-footer-box">
 				<div className="tab-button-box">
 					<Button type="primary" shape="round" size={'large'} onClick={handleClick}>
-						{isAdd ? '添加' : '修改'}
+						{/* {isAdd ? '添加' : '修改'} */}
+					提交
 					</Button>
 					{/* <Button shape="round" size={'large'}>
 						取消
@@ -567,23 +566,27 @@ function EditableFormTable(props) {
 	return (
 		<div className="middle-table">
 			<div className="middle-table-box">
-				<Table pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
+				<Table style={isDisplay ? {
+					display: 'none'
+				} : {}} pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
-			<div className="footer-table-box">
-				<FooterEditableFormTable
-					setIsAdd={function(s) {
-						setIsAdd(s);
-					}}
-					listReq={listReq}
-					rowData={rowData}
-					handleEdit={handleEdit}
-					className="footer-table"
-				/>
-			</div>
+
+			{
+				<div style={{ display: props.isUpgrade === false ? 'none' : 'block' }} className="footer-table-box">
+					<FooterEditableFormTable
+						className="footer-table"
+						setIsAdd={function (s) {
+							setIsAdd(s);
+						}}
+						listReq={listReq}
+						rowData={rowData}
+						handleEdit={handleEdit}
+					/>
+				</div>
+			}
 		</div>
 	);
 }
-
 class Toll extends React.Component {
 	constructor(props) {
 		super(props);
@@ -596,7 +599,7 @@ class Toll extends React.Component {
 	componentDidMount() {
 		this.init();
 	}
-	init = () => {};
+	init = () => { };
 	upDataIsPolling = rowLength => {
 		if (this.flag) {
 			this.setState({
@@ -612,42 +615,25 @@ class Toll extends React.Component {
 			this.setState({ isPolling: true });
 		}
 	};
-	handleClick = () => {};
+	handleClick = () => { };
 	isUpgradeFn = () => {
-		this.setState({ isUpgrade: !this.isUpgradeFn });
+		this.setState({ isUpgrade: !this.state.isUpgrade });
 	};
 	render() {
 		let { isUpgrade } = this.state;
 		return (
 			<div>
-				<div className="bottom-margin">
-					<Button
-						className="title-button"
-						onClick={() => {
-							this.setState({
-								isUpgrade: true
-							});
-						}}
-					>
-						+添加升级策略
-					</Button>
-				</div>
-
 				<div>
 					{this.state.isPolling ? (
 						<div className="bottom-margin">
 							<HeaderList />
 						</div>
 					) : (
-						''
-					)}
-					{isUpgrade ? (
-						<div className="bottom-margin">
-							<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgradeFn={this.isUpgradeFn} />
-						</div>
-					) : (
-						''
-					)}
+							''
+						)}
+					<div className="bottom-margin">
+						<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgrade={isUpgrade} isUpgradeFn={this.isUpgradeFn} />
+					</div>
 				</div>
 			</div>
 		);
