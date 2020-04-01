@@ -3,6 +3,7 @@ package cn.tico.iot.configmanger.module.iot.services;
 import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import com.google.common.collect.Lists;
 import org.nutz.dao.Cnd;
@@ -226,5 +227,12 @@ public class KindService extends Service<Kind> {
 
 
         return result;
+    }
+
+    public List<Kind> findAllKinds() {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("status", "=", "true");
+        cnd.and("delflag","=","false");
+        return query(cnd);
     }
 }

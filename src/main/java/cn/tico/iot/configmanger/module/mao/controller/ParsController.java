@@ -7,6 +7,7 @@ import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.KindService;
 import cn.tico.iot.configmanger.module.iot.services.LocationService;
+import cn.tico.iot.configmanger.module.mao.common.BaseController;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.DeptService;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  */
 @IocBean
 @At("/mao/pars")
-public class ParsController implements AdminKey {
+public class ParsController extends BaseController implements AdminKey {
 	private static final Log log = Logs.get();
 
 	@Inject

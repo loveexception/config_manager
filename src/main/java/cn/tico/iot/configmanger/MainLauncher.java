@@ -8,6 +8,7 @@ import cn.tico.iot.configmanger.module.iot.graphql.GatewayBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.OtherMessageBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.SubGatewayBlock;
+import cn.tico.iot.configmanger.module.mao.common.MyActionChainMaker;
 import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
@@ -15,14 +16,12 @@ import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.ConfigService;
 import cn.tico.iot.configmanger.module.sys.services.MenuService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.nutz.boot.NbApp;
 import org.nutz.conf.NutConf;
 import org.nutz.dao.Dao;
 import org.nutz.el.opt.RunMethod;
 import org.nutz.el.opt.custom.CustomMake;
-import org.nutz.integration.quartz.QuartzManager;
 import org.nutz.ioc.Ioc;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.*;
@@ -31,6 +30,7 @@ import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.*;
+import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -40,6 +40,7 @@ import java.util.Map;
  * @author haiming
  */
 @IocBean(create = "init", depose = "depose")
+@ChainBy(type=MyActionChainMaker.class, args={})
 public class MainLauncher {
 	private static final Log log = Logs.get();
 

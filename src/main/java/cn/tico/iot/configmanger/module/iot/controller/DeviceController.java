@@ -161,6 +161,9 @@ public class DeviceController implements AdminKey {
 	private boolean isAdmin() {
 
 		User user = ShiroUtils.getSysUser();
+		if(Lang.isEmpty(user)){
+			return false;
+		}
 
 		Set roles = userService.getRoleCodeList(user);
 

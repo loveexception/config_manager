@@ -1,8 +1,9 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.tico</groupId>
-    <artifactId>configmanger</artifactId>
+    <artifactId>configmanager</artifactId>
     <version>1.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -337,6 +338,7 @@
             <version>1.r.60</version>
             <scope>test</scope>
         </dependency>
+
         <!-- 可选, 安利一下mockito,模拟mock对象很方便 -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -366,6 +368,12 @@
             <version>4.11.0.201803080745-r</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutzboot-starter-caffeine</artifactId>
+            <version>2.3.5.v20190516</version>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>
@@ -375,9 +383,8 @@
         <repository>
             <id>nutz-snapshots</id>
             <!--
-            <url>http://jfrog.nutz.cn/artifactory/snapshots</url>
+                      <url>http://jfrog.nutz.cn/artifactory/snapshots</url>
             -->
-
             <url>http://jfrog.wchin.cn/artifactory/snapshots</url>
 
             <snapshots>
@@ -407,7 +414,7 @@
         </pluginRepository>
     </pluginRepositories>
     <build>
-        <finalName>configmanger</finalName>
+        <finalName>configmanager</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

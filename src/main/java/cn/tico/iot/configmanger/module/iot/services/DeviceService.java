@@ -4,18 +4,28 @@ import cn.tico.iot.configmanger.common.base.Service;
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.iot.controller.ApiController;
 import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
+import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
+import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
+import cn.tico.iot.configmanger.module.mao.controller.MyGraphQLController;
+import cn.tico.iot.configmanger.module.sys.models.Dept;
+import com.google.common.collect.Lists;
+import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.FieldFilter;
 import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.log.Logs;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 业务标签 服务层实现
@@ -30,6 +40,8 @@ public class DeviceService extends Service<Device> {
 
     @Inject
     ApiController api;
+    @Inject
+    MyGraphQLController graphql;
 
     @Inject
     TagService tagService;
@@ -96,17 +108,28 @@ public class DeviceService extends Service<Device> {
         return this.dao().update(drivers);
     }
 
-    public void kafka(List<Device> result) {
+    public void kafka(List<Device> devices) {
         new Thread(){
             @Override
             public void run() {
-                for (int i = 0; i < result.size(); i++) {
-                    String sno =result.get(i).getSno();
+                for (int i = 0; i < devices.size(); i++) {
+                    String sno =devices.get(i).getSno();
                     api.device(sno,null);
+                    Logs.get().infof("cach kill :%s",sno);
+                    graphql.killCache(sno);
+                    Logs.get().infof("sno cacheing:%s",sno);
+                    graphql.device(sno);
+                    Logs.get().infof("cache over");
                 }
-
-                for (Device device:result) {
+                for (Device device:devices) {
+                    Logs.get().infof("kafka sno ring :%s" ,device.getSno());
                     kafkaBlock.produce(KafkaBlock.TOPIC, KafkaBlock.KEY_SNO,device.getSno());
+
+                    try {
+                        Thread.sleep(2000l);
+                    } catch (InterruptedException e) {
+
+                    }
 
                 }
             }
@@ -119,5 +142,102 @@ public class DeviceService extends Service<Device> {
         tag = tagService.fetchLinks(tag,"devices");
         final List<Device> devices = tag.devices;
         kafka(devices);
+    }
+    public void kafka(Driver driver){
+        Device device = new Device();
+        device .setDriverid(driver.getId());
+        Cnd cnd = findByDevice(device);
+        List<Device> devices =query(cnd);
+        kafka(devices);
+    }
+//    public void kafka(Gateway gateway){
+//        Device device =new Device();
+//        device.setGatewayid(gateway.getId());
+//        Cnd cnd = findByDevice(device);
+//        List<Device> devices = query(cnd);
+//        kafka(devices);
+//    }
+
+    public void kafka(Gateway from,Gateway to){
+
+        Device device =new Device();
+        device.setGatewayid(from.getId());
+        Cnd cnd = findByDevice(device);
+        List<Device> devices = query(cnd);
+
+        device =new Device();
+        device.setGatewayid(to.getId());
+        cnd = findByDevice(device);
+
+
+        devices .addAll( query(cnd) );
+
+        kafka(devices);
+    }
+    public void kafka(Dept dept){
+        Device device = new Device();
+        device.setDeptid(dept.getId());
+        Cnd cnd = findByDevice(device);
+        List<Device> devices = query(cnd);
+        kafka(devices);
+
+    }
+    public void kafka(Kind kind){
+        Device device = new Device();
+        device.setKindid(kind.getId());
+        Cnd cnd = findByDevice(device);
+        List<Device> devices = query(cnd);
+        kafka(devices);
+
+    }
+    public void kafka(Location location){
+        Device device = new Device();
+        device.setLocationid(location.getId());
+        Cnd cnd = findByDevice(device);
+        List<Device> devices = query(cnd);
+        kafka(devices);
+
+    }
+
+    public   Cnd findByDevice(Device device) {
+        if(Lang.isEmpty(device)){
+            return Cnd.NEW();
+        }
+        Cnd cnd = Cnd.NEW();
+        cnd.and("status","=","true");
+        cnd.and("delflag","=","false");
+
+        if(Strings.isNotBlank(device.getDriverid())){
+            cnd.and("driver_id","=",device.getDriverid());
+        }
+        if(Strings.isNotBlank(device.getGatewayid())){
+            cnd.and("gateway_id","=",device.getGatewayid());
+        }
+        if(Strings.isNotBlank(device.getDeptid())){
+            cnd.and("dept_id","=",device.getDeptid());
+        }
+        if(Strings.isNotBlank(device.getLocationid())){
+            cnd.and("location_id","=",device.getLocationid());
+        }
+        if(Strings.isNotBlank(device.getKindid())){
+            cnd.and("kind_id","=",device.getKindid());
+        }
+        if(Lang.isNotEmpty(device.getTags())){
+            List<Device> all = Lists.newArrayList();
+            List<String> ids = device.getTags()
+                    .stream()
+                    .reduce(all,(acc,item)->{
+                        item = dao().fetchLinks(item,"devices");
+                        acc.addAll(item.getDevices());
+                        return acc;
+                    },(acc,item)->null)
+                    .stream()
+                    .map(item -> item.getId())
+                    .collect(Collectors.toList());
+            cnd.and("id","in",ids);
+        }
+
+        return cnd;
+
     }
 }

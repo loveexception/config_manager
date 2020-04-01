@@ -1,7 +1,10 @@
 package cn.tico.iot.configmanger.module.mao.redis;
 
+import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
+import cn.tico.iot.configmanger.module.iot.services.KindService;
 import cn.tico.iot.configmanger.module.iot.services.LocationService;
+import cn.tico.iot.configmanger.module.mao.common.BaseManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.nutz.ioc.aop.Aop;
@@ -14,18 +17,20 @@ import org.nutz.lang.Strings;
 import org.nutz.lang.util.NutMap;
 import org.nutz.log.Logs;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.nutz.integration.jedis.RedisInterceptor.jedis;
 
 @IocBean(create = "init")
-public class LocationManager {
+public class KindManager extends BaseManager {
     @Inject
     PropertiesProxy conf;
     @Inject
-    LocationService locationService;
+    KindService kindService;
 
      String KEY_PATH  ;
     static final String REG_STAT = ".*(";
@@ -37,17 +42,17 @@ public class LocationManager {
     public void init(){
         Logs.get().debugf("location redis path : %s ",KEY_PATH);
 
-        KEY_PATH = conf.get("redis.pre.key.location");
+        KEY_PATH = conf.get("redis.pre.key.kind");
 
         Set<String> keys= jedis().keys(KEY_PATH+"*");
         Logs.get().debugf("keys",keys);
         keys.stream().forEach(key->jedis().del(key));
 
-        List <Location> all = locationService.findAllLocations();
-        List<Location> copy = Lists.newArrayList(all);
+        List <Kind> all = kindService.findAllKinds();
+        List<Kind> copy = Lists.newArrayList(all);
         all = all.stream()
-                .map(location -> findAncestors(location,copy))
-                .map(location -> fatherName(location))
+                .map(kind -> findAncestors(kind,copy))
+                .map(kind -> fatherName(kind))
                 .collect(Collectors.toList());
         all = children(all);
 
@@ -61,13 +66,13 @@ public class LocationManager {
      * @param all
      * @return
      */
-    public  Location findAncestors(Location me ,List<Location> all) {
-        List<Location> list = getAncestorsLocationsByMe(me,all);
-        Map<String,Location> parents = list
+    public  Kind findAncestors(Kind me ,List<Kind> all) {
+        List<Kind> list = getAncestorsLocationsByMe(me,all);
+        Map<String,Kind> parents = list
                .stream()
                .collect(Collectors.toMap(
-                       location-> location.getLevel(),
-                       location->location)
+                       kind-> kind.getLevel(),
+                       kind->kind)
                );
 
        me.setParents(parents);
@@ -79,19 +84,19 @@ public class LocationManager {
      * @param all
      * @return
      */
-    public List<Location> children(List<Location> all){
-        Map<String,Location > map =  all.stream().collect(Collectors.toMap(location->location.getId(),location->location));
-        List<Location> result =  all.stream().map(location ->{
-            String id = location.getParentId();
+    public List<Kind> children(List<Kind> all){
+        Map<String,Kind > map =  all.stream().collect(Collectors.toMap(kind->kind.getId(),kind->kind));
+        List<Kind> result =  all.stream().map(kind ->{
+            String id = kind.getParentId();
             if(Strings.isBlank(id)||Strings.equals("0",id)){
-                return location;
+                return kind;
             }
-            Location father = map.get(id);
+            Kind father = map.get(id);
             if(Lang.isEmpty(father.getChildren())){
                 father.setChildren(Lists.newArrayList());
             }
-            father.getChildren().add(location);
-        return  location;
+            father.getChildren().add(kind);
+        return  kind;
         }).collect(Collectors.toList());
         return result;
     }
@@ -102,8 +107,8 @@ public class LocationManager {
      * @param all
      * @return
      */
-    public Location zip(String id ,List<Location> all){
-        List<Location> root = children (all);
+    public Kind zip(String id ,List<Kind> all){
+        List<Kind> root = children (all);
         return root.stream()
                 .filter(location -> Strings.equals(id,location.getId()))
                 .findFirst()
@@ -117,14 +122,13 @@ public class LocationManager {
      * @return
      */
     @Aop("redis")
-    public Location get(String id){
+    public Kind get(String id){
         String json = jedis().get(KEY_PATH+id);
         if(Strings.isBlank(json)){
-
             return null;
         }
 
-        return Json.fromJson(Location.class,json);
+        return Json.fromJson(Kind.class,json);
     }
 
     /**
@@ -140,13 +144,13 @@ public class LocationManager {
         return set.stream().map(key-> Strings.replaceBy(key, NutMap.NEW().addv(KEY_PATH,""))).collect(Collectors.toSet());
     }
 
-    public Location byName(String longSplitName,List<Location> all){
+    public Kind byName(String longSplitName,List<Kind> all){
         String[] array =Strings.splitIgnoreBlank(longSplitName,SPLIT);
         List<String> names = Lang.array2list(array);
         String last = Lists.newLinkedList(names).getLast();
 
 
-          List<Location> ones = all.stream()
+          List<Kind> ones = all.stream()
                   .filter(one-> isMatchByKey(last, one.getCnName()))
                   .filter(one ->{
 
@@ -177,7 +181,7 @@ public class LocationManager {
      * 所有的地理位制
      * @return
      */
-    public List<Location> all() {
+    public List<Kind> all() {
         Set<String> keys = keys();
         return keys.stream().map(key-> get(key)).collect(Collectors.toList());
     }
@@ -186,43 +190,44 @@ public class LocationManager {
      * 靠父目录数据补完
      * fatherName
      * 字段
-     * @param location
+     * @param kind
      */
-    public Location fatherName(Location location) {
-        Map<String,Object> map = location.getParents();
+    public Kind fatherName(Kind kind) {
+
+        Map<String,Object> map = kind.getParents();
         if(Lang.isEmpty(map)){
-            return location;
+            return kind;
         }
+
         List<String> list  = map.values()
                         .stream()
                         .map(value->Lang.obj2nutmap(value).getString("cnName"))
                         .collect(Collectors.toList());
         String fatherName = Strings.join(SPLIT,list);
-        location.setParentName(fatherName);
-        return location;
+
+        kind.setParentName(fatherName);
+
+        return kind;
     }
 
 
     /**
      * 跟据 LOCATION 得到所有的 Location 父数据
-     * @param locationId
+     * @param kindId
      * @return
      */
-    public List<Location> allFamilyWithMe(String locationId) {
-        Location me = get(locationId);
-        if(Lang.isEmpty(me)){
-            return Lists.newArrayList();
-        }
-        List<Location> result = getAncestorsLocationsByMe(me,all());
+    public List<Kind> allFamilyWithMe(String kindId) {
+        Kind me = get(kindId);
+        List<Kind> result = getAncestorsLocationsByMe(me,all());
         result.add(me);
         return result ;
     }
 
-    public List<Location> getAncestorsLocationsByMe(Location me,List<Location> all) {
+    public List<Kind> getAncestorsLocationsByMe(Kind me,List<Kind> all) {
         return all
                     .stream()
-                    .filter(location ->isMatchByKey(
-                            location.getId()
+                    .filter(kind ->isMatchByKey(
+                            kind.getId()
                             ,me.getAncestors()))
 
                     .collect(Collectors.toList());

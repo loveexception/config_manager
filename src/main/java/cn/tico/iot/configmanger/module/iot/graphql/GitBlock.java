@@ -216,7 +216,7 @@ public class GitBlock {
                     File file = Files.createFileIfNoExists2(p);
                     dri.put("filename",file.getName());
                 }catch (Exception e){
-                    Logs.get().debugf("path:%s, is unchecked ",dri.getString("path"));
+                    Logs.get().errorf("path:%s, is unchecked %s ",dri.getString("path"),e);
                 }
 
             }
@@ -280,14 +280,19 @@ public class GitBlock {
         }
 
         for(Driver src : drivers){
-            File target_file = Files.createFileIfNoExists(target+"/"+Files.getName(src.getPath()));
+            try{
+                File target_file = Files.createFileIfNoExists(target+"/"+Files.getName(src.getPath()));
 
-            File src_file = Files.createFileIfNoExists(src.getPath());
+                File src_file = Files.createFileIfNoExists(src.getPath());
 
-            Logs.getLog(this.getClass()).infof("start:copy driver py from %s to %s",src_file ,target_file);
+                Logs.getLog(this.getClass()).infof("start:copy driver py from %s to %s",src_file ,target_file);
 
-            ok = Files.copyFileWithoutException( src_file, target_file,-1l);
-            Logs.getLog(this.getClass()).infof("end:copy driver py  is %s",ok);
+                ok = Files.copyFileWithoutException( src_file, target_file,-1l);
+                Logs.getLog(this.getClass()).infof("end:copy driver py  is %s",ok);
+            }catch (Exception ex){
+                Logs.get().error(ex);
+            }
+
 
         }
 

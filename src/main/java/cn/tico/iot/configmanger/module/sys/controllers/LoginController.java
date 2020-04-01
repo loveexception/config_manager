@@ -76,6 +76,7 @@ public class LoginController {
             map.addv("location_id",user.getLocationId());
             map.addv("login_name",user.getLoginName());
             map.addv("cn_name",user.getUserName());
+            map.addv("session_id",session.getId());
 
             return Result.success("login.success",map );
         } catch (LockedAccountException e) {

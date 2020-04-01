@@ -4,7 +4,8 @@ import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.models.base.Tag;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.driver.Normal;
-//import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
+//
+import cn.tico.iot.configmanger.module.iot.services.MysqlTestDao;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +26,7 @@ public class CreateTableTest {
     public void setUp() throws Exception {
 
 
-//        dao = MysqlTestDao.NEW2();
+        dao = MysqlTestDao.NEW2();
        // Daos.createTablesInPackage(dao0, "cn.tico.iot.configmanger.module.iot.models", true);
 
         //Daos.migration(dao, "cn.tico.iot.configmanger.module.iot.models", true, false, false);
@@ -96,8 +97,20 @@ public class CreateTableTest {
     @Test
     public void allTable(){
 
-        //Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",true );
-        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.mao.models",true );
+//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",false );
+//        Daos.migration(dao,"cn.tico.iot.configmanger.module.wx.models",true ,false);
+//
+//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.iot.models",false );
+//        Daos.migration(dao,"cn.tico.iot.configmanger.module.iot.models",true ,false);
+//
+//
+//        Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.mao.models",false );
+//        Daos.migration(dao,"cn.tico.iot.configmanger.module.mao.models",true ,false);
+
+
+//        Daos.migration(dao,"cn.tico.iot.configmanger.*.models",true ,false);
+
+
         //Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger.module.wx.models",true );
        // Daos.createTablesInPackage(dao,"cn.tico.iot.configmanger",true );
 

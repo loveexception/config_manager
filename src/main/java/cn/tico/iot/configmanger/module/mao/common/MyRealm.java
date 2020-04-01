@@ -1,4 +1,4 @@
-package cn.tico.iot.configmanger.realui.bean;
+package cn.tico.iot.configmanger.module.mao.common;
 
 import cn.tico.iot.configmanger.module.sys.models.Role;
 import cn.tico.iot.configmanger.module.sys.models.User;
@@ -18,13 +18,17 @@ import org.nutz.dao.Dao;
 
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.cache.CacheManager;
+import org.nutz.integration.jedis.JedisAgent;
 import org.nutz.integration.shiro.SimpleShiroToken;
+import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.mvc.Mvcs;
 
 import java.util.Set;
+
+import static org.nutz.integration.jedis.RedisInterceptor.jedis;
 
 
 public class MyRealm extends AuthorizingRealm {
@@ -34,6 +38,8 @@ public class MyRealm extends AuthorizingRealm {
     private UserService userService = Mvcs.ctx()
             .getDefaultIoc()
             .get(UserService.class);
+    @Inject
+    private JedisAgent agent = Mvcs.ctx().getDefaultIoc().get(JedisAgent.class);
 
     public MyRealm() {
         this(null, null);
@@ -101,12 +107,17 @@ public class MyRealm extends AuthorizingRealm {
         if (user.isStatus()) {
             throw Lang.makeThrow(LockedAccountException.class, "Account [ %s ] is locked.", upToken.getUsername());
         }
+
+
+        
         SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user,
                 user.getPassword().toCharArray(), ByteSource.Util.bytes(user.getSalt()), getName());
         info.setCredentialsSalt(ByteSource.Util.bytes(user.getSalt()));
-//        info.
+
         return info;
     }
+
+
 
 
 }
