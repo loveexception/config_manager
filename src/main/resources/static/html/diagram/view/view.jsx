@@ -8,7 +8,6 @@ for (let i = 0.1; i < 2.1; i += 0.1) {
 const href = 'http://172.16.16.9/api/webManage/';
 // console.log(, 'dd')
 let urlData = {};
-console.log(ReactDraggable, 'ReactDraggable')
 window.location.search.slice(1).split('&').map((e) => {
 	return e.split('=')
 }).forEach((e, i, arr) => {
@@ -53,7 +52,7 @@ function Topo(props) {
 	let DiagramAction = window.DiagramAction;
 	// let { id = '', name = '' } = props.location.query;
 	// zoomInBtn.current.onClick
-	function handleImgPx(width, height) {
+	function handleImgPx(width = false, height = false) {
 		let selfImg = refImg.current;
 		selfImg.style.width = width == false ? "auto" : width;
 		selfImg.style.height = height == false ? "auto" : height
