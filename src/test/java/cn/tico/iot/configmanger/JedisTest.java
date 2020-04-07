@@ -10,7 +10,10 @@ import org.nutz.integration.jedis.JedisAgent;
 import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.log.Logs;
 import redis.clients.jedis.Jedis;
+
+import java.util.Set;
 
 import static org.nutz.integration.jedis.RedisInterceptor.jedis;
 

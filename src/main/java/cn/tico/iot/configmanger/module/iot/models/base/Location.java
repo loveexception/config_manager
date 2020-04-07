@@ -18,7 +18,7 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode
-@ToString(includeFieldNames = true,callSuper = true,doNotUseGetters = false,exclude = "id")
+//@ToString(includeFieldNames = true,callSuper = true,doNotUseGetters = false,exclude = "id")
 @Sortable(includes = "level")
 @Table("t_iot_locations")
 public class Location extends FatherModel implements Serializable {

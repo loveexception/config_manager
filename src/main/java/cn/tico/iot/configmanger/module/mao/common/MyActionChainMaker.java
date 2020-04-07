@@ -22,8 +22,8 @@ public class MyActionChainMaker implements ActionChainMaker {
         list.add(new ModuleProcessor()); // 获取入口类的对象,从ioc或直接new
 
         //自定义规则链
-        list.add(new MyCorssProcessor());
-        list.add(new MyTokenProcessor());
+        //list.add(new MyCorssProcessor());
+        //list.add(new MyTokenProcessor());
         //list.add(config.getIoc().get(MyTokenProcessor.class));
         //
         list.add(new ActionFiltersProcessor()); // 处理@Filters

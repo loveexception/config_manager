@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nutz.boot.NbApp;
 import org.nutz.boot.test.junit4.NbJUnit4Runner;
+import org.nutz.ioc.Ioc;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.Json;
@@ -38,6 +39,10 @@ public class LocationManagerTest extends Assert {
 
     @Inject
     private Jedis jedis;
+
+
+    @Inject("refer:$ioc")
+    private Ioc ioc;
 
 
     public static NbApp createNbApp() {
@@ -133,6 +138,12 @@ public class LocationManagerTest extends Assert {
 
         //locationManager.get("");
     }
+    @Test
+    public void testInit(){
+        LocationManager locationManager = ioc.get(LocationManager.class);
+        locationManager.init();
+    }
+
     @Test
     public void byName(){
 

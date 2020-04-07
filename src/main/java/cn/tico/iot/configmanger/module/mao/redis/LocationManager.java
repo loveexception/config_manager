@@ -4,6 +4,7 @@ import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.nutz.integration.jedis.RedisService;
 import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -27,21 +28,26 @@ public class LocationManager {
     @Inject
     LocationService locationService;
 
+    @Inject
+    RedisService redisService ;
+
      String KEY_PATH  ;
     static final String REG_STAT = ".*(";
     static final String REG_END = ").*";
     static final String SPLIT =":";
 
 
-    @Aop("redis")
+    //@Aop("redis")
     public void init(){
         Logs.get().debugf("location redis path : %s ",KEY_PATH);
 
         KEY_PATH = conf.get("redis.pre.key.location");
+        String redispath = conf.get("redis.host");
+        Logs.get().debug(redispath);
 
-        Set<String> keys= jedis().keys(KEY_PATH+"*");
-        Logs.get().debugf("keys",keys);
-        keys.stream().forEach(key->jedis().del(key));
+        Set<String> keys= redisService.keys(KEY_PATH+"*");
+        Logs.get().debugf("keys%s",keys.size());
+        keys.stream().forEach(key->redisService.del(key));
 
         List <Location> all = locationService.findAllLocations();
         List<Location> copy = Lists.newArrayList(all);
@@ -49,9 +55,14 @@ public class LocationManager {
                 .map(location -> findAncestors(location,copy))
                 .map(location -> fatherName(location))
                 .collect(Collectors.toList());
-        all = children(all);
 
-        all.forEach(location -> jedis().set(KEY_PATH+location.getId(),Json.toJson(location)));
+        all = children(all);
+        Logs.get().debug(all);
+//        all.forEach(location ->
+//            redisService.set(
+//                    KEY_PATH+location.getId()
+//                    ,Json.toJson(location))
+//        );
 
     }
 
@@ -80,7 +91,12 @@ public class LocationManager {
      * @return
      */
     public List<Location> children(List<Location> all){
-        Map<String,Location > map =  all.stream().collect(Collectors.toMap(location->location.getId(),location->location));
+        Map<String,Location > map =  all.stream().collect(Collectors.toMap(
+                location->location.getId()
+                ,location->location)
+        );
+
+
         List<Location> result =  all.stream().map(location ->{
             String id = location.getParentId();
             if(Strings.isBlank(id)||Strings.equals("0",id)){
@@ -116,9 +132,9 @@ public class LocationManager {
      * @param id
      * @return
      */
-    @Aop("redis")
+    //@Aop("redis")
     public Location get(String id){
-        String json = jedis().get(KEY_PATH+id);
+        String json = redisService.get(KEY_PATH+id);
         if(Strings.isBlank(json)){
 
             return null;
@@ -131,9 +147,9 @@ public class LocationManager {
      * 查寻所有已知的KEY
      * @return
      */
-    @Aop("redis")
+   // @Aop("redis")
     public Set<String> keys(){
-        Set<String> set =  jedis().keys(KEY_PATH+"*");
+        Set<String> set =  redisService.keys(KEY_PATH+"*");
         if(Lang.isEmpty(set)){
             return Sets.newHashSet();
         }

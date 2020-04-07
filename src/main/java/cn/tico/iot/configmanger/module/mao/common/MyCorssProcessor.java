@@ -48,7 +48,6 @@ public class MyCorssProcessor extends AbstractProcessor {
                 ac.getResponse().setHeader("Access-Control-Allow-Methods","GET, POST, PUT,DELETE,OPTIONS");
                 ac.getRequest().setAttribute("","");
             }
-            ShiroEnvStarter s;
             doNext(ac);
 
         } finally {
