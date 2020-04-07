@@ -5,8 +5,24 @@
 // import './index.less';
 let { PureComponent, useState } = React;
 let DiagramAction = window.DiagramAction;
-let { Popconfirm, Upload, Form, message, Icon, Input, InputNumber, Button, Table } = antd;
+let { Popconfirm, Upload, Form, message, Icon, Input, InputNumber, Button, Table, Tooltip, Modal } = antd;
+let { confirm } = Modal;
 let Message = message;
+// modal 显示
+function showConfirm(_ok) {
+	confirm({
+		title: '你确定要删除这几张图片吗',
+		// content: 'Some descriptions',
+		onOk() {
+			// console.log('OK');
+			// _ok()
+			_ok()
+			// flag = true
+		},
+		onCancel() {
+		},
+	});
+}
 // let PubSub  = pubsub-js
 // import {  } from '@/utils/customFunction.jsx';
 
@@ -53,6 +69,7 @@ let deleteFn = (arr = undefined, ListFn) => {
 	if (!arr) {
 		return;
 	}
+
 	let reqArr = [];
 	Array.isArray(arr) &&
 		arr.forEach(e => {
@@ -61,8 +78,10 @@ let deleteFn = (arr = undefined, ListFn) => {
 	DiagramAction.diagramMRmImg({ ids: reqArr }, res => {
 		if (res.success) {
 			Message.success('操作成功', 0.5);
+			setTimeout(function () {
 
-			typeof ListFn === 'function' && ListFn();
+				ListFn && ListFn()
+			}, 0)
 		}
 	});
 };
@@ -78,6 +97,10 @@ let uploadFn = (arr = undefined, ListFn) => {
 	if (!arr) {
 		return;
 	}
+	if (arr.length === 0) {
+		message.info('请选择下载文件.', .5)
+	}
+
 	let reqArr = [];
 	Array.isArray(arr) &&
 		arr.forEach(e => {
@@ -182,8 +205,9 @@ class EditableTable extends React.Component {
 		this.state = {
 			data,
 			editingKey: '',
-			//check Arr X当前选中的 行
 			checkArr: [],
+			sortFlagName: true,
+			currentPage: 1
 		};
 		//ref
 		this.rename = React.createRef();
@@ -194,7 +218,16 @@ class EditableTable extends React.Component {
 				dataIndex: 'name',
 				width: '25%',
 				editable: true,
-				align,
+				// sorter: (current, next, asd) => {
+				// 	let { currentPage } = this.state;
+				// 	if (asd === 'ascend') {
+				// 		this.props.reqListFn(currentPage, 'name asc')
+				// 	} else {
+				// 		this.props.reqListFn(currentPage, 'name desc')
+				// 	}
+				// 	// console.log(arguments)
+				// },
+				sorter: true,
 				render: (text, record) => {
 					return (
 						<span
@@ -214,16 +247,55 @@ class EditableTable extends React.Component {
 				title: '大小',
 				dataIndex: 'file_size',
 				width: '15%',
-				align,
+				// sorter: (current, next, asd, xxx) => {
+
+				// 	// console.log(current, next, asd, xxx, 'current')
+				// 	// return
+				// 	let { currentPage } = this.state;
+				// 	if (asd === 'ascend') {
+				// 		this.props.reqListFn(currentPage, 'file_size asc')
+				// 	} else {
+				// 		this.props.reqListFn(currentPage, 'file_size desc')
+				// 	}
+				// 	// console.log(arguments)
+				// },
+				sorter: true,
+
+				render(text) {
+					if (!text) {
+						return
+					}
+					let strNumber = (text / 1024 / 1024).toFixed(2);
+					// console.log((text / 1024 / 1024).toFixed(2), '(text / 1024 / 1024).toFixed(2)')
+					if (strNumber == 0) {
+						strNumber = strNumber.slice(0, strNumber.length - 1) + '1'
+					}
+					return strNumber + 'MB'
+				}
 				// editable: true,
 			},
 			{
 				title: '修改时间',
 				dataIndex: 'mod_time',
 				width: '40%',
+				// align: 'center',
 				// align,
-				render(record) {
-					return dateUtil(new Date(record));
+				// sorter: (current, next, asd) => {
+				// 	let { currentPage } = this.state;
+				// 	if (asd === 'ascend') {
+				// 		this.props.reqListFn(currentPage, 'mod_time asc')
+				// 	} else {
+				// 		this.props.reqListFn(currentPage, 'mod_time desc')
+				// 	}
+				// 	// console.log(arguments)
+				// },
+				sorter: true,
+				render(text) {
+					if (!text) {
+						return
+					}
+					return moment(text).format('YYYY-MM-DD HH:mm:ss')
+					// return dateUtil(new Date(record));
 				},
 
 				// editable: true,
@@ -231,7 +303,7 @@ class EditableTable extends React.Component {
 			{
 				title: '操作',
 				dataIndex: 'operation',
-				align: 'center',
+				// align: 'center',
 				render: (text, record) => {
 					const { editingKey } = this.state;
 					// const editable = this.isEditing(record);
@@ -240,17 +312,22 @@ class EditableTable extends React.Component {
 						<ul>
 							<li>
 								<div className="svg-content" disabled={editingKey !== ''}>
-									<Icon type="eye" onClick={() => {
-										$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`)
-										// $.modal.open(record.name + '查看', `/html / diagram / view / view.html ? id = ${ record.id } & name= ${ record.name } `)
-										// router.push(`view ? id = ${ record.id }& name=${record.name}`);
-									}} />
+									<Tooltip placement="top" title={'查看图片'}>
+										<Icon type="eye" onClick={() => {
+											$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`)
+											// $.modal.open(record.name + '查看', `/html / diagram / view / view.html ? id = ${ record.id } & name= ${ record.name } `)
+											// router.push(`view ? id = ${ record.id }& name=${record.name}`);
+										}} />
+									</Tooltip>
 								</div>
 							</li>
 							<li>
-								<Icon type="cloud-download" onClick={() => {
-									uploadFn([record]);
-								}} />
+								<Tooltip placement="top" title={'下载图片'}>
+									<Icon type="cloud-download" onClick={() => {
+										uploadFn([record]);
+									}} />
+								</Tooltip>
+
 								<div
 									className="svg-content"
 
@@ -259,14 +336,17 @@ class EditableTable extends React.Component {
 								</div>
 							</li>
 							<li>
-								<div
-									className="svg-content"
-									onClick={() => {
-										deleteFn([record], this.props.reqListFn);
-									}}
-								>
-									<Icon type="delete" />
-								</div>
+								<Popconfirm placement="top" title={'确定要删除图片吗?'} onConfirm={() => {
+									deleteFn([record], this.props.reqListFn);
+								}} okText="删除" cancelText="取消">
+									<div
+										className="svg-content"
+									>
+										<Tooltip placement="top" title={'删除图片'}>
+											<Icon type="delete" />
+										</Tooltip>
+									</div>
+								</Popconfirm>
 							</li>
 							{/* <li>
 								<div className="svg-content">
@@ -286,8 +366,16 @@ class EditableTable extends React.Component {
 			},
 		];
 		// change 分页 pagination
-		this.paginationChange = targetCurrent => {
-			this.props.reqListFn && this.props.reqListFn(targetCurrent);
+		this.paginationChange = (targetCurrent, ) => {
+			let { currentPage } = this.state;
+			if (currentPage == targetCurrent) {
+				return
+			}
+			this.setState({
+				currentPage: targetCurrent
+			}, () => {
+				this.props.reqListFn && this.props.reqListFn(targetCurrent);
+			})
 		};
 	}
 
@@ -323,7 +411,7 @@ class EditableTable extends React.Component {
 				name = row.name;
 			});
 		}
-
+		// console.log(form, key, xxx, 'ss')
 		DiagramAction.diagramRename(
 			{
 				id: key,
@@ -332,7 +420,7 @@ class EditableTable extends React.Component {
 			res => {
 				if (res.success) {
 					Message.success('修改成功', 0.5);
-					this.props.reqListFn && this.props.reqListFn();
+					this.props.reqListFn && this.props.reqListFn(this.state.currentPage);
 				} else {
 					Message.error(res.data, 0.5);
 				}
@@ -391,6 +479,7 @@ class EditableTable extends React.Component {
 		return (
 			<EditableContext.Provider value={this.props.form}>
 				<Table
+					loading={this.props.loading}
 					components={components}
 					bordered
 					dataSource={this.props ? this.props.data : []}
@@ -406,7 +495,10 @@ class EditableTable extends React.Component {
 					}}
 					rowKey={record => record.id}
 					rowSelection={this.rowSelection}
-					onChange={(selectedRowKeys, selectedRows) => {
+					onChange={(selectedRowKeys, selectedRows, orderByClause) => {
+						let { columnKey, order } = orderByClause;
+						// console.log(this.props, 'ss'),
+						this.props.reqListFn(this.state.currentPage, order ? `${columnKey} ${order.slice(0, -3)}` : '')
 						this.setState({
 							checkArr: selectedRows,
 						});
@@ -467,11 +559,14 @@ function ButtonList(props) {
 							_EditableTable.props.reqListFn && _EditableTable.props.reqListFn();
 						}
 					}}
-					action="http://172.16.16.9/api/webManage/topology/upload"
+					headers={{
+						dept_id: localStorage.getItem('deptId')
+					}}
+					action="http://172.16.16.9/api/backgroundinterface/topology/upload"
 					method="post"
 					enctype="multipart/form-data"
 				>
-					<Button type="primary" onClick={uploadingFn} style={{ marginRight: '0.4rem' }}>
+					<Button type="primary" style={{ marginRight: '0.4rem' }}>
 						<Icon type="cloud-upload" />
 						上传
 					</Button>
@@ -479,17 +574,7 @@ function ButtonList(props) {
 				<ButtonGroup>
 					<Button
 						onClick={() => {
-							// debugger;
-							// let reqArr = [];
-							// Array.isArray(_EditableTable.state.checkArr) &&
-							// 	_EditableTable.state.checkArr.forEach(e => {
-							// 		reqArr.push(e.file_name);
-							// 	});
-							// DiagramAction.diagramMDownImg({ names: reqArr }, res => {
-							// 	console.log(res, 'res');
-							// });
 							uploadFn(_EditableTable.state.checkArr);
-							// console.log(_EditableTable, ' 下载');
 						}}
 					>
 						<Icon type="cloud-download" />
@@ -497,7 +582,13 @@ function ButtonList(props) {
 					</Button>
 					<Button
 						onClick={() => {
-							deleteFn(_EditableTable.state.checkArr, _EditableTable.props.reqListFn);
+							if (_EditableTable.state.checkArr.length === 0) {
+								message.info('请选择要删除的图片.', .5)
+								return
+							}
+							showConfirm(
+								function () { deleteFn(_EditableTable.state.checkArr, _EditableTable.props.reqListFn) }
+							)
 						}}
 					>
 						<Icon type="delete" />
@@ -517,7 +608,8 @@ function ButtonList(props) {
 			<Search
 				placeholder="按名称搜索"
 				onSearch={value => {
-					_EditableTable.props.reqListFn && _EditableTable.props.reqListFn(1, value, _EditableTable);
+
+					_EditableTable.props.searchFn && _EditableTable.props.searchFn(value);
 					// console.log(value);
 				}}
 				style={{ float: 'right', width: 200 }}
@@ -529,61 +621,114 @@ function ButtonList(props) {
 // 总函数
 function Topo() {
 	let [data, setData] = useState([]);
+	let [loading, setLoading] = useState(true)
 	let [_pagination, set_pagination] = useState({
-		// pageSize: 4,
 		current: 1,
+		pageSize
 	});
 	// setTimeout(() => {
 	// 	setData(dataSource);
 	// }, 2000);
-	function reqListFn(page_num = 1, searchValue) {
+	// 请求函数1
+	function filterFn(data = []) {
+		// for (let i = 0; i < pageSize + 1 - data.length; i++) {
+		// 	data.push({})
+		// }
+		return data
+	}
+	function searchFn(searchValue, orderByClause, page_num = 1) {
 		let sValue = searchValue && searchValue.trim();
-		if (sValue) {
-			DiagramAction.diagramList(
-				{
-					page_num,
-					page_size: pageSize,
-					name: searchValue.trim(),
-				},
-				function (res) {
-					if (res.success) {
-						let data = res.data;
-						let arr = data.result;
-						Array.isArray(arr) &&
-							arr.forEach(e => {
-								e.key = e.id;
-								e.file_size = (e.file_size / 1024 / 1024).toFixed(1) + 'MB';
-							});
-						// console.log(res.data.result);
-						setData(data.result);
-						set_pagination({
-							current: data.current_page,
-							total: data.total,
-							next: data.has_next,
-							totalPageCount: res.total_page_count,
+		DiagramAction.diagramList(
+			{
+				// orderByClause: orderByClause ? orderByClause : 'time asc',
+				orderByClause: orderByClause ? orderByClause : 'mod_time desc',
+				page_num,
+				page_size: pageSize,
+				name: sValue || searchValue,
+			},
+			function (res) {
+				if (res.success) {
+					let data = res.data;
+					let arr = data.result;
+					Array.isArray(arr) &&
+						arr.forEach(e => {
+							e.key = e.id;
 						});
-					} else {
-						Message.error('接口报错', 0.5);
-					}
+					// console.log(res.data.result);
+					setData(filterFn(data.result));
+					set_pagination({
+						current: data.current_page,
+						total: data.total,
+						next: data.has_next,
+						totalPageCount: res.total_page_count,
+					});
+				} else {
+					Message.error('接口报错', 0.5);
 				}
-			);
+			}
+		);
+	}
+	function reqListFn(page_num = 1, orderByClause) {
+		setLoading(true)
+
+		if (false) {
+
 		} else {
-			DiagramAction.diagramList(
-				{
-					page_num,
+			if (typeof page_num === 'number') {
+				DiagramAction.diagramList(
+					{
+						// orderByClause: orderByClause ? orderByClause : 'time asc',
+						orderByClause: orderByClause ? orderByClause : 'mod_time desc',
+						page_num,
+						page_size: pageSize,
+						_pagination
+					},
+					function (res) {
+						if (res.success) {
+							let data = res.data;
+							let arr = data.result;
+							Array.isArray(arr) &&
+								arr.forEach(e => {
+									e.key = e.id;
+								});
+							// console.log(res.data.result);
+							setData(filterFn(data.result));
+
+							// setData(data.result);
+							set_pagination({
+								current: data.current_page,
+								total: data.total,
+								next: data.has_next,
+								totalPageCount: res.total_page_count,
+							});
+						} else {
+							Message.error('接口报错', 0.5);
+						}
+					}
+				);
+			} else if (typeof page_num === 'object') {
+				let pagenum = _pagination.current * pageSize
+				let params = {
+					// orderByClause: orderByClause ? orderByClause : 'time asc',
+					orderByClause: orderByClause ? orderByClause : 'mod_time desc',
+					page_num: pagenum,
 					page_size: pageSize,
-				},
-				function (res) {
+					orderByClause: page_num.sortMes
+				}
+
+				// if (page_num.asc) {
+
+				// }
+				DiagramAction.diagramListSort(params, function (res) {
 					if (res.success) {
 						let data = res.data;
 						let arr = data.result;
 						Array.isArray(arr) &&
 							arr.forEach(e => {
 								e.key = e.id;
-								e.file_size = (e.file_size / 1024 / 1024).toFixed(1) + 'MB';
 							});
-						// console.log(res.data.result);
-						setData(data.result);
+						setData(filterFn(data.result));
+						// setData(data.result);
 						set_pagination({
 							current: data.current_page,
 							total: data.total,
@@ -593,18 +738,20 @@ function Topo() {
 					} else {
 						Message.error('接口报错', 0.5);
 					}
-				}
-			);
+				})
+			}
 		}
 		// console.log(EditableFormTable)
+		setLoading(false)
 	}
 	React.useEffect(function () {
+		// debugger
 		reqListFn();
 	}, []);
 	return (
 		<div className="diagram-list-box">
 			<ButtonList />
-			<EditableFormTable data={data} _pagination={_pagination} reqListFn={reqListFn} />
+			<EditableFormTable data={data} loading={loading} searchFn={searchFn} _pagination={_pagination} reqListFn={reqListFn} />
 			{/* <Table rowSelection={rowSelection} bordered={true} dataSource={data} columns={columns} /> */}
 		</div>
 	);

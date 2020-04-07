@@ -58,6 +58,7 @@ class FooterEditableFormTable extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.handleClick = (e, text, mes, index) => {
+			props.isUpgradeFn(true)
 			props.handleEdit && props.handleEdit(mes, index, e);
 			// props.listReq()
 		};
@@ -537,12 +538,17 @@ function EditableFormTable(props) {
 				<div className="table-title-text">{textFormat}编辑升级策略</div>
 				<MIcon
 					onClick={
-						() => {
-							setIsDisplay(!isDisplay)
+						isUpgradeFn &&
+						function () {
+							isUpgradeFn(false);
 						}
 					}
 					style={{ fontSize: '0.2rem' }}
-					type={isUpgrade ? 'down-circle' : 'up-circle'}
+					// type={isUpgrade ? 'down-circle' : 'up-circle'}
+
+					// 更改
+					type={"close-circle"}
+
 					theme="twoTone"
 				/>
 			</div>
@@ -566,14 +572,13 @@ function EditableFormTable(props) {
 	return (
 		<div className="middle-table">
 			<div className="middle-table-box">
-				<Table style={isDisplay ? {
-					display: 'none'
-				} : {}} pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
+				<Table style={{ display: props.isUpgrade === false ? 'none' : 'block' }} pagination={false} columns={columns} dataSource={data} bordered title={headerFn} footer={footerFn} pagination={false} />
 			</div>
 
 			{
-				<div style={{ display: props.isUpgrade === false ? 'none' : 'block' }} className="footer-table-box">
+				<div className="footer-table-box">
 					<FooterEditableFormTable
+						{...props}
 						className="footer-table"
 						setIsAdd={function (s) {
 							setIsAdd(s);
@@ -616,8 +621,8 @@ class Toll extends React.Component {
 		}
 	};
 	handleClick = () => { };
-	isUpgradeFn = () => {
-		this.setState({ isUpgrade: !this.state.isUpgrade });
+	isUpgradeFn = (boolean) => {
+		this.setState({ isUpgrade: boolean });
 	};
 	render() {
 		let { isUpgrade } = this.state;

@@ -1,4 +1,4 @@
-let { Message, Icon } = antd;
+let { Message, Icon, Spin } = antd;
 let { Scrollbars } = ReactCustomScrollbars;
 // React
 const scaleArr = [];
@@ -8,6 +8,7 @@ for (let i = 0.1; i < 2.1; i += 0.1) {
 const href = 'http://172.16.16.9/api/webManage/';
 // console.log(, 'dd')
 let urlData = {};
+console.log(ReactDraggable, 'ReactDraggable')
 window.location.search.slice(1).split('&').map((e) => {
 	return e.split('=')
 }).forEach((e, i, arr) => {
@@ -45,6 +46,7 @@ function Topo(props) {
 	let [imgSrc, setImgSrc] = React.useState('');
 	let [selecetValue, setSelectValue] = React.useState('1.0');
 	let [imgReset, setImgReset] = React.useState(0)
+	let [imgLoading, setImgLoading] = React.useState(true);
 	let content = React.useRef({})
 	let optionArr = ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%', '110%', '120%', '130%', '140%', '150%', '160%', '170%', '180%', '190%', '200%'];
 	// let scaleArr = [];
@@ -180,6 +182,7 @@ function Topo(props) {
 					// let w = `${(refImg.current.width / 100).toFixed(2)}rem`;
 					if (refImg.current) {
 						refImg.current.onload = function () {
+							setImgLoading(false)
 							let iO = {
 								width: refImg.current.width,
 								height: refImg.current.height,
@@ -206,61 +209,73 @@ function Topo(props) {
 		<div className="diagram-view-box" style={{
 		}}>
 			{/* <div style={{ float: 'left' }}> */}
-
-			<div className="diagram-view-container" ref={contentImg}
-				style={{
-					height: "5rem",
-					width: "100%",
-				}}
-			>
-				<Scrollbars
-					style={
-						{
-							// width:1
-							height: '5rem',
-						}
-					}
-					renderThumbVertical={() => {
-						const thumbStyle = {
-							width: '8px',
-							backgroundColor: '#8f8f8f',
-							// opacity: '0.2',
-							borderRadius: '6px',
-							right: '4px',
-						}
-						return <div style={{
-							...thumbStyle
-						}}>
-
-						</div>
+			<Spin spinning={imgLoading} indicator={<Icon type="loading" style={{ fontSize: 48 }} spin />} >
+				<div className="diagram-view-container" ref={contentImg}
+					style={{
+						height: "5rem",
+						width: "100%",
 					}}
-					autoHide={true}
 				>
-					<img
-						draggable="false"
-						ref={refImg}
-						style={{
-							marginTop: imgReset,
-							width: imgWidth,
-							// height: "100%",
-							// width: "100%"
-							// position: 'absolute',
-							// left: 0,
-							// right: 0,
-							// top: 0,
-							// bottom: 0,
-							// margin: 'auto'
-							// transform: 'translateX(-50%)',
-							// transform: translateX(-50 %);
-							// marginLeft: "50%"
-							// zIndex: -1,
+					<Scrollbars
+						style={
+							{
+								// width:1
+								height: '5rem',
+							}
+						}
+						renderThumbVertical={() => {
+							const thumbStyle = {
+								width: '8px',
+								backgroundColor: '#8f8f8f',
+								// opacity: '0.2',
+								borderRadius: '6px',
+								right: '4px',
+							}
+							return <div style={{
+								...thumbStyle
+							}}>
+
+							</div>
 						}}
-						src={imgSrc}
-						alt=""
-						onMouseOver={e => { }}
-					/>
-				</Scrollbars>
-			</div>
+						autoHide={true}
+					>
+						<ReactDraggable
+							axis="both"
+							handle=".handle"
+							defaultPosition={{ x: 0, y: 0 }}
+							position={null}
+							grid={[10, 10]}
+							scale={1}>
+							<div>
+								<img
+									className="handle"
+									draggable="false"
+									ref={refImg}
+									style={{
+										marginTop: imgReset,
+										width: imgWidth,
+										// height: "100%",
+										// width: "100%"
+										// position: 'absolute',
+										// left: 0,
+										// right: 0,
+										// top: 0,
+										// bottom: 0,
+										// margin: 'auto'
+										// transform: 'translateX(-50%)',
+										// transform: translateX(-50 %);
+										// marginLeft: "50%"
+										// zIndex: -1,
+									}}
+									src={imgSrc}
+									alt=""
+									onMouseOver={e => { }}
+								/>
+							</div>
+						</ReactDraggable>
+					</Scrollbars>
+				</div>
+			</Spin>
 
 			{/* </div> */}
 			<div className="view-btn-container"
