@@ -366,9 +366,9 @@ class EditableTable extends React.Component {
 			},
 		];
 		// change 分页 pagination
-		this.paginationChange = (targetCurrent, ) => {
+		this.paginationChange = (targetCurrent, x) => {
 			let { currentPage } = this.state;
-			if (currentPage == targetCurrent) {
+			if (x === undefined) {
 				return
 			}
 			this.setState({
