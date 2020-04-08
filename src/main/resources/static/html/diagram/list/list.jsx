@@ -7,16 +7,23 @@ let { PureComponent, useState } = React;
 let DiagramAction = window.DiagramAction;
 let { Popconfirm, Upload, Form, message, Icon, Input, InputNumber, Button, Table, Tooltip, Modal } = antd;
 let { confirm } = Modal;
+// Modal.method({
+// 	okText: '确定'
+// })
 let Message = message;
 // modal 显示
-function showConfirm(_ok) {
+function showConfirm(_ok, _EditableTable) {
 	confirm({
 		title: '你确定要删除这几张图片吗',
+		okText: '确认',
+		cancelText: '取消',
 		// content: 'Some descriptions',
 		onOk() {
 			// console.log('OK');
 			// _ok()
-			_ok()
+			if (_ok()) {
+				_EditableTable.state.checkArr = []
+			}
 			// flag = true
 		},
 		onCancel() {
@@ -65,11 +72,10 @@ const pageSize = 6;
 const align = 'left';
 
 // 删除调用函数
-let deleteFn = (arr = undefined, ListFn) => {
+let deleteFn = (arr = undefined, ListFn, _EditableTable) => {
 	if (!arr) {
 		return;
 	}
-
 	let reqArr = [];
 	Array.isArray(arr) &&
 		arr.forEach(e => {
@@ -78,6 +84,7 @@ let deleteFn = (arr = undefined, ListFn) => {
 	DiagramAction.diagramMRmImg({ ids: reqArr }, res => {
 		if (res.success) {
 			Message.success('操作成功', 0.5);
+			// _EditableTable.state.checkArr = []
 			setTimeout(function () {
 
 				ListFn && ListFn()
@@ -218,6 +225,7 @@ class EditableTable extends React.Component {
 				dataIndex: 'name',
 				width: '25%',
 				editable: true,
+				align: 'center',
 				// sorter: (current, next, asd) => {
 				// 	let { currentPage } = this.state;
 				// 	if (asd === 'ascend') {
@@ -247,6 +255,7 @@ class EditableTable extends React.Component {
 				title: '大小',
 				dataIndex: 'file_size',
 				width: '15%',
+				align: 'center',
 				// sorter: (current, next, asd, xxx) => {
 
 				// 	// console.log(current, next, asd, xxx, 'current')
@@ -278,6 +287,7 @@ class EditableTable extends React.Component {
 				title: '修改时间',
 				dataIndex: 'mod_time',
 				width: '40%',
+				align: 'center',
 				// align: 'center',
 				// align,
 				// sorter: (current, next, asd) => {
@@ -303,7 +313,7 @@ class EditableTable extends React.Component {
 			{
 				title: '操作',
 				dataIndex: 'operation',
-				// align: 'center',
+				align: 'center',
 				render: (text, record) => {
 					const { editingKey } = this.state;
 					// const editable = this.isEditing(record);
@@ -529,9 +539,7 @@ function ButtonList(props) {
 	// }, 10);
 	function upDataChecked(o, key) {
 		setIsOff(o);
-		// console.log(checkedArr);
 		checkedArr.current.length = 0;
-		// console.log(key, 'key');
 		checkedArr.current.push(...key);
 		// checkedArr
 	}
@@ -539,10 +547,8 @@ function ButtonList(props) {
 	// SetIsOff = setIsOff;
 
 	PubSub.subscribe('_EditableTable', (n, _this) => {
-		// console.log(232, n, _this, '=======');
 		set_EditableTable(_this);
 		// _this.setState();
-		// console.log(_this, '_this');
 	});
 	React.useEffect(() => {
 		return;
@@ -559,12 +565,47 @@ function ButtonList(props) {
 							_EditableTable.props.reqListFn && _EditableTable.props.reqListFn();
 						}
 					}}
+					accept={'.png,.bmp,.jpg,.tif,.gif,.pcx,.tga,.exif,.fpx,.svg,.psd,.raw'}
 					headers={{
 						dept_id: localStorage.getItem('deptId')
 					}}
 					action="http://172.16.16.9/api/backgroundinterface/topology/upload"
 					method="post"
+					beforeUpload={(file, fileList) => {
+						let reg = /\.(jpg|gif|bmp|tif|png|pcx|jpeg|exif|tga|svg|raw|psd|)+$/
+						// console.log(file, 'file.type ')
+						// console.log(file.type.split('/')[1])
+
+						let isImg = reg.test(file.name);
+						if (isImg) {
+							return true
+						} else {
+							message.error('文件格式不对', .5)
+							return false
+						}
+						// console.log(file.type, fileList, 'file, fileList')
+					}}
 					enctype="multipart/form-data"
+					onChange={(info, info2) => {
+						// console.log(info, 'info')
+						if (
+							info.file.status === undefined
+						) {
+							return
+						}
+						if (info.file.status !== 'uploading') {
+							message.loading(`${info.file.name} 上传中...`);
+						}
+						if (info.file.status === 'done') {
+							_EditableTable.props.reqListFn()
+							message.destroy()
+							message.success(`${info.file.name} 上传成功.`, .5);
+
+						} else if (info.file.status === 'error') {
+							message.destroy()
+							message.error(`${info.file.name} 上传失败.`, .5);
+						}
+					}}
 				>
 					<Button type="primary" style={{ marginRight: '0.4rem' }}>
 						<Icon type="cloud-upload" />
@@ -587,7 +628,7 @@ function ButtonList(props) {
 								return
 							}
 							showConfirm(
-								function () { deleteFn(_EditableTable.state.checkArr, _EditableTable.props.reqListFn) }
+								function () { deleteFn(_EditableTable.state.checkArr, _EditableTable.props.reqListFn, _EditableTable) },
 							)
 						}}
 					>
@@ -614,7 +655,7 @@ function ButtonList(props) {
 				}}
 				style={{ float: 'right', width: 200 }}
 			/>
-		</div>
+		</div >
 	);
 }
 //diagramRename
@@ -670,7 +711,7 @@ function Topo() {
 	}
 	function reqListFn(page_num = 1, orderByClause) {
 		setLoading(true)
-
+		let reqFlag = false;
 		if (false) {
 
 		} else {
