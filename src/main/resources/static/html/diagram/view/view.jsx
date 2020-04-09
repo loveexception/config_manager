@@ -1,4 +1,4 @@
-let { Message, Icon, Spin } = antd;
+let { InputNumber, Message, Icon, Spin, Tooltip, Input } = antd;
 let { Scrollbars } = ReactCustomScrollbars;
 // React
 const scaleArr = [];
@@ -22,32 +22,105 @@ let { id, name } = urlData;
 // 	})
 // })
 //  api 
-function diagramViewImg(params, callback) {
-	$.ajax({
-		cache: true,
-		type: 'POST',
-		url: href + 'topology/list',
-		contentType: "application/json",
-		data: JSON.stringify(params),
-		dataType: 'json',
-		async: false,
-		success: callback
-	})
+
+function transformCss(node, name, value) {
+	// 添加一个容器
+	//这个容器必须能区分开是给哪个元素存储的
+	//而且这个容器如果存在，不能发生覆盖
+	//最终我们的决定是传哪个dom元素对象，就在哪个元素对象身上创建存储属性值的对象
+	// node 元素节点
+	//  name 要添加的tranform 属性 
+	if (!node.transformObj) {
+		node.transformObj = {
+		};
+	}
+
+	if (arguments.length > 2) {
+		node.transformObj[name] = value;
+		var result = '';
+		for (var key in node.transformObj) {
+			switch (key) {
+				case 'translateX':
+				case 'translateY':
+				case 'translateZ':
+				case 'translate':
+					result += key + '(' + node.transformObj[key] + ') ';
+					break;
+				case 'rotate':
+				case 'rotateX':
+				case 'rotateY':
+				case 'rotateZ':
+				case 'skew':
+				case 'skewX':
+				case 'skewY':
+					result += key + '(' + node.transformObj[key] + 'deg) ';
+					break;
+
+				case 'scale':
+				case 'scaleX':
+				case 'scaleY':
+					result += key + '(' + node.transformObj[key] + ') ';
+					break;
+			}
+
+		}
+
+		node.style.transform = result;
+	} else {
+		var result = '';
+		if (node.transformObj[name] == undefined) {
+			if (name == 'scale' || name == 'scaleX' || name == 'scaleY') {
+				result = '1';
+			} else {
+				result = 0;
+			}
+		} else {
+			result = node.transformObj[name];
+		}
+
+		return result;
+	}
 }
+
+
+// input 
+function formatNumber(value) {
+	value += '';
+	const list = value.split('.');
+	const prefix = list[0].charAt(0) === '-' ? '-' : '';
+	let num = prefix ? list[0].slice(1) : list[0];
+	let result = '';
+	while (num.length > 3) {
+		result = `,${num.slice(-3)}${result}`;
+		num = num.slice(0, num.length - 3);
+	}
+	if (num) {
+		result = num + result;
+	}
+	return `${prefix}${result}${list[1] ? `.${list[1]}` : ''}`;
+}
+
+
+
 function Topo(props) {
-	let contentImg = React.useRef(null);
-	let zoomInBtn = React.useRef(null);
-	let zoomOutBtn = React.useRef(null);
-	let imgInitValue = React.useRef(null);
-	let selecetRef = React.useRef(null);
-	let refImg = React.useRef(null);
+	let [routeValue, setRouteValue] = React.useState(0);
 	let [imgWidth, setImgWidth] = React.useState("auto");
 	let [imgSrc, setImgSrc] = React.useState('');
 	let [selecetValue, setSelectValue] = React.useState('1.0');
 	let [imgReset, setImgReset] = React.useState(0)
 	let [imgLoading, setImgLoading] = React.useState(true);
+
+	let contentImg = React.useRef(null);
+	let zoomInBtn = React.useRef(null);
+	let zoomOutBtn = React.useRef(null);
+	let imgInitValue = React.useRef(null);
+	let selecetRef = React.useRef(null);
+	let timeId = React.useRef(null);
 	let content = React.useRef({})
+	let refImg = React.useRef(null);
+
 	let optionArr = ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%', '110%', '120%', '130%', '140%', '150%', '160%', '170%', '180%', '190%', '200%'];
+
 	// let scaleArr = [];
 	let DiagramAction = window.DiagramAction;
 	// let { id = '', name = '' } = props.location.query;
@@ -172,6 +245,40 @@ function Topo(props) {
 	function autoValue() {
 		handleImgHeight("auto")
 	}
+	function handleRotate(rotateVlue, deg = 90) {
+		// 顺时针 true
+		if (!refImg.current) {
+			return
+		}
+		if (rotateVlue === true) {
+			let _value = transformCss(refImg.current, 'rotate') + deg
+			transformCss(refImg.current, 'rotate', _value < 180 ? _value : 180)
+			// refImg.current.style.
+		} else if (rotateVlue === false) {
+			let _value = transformCss(refImg.current, 'rotate') - deg
+			transformCss(refImg.current, 'rotate', _value < -180 ? -180 : _value)
+		} else if (rotateVlue === 'auto') {
+			transformCss(refImg.current, 'rotate', 0)
+		} else if (rotateVlue === 'settingValue') {
+			let _value = deg > 180 ? 180 : deg;
+			_value = _value < -180 ? -180 : _value;
+			transformCss(refImg.current, 'rotate', _value)
+		}
+		setRouteValue(transformCss(refImg.current, 'rotate'))
+	}
+	function numberChange(numValue) {
+		// let { value } = e.target;
+		let rotateBoolean = numValue > 0 ? true : numValue === 0 ? 'auto' : false
+		// handleRotate(rotateBoolean, Math.abs(numValue))
+		handleRotate("settingValue", numValue)
+	}
+	function handleBulr(e) {
+		let { value } = e.target;
+		// console.log(, 'value')
+		let result = value.slice(0, -1);
+		let numValue = Number(result);
+		// let rotateBoolean = numValue > 0 ? true : numValue === 0 ? 'auto' : false
+	}
 	React.useEffect(
 		function () {
 			DiagramAction.diagramViewImg({ id }, res => {
@@ -243,7 +350,7 @@ function Topo(props) {
 							handle=".handle"
 							defaultPosition={{ x: 0, y: 0 }}
 							position={null}
-							grid={[10, 10]}
+							grid={[2, 2]}
 							scale={1}>
 							<div>
 								<img
@@ -268,7 +375,21 @@ function Topo(props) {
 									}}
 									src={imgSrc}
 									alt=""
-									onMouseOver={e => { }}
+									// onClick={() => {
+									// 	console.log(1)
+									// }}
+									onMouseOut={() => {
+										// timeId.current && clearTimeout(timeId.current)
+										// console.log(false)
+									}}
+									onMouseMove={e => {
+										// this.
+										// timeId.current && clearTimeout(timeId.current)
+										// timeId.current = setTimeout(() => {
+										// 	console.log(true)
+										// }, 2000)
+									}}
+								// onMouseOver={e => { console.log(11) }}
 								/>
 							</div>
 						</ReactDraggable>
@@ -278,17 +399,52 @@ function Topo(props) {
 
 			{/* </div> */}
 			<div className="view-btn-container"
-			// style={{
-			// 	position: 'absolute',
-			// 	left: '0',
-			// 	top: 0
-			// }}
 			>
+				{/* 旋转组 */}
+				<div className="view-btn-adapt " onClick={() => {
+				}}>
+					<Tooltip placement="bottom" title={'设置旋转角度'}>
+						<InputNumber
+							style={{
+								width: "1rem",
+								border: 'none'
+							}}
+							formatter={value => {
+								value = Number(value);
+								let _value = value < -180 ? -180 : value;
+								_value = _value > 180 ? 180 : _value;
+								return `${_value}°`
+							}}
+							onChange={numberChange}
+							onBlur={handleBulr}
+							placeholder="请输入调整角度"
+							min={-180} max={180}
+							defaultValue={0}
+							value={routeValue}
+						// onChange
+						/>
+					</Tooltip>
+				</div>
+				<div className="view-btn" onClick={() => {
+					handleRotate(false)
+				}}>
+					<Icon type="undo" className="handle-hover" />
+				</div>
+				<div className="view-btn-adapt handle-hover" onClick={() => {
+					handleRotate("auto")
+				}}>
+					重置
+				</div>
+				<div className="view-btn" onClick={() => {
+					handleRotate(true)
+				}}>
+					<Icon type="redo" className="handle-hover" />
+				</div>
+				{/* 放大组 */}
 				<div className="view-btn" onClick={() => {
 					handleScale(false)
 				}}>
 					<Icon type="zoom-out" className="handle-hover" />
-					{/* <span className="iconfont ticobackicon-narrow"></span> */}
 				</div>
 
 				<div className="view-select handle-hover">
