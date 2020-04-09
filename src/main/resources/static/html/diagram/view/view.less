@@ -1,5 +1,9 @@
 .diagram-view-box {
-
+	.diagram-view-rotate{
+		display: flex;
+		// justify-content: ;
+		justify-content: space-between;
+	}
 	.diagram-view-name {
 		font-family: MicrosoftYaHei;
 		// font-size: 16px;
@@ -20,6 +24,12 @@
 				position: relative;
 				overflow: auto;
 				background-image: url('/assets/img/back-img.png') ;
+				.ant-input-number{
+					border: none;
+				}
+				.handle {
+					transition: all 0.5s;
+				}
 				img{
 					display:  block;
 					margin:  auto;
