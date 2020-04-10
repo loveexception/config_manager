@@ -1,46 +1,51 @@
 <!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <meta charset="utf-8">
+
 <head th:include="include :: header"></head>
-<link th:href="@{/assets/plugins/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+<link th:href="@{/assets/plugins/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet" />
+
 <body class="white-bg">
 	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
 		<form class="form-horizontal m" id="form-role-edit">
-			<input id="id" name="id" type="hidden"  th:value="${role.id}"/>
+			<input id="id" name="id" type="hidden" th:value="${role.id}" />
 			<div class="form-group">
 				<label class="col-sm-3 control-label ">角色名称：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="roleName" id="roleName"  th:value="${role.roleName}"/>
+					<input class="form-control" type="text" name="roleName" id="roleName" th:value="${role.roleName}" />
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-3 control-label">权限字符：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="roleKey" id="roleKey"  th:value="${role.roleKey}">
+					<input class="form-control" type="text" name="roleKey" id="roleKey" th:value="${role.roleKey}">
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-3 control-label">显示顺序：</label>
 				<div class="col-sm-8">
-					<input class="form-control" type="text" name="roleSort" id="roleSort"  th:value="${role.roleSort}">
+					<input class="form-control" type="text" name="roleSort" id="roleSort" th:value="${role.roleSort}">
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-3 control-label">状态：</label>
 				<div class="col-sm-8">
 					<div class="onoffswitch">
-                         <input type="checkbox" th:checked="${role.status == '0' ? false : true}" class="onoffswitch-checkbox" id="status" name="status">
-                         <label class="onoffswitch-label" for="status">
-                             <span class="onoffswitch-inner"></span>
-                             <span class="onoffswitch-switch"></span>
-                         </label>
-                     </div>
+						<input type="checkbox" th:checked="${!role.status}" class="onoffswitch-checkbox" id="status"
+							name="status">
+
+						<!-- <input type="checkbox" th:checked="${console.log(role.status)}" class="onoffswitch-checkbox" id="status" name="status"> -->
+						<label class="onoffswitch-label" for="status">
+							<span class="onoffswitch-inner"></span>
+							<span class="onoffswitch-switch"></span>
+						</label>
+					</div>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-3 control-label">备注：</label>
 				<div class="col-sm-8">
-					<input id="remark" name="remark" class="form-control" type="text"  th:value="${role.remark}">
+					<input id="remark" name="remark" class="form-control" type="text" th:value="${role.remark}">
 				</div>
 			</div>
 			<div class="form-group">
@@ -54,71 +59,71 @@
 	<div th:include="include::footer"></div>
 	<script th:src="@{/assets/plugins/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
 	<script type="text/javascript">
-	     $(function() {
+		$(function () {
 			var url = ctx + "sys/menu/roleMenuTreeData?id=" + $("#id").val();
 			var options = {
 				id: "menuTrees",
-		        url: url,
-		        check: { enable: true, nocheckInherit: true, chkboxType: { "Y": "ps", "N": "ps" } },
-		        expandLevel: 0
-		    };
+				url: url,
+				check: { enable: true, nocheckInherit: true, chkboxType: { "Y": "ps", "N": "ps" } },
+				expandLevel: 0
+			};
 			$.tree.init(options);
 		});
-	
+
 		$("#form-role-edit").validate({
 			onkeyup: false,
-			rules:{
-				roleName:{
-					required:true,
+			rules: {
+				roleName: {
+					required: true,
 					remote: {
-		                url: ctx + "sys/role/checkRoleNameUnique",
-		                type: "post",
-		                dataType: "json",
-		                data: {
-							"id": function() {
-							    return $("#id").val();
-							},
-							"roleName": function() {
-							    return $.common.trim($("#roleName").val());
-							}
-		                },
-		                dataFilter: function(data, type) {
-		                	return data;
-		                }
-		            }
-				},
-				roleKey:{
-					required:true,
-					remote: {
-		                url: ctx + "sys/role/checkRoleNameUnique",
-		                type: "post",
-		                dataType: "json",
-		                data: {
-							"id": function() {
+						url: ctx + "sys/role/checkRoleNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							"id": function () {
 								return $("#id").val();
 							},
-							"roleKey": function() {
-							    return $.common.trim($("#roleKey").val());
+							"roleName": function () {
+								return $.common.trim($("#roleName").val());
 							}
-		                },
-		                dataFilter: function(data, type) {
+						},
+						dataFilter: function (data, type) {
 							return data;
-		                }
-		            }
+						}
+					}
 				},
-				roleSort:{
-					required:true,
-					digits:true
+				roleKey: {
+					required: true,
+					remote: {
+						url: ctx + "sys/role/checkRoleNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							"id": function () {
+								return $("#id").val();
+							},
+							"roleKey": function () {
+								return $.common.trim($("#roleKey").val());
+							}
+						},
+						dataFilter: function (data, type) {
+							return data;
+						}
+					}
+				},
+				roleSort: {
+					required: true,
+					digits: true
 				},
 			},
 			messages: {
-		        "roleName": {
-		            remote: "角色名称已经存在"
-		        },
-		        "roleKey": {
-		            remote: "角色权限已经存在"
-		        }
-		    }
+				"roleName": {
+					remote: "角色名称已经存在"
+				},
+				"roleKey": {
+					remote: "角色权限已经存在"
+				}
+			}
 		});
 
 		function edit() {
@@ -130,10 +135,10 @@
 			var remark = $("input[name='remark']").val();
 			var menuIds = $.tree.getCheckedNodes();
 			$.ajax({
-				cache : true,
-				type : "POST",
-				url : ctx + "sys/role/editDo",
-				data : {
+				cache: true,
+				type: "POST",
+				url: ctx + "sys/role/editDo",
+				data: {
 					"id": id,
 					"roleName": roleName,
 					"roleKey": roleKey,
@@ -142,21 +147,22 @@
 					"remark": remark,
 					"menuIds": menuIds
 				},
-				async : false,
-				error : function(request) {
+				async: false,
+				error: function (request) {
 					$.modal.alertError("系统错误");
 				},
-				success : function(data) {
+				success: function (data) {
 					$.operate.successCallback(data);
 				}
 			});
 		}
-		
+
 		function submitHandler() {
-	        if ($.validate.form()) {
-	        	edit();
-	        }
-	    }
+			if ($.validate.form()) {
+				edit();
+			}
+		}
 	</script>
 </body>
+
 </html>
