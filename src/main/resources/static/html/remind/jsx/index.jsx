@@ -15,13 +15,11 @@ function Title(props) {
 	return (
 		<div>
 			<Radio.Group
-				style={{
-					paddingLeft: '20px'
-				}}
+
 				value={'large'}
 			>
 				<Radio.Button
-					onClick={function() {
+					onClick={function () {
 						props.needState(true);
 						btnState ? '' : setBtnState(true);
 					}}
@@ -30,7 +28,7 @@ function Title(props) {
 					更换提醒
 				</Radio.Button>
 				<Radio.Button
-					onClick={function() {
+					onClick={function () {
 						props.needState(false);
 						btnState ? setBtnState(false) : '';
 					}}
@@ -46,7 +44,7 @@ function Title(props) {
 function App(props) {
 	let [btnState, BtnSetState] = useState(true);
 	useEffect(() => {
-		return function() {};
+		return function () { };
 	}, []);
 	function needState(state) {
 		BtnSetState(state);
