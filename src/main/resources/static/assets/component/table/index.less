@@ -1,0 +1,72 @@
+.my-edit-component-box{
+	height: 90%;
+	margin-bottom: 0.5rem;
+	.header-box{
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 0.1rem;
+		.header-title{
+		    font-family: MicrosoftYaHei;
+			font-stretch: normal;
+			line-height: 0.3rem;
+			letter-spacing: 0rem;
+			color: #646464;
+			font-size: 0.16rem;
+			font-weight: bold;
+			margin-bottom: 0.1rem;
+		}
+		.use-box{
+			display: flex;
+			justify-content: space-between;
+			.ant-btn{
+				width: 1rem;
+				margin-right: 0.23rem;
+				& :nth-last-child(1){
+					margin-right: 0;
+				}
+			}
+			.use-right{
+				display: flex;
+				.ant-select{
+					margin-right: 0.2rem;
+				}
+			}
+		}
+	}
+	.test-less-import{
+		display: none;
+	}
+	.my-edit-component-content{
+		position: relative;
+		height: 100%;
+		.ant-pagination {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			z-index: 2;
+		}
+		.ant-pagination{
+			// position: ab;
+			display: flex;
+			justify-content: flex-end;
+			position: absolute;
+			bottom: -0.35rem;
+			right: 0rem;
+		}
+		.ant-table-content{
+			height: 4rem;
+			background: #fff
+		}
+		.ant-table-wrapper{
+		// height: 100%;
+		table{
+			// height: 4.5rem;
+			.ant-table-row {
+				>td{
+				}
+			}
+		}
+
+		}
+	}
+}

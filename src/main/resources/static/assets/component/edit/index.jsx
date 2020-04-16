@@ -33,7 +33,7 @@
 
 
 	const WarrperFormComponent = (props) => {
-		let { liObj = [] } = props;
+		let { liObj = [], data = {} } = props;
 		const [form] = Form.useForm();
 		const layout = {
 			labelCol: {
@@ -88,7 +88,7 @@
 			console.log(props, 'props')
 		})
 		return (
-			<Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+			<Form {...data} {...layout} form={form} name="control-hooks" onFinish={onFinish}>
 				{liObj.map(({ type = "input", leftName = "", required = false, placeholder = "", key, }, index) => {
 					let _props = {
 						name: leftName,
@@ -193,11 +193,11 @@
 	};
 	function EditComponent(props) {
 		// React
-		let { title = "传入help为true获取config信息", help = false, liObj = [] } = props;
+		let { title = "传入help为true获取config信息", help = false, liObj = [], data = {} } = props;
 		useEffect(function () {
 			if (help) {
 				console.log("title :string 标题信息")
-				console.log("liObj :Array 每一个表格的内容(object) attr >>> required :boolean(false), leftName: string(''),placeholder: string(''),whitespace:boolean (false)   ")
+				console.log("liObj :Array 每一个表格的内容(object) attr >>> required :boolean(false), leftName: string(''),placeholder: string(''),whitespace:boolean (false)  data : object 直接传入组件 ")
 			}
 		}, [])
 		useEffect(function () {
@@ -208,7 +208,7 @@
 			</div>
 			<div className="my-edit-component-content">
 				<div className="my-title"> {title} </div>
-				<WarrperFormComponent liObj={liObj} />
+				<WarrperFormComponent data={data} liObj={liObj} />
 			</div>
 		</div>)
 	}
