@@ -1,10 +1,13 @@
 let { useRef, useState, useEffect, useLayoutEffect, PureComponent } = React;
 let allHeight = 150;// 图高度设置 不包括饼图
 let DiagramAction = window.DiagramAction;
-let { Popconfirm, Upload, Form, message, Icon, Input, InputNumber, Button, Table, Tooltip, Modal, DatePicker, BackTop } = antd;
+let { Popconfirm, Upload, Tag, UpCircleFilled, Form, message, Icon, Input, InputNumber, Button, Table, Tooltip, Modal, DatePicker, BackTop, ConfigProvider } = antd;
 let { confirm } = Modal;
 let Message = message;
 let { RangePicker } = DatePicker;
+let { _import = {} } = window;
+let { TableComponent } = _import;
+moment.locale('zh-cn')
 // 日历
 class DateRange extends React.Component {
 	state = {
@@ -63,30 +66,32 @@ class DateRange extends React.Component {
 			}}>
 				<span className="data-title">会议数据统计表</span>
 				&nbsp;&nbsp;&nbsp;&nbsp;
-				<DatePicker
-					disabledDate={this.disabledStartDate}
-					showTime
-					format="YYYY-MM-DD HH:mm"
-					value={startValue}
-					placeholder="开始时间"
-					onChange={this.onStartChange}
-					onOpenChange={this.handleStartOpenChange}
-				/>
+				<ConfigProvider locale={antd.locales && antd.locales.zh_CN}>
+					<DatePicker
+						disabledDate={this.disabledStartDate}
+						showTime
+						format="YYYY-MM-DD HH:mm"
+						value={startValue}
+						placeholder="开始时间"
+						onChange={this.onStartChange}
+						onOpenChange={this.handleStartOpenChange}
+					/>
 					至
 				<DatePicker
-					ranges={{
-						Today: [moment(), moment()],
-						'This Month': [moment().startOf('month'), moment().endOf('month')],
-					}}
-					disabledDate={this.disabledEndDate}
-					showTime
-					format="YYYY-MM-DD HH:mm"
-					value={endValue}
-					placeholder="结束时间"
-					onChange={this.onEndChange}
-					open={endOpen}
-					onOpenChange={this.handleEndOpenChange}
-				/>
+						ranges={{
+							Today: [moment(), moment()],
+							'This Month': [moment().startOf('month'), moment().endOf('month')],
+						}}
+						disabledDate={this.disabledEndDate}
+						showTime
+						format="YYYY-MM-DD HH:mm"
+						value={endValue}
+						placeholder="结束时间"
+						onChange={this.onEndChange}
+						open={endOpen}
+						onOpenChange={this.handleEndOpenChange}
+					/>
+				</ConfigProvider>
 			</div>
 		);
 	}
@@ -313,11 +318,119 @@ function VisualBottom(props) {
 }
 function App() {
 	let node = useRef(null);
-	let [isShowBtn, setIsShowBtn] = useState(false)
+	let [isShowBtn, setIsShowBtn] = useState(false);
+	let [dataSource, setDataSource] = useState([{
+		key: '1',
+		name: 'John Brown',
+		age: 32,
+		address: 'New York No. 1 Lake Park',
+	},
+	{
+		key: '2',
+		name: 'Jim Green',
+		age: 42,
+		address: 'London No. 1 Lake Park',
+	},
+	{
+		key: '3',
+		name: 'Joe Black',
+		age: 32,
+		address: 'Sidney No. 1 Lake Park',
+	},])
+	let [selectedRowKeys, setSelectedRowKeys] = useState([])
+	let columns = useRef([
+		{
+			title: 'Name',
+			dataIndex: 'name',
+			key: 'name',
+			render: text => <a>{text}</a>,
+		},
+		{
+			title: 'Age',
+			dataIndex: 'age',
+			key: 'age',
+		},
+		{
+			title: 'Address',
+			dataIndex: 'address',
+			key: 'address',
+		},
+		{
+			title: 'Action',
+			key: 'action',
+			render: (text, record) => (
+				<span>
+					<a style={{ marginRight: 16 }}>Invite {record.name}</a>
+					<a>Delete</a>
+				</span>
+			),
+		}, {
+			title: '操作',
+			key: '操作',
+			render(text, record) {
+				return <span onClick={() => {
+					$.modal.openFull('修改会议', '/html/meeting/edit/index.html')
+				}}>编辑</span>
+			}
+
+		}
+	])
+	let btnArr = useRef([{
+		type: "primary",
+		size: 'default',
+		text: '新增',
+		click: newAdd
+	}, {
+		type: "dashed",
+		size: 'default',
+		text: '删除',
+		click: deleteFn
+	},
+	{
+		type: "dashed",
+		size: 'default',
+		text: '批量导入',
+		click: allImport
+	}])
+	let rightConfig = useRef({
+		searchConfig: {
+			onSearch: searchFn,
+			placeholder: "请输入搜索内容"
+		},
+		select: {
+			onSelectChange: selectChangeFn
+		}
+	})
+	// 新增click 事件
+	function newAdd() {
+		console.log('++是')
+	}
+	function deleteFn() {
+
+	}
+	function allImport() {
+
+	}
+	// 右边
+	function searchFn() {
+
+	}
+	function selectChangeFn() {
+
+	}
 	function handleScroll(e) {
 
 		node.current.scrollTop > 0 ? setIsShowBtn(true) : setIsShowBtn(false)
 	}
+	function onSelectChange(selectedRowKeys) {
+		console.log('selectedRowKeys changed: ', selectedRowKeys);
+		// this.setState({selectedRowKeys});
+		setSelectedRowKeys(selectedRowKeys)
+	};
+	const rowSelection = {
+		selectedRowKeys: selectedRowKeys.current,
+		onChange: onSelectChange,
+	};
 	useEffect(function () {
 		// chart.on('tooltip:show', (ev) => {
 		// 	// x: 当前鼠标的 x 坐标,
@@ -343,10 +456,14 @@ function App() {
 			}} onClick={function () {
 				node.current.scroll(0, 0)
 			}}>
-				<Icon type="to-top" />
+				<img style={{
+					width: "0.18rem"
+				}} src="/assets/img/uparrow.png" alt="" />
+				{/* <Icon type="to-top" /> */}
 			</Button>
 		</div>
 		<div className="table-box">
+			<TableComponent rightConfig={rightConfig.current} btnArr={btnArr.current} title={"会议保障记录表"} isBordered={true} dataSource={dataSource} rowSelection={rowSelection} columns={columns.current} />
 		</div>
 		<div className="visual-box">
 			<div className="visual-select-box">
@@ -362,6 +479,7 @@ function App() {
 		</div>
 
 	</div>
+
 }
 
 ReactDOM.render(<App />, window.rootNode);
