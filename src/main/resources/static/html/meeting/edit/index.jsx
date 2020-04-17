@@ -3,8 +3,11 @@
 // function 
 let { _import = {} } = window;
 let { EditComponent } = _import;
-// console.log(window._import, 'xxx')
+let isEdit = location.search.split('?')[1];
+isEdit = isEdit && JSON.parse(isEdit.split('=')[1]);
 function App(props) {
+	React.useEffect(() => {
+	}, [])
 	let liObj = React.useRef([{
 		leftName: '会议名称',
 		required: true,
@@ -44,8 +47,18 @@ function App(props) {
 		key: "description"
 	}
 	])
+
+	function commitFn(data) {
+		//发送请求
+		if (isEdit === true) {
+			$.modal.close()
+		} else if (isEdit === false) {
+			$.modal.close()
+		}
+		// 成功后关闭窗口
+	}
 	return <div className="meeting-edit-box">
-		<EditComponent liObj={liObj.current} title={'基本信息'} />
+		<EditComponent liObj={liObj.current} title={isEdit ? '修改基本信息' : '新增基本信息'} commitFn={commitFn} />
 	</div>
 }
 
