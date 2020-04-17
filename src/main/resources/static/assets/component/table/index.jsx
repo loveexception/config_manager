@@ -13,7 +13,7 @@
 	let { Input, Pagination, ConfigProvider, Table, Button, Tag, Select } = antd;
 	const { Search } = Input;
 	function HeaderBox(props) {
-		let { btnArr = [], title = "", rightConfig = {} } = props;
+		let { btnArr = [], title = "", rightConfig = {}, selectConfig } = props;
 		return <div className="header-box">
 			<div className="header-title">{title}</div>
 			<div className="use-box">
@@ -26,13 +26,11 @@
 
 				</div>
 				<div className="use-right">
-					<Select defaultValue="lucy" style={{ width: 120 }} onChange={rightConfig.select.onSelectChange}>
-						<Option value="jack">Jack</Option>
-						<Option value="lucy">Lucy</Option>
-						<Option value="disabled" disabled>
-							Disabled
- 					     </Option>
-						<Option value="Yiminghe">yiminghe</Option>
+					<Select style={{ width: 120 }} onChange={rightConfig.select.onSelectChange}>
+						{
+							rightConfig.select && rightConfig.select.selectArr.map((element, index) => (<Option value={element.value} key={index}>{element.key}</Option>))
+						}
+
 					</Select>
 					<Search
 						placeholder={rightConfig.searchConfig && rightConfig.searchConfig.placeholder}
@@ -66,7 +64,7 @@
 					<Table pagination={false} bordered={isBordered} rowSelection={rowSelection} {...data} columns={columns} dataSource={dataSource} onChange={handleChange} />
 					{paginationConfig ? <Pagination style={{
 						position: "relative",
-					}} {...paginationConfig} size="small" total={50} showQuickJumper /> : ""}
+					}} {...paginationConfig} size="small" showQuickJumper /> : ""}
 				</ConfigProvider>
 			</div>
 		</div>)
