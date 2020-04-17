@@ -45,7 +45,7 @@
 		</div>
 	}
 	function TableComponent(props) { // 组件名唯一
-		let { title = "传入help为true获取config信息", rightConfig, btnArr = [], help = false, rowSelection = {}, dataSource = [], data = {}, columns = [], isPagination = false, isBordered = false } = props;
+		let { title = "传入help为true获取config信息", rightConfig, btnArr = [], help = false, rowSelection = {}, dataSource = [], data = {}, columns = [], paginationConfig = false, isBordered = false } = props;
 		function handleChange(pagination, filters, sorter) {
 
 		}
@@ -53,20 +53,20 @@
 			if (help) {
 				console.log("title :string 标题信息")
 				console.log("btnArr : Array<object> 按钮信息 ")
-				console.log("data : Object({}) : >>> dataSource : Array<object> ([]) >>> isPagination :object (false) >>> column : Array<object> >>> isBordered:boolean (false) || object   >>> data : object 直接传入组件 ")
+				console.log("data : Object({}) : >>> dataSource : Array<object> ([]) >>> paginationConfig :object (false) >>> column : Array<object> >>> isBordered:boolean (false) || object   >>> data : object 直接传入组件 ")
 			}
 		}, [])
-		return (<div className="my-edit-component-box">
+		return (<div className="my-table-component-box">
 			<div className="test-less-import">
 				您好像没引入less文件那
 			</div>
-			<div className="my-edit-component-content">
+			<div className="my-table-component-content">
 				<HeaderBox rightConfig={rightConfig} title={title} btnArr={btnArr} />
 				<ConfigProvider locale={antd.locales && antd.locales.zh_CN}>
 					<Table pagination={false} bordered={isBordered} rowSelection={rowSelection} {...data} columns={columns} dataSource={dataSource} onChange={handleChange} />
-					{!isPagination ? <Pagination style={{
+					{paginationConfig ? <Pagination style={{
 						position: "relative",
-					}} {...isPagination} size="small" total={50} showQuickJumper /> : ""}
+					}} {...paginationConfig} size="small" total={50} showQuickJumper /> : ""}
 				</ConfigProvider>
 			</div>
 		</div>)

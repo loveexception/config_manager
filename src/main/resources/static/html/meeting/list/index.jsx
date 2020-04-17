@@ -5,8 +5,12 @@ let { Popconfirm, Upload, Tag, UpCircleFilled, Form, message, Icon, Input, Input
 let { confirm } = Modal;
 let Message = message;
 let { RangePicker } = DatePicker;
-let { _import = {} } = window;
-let { TableComponent } = _import;
+let { FormOutlined } = icons;
+
+
+
+let { _import = {}, } = window;
+let { TableComponent, MyIcon } = _import;
 moment.locale('zh-cn')
 // 日历
 class DateRange extends React.Component {
@@ -337,40 +341,88 @@ function App() {
 		age: 32,
 		address: 'Sidney No. 1 Lake Park',
 	},])
-	let [selectedRowKeys, setSelectedRowKeys] = useState([])
+	let
+		let [selectedRowKeys, setSelectedRowKeys] = useState([])
 	let columns = useRef([
 		{
-			title: 'Name',
+			title: '会议名称',
 			dataIndex: 'name',
 			key: 'name',
-			render: text => <a>{text}</a>,
+			width: "10%",
+			align: 'center'
 		},
 		{
-			title: 'Age',
+			title: '开始时间',
 			dataIndex: 'age',
 			key: 'age',
+			width: "10%",
+			align: 'center'
+
 		},
 		{
-			title: 'Address',
-			dataIndex: 'address',
-			key: 'address',
+			title: '结束时间',
+			dataIndex: 'addess',
+			key: 'addres',
+			width: "10%",
+			align: 'center'
+
 		},
 		{
-			title: 'Action',
-			key: 'action',
-			render: (text, record) => (
-				<span>
-					<a style={{ marginRight: 16 }}>Invite {record.name}</a>
-					<a>Delete</a>
-				</span>
-			),
-		}, {
+			title: '会议时长',
+			dataIndex: 'length',
+			key: 'length',
+			width: "10%",
+			align: 'center'
+
+		},
+		{
+			title: '会议级别',
+			dataIndex: 'level',
+			key: 'level',
+			width: "10%",
+			align: 'center'
+
+		},
+		{
+			title: '保证人员',
+			dataIndex: 'person',
+			key: 'person',
+			width: "10%",
+			align: 'center'
+
+		},
+		{
+			title: '描述',
+			dataIndex: 'message',
+			key: 'message',
+			width: "20%",
+			align: 'center'
+
+		},
+		{
 			title: '操作',
 			key: '操作',
+			width: "10%",
+			align: 'center',
 			render(text, record) {
-				return <span onClick={() => {
-					$.modal.openFull('修改会议', '/html/meeting/edit/index.html')
-				}}>编辑</span>
+				return <div style={{
+					display: 'flex',
+					justifyContent: 'space-around'
+				}
+				} >
+					<MyIcon _props={{
+						style: {
+							fontSize: "0.18rem"
+						}
+					}} click={() => {
+						$.modal.openFull('修改会议', '/html/meeting/edit/index.html?edit=true')
+					}} iconKey={"FormOutlined"} placement={"top"} text={"修改"} />
+					<MyIcon _props={{
+						style: {
+							fontSize: "0.18rem"
+						}
+					}} click={deleteIcon} iconKey={"DeleteOutlined"} placement={"top"} text={"删除"} />
+				</div >
 			}
 
 		}
@@ -403,9 +455,12 @@ function App() {
 	})
 	// 新增click 事件
 	function newAdd() {
-		console.log('++是')
+		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false')
 	}
 	function deleteFn() {
+
+	}
+	function deleteIcon() { //icon 删除
 
 	}
 	function allImport() {
@@ -454,7 +509,7 @@ function App() {
 			<Button style={{
 				display: isShowBtn ? '' : 'none'
 			}} onClick={function () {
-				node.current.scroll(0, 0)
+				node.current.scroll({ top: 0, left: 0, behavior: 'smooth' })
 			}}>
 				<img style={{
 					width: "0.18rem"
@@ -463,7 +518,7 @@ function App() {
 			</Button>
 		</div>
 		<div className="table-box">
-			<TableComponent rightConfig={rightConfig.current} btnArr={btnArr.current} title={"会议保障记录表"} isBordered={true} dataSource={dataSource} rowSelection={rowSelection} columns={columns.current} />
+			<TableComponent paginationConfig={paginationConfig} rightConfig={rightConfig.current} btnArr={btnArr.current} title={"会议保障记录表"} isBordered={true} dataSource={dataSource} rowSelection={rowSelection} columns={columns.current} />
 		</div>
 		<div className="visual-box">
 			<div className="visual-select-box">

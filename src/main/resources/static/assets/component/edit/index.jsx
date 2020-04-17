@@ -30,10 +30,12 @@
 		DatePicker,
 		AutoComplete } = antd;
 	const { MonthPicker, RangePicker } = DatePicker;
-
+	function momentShowTime(momentObj) {
+		return moment(momentObj).valueOf()
+	}
 
 	const WarrperFormComponent = (props) => {
-		let { liObj = [], data = {} } = props;
+		let { liObj = [], data = {}, commitFn } = props;
 		const [form] = Form.useForm();
 		const layout = {
 			labelCol: {
@@ -70,20 +72,18 @@
 			}
 		};
 
-		const onFinish = values => {
-			console.log(values);
+		const onFinish = formData => {
+			formData.startTime = moment(formData.startTime).valueOf();
+			formData.endTime = moment(formData.endTime).valueOf();
+			commitFn && commitFn(formData)
 		};
 
 		const onReset = () => {
 			form.resetFields();
 		};
-
-		const onFill = () => {
-			form.setFieldsValue({
-				note: 'Hello world!',
-				gender: 'male',
-			});
-		};
+		function handleChange() {
+			console.log(arguemnts)
+		}
 		useEffect(() => {
 			console.log(props, 'props')
 		})
@@ -91,7 +91,7 @@
 			<Form {...data} {...layout} form={form} name="control-hooks" onFinish={onFinish}>
 				{liObj.map(({ type = "input", leftName = "", required = false, placeholder = "", key, }, index) => {
 					let _props = {
-						name: leftName,
+						name: key,
 						label: leftName,
 						required,
 						key: index,
@@ -129,20 +129,32 @@
 								</Select>
 							</Form.Item>
 						case "time":
-							return <Form.Item
-								{..._props}
-								rules={[
-									{
-										required: required,
-										message: `${leftName}是必填项！`
-									},
-								]}
-							>
-								<ConfigProvider locale={antd.locales.zh_CN}>
-									<DatePicker placeholder={placeholder} showTime format="YYYY-MM-DD HH:mm:ss" />
+							return <ConfigProvider key={index} locale={antd.locales.zh_CN}>
+								<Form.Item
+									{..._props}
+									rules={[
+										{
+											// type: 'object',
+											required: true,
+											message: '请选择时间',
+										}, ({ getFieldValue }) => ({
+											validator(rule, value) {
+												// console.log()
+												if (momentShowTime(getFieldValue('startTime')) < momentShowTime(getFieldValue('endTime')) || getFieldValue('endTime') === undefined || getFieldValue('startTime') === undefined) {
+													return Promise.resolve()
+												}
+												// if (!value ||  === value) {
+												// return Promise.resolve();
+												// }
 
-								</ConfigProvider>
-							</Form.Item>
+												return Promise.reject('开始时间应大于结束时间');
+											},
+										})
+									]}
+								>
+									<DatePicker placeholder={placeholder} showTime format="YYYY-MM-DD HH:mm:ss" />
+								</Form.Item>
+							</ConfigProvider>
 						default:
 							return (<Form.Item
 								{...props}
@@ -193,7 +205,7 @@
 	};
 	function EditComponent(props) {
 		// React
-		let { title = "传入help为true获取config信息", help = false, liObj = [], data = {} } = props;
+		let { title = "传入help为true获取config信息", commitFn, help = false, liObj = [], data = {} } = props;
 		useEffect(function () {
 			if (help) {
 				console.log("title :string 标题信息")
@@ -208,7 +220,7 @@
 			</div>
 			<div className="my-edit-component-content">
 				<div className="my-title"> {title} </div>
-				<WarrperFormComponent data={data} liObj={liObj} />
+				<WarrperFormComponent commitFn={commitFn} data={data} liObj={liObj} />
 			</div>
 		</div>)
 	}
