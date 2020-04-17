@@ -1,17 +1,12 @@
 (function (w) {
 	// 地址
 
-	const href = 'http://172.16.16.9/api/backgroundinterface/';
-	w.DiagramAction = {
-		diagramList,
-		diagramuploadImg,
-		diagramRename,
-		diagramViewImg,
-		diagramODownImg,
-		diagramORmImg,
-		diagramMRmImg,
-		diagramMDownImg,
-		diagramListSort
+	const href = 'http://172.16.16.9/api/backgroundinterface/meeting/';
+	// /batchDeleteMeeting
+	w.backgroundInterface = {
+		getMeetingByPage,
+		saveMeeting,
+		updateMeeting
 	};
 	function getDeptId() {
 		let id = localStorage.getItem('deptId');
@@ -20,11 +15,25 @@
 		}
 		return id
 	}
-	function diagramListSort(params, callback) {
+
+	function getMeetingByPage(params, callback) {
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href + 'topology/list',
+			url: href + 'getMeetingByPage',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+	}
+	function saveMeeting(params, callback) {
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + '/saveMeeting',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -35,11 +44,11 @@
 		})
 
 	}
-	function diagramList(params, callback) {
+	function updateMeeting(params, callback) {
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href + 'topology/list',
+			url: href + 'updateMeeting',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,

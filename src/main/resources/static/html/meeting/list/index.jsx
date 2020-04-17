@@ -8,10 +8,15 @@ let { RangePicker } = DatePicker;
 let { FormOutlined } = icons;
 
 
-
+let { getMeetingByPage } = window.backgroundInterface;
 let { _import = {}, } = window;
 let { TableComponent, MyIcon } = _import;
 moment.locale('zh-cn')
+
+function dateUtil(time) {
+	let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate() + ' ' + time.getHours() + ':' + time.getMinutes();
+	return result;
+}
 // 日历
 class DateRange extends React.Component {
 	state = {
@@ -341,8 +346,19 @@ function App() {
 		age: 32,
 		address: 'Sidney No. 1 Lake Park',
 	},])
-	let
-		let [selectedRowKeys, setSelectedRowKeys] = useState([])
+	let [paginationConfig, setPaginationConfig] = useState({
+		current: 1,
+		pageSize: 7,
+		total: 10,
+		onChange(next, size) {
+			setPaginationConfig({
+				...paginationConfig,
+				current: next
+			})
+			// console.log(arguments, 'arguments')
+		}
+	})
+	let [selectedRowKeys, setSelectedRowKeys] = useState([])
 	let columns = useRef([
 		{
 			title: '会议名称',
@@ -450,6 +466,16 @@ function App() {
 			placeholder: "请输入搜索内容"
 		},
 		select: {
+			selectArr: [
+				{ key: '全部', value: 0 },
+				{ key: '会议名称', value: 0 },
+				{ key: '开始时间', value: 0 },
+				{ key: '结束时间', value: 0 },
+				{ key: '会议时长', value: 0 },
+				{ key: '会议级别', value: 0 },
+				{ key: '保证人员', value: 0 },
+				{ key: '描述', value: 0 },
+			],
 			onSelectChange: selectChangeFn
 		}
 	})
@@ -471,7 +497,7 @@ function App() {
 
 	}
 	function selectChangeFn() {
-
+		console.log(arguments, 'arguments')
 	}
 	function handleScroll(e) {
 
@@ -486,15 +512,16 @@ function App() {
 		selectedRowKeys: selectedRowKeys.current,
 		onChange: onSelectChange,
 	};
+
+	//获取 数据 function search ?
+	function getTableData(searchConfig) {
+		getMeetingByPage({}, (res) => {
+			console.log(res, 'res')
+		})
+	}
 	useEffect(function () {
-		// chart.on('tooltip:show', (ev) => {
-		// 	// x: 当前鼠标的 x 坐标,
-		// 	// y: 当前鼠标的 y 坐标,
-		// 	// tooltip: 当前的 tooltip 对象
-		// 	// items: 数组对象，当前 tooltip 显示的每条内容
-		// 	// title: tooltip 标题
-		// 	const { tooltip, items, title, x, y } = ev;
-		// });
+		window.getTableData = getTableData;
+		getTableData()
 	}, [])
 
 

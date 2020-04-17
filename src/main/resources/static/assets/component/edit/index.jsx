@@ -33,7 +33,8 @@
 	function momentShowTime(momentObj) {
 		return moment(momentObj).valueOf()
 	}
-
+	let start = "";
+	let end = "";
 	const WarrperFormComponent = (props) => {
 		let { liObj = [], data = {}, commitFn } = props;
 		const [form] = Form.useForm();
@@ -73,8 +74,12 @@
 		};
 
 		const onFinish = formData => {
-			formData.startTime = moment(formData.startTime).valueOf();
-			formData.endTime = moment(formData.endTime).valueOf();
+			for (let d in formData) {
+				if (formData[d] instanceof moment) {
+					formData[d] = moment(formData[d]).valueOf();
+				}
+
+			}
 			commitFn && commitFn(formData)
 		};
 
@@ -89,7 +94,8 @@
 		})
 		return (
 			<Form {...data} {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-				{liObj.map(({ type = "input", leftName = "", required = false, placeholder = "", key, }, index) => {
+				{liObj.map(({ isStart = true, selectArr, type = "input", leftName = "", required = false, placeholder = "", key, }, index) => {
+					// required = false;
 					let _props = {
 						name: key,
 						label: leftName,
@@ -110,6 +116,11 @@
 								<Input placeholder={placeholder} />
 							</Form.Item>
 						case "select":
+							if (isStart) {
+								start = key;
+							} else {
+								end = key;
+							}
 							return <Form.Item
 								{..._props}
 								rules={[
@@ -123,9 +134,9 @@
 									placeholder={placeholder}
 								// onChange={onGenderChange}
 								>
-									<Option value="male">male</Option>
-									<Option value="female">female</Option>
-									<Option value="other">other</Option>
+									{selectArr.map((e, index) => {
+										return <Option key={index} value={e.value}>{e.key}</Option>
+									})}
 								</Select>
 							</Form.Item>
 						case "time":
@@ -140,7 +151,7 @@
 										}, ({ getFieldValue }) => ({
 											validator(rule, value) {
 												// console.log()
-												if (momentShowTime(getFieldValue('startTime')) < momentShowTime(getFieldValue('endTime')) || getFieldValue('endTime') === undefined || getFieldValue('startTime') === undefined) {
+												if (momentShowTime(getFieldValue(start)) < momentShowTime(getFieldValue(end)) || getFieldValue(end) === undefined || getFieldValue(start) === undefined) {
 													return Promise.resolve()
 												}
 												// if (!value ||  === value) {
