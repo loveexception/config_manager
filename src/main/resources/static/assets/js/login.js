@@ -1,4 +1,3 @@
-
 $(function () {
 	validateRule();
 	$('.imgcode').click(function () {
