@@ -1,7 +1,7 @@
 (function (w) {
 
 	// 地址
-	const href = 'http://172.16.16.9/api/webManage/';
+	const href = 'http://172.16.16.9/api/backgroundinterface/';
 	w.DiagramAction = {
 		diagramList,
 		diagramuploadImg,
@@ -11,8 +11,30 @@
 		diagramORmImg,
 		diagramMRmImg,
 		diagramMDownImg,
-
+		diagramListSort
 	};
+	function getDeptId() {
+		let id = localStorage.getItem('deptId');
+		if (id === null) {
+			console.log('deptId 为空 请重新登陆')
+		}
+		return id
+	}
+	function diagramListSort(params, callback) {
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + 'topology/list',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			// 加东西 
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+
+	}
 	function diagramList(params, callback) {
 		$.ajax({
 			cache: true,
@@ -21,6 +43,9 @@
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
+			// 加东西 
+
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			contentType: "application/json",
 			success: callback
 		})
@@ -34,6 +59,8 @@
 			url: href + 'topology/upload',
 			data: JSON.stringify(params),
 			dataType: 'json',
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			async: false,
 			success: callback
 		})
@@ -46,6 +73,7 @@
 			url: href + 'topology/renameById',
 			contentType: "application/json",
 			data: JSON.stringify(params),
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			dataType: 'json',
 			async: false,
 			success: callback
@@ -59,6 +87,7 @@
 			url: href + 'topology/preview',
 			contentType: "application/json",
 			data: JSON.stringify(params),
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			dataType: 'json',
 			async: false,
 			success: callback
@@ -75,6 +104,7 @@
 			data: JSON.stringify(params),
 			dataType: 'json',
 			contentType: "application/json",
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			async: false,
 			success: callback
 		})
@@ -87,6 +117,7 @@
 			url: href + 'topology/downImg',
 			data: JSON.stringify(params),
 			contentType: "application/json",
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			dataType: 'json',
 			async: false,
 			success: callback
@@ -100,6 +131,7 @@
 			contentType: "application/json",
 			url: href + 'topology/deleteByPrimaryKey',
 			data: JSON.stringify(params),
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			dataType: 'json',
 			async: false,
 			success: callback
@@ -113,6 +145,7 @@
 			url: href + 'topology/beachDel',
 			data: JSON.stringify(params),
 			contentType: "application/json",
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			dataType: 'json',
 			async: false,
 			success: callback

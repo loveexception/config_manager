@@ -1,7 +1,7 @@
 (function (w) {
 
 	// 地址
-	const href = 'http://172.16.16.9/api/webManage/';
+	const href = 'http://172.16.16.9/api/backgroundinterface/';
 	w.DiagramAction = {
 		diagramList,
 		diagramuploadImg,
@@ -12,12 +12,22 @@
 		diagramMRmImg,
 		diagramMDownImg,
 
+
 	};
+	function getDeptId() {
+		let id = localStorage.getItem('deptId');
+		if (id === null) {
+			console.log('deptId 为空 请重新登陆')
+		}
+		return id
+	}
 	function diagramList(params, callback) {
 		$.ajax({
 			cache: true,
 			type: 'POST',
 			url: href + 'topology/list',
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -34,6 +44,8 @@
 			url: href + 'topology/upload',
 			data: JSON.stringify(params),
 			dataType: 'json',
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			async: false,
 			success: callback
 		})
@@ -47,6 +59,8 @@
 			contentType: "application/json",
 			data: JSON.stringify(params),
 			dataType: 'json',
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			async: false,
 			success: callback
 		})
@@ -61,7 +75,9 @@
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			success: callback
+
 		})
 	}
 	// 点击下载图片 多
@@ -76,6 +92,8 @@
 			dataType: 'json',
 			contentType: "application/json",
 			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			success: callback
 		})
 	}
@@ -89,6 +107,8 @@
 			contentType: "application/json",
 			dataType: 'json',
 			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			success: callback
 		})
 	}
@@ -101,6 +121,8 @@
 			url: href + 'topology/deleteByPrimaryKey',
 			data: JSON.stringify(params),
 			dataType: 'json',
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+
 			async: false,
 			success: callback
 		})
@@ -115,7 +137,9 @@
 			contentType: "application/json",
 			dataType: 'json',
 			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
 			success: callback
+
 		})
 	}
 	//
