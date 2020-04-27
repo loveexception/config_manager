@@ -46,17 +46,25 @@
 	<script src="/assets/react/less.min.js"></script>
 </head>
 <style>
-	#meeting-list-box {
+	#meeting-level-box {
 		padding: 0.2rem 0.5rem 0;
 		height: 100%;
 		background-color: #F5F5F5;
 	}
+
+	.layui-layer-btn,
+	.layui-layer-btn {
+		display: none;
+		height: 0;
+		width: 0;
+		overflow: hidden;
+	}
 </style>
 
 <body class="gray-bg">
-	<div id="meeting-list-box"></div>
+	<div id="meeting-level-box"></div>
 	<script>
-		window.rootNode = document.getElementById('meeting-list-box');
+		window.rootNode = document.getElementById('meeting-level-box');
 	</script>
 	<script src="/assets/js/jquery.min.js"></script>
 	<!-- 遮罩层 -->
@@ -66,7 +74,7 @@
 	<script src="/assets/plugins/layui/layui.js"></script>
 	<!-- <script src="/assets/js/common.js?v=3.1.0"></script> -->
 	<script src="/assets/js/ui.js?v=3.1.0"></script>
-	<script type="text/babel" src="./index.jsx" domId="meeting-list-box"></script>
+	<script type="text/babel" src="./index.jsx" domId="meeting-level-box"></script>
 	<script>
 		var ctx = '\/';
 	</script>

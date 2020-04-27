@@ -1,18 +1,46 @@
 .test{
 	// background-color: pink !important;
+	position: relative;
+	top: -0.035rem;
+	width: 0.41rem;
+	height: 0.22rem;
+	background-color: #ffffff;
+	text-align: center;
+	line-height: 0.22rem;
 }
-.g2-tooltip{
-	background-color: yellow !important;
+
+#circle{
+	.g2-tooltip{
+		background-color: rgb(243, 89, 13) !important;
+		// background-color: yellow !important;
+		.top-test{
+			position: relative;
+			top: -0.05rem;
+			color: #fff;
+			text-align: center;
+			line-height: 0.14rem;
+		}
+	}
 }
 .meeting-list-box{
 	height: 100%;
 	overflow: auto;
-
+	.ant-upload-list{
+		display: none;
+	}
 	// public padding
 	.padding-view {
 		padding: 0.2rem;
 	}
-		//text title style 
+	.visual-box{
+		.ant-spin-nested-loading{
+
+			height: 100%;
+			.ant-spin-container{
+				height: 100%;
+			}
+		} 
+	}
 	.view-title{
 				
 		font-family: MicrosoftYaHei;
@@ -108,6 +136,9 @@
 		color: #646464;
 		font-size: 0.16rem;
 		font-weight: bold;
+	}
+	.ant-empty{
+		height: 2rem;
 	}
 .table-box {
 	.my-icon-component-content{

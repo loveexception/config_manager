@@ -1,17 +1,14 @@
 (function (w) {
 	// 地址
 
-	const href = 'http://172.16.16.9/api/backgroundinterface/meeting/';
-	const href2 = 'http://172.16.16.9/api/backgroundinterface/meetingLevel/'
+	const href = 'http://172.16.16.9/api/backgroundinterface/meetingLevel/';
 	// /batchDeleteMeeting
 	w.backgroundInterface = {
-		getMeetingByPage,
-		saveMeeting,
-		updateMeeting,
-		getDurationStats,
-		batchDeleteMeeting,
+		getMeetingLevelByPage,
 		getMeetingLevelByDept,
-		getMeetingLevelStats
+		batchDelete,
+		saveMeetingLevel,
+		updateMeetingLevel,
 	};
 	function getDeptId() {
 		let id = localStorage.getItem('deptId');
@@ -21,13 +18,11 @@
 		return id
 	}
 
-
-
-	function getDurationStats(params, callback) {  // 持续时间状态
+	function getMeetingLevelByPage(params, callback) {  // 持续时间状态
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href + 'getDurationStats',
+			url: href + 'getMeetingLevelByPage',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -37,11 +32,11 @@
 		})
 
 	}
-	function getMeetingLevelStats(params, callback) {  // 持续时间状态
+	function updateMeetingLevel(params, callback) {  // 持续时间状态
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href + 'getMeetingLevelStats',
+			url: href + 'update',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -51,11 +46,26 @@
 		})
 
 	}
+	function saveMeetingLevel(params, callback) {  // 持续时间状态
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + 'save',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+
+	}
+
 	function getMeetingLevelByDept(params, callback) {  // 持续时间状态
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href2 + 'getMeetingLevelByDept',
+			url: href + 'getMeetingLevelByDept',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -65,11 +75,11 @@
 		})
 
 	}
-	function batchDeleteMeeting(params, callback) {  //删除
+	function batchDelete(params, callback) {  // 持续时间状态
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href + 'batchDeleteMeeting',
+			url: href + 'batchDelete',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -78,49 +88,6 @@
 			success: callback
 		})
 
-	}
-	function getMeetingByPage(params, callback) {  //列表
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'getMeetingByPage',
-			data: JSON.stringify(params),
-			dataType: 'json',
-			async: false,
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			contentType: "application/json",
-			success: callback
-		})
-	}
-	function saveMeeting(params, callback) {  ///保存函数
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'saveMeeting',
-			data: JSON.stringify(params),
-			dataType: 'json',
-			async: false,
-			// 加东西 
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			contentType: "application/json",
-			success: callback
-		})
-
-	}
-	function updateMeeting(params, callback) {  // 更新函数
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'updateMeeting',
-			data: JSON.stringify(params),
-			dataType: 'json',
-			async: false,
-			// 加东西 
-
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			contentType: "application/json",
-			success: callback
-		})
 	}
 
 })(window)

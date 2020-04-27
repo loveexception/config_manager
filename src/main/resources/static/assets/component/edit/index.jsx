@@ -36,7 +36,7 @@
 	let start = "";
 	let end = "";
 	const WarrperFormComponent = (props) => {
-		let { liObj = [], data = {}, commitFn } = props;
+		let { liObj = [], data = {}, commitFn, inputMessage = {}, formName = 'form' } = props;
 		const [form] = Form.useForm();
 		const layout = {
 			labelCol: {
@@ -52,30 +52,9 @@
 				span: 16,
 			},
 		};
-		const onGenderChange = value => {
-			switch (value) {
-				case 'male':
-					form.setFieldsValue({
-						note: 'Hi, man!',
-					});
-					return;
-
-				case 'female':
-					form.setFieldsValue({
-						note: 'Hi, lady!',
-					});
-					return;
-
-				case 'other':
-					form.setFieldsValue({
-						note: 'Hi there!',
-					});
-			}
-		};
-
 		const onFinish = formData => {
 			for (let d in formData) {
-				if (formData[d] instanceof moment) {
+				if (moment.isMoment(formData[d])) {
 					formData[d] = moment(formData[d]).valueOf();
 				}
 
@@ -87,25 +66,30 @@
 			form.resetFields();
 		};
 		function handleChange() {
-			console.log(arguemnts)
 		}
 		useEffect(() => {
-			console.log(props, 'props')
-		})
+		}, [])
 		return (
-			<Form {...data} {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-				{liObj.map(({ isStart = true, selectArr, type = "input", leftName = "", required = false, placeholder = "", key, }, index) => {
+			<Form {...data} {...layout} form={form} name={formName} onFinish={onFinish} onFinishFailed={function () {
+			}} initialValues={parent.currentEditObj || {}}>
+				{liObj.map(({ isStart = true, selectArr, type = "input", leftName = "", rule, required = false, placeholder = "", key, }, index) => {
 					// required = false;
+					let value = {};
+					if (inputMessage[key]) {
+						value.defaultValue = inputMessage[key]
+					}
 					let _props = {
 						name: key,
 						label: leftName,
 						required,
 						key: index,
+						validateFirst: true
 					};
 					switch (type) {
 						case 'input':
 							return <Form.Item
 								{..._props}
+								name={key}
 								rules={[
 									{
 										required,
@@ -113,15 +97,12 @@
 									},
 								]}
 							>
-								<Input placeholder={placeholder} />
+								<Input
+									placeholder={placeholder} />
 							</Form.Item>
 						case "select":
-							if (isStart) {
-								start = key;
-							} else {
-								end = key;
-							}
 							return <Form.Item
+								name={key}
 								{..._props}
 								rules={[
 									{
@@ -131,6 +112,7 @@
 								]}
 							>
 								<Select
+									name="edit"
 									placeholder={placeholder}
 								// onChange={onGenderChange}
 								>
@@ -139,36 +121,60 @@
 									})}
 								</Select>
 							</Form.Item>
+
 						case "time":
+							if (isStart) {
+								start = key;
+							} else {
+								end = key;
+							}
 							return <ConfigProvider key={index} locale={antd.locales.zh_CN}>
 								<Form.Item
+									// initialValue={moment(parent.currentEditObj[key])} 	
 									{..._props}
 									rules={[
 										{
-											// type: 'object',
 											required: true,
 											message: '请选择时间',
 										}, ({ getFieldValue }) => ({
+
 											validator(rule, value) {
-												// console.log()
-												if (momentShowTime(getFieldValue(start)) < momentShowTime(getFieldValue(end)) || getFieldValue(end) === undefined || getFieldValue(start) === undefined) {
+												if (isStart) {
+													return Promise.resolve()
+
+												}
+												if (momentShowTime(getFieldValue(start)) <= momentShowTime(getFieldValue(end))) {
 													return Promise.resolve()
 												}
-												// if (!value ||  === value) {
-												// return Promise.resolve();
-												// }
-
-												return Promise.reject('开始时间应大于结束时间');
+												return Promise.reject('结束时间应大于开始时间');
+											},
+										}),
+										({ getFieldValue }) => ({
+											validator(rule, value) {
+												if (isStart) {
+													return Promise.resolve()
+												}
+												if (!rule) {
+													return Promise.resolve()
+												}
+												if (momentShowTime(getFieldValue(start)) + 24 * 60 * 60 * 1000 >= momentShowTime(getFieldValue(end))) {
+													return Promise.resolve()
+												}
+												return Promise.reject('时间差不能超过24小时');
 											},
 										})
 									]}
 								>
-									<DatePicker placeholder={placeholder} showTime format="YYYY-MM-DD HH:mm:ss" />
+									<DatePicker
+										// defaultValue={inputMessage[key]|| ''}
+										placeholder={placeholder} showTime format="YYYY-MM-DD HH:mm:ss" />
 								</Form.Item>
 							</ConfigProvider>
 						default:
 							return (<Form.Item
 								{...props}
+								initialValue={parent.currentEditObj[key]}
+
 								rules={[
 									{
 										required,
@@ -231,7 +237,7 @@
 			</div>
 			<div className="my-edit-component-content">
 				<div className="my-title"> {title} </div>
-				<WarrperFormComponent commitFn={commitFn} data={data} liObj={liObj} />
+				<WarrperFormComponent {...props} />
 			</div>
 		</div>)
 	}
