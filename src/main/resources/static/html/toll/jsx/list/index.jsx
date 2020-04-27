@@ -1,4 +1,4 @@
-let { Select, Radio, Button, Icon, Popconfirm, PageHeader, List, Avatar, Table, Input, InputNumber, Form, message } = antd;
+let { Select, Radio, Button, Icon, Popconfirm, PageHeader, Spin, List, Avatar, Table, Input, InputNumber, Form, message } = antd;
 const { Option } = Select;
 let MIcon = function (props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
@@ -172,7 +172,9 @@ class FooterEditableFormTable extends React.PureComponent {
 										if (!value[1].id) {
 											return;
 										}
+										this.props.setLoading && this.props.setLoading(true)
 										$.post('/mao/upgrades/remove', { ids: value[1].id }, results => {
+											this.props.setLoading && this.props.setLoading(false)
 											if (results.code === 0) {
 												message.success(results.msg, 0.5);
 												this.props.listReq && this.props.listReq();
@@ -294,7 +296,16 @@ class FooterEditableFormTable extends React.PureComponent {
 
 		return (
 			<FooterEditableContext.Provider value={this.props.form}>
-				<Table components={components} bordered dataSource={this.state.data} columns={columns} rowClassName="editable-row" pagination={false} />
+				<Table  {...{
+					...this.props,
+					components,
+					dataSource: this.state.data,
+					columns,
+					rowClassName: "editable-row",
+					pagination: false,
+					bordered: true
+				}}
+				/>
 			</FooterEditableContext.Provider>
 		);
 	}
@@ -441,13 +452,18 @@ function EditableFormTable(props) {
 		}
 	];
 	function listReq() {
+		let { setLoading = function () { } } = props;
+		setLoading(true)
 		$.post('/mao/upgrades/list', results => {
+			setTimeout(() => {
+
+				setLoading(false)
+			});
 			if (Array.isArray(results.rows)) {
 				let isRadio = [true, true, true, true];
 				results.rows.forEach(e => {
 					isRadio[e.grade] = false;
 				});
-				// debugger
 				props.upDataIsPolling && props.upDataIsPolling(results.rows.length);
 				setRowData(results.rows);
 				setIsRadio(isRadio);
@@ -469,8 +485,13 @@ function EditableFormTable(props) {
 		return () => { };
 	}, []);
 	let handleClick = () => {
+		console.log(props, 'props')
+		let { setLoading = function () { } } = props;
 		let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
+
+		setLoading(true)
 		$.post('/mao/upgrades/addDo', data, function (results) {
+			setLoading(false)
 			if (results.code === 0) {
 				message.success(results.msg, 0.5);
 				// reset()
@@ -598,7 +619,8 @@ class Toll extends React.Component {
 		this.flag = true;
 		this.state = {
 			isUpgrade: true,
-			isPolling: true
+			isPolling: true,
+			isLoading: true
 		};
 	}
 	componentDidMount() {
@@ -613,10 +635,8 @@ class Toll extends React.Component {
 			this.flag = false;
 		}
 		if (rowLength > 0) {
-			// this.setState({isUpgrade:true})
 			this.setState({ isPolling: false });
 		} else {
-			// this.setState({isUpgrade:false})
 			this.setState({ isPolling: true });
 		}
 	};
@@ -624,6 +644,11 @@ class Toll extends React.Component {
 	isUpgradeFn = (boolean) => {
 		this.setState({ isUpgrade: boolean });
 	};
+	setLoading = (bool) => {
+		this.setState({
+			isLoading: bool
+		})
+	}
 	render() {
 		let { isUpgrade } = this.state;
 		return (
@@ -636,9 +661,11 @@ class Toll extends React.Component {
 					) : (
 							''
 						)}
-					<div className="bottom-margin">
-						<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgrade={isUpgrade} isUpgradeFn={this.isUpgradeFn} />
-					</div>
+					<Spin spinning={this.state.isLoading} tip="">
+						<div className="bottom-margin">
+							<EditableFormTable setLoading={this.setLoading} upDataIsPolling={this.upDataIsPolling} isUpgrade={isUpgrade} isUpgradeFn={this.isUpgradeFn} />
+						</div>
+					</Spin>
 				</div>
 			</div>
 		);

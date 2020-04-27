@@ -1,6 +1,23 @@
 .my-table-component-box{
 	height: 90%;
 	margin-bottom: 0.5rem;
+	.my-table-container{
+		position: relative;
+		height: 80%;
+		// border: 1px solid rgb(153, 153, 153);
+		background-color: #fff;
+		.ant-empty {
+		}
+	}
+	.ant-table-tbody{
+
+		>tr{
+
+			>td{
+				// border-bottom: 0;
+			}
+		}
+	}
 	.header-box{
 		display: flex;
 		flex-direction: column;
@@ -50,15 +67,14 @@
 			display: flex;
 			justify-content: flex-end;
 			position: absolute;
-			bottom: -0.35rem;
-			right: 0rem;
+			bottom: 0.3rem;
+			right: 1rem;
 		}
 		.ant-table-content{
-			height: 4rem;
+			height: auto;
 			background: #fff
 		}
 		.ant-table-wrapper{
-		// height: 100%;
 		table{
 			// height: 4.5rem;
 			.ant-table-row {

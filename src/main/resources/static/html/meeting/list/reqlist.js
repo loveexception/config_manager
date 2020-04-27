@@ -2,11 +2,18 @@
 	// 地址
 
 	const href = 'http://172.16.16.9/api/backgroundinterface/meeting/';
+	const href2 = 'http://172.16.16.9/api/backgroundinterface/meetingLevel/'
 	// /batchDeleteMeeting
 	w.backgroundInterface = {
 		getMeetingByPage,
 		saveMeeting,
-		updateMeeting
+		updateMeeting,
+		getDurationStats,
+		batchDeleteMeeting,
+		getMeetingLevelByDept,
+		getMeetingLevelStats,
+		getDownLoadUrl,
+		downLoad
 	};
 	function getDeptId() {
 		let id = localStorage.getItem('deptId');
@@ -16,7 +23,91 @@
 		return id
 	}
 
-	function getMeetingByPage(params, callback) {
+	function getDownLoadUrl(params, callback) {
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + 'downLoadMeetingTemplate',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+	}
+	function downLoad(url, callback) {
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url,
+			// data: JSON.stringify(params),
+			responseType: 'blob',
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+	}
+
+	function getDurationStats(params, callback) {  // 持续时间状态
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + 'getDurationStats',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+
+	}
+	function getMeetingLevelStats(params, callback) {  // 持续时间状态
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + 'getMeetingLevelStats',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+
+	}
+	function getMeetingLevelByDept(params, callback) {  // 持续时间状态
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href2 + 'getMeetingLevelByDept',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+
+	}
+	function batchDeleteMeeting(params, callback) {  //删除
+		$.ajax({
+			cache: true,
+			type: 'POST',
+			url: href + 'batchDeleteMeeting',
+			data: JSON.stringify(params),
+			dataType: 'json',
+			async: false,
+			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
+			contentType: "application/json",
+			success: callback
+		})
+
+	}
+	function getMeetingByPage(params, callback) {  //列表
 		$.ajax({
 			cache: true,
 			type: 'POST',
@@ -29,11 +120,11 @@
 			success: callback
 		})
 	}
-	function saveMeeting(params, callback) {
+	function saveMeeting(params, callback) {  ///保存函数
 		$.ajax({
 			cache: true,
 			type: 'POST',
-			url: href + '/saveMeeting',
+			url: href + 'saveMeeting',
 			data: JSON.stringify(params),
 			dataType: 'json',
 			async: false,
@@ -44,7 +135,7 @@
 		})
 
 	}
-	function updateMeeting(params, callback) {
+	function updateMeeting(params, callback) {  // 更新函数
 		$.ajax({
 			cache: true,
 			type: 'POST',
@@ -59,107 +150,5 @@
 			success: callback
 		})
 	}
-	// 上传图片
-	function diagramuploadImg(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			contentType: "application/json",
-			url: href + 'topology/upload',
-			data: JSON.stringify(params),
-			dataType: 'json',
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-
-			async: false,
-			success: callback
-		})
-	}
-	//重命名
-	function diagramRename(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'topology/renameById',
-			contentType: "application/json",
-			data: JSON.stringify(params),
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			dataType: 'json',
-			async: false,
-			success: callback
-		})
-	}
-	// 点击显示图片
-	function diagramViewImg(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'topology/preview',
-			contentType: "application/json",
-			data: JSON.stringify(params),
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			dataType: 'json',
-			async: false,
-			success: callback
-		})
-	}
-	// 点击下载图片 多
-	function test() {
-	}
-	function diagramMDownImg(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'topology/beachDownImg',
-			data: JSON.stringify(params),
-			dataType: 'json',
-			contentType: "application/json",
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			async: false,
-			success: callback
-		})
-	}
-	// 点击下载图片 单
-	function diagramODownImg(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'GET',
-			url: href + 'topology/downImg',
-			data: JSON.stringify(params),
-			contentType: "application/json",
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			dataType: 'json',
-			async: false,
-			success: callback
-		})
-	}
-	// 点击删除图片 单
-	function diagramORmImg(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			contentType: "application/json",
-			url: href + 'topology/deleteByPrimaryKey',
-			data: JSON.stringify(params),
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			dataType: 'json',
-			async: false,
-			success: callback
-		})
-	}
-	// 点击删除图片 多
-	function diagramMRmImg(params, callback) {
-		$.ajax({
-			cache: true,
-			type: 'POST',
-			url: href + 'topology/beachDel',
-			data: JSON.stringify(params),
-			contentType: "application/json",
-			headers: { 'Content-Type': 'application/json;charset=utf8', 'dept_id': getDeptId() },
-			dataType: 'json',
-			async: false,
-			success: callback
-		})
-	}
-	//
 
 })(window)

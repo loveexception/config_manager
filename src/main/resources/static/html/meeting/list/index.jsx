@@ -1,18 +1,103 @@
 let { useRef, useState, useEffect, useLayoutEffect, PureComponent } = React;
 let allHeight = 150;// 图高度设置 不包括饼图
 let DiagramAction = window.DiagramAction;
-let { Popconfirm, Upload, Tag, UpCircleFilled, Form, message, Icon, Input, InputNumber, Button, Table, Tooltip, Modal, DatePicker, BackTop, ConfigProvider } = antd;
+let { Popconfirm, Upload, Tag, UpCircleFilled, Form, message, Spin, Icon, Input, InputNumber, Button, Table, Tooltip, Modal, DatePicker, BackTop, ConfigProvider } = antd;
 let { confirm } = Modal;
 let Message = message;
 let { RangePicker } = DatePicker;
-let { FormOutlined } = icons;
+let { FormOutlined, LoadingOutlined } = icons;
 
-
-let { getMeetingByPage } = window.backgroundInterface;
+let { downLoad, getDownLoadUrl, getMeetingByPage, batchDeleteMeeting, getDurationStats, getMeetingLevelByDept, getMeetingLevelStats } = window.backgroundInterface;
 let { _import = {}, } = window;
 let { TableComponent, MyIcon } = _import;
 moment.locale('zh-cn')
+getMeetingLevelByDept({}, function (res) {
+	if (res.success) {
+		window.meetingLevelObj = res.data;
+	} else {
+		window.meetingLevelObj = []
+		message.error('接口报错', .5)
+	}
+})
 
+function toDayNow() {
+	let time = new Date(Date.now());
+	let now = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate()
+	let result = moment(now).valueOf();
+	return result
+}
+// 请求函数 
+function chartFn({ begin_time = toDayNow(), end_time = Date.now() }, upDateFn = {}) {
+	let fn = function () { };
+	function getYearAndMonthAndDay(startTime, endTime) {
+		console.log(startTime)
+		// debugger
+		var date_all = [], i = 0;
+		// var startTime = start.getDate();
+		// var endTime = end.getDate();
+		while ((endTime.getTime() - startTime.getTime()) >= 0) {
+			var year = startTime.getFullYear();
+			var month = (startTime.getMonth() + 1).toString().length == 1 ? "0" + (startTime.getMonth() + 1).toString() : (startTime.getMonth() + 1).toString();
+			var day = startTime.getDate().toString().length == 1 ? "0" + startTime.getDate() : startTime.getDate();
+			date_all[i] = year + "-" + month + "-" + day;
+			startTime.setDate(startTime.getDate() + 1);
+			i += 1;
+		}
+		return date_all;
+	}
+	let {
+		isLoadingLeft = fn,
+		isLoadingRight = fn,
+		visualBottomOfLoading = fn,
+		visualBottomData = fn,
+		visualTopData = fn,
+	} = upDateFn;
+	isLoadingRight(true)
+	visualBottomOfLoading(true)
+	if (moment.isMoment(begin_time)) {
+		begin_time = begin_time.valueOf();
+		end_time = end_time.valueOf();
+	}
+	let paramTime = { begin_time, end_time };
+	getDurationStats(paramTime, function (res) {
+		if (res.success) {
+			let start = 0;
+			let end = 0;
+			let arr = [];
+			for (let k in res.data) {
+				// moment(k)
+				// debugger
+				let m = moment(k).valueOf()
+				start = start ? m < start ? m : start : m;
+				end = end > m ? end : m;
+			}
+
+			if (start && end) {
+
+				arr = getYearAndMonthAndDay(new Date(start), new Date(end))
+			}
+			arr.forEach((e) => {
+				res.data[e] = res.data[e] ? res.data[e] : { sum: 0 }; //补0
+			})
+			visualBottomData(res.data)
+			setTimeout(() => {
+				visualBottomOfLoading(false)
+			}, 300)
+		} else {
+			message.error('接口报错', .5);
+		}
+	})
+	getMeetingLevelStats(paramTime, function (res) {
+		if (res.success) {
+			setTimeout(() => {
+				isLoadingRight(false)
+			}, 300)
+			visualTopData(res.data)
+		} else {
+			message.error('接口报错', .5);
+		}
+	})
+}
 function dateUtil(time) {
 	let result = time.getFullYear() + '-' + (time.getMonth() - 0 + 1) + '-' + time.getDate() + ' ' + time.getHours() + ':' + time.getMinutes();
 	return result;
@@ -23,6 +108,8 @@ class DateRange extends React.Component {
 		startValue: null,
 		endValue: null,
 		endOpen: false,
+		begin_time: toDayNow(),
+		end_time: Date.now()
 	};
 
 	disabledStartDate = startValue => {
@@ -40,13 +127,39 @@ class DateRange extends React.Component {
 		}
 		return endValue.valueOf() <= startValue.valueOf();
 	};
-
-	onChange = (field, value) => {
+	componentDidMount() {
+		setTimeout(() => {
+			chartFn({}, this.props.useChartObj)
+			this.props.getResetFn && this.props.getResetFn(this.resetTimeData)
+		}, 500)
+	}
+	onChange = (field, value, xx) => {
+		let { useChartObj = {} } = this.props;
 		this.setState({
 			[field]: value,
+		}, () => {
+			if (this.state.endValue && this.state.startValue) {
+				// loading  
+				// 发请求
+				chartFn({ begin_time: this.state.startValue, end_time: this.state.endValue }, useChartObj)
+			}
+
 		});
 	};
-
+	onChange2 = (field, value, xx) => {
+		let { useChartObj = {} } = this.props;
+		let [begin_time, end_time] = field;
+		this.setState({
+			begin_time, end_time
+		})
+		if (begin_time && end_time) {
+			chartFn({ begin_time, end_time }, useChartObj)
+		}
+	};
+	resetTimeData = () => {
+		let { useChartObj = {} } = this.props;
+		chartFn({ begin_time: this.state.begin_time, end_time: this.state.end_time }, useChartObj)
+	}
 	onStartChange = value => {
 		this.onChange('startValue', value);
 	};
@@ -76,32 +189,38 @@ class DateRange extends React.Component {
 				<span className="data-title">会议数据统计表</span>
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<ConfigProvider locale={antd.locales && antd.locales.zh_CN}>
-					<DatePicker
-						disabledDate={this.disabledStartDate}
-						showTime
-						format="YYYY-MM-DD HH:mm"
-						value={startValue}
-						placeholder="开始时间"
-						onChange={this.onStartChange}
-						onOpenChange={this.handleStartOpenChange}
-					/>
+					{/* <DatePicker
+					disabledDate={this.disabledStartDate}
+					showTime
+					format="YYYY-MM-DD HH:mm"
+					value={startValue}
+					placeholder="开始时间"
+					onChange={this.onStartChange}
+					onOpenChange={this.handleStartOpenChange}
+				/>
 					至
 				<DatePicker
-						ranges={{
-							Today: [moment(), moment()],
-							'This Month': [moment().startOf('month'), moment().endOf('month')],
-						}}
-						disabledDate={this.disabledEndDate}
+					ranges={{
+						Today: [moment(), moment()],
+						'This Month': [moment().startOf('month'), moment().endOf('month')],
+					}}
+					disabledDate={this.disabledEndDate}
+					showTime
+					format="YYYY-MM-DD HH:mm"
+					value={endValue}
+					placeholder="结束时间"
+					onChange={this.onEndChange}
+					open={endOpen}
+					onOpenChange={this.handleEndOpenChange}
+				/>  */}
+					<RangePicker
+						defaultValue={[moment(toDayNow()), moment(Date.now())]}
+						onChange={this.onChange2}
 						showTime
-						format="YYYY-MM-DD HH:mm"
-						value={endValue}
-						placeholder="结束时间"
-						onChange={this.onEndChange}
-						open={endOpen}
-						onOpenChange={this.handleEndOpenChange}
+						format="YYYY/MM/DD HH:mm:ss"
 					/>
 				</ConfigProvider>
-			</div>
+			</div >
 		);
 	}
 }
@@ -110,9 +229,23 @@ class DateRange extends React.Component {
 
 //圆柱图 && 饼图
 function VisualTop(props) {
-	let [count, setCount] = useState(1);
+	let [count, setCount] = useState(0);
+	let [isLoadingLeft, setIsLoadingLeft] = useState(false);
+	let [isLoadingRight, setIsLoadingRight] = useState(false)
+	let [visualTopData, setVisualTopData] = useState([])
+	let [chartObj, setChartObj] = props.useChartObj;
+	let pie = useRef(null);
+	let circle = useRef(null);
 	// 圆柱
 	useEffect(() => {
+		circle.current.firstChild && circle.current.removeChild(circle.current.firstChild)
+		const data = []; //{ year: '正常例会', value: 5 },
+		visualTopData.forEach((e) => {
+			data.push({
+				year: e.level_name,
+				value: e.duration
+			})
+		})
 		G2.registerShape('interval', 'border-radius', {
 			draw(cfg, container) {
 				const points = cfg.points;
@@ -123,7 +256,6 @@ function VisualTop(props) {
 				path.push(['L', points[3].x, points[3].y]);
 				path.push('Z');
 				path = this.parsePath(path); // 将 0 - 1 转化为画布坐标
-
 				const group = container.addGroup();
 				group.addShape('rect', {
 					attrs: {
@@ -139,12 +271,8 @@ function VisualTop(props) {
 				return group;
 			},
 		});
-		const data = [
-			{ year: '1991', value: 3 },
-			{ year: '1992', value: 4 },
-			{ year: '1993', value: 3.5 },
-			{ year: '1994', value: 5 },
-		];
+
+
 		const chart = new G2.Chart({
 			container: 'circle',
 			// width: 50,
@@ -156,37 +284,52 @@ function VisualTop(props) {
 
 		chart.data(data);
 		chart.tooltip({
-			//showMarkers: false
+			// showCrosshairs: true, // 展示 Tooltip 辅助线
+			shared: true,
+			showTitle: false,
+			itemTpl: '<li class="top-test">{value}h</li>',
 		});
 		// 滑块选取
 		// chart.interaction('brush');
 		// 控制大小site
-		chart.interval().position('year*value').color('l(90) 0:#4c71fe 1:rgba(76, 113, 254, 0.64) ').size(5).shape('date*actual', (date, val) => {
+		chart.interval().position('year*value').color('l(90) 0:#4c71fe 1:rgba(76, 113, 254, 0.64) ').size(15).shape('date*actual', (date, val) => {
 			if (val === 0) {
 				return;
 			}
 			return 'border-radius';
 		});
 		chart.render();
-	}, [])
+	}, [visualTopData])
 	//饼图
-
 	useEffect(() => {
-		const data = [
-			{ item: '事例一', count: 40, percent: 0.4 },
-			{ item: '事例二', count: 21, percent: 0.21 },
-			{ item: '事例三', count: 17, percent: 0.17 },
-			{ item: '事例四', count: 13, percent: 0.13 },
-			{ item: '事例五', count: 9, percent: 0.09 },
+		pie.current.firstChild && pie.current.removeChild(pie.current.firstChild)
+		let data = [
 		];
-
+		let totalCount = 0;
+		visualTopData.forEach((e) => {
+			totalCount += e.count;
+		})
+		setCount(totalCount);
+		visualTopData.forEach((e) => {
+			if (e.count === 0) {
+				return
+			}
+			data.push({
+				item: e.level_name,
+				count: e.count,
+				percent: Number((e.count / totalCount).toFixed(2))
+			})
+		})
+		if (data.length === 0) {
+			return
+		}
+		console.log(data, 'data')
 		const chart = new G2.Chart({
 			container: 'pie',
 			// width: 250,
 			autoFit: true,
 			height: 220,
 		});
-
 		chart.coordinate('theta', {
 			radius: 0.75,
 		});
@@ -211,7 +354,8 @@ function VisualTop(props) {
 		chart
 			.interval()
 			.position('percent')
-			.color('item')
+			.color('item', ['rgb(76, 113, 254)', 'rgb(112, 141, 254)', 'rgb(183, 198, 255)', 'rgb(201, 212, 255)'])
+			// .color('item')
 			.label('percent', {
 				offset: -20,
 				style: {
@@ -227,34 +371,55 @@ function VisualTop(props) {
 		chart.interaction('element-active');
 
 		chart.render();
-	}, [])
-	return <div className="visual-top-box">
-		<div className="circle-box padding-view">
-			<div className="view-title">
-				会议级别时长
-		</div>
-			<span className="view-unit">
-				单位: 小时
-		</span>
-			<div id="circle" >
+	}, [visualTopData])
+	//更新数据方法
+	useEffect(() => {
+		if (chartObj.visualTopData) {
+			return
+		}
+		let config = { ...chartObj, visualTopData: setVisualTopData, isLoadingLeft: setIsLoadingLeft, isLoadingRight: setIsLoadingRight };
+		setChartObj(config)
+	}, [chartObj])
+	return <Spin style={{
+	}} spinning={isLoadingRight} tip={"加载中..."} indicator={
+		<LoadingOutlined style={{ fontSize: 24 }} spin />
+	}> <div className="visual-top-box">
 
-			</div>
+			<div className="circle-box padding-view">
+				<div className="view-title">
+					会议级别时长
 		</div>
-		<div className="pie-box padding-view">
-			<div className="view-title">
-				会议级别统计
-		</div>
-			<span className="view-unit">
-				单位: 次
+				<span className="view-unit">
+					单位: 小时
 		</span>
-			<div className="all-count">
-				<div className="all-title">总次数
-				<br />
-					<span className="all-number">{count}</span></div>
+
+				<div id="circle" ref={circle} >
+
+				</div>
 			</div>
-			<div id="pie"></div>
+
+			<div className="pie-box padding-view"
+			>
+				<div className="view-title">
+					会议级别统计
 		</div>
-	</div >
+				<span className="view-unit">
+					单位: 次
+		</span>
+				<div className="all-count">
+					<div className="all-title">总次数
+				<br />
+						<span className="all-number">{count}</span></div>
+				</div>
+
+				{/* {visualTopData.length === 0 || true ? <div className="">
+					{emptyImg}
+				</div> : */}
+				<div id="pie" ref={pie}></div>
+				{/* } */}
+			</div>
+		</div >
+	</Spin>
 
 
 
@@ -263,22 +428,25 @@ function VisualTop(props) {
 
 // 折线图
 function VisualBottom(props) {
+	let [isLoading, setIsLoading] = useState(false);
+	let [visualBottomData, setVisualBottomData] = useState({})
+	let [chartObj, setChartObj] = props.useChartObj;
+	let line = useRef(null);
+	let emptyImg = <svg className="ant-empty-img-simple" width="64" height="41" viewBox="0 0 64 41" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 1)" fill="none" fill-rule="evenodd"><ellipse class="ant-empty-img-simple-ellipse" cx="32" cy="33" rx="32" ry="7"></ellipse><g class="ant-empty-img-simple-g" fill-rule="nonzero"><path d="M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z"></path><path d="M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z" class="ant-empty-img-simple-path"></path></g></g></svg>
 	useEffect(() => {
-		const data = [
-			{ year: '1991', value: 3 },
-			{ year: '1992', value: 4 },
-			{ year: '1993', value: 3.5 },
-			{ year: '1994', value: 5 },
-			{ year: '1995', value: 4.9 },
-			{ year: '1996', value: 6 },
-			{ year: '1997', value: 7 },
-			{ year: '1998', value: 9 },
-			{ year: '1999', value: 13 },
-		];
+		line.current.firstChild && line.current.removeChild(line.current.firstChild)
+		let data = [];
+
+
+		for (let key in visualBottomData) {
+			data.push({ year: key, value: Number(visualBottomData[key].sum.toFixed(2)) })
+		}
+		data = data.sort((e1, e2) => {
+			return moment(e1.year).valueOf() - moment(e2.year).valueOf()
+		})
 		const chart = new G2.Chart({
 			container: 'line-content',
 			autoFit: true,
-
 			height: allHeight,
 		});
 
@@ -296,123 +464,153 @@ function VisualBottom(props) {
 		chart.tooltip({
 			showCrosshairs: true, // 展示 Tooltip 辅助线
 			shared: true,
+			crosshairs: {
+				type: 'xy', // 展示十字辅助线
+			},
 		});
 
-		chart.line().position('year*value').label('value');
+		// chart.line().position('year*value').label('value');
 		chart.point().position('year*value');
 		chart.area().position('year*value').style({
-			// fill: 'r(0.5,1.3,1.3) 0:#ffffff 1:#1890ff',
-			fill: "l(90) 0:#1890FF 1:#f7f7f7",
-			//stroke: 'l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff'
-		})
+			fill: "l(90) 0:rgb(119, 147, 254) 1:rgb(85, 120, 254)",
+		});
 		chart.tooltip({
 			// showCrosshairs: true, // 展示 Tooltip 辅助线
 			shared: true,
 			showTitle: false,
-			itemTpl: '<li class="test">{year} 有 {value} 个</li>',
+			itemTpl: '<li class="test">{value}h</li>',
 		});
 
 		chart.render();
-	}, [])
-	return <div className="line-box ">
-		<div className="line-title view-title">
-			会议保障时长
+	}, [visualBottomData]) //duixiang 
+	useEffect(() => {
+		if (chartObj.visualBottomData) {
+			return
+		}
+		setChartObj({ ...chartObj, visualBottomData: setVisualBottomData, visualBottomOfLoading: setIsLoading })
+	}, [chartObj])
+	return <Spin style={{
+	}} spinning={isLoading} tip={"加载中..."} indicator={
+		<LoadingOutlined style={{ fontSize: 24 }} spin />
+	}>
+		<div className="line-box ">
+			<div className="line-title view-title">
+				会议保障时长
 		</div>
-		<span className="line-unit view-unit">
-			单位: 小时
+			<span className="line-unit view-unit">
+				单位: 小时
 		</span>
-		<div id="line-content">
+			<div>
+
+				{/* {visualBottomData.key ?  */}
+				<div id="line-content" ref={line}>
+				</div>
+
+			</div>
 		</div>
-	</div>
+	</Spin >
+}
+
+// retrun 图函数
+function ImgFn(props) {
+	let { showImg, } = props;
+	return showImg === undefined ? '' : showImg ? <LoadingOutlined style={{ fontSize: 24 }} spin /> : <svg className="ant-empty-img-simple" width="64" height="41" viewBox="0 0 64 41" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 1)" fill="none" fill-rule="evenodd"><ellipse class="ant-empty-img-simple-ellipse" cx="32" cy="33" rx="32" ry="7"></ellipse><g class="ant-empty-img-simple-g" fill-rule="nonzero"><path d="M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z"></path><path d="M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z" class="ant-empty-img-simple-path"></path></g></g></svg>
 }
 function App() {
-	let node = useRef(null);
 	let [isShowBtn, setIsShowBtn] = useState(false);
-	let [dataSource, setDataSource] = useState([{
-		key: '1',
-		name: 'John Brown',
-		age: 32,
-		address: 'New York No. 1 Lake Park',
-	},
-	{
-		key: '2',
-		name: 'Jim Green',
-		age: 42,
-		address: 'London No. 1 Lake Park',
-	},
-	{
-		key: '3',
-		name: 'Joe Black',
-		age: 32,
-		address: 'Sidney No. 1 Lake Park',
-	},])
+	let [isLoading, setIsLoading] = useState(true);
+	let [dataSource, setDataSource] = useState([]);
+	let [search, setSearch] = useState({})
+	let [chartObj, setChartObj] = useState({});
+	let resetFn = useRef(() => {
+		return () => { }
+	});
 	let [paginationConfig, setPaginationConfig] = useState({
 		current: 1,
-		pageSize: 7,
-		total: 10,
-		onChange(next, size) {
-			setPaginationConfig({
-				...paginationConfig,
-				current: next
-			})
-			// console.log(arguments, 'arguments')
+		pageSize: 5,
+		// total: 550,
+		onChange(next, pageSize) {
+			getTableData({}, next, pageSize)
+			// setPaginationConfig({
+			// 	...paginationConfig,
+			// 	current: next
+			// })
 		}
 	})
-	let [selectedRowKeys, setSelectedRowKeys] = useState([])
+	// let [deleteFn, setDeleteFn] = useState()
+	let [rowKey, setRowKey] = useState([])
 	let columns = useRef([
 		{
 			title: '会议名称',
 			dataIndex: 'name',
 			key: 'name',
 			width: "10%",
-			align: 'center'
+			align: 'center',
+			sorter: true
+
 		},
 		{
 			title: '开始时间',
-			dataIndex: 'age',
-			key: 'age',
-			width: "10%",
-			align: 'center'
+			dataIndex: 'begin_time',
+			key: 'begin_time',
+			// width: "10%",
+			align: 'center',
+			sorter: true
+
 
 		},
 		{
 			title: '结束时间',
-			dataIndex: 'addess',
-			key: 'addres',
-			width: "10%",
-			align: 'center'
-
+			dataIndex: 'end_time',
+			key: 'end_time',
+			// width: "10%",
+			align: 'center',
+			sorter: true
 		},
 		{
 			title: '会议时长',
-			dataIndex: 'length',
-			key: 'length',
-			width: "10%",
-			align: 'center'
-
+			dataIndex: 'duration',
+			key: 'duration',
+			// width: "10%",
+			align: 'center',
+			render(text, record) {
+				return text + '小时'
+			}
 		},
 		{
 			title: '会议级别',
-			dataIndex: 'level',
-			key: 'level',
+			dataIndex: 'level_name',
+			key: 'level_name',
 			width: "10%",
-			align: 'center'
+			align: 'center',
+
+			// render(text) {
+
+			// 	return [
+			// 		{ key: '年中', value: 0 },
+			// 		{ key: '年终', value: 1 },
+			// 		{ key: '季度', value: 2 },
+			// 		{ key: '月例会', value: 3 },
+			// 		{ key: '周例会', value: 4 },
+			// 		{ key: '迎峰度夏', value: 5 },
+			// 		{ key: '迎峰度冬', value: 6 },
+			// 	][text].key
+			// }
 
 		},
 		{
 			title: '保证人员',
-			dataIndex: 'person',
-			key: 'person',
+			dataIndex: 'user_name',
+			key: 'user_name',
 			width: "10%",
 			align: 'center'
-
 		},
 		{
 			title: '描述',
-			dataIndex: 'message',
-			key: 'message',
+			dataIndex: 'remark',
+			key: 'remark',
 			width: "20%",
-			align: 'center'
+			// align: 'center'
 
 		},
 		{
@@ -431,19 +629,22 @@ function App() {
 							fontSize: "0.18rem"
 						}
 					}} click={() => {
-						$.modal.openFull('修改会议', '/html/meeting/edit/index.html?edit=true')
+						console.log(record, 'record')
+						window.currentEditObj = { ...record, begin_time: moment(record.begin_time), end_time: moment(record.end_time), level_id: record.level_name };
+						$.modal.openFull('修改会议', `/html/meeting/edit/index.html?edit=true&id=${record.id}`)
 					}} iconKey={"FormOutlined"} placement={"top"} text={"修改"} />
+
 					<MyIcon _props={{
 						style: {
 							fontSize: "0.18rem"
 						}
-					}} click={deleteIcon} iconKey={"DeleteOutlined"} placement={"top"} text={"删除"} />
+					}} iconKey={"DeleteOutlined"} click={function () { deleteIcon(record.id) }} placement={"top"} text={"删除"} />
 				</div >
 			}
 
 		}
 	])
-	let btnArr = useRef([{
+	let btnArr = [{
 		type: "primary",
 		size: 'default',
 		text: '新增',
@@ -452,71 +653,239 @@ function App() {
 		type: "dashed",
 		size: 'default',
 		text: '删除',
-		click: deleteFn
+		click: function () {
+			if (rowKey.length === 0) {
+				message.info('请选择删除项.', .5)
+				return
+			}
+			confirm({
+				content: '你确定要删除这些数据吗?',
+				onOk() {
+					deleteFn()
+				},
+				onCancel() {
+				},
+			})
+
+		}
+	}, {
+		type: "dashed",
+		size: 'default',
+		text: '模板下载',
+		click: dowloadFn
 	},
 	{
 		type: "dashed",
 		size: 'default',
 		text: '批量导入',
+		upload: true,
+		uploadProps: {
+			action: "http://172.16.16.9/api/backgroundinterface/meeting/uploadMeetingExcel",
+			method: "post",
+			headers: {
+				dept_id: localStorage.getItem('deptId')
+			},
+			accept: '.xlsx',
+			beforeUpload: (file, fileList) => {
+				let reg = /\.(xlsx)+$/
+				let isImg = reg.test(file.name);
+				if (isImg) {
+					return true
+				} else {
+					message.error('文件格式不对', .5)
+					return false
+				}
+				// console.log(file.type, fileList, 'file, fileList')
+			},
+			onChange(info) {
+				console.log(info, 'info')
+				if (
+					info.file.status === undefined
+				) {
+					return
+				}
+				if (info.file.status !== 'uploading') {
+					message.loading(`${info.file.name} 上传中...`);
+				}
+				if (info.file.status === 'done') {
+					// _EditableTable.props.reqListFn()
+					setTimeout(() => {
+						chartFn({}, chartObj)
+					}, 1000)
+					message.destroy()
+					message.success(`${info.file.name} 上传成功.`, .5);
+
+				} else if (info.file.status === 'error') {
+					message.destroy()
+					message.error(`${info.file.name} 上传失败.`, .5);
+				}
+			},
+
+
+		},
 		click: allImport
-	}])
+	}];
+	let selectValue = useRef({
+		config: [
+			// {key: '全部', value: 0 },
+			// {key: '会议名称', value: 0 },
+			// {key: '开始时间', value: 0 },
+			// {key: '结束时间', value: 0 },
+			// {key: '会议时长', value: 0 },
+			// {key: '会议级别', value: 0 },
+			// {key: '保证人员', value: 0 },
+			{ key: '全部', value: true },
+			{ key: '会议名称', value: 'name' },
+			{ key: '会议级别', value: 'level' },
+			{ key: '保证人员', value: 'user_name' },
+		],
+		selectCurrent: true,
+	})  //选择器配置 容器
 	let rightConfig = useRef({
 		searchConfig: {
 			onSearch: searchFn,
 			placeholder: "请输入搜索内容"
 		},
 		select: {
-			selectArr: [
-				{ key: '全部', value: 0 },
-				{ key: '会议名称', value: 0 },
-				{ key: '开始时间', value: 0 },
-				{ key: '结束时间', value: 0 },
-				{ key: '会议时长', value: 0 },
-				{ key: '会议级别', value: 0 },
-				{ key: '保证人员', value: 0 },
-				{ key: '描述', value: 0 },
-			],
-			onSelectChange: selectChangeFn
+			selectArr: selectValue.current.config,
+			onSelectChange: selectChangeFn,
+			defaultValue: selectValue.current.config[0].value  // 第几个的value值
 		}
 	})
+	let node = useRef(null);
+
 	// 新增click 事件
 	function newAdd() {
-		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false')
+		let obj = {};
+		for (let key in window.currentEditObj) {
+			obj[key] = undefined;
+		}
+		window.currentEditObj = obj;
+		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false&id=502')
 	}
-	function deleteFn() {
-
+	function confirmDelete() {
+		deleteIcon()
 	}
-	function deleteIcon() { //icon 删除
-
+	function deleteIcon(id) { //icon 删除
+		deleteFn([id])
 	}
 	function allImport() {
 
 	}
-	// 右边
-	function searchFn() {
-
+	function dowloadFn() { //模板下载
+		getDownLoadUrl({}, function (res) {
+			if (res.success) {
+				// responseType: 'blob',
+				// downLoad(res.url, (res) => {
+				// 	console.log(res)
+				// })
+				// parent.open(res.data)
+				window.top.open(res.data)
+				// console.log(, 'xx')
+				// window.open(res.data)
+				// let dealDownload = (res, fileName) => {
+				// 	let $blob = new Blob([res]);
+				// 	if (window.navigator.msSaveOrOpenBlob) {
+				// 		navigator.msSaveBlob($blob, fileName);
+				// 	} else {
+				// 		// 创建 a 标签并为其添加属性
+				// 		let $a = document.createElement("a");
+				// 		// 创建下载链接
+				// 		$a.href = window.URL.createObjectURL($blob);
+				// 		$a.download = fileName;
+				// 		document.body.appendChild($a);
+				// 		// 触发点击事件执行下载
+				// 		$a.click();
+				// 		document.body.removeChild($a);
+				// 	}
+				// }
+				// dealDownload(res.data, '模板.xlsx')
+				// let a = document.createElement('a');
+				// a.download = "模板";
+				// a.href = res.data;
+				// document.body.appendChild(a);
+				// a.click();
+				// document.body.removeChild(a);
+				// < a download="PHP实现并发请求.html" href={res.data} > PHP实现并发请求</a >
+			} else {
+				// console.log()
+				message.error('接口报错')
+			}
+			// console.log(res, 'res')
+		})
 	}
-	function selectChangeFn() {
-		console.log(arguments, 'arguments')
+
+	// 右边
+	function searchFn(value) {
+		let params = {}
+		let result = value && value.trim();
+		if (result) {
+			if (selectValue.current.selectCurrent === true) { //全部
+				// params.
+				params.all_query = result;
+			} else {
+				params[selectValue.current.selectCurrent] = result
+			}
+
+		} else {
+
+		}
+		setSearch(params)
+		getTableData(params)
+	}
+	function selectChangeFn(value) {
+		selectValue.current.selectCurrent = value;
 	}
 	function handleScroll(e) {
 
 		node.current.scrollTop > 0 ? setIsShowBtn(true) : setIsShowBtn(false)
 	}
-	function onSelectChange(selectedRowKeys) {
-		console.log('selectedRowKeys changed: ', selectedRowKeys);
-		// this.setState({selectedRowKeys});
-		setSelectedRowKeys(selectedRowKeys)
+	function deleteFn(id) {
+		setIsLoading(true)
+		batchDeleteMeeting({
+			ids: id || rowKey
+		}, function (res) {
+			if (res.success) {
+				message.success('删除成功', .5)
+				getTableData()
+			} else {
+
+			}
+		})
+	}
+	function onSelectChange(rowKey, current) {
+		setRowKey(rowKey)
 	};
+
+
+	function getResetFn(fn) {
+		resetFn.current = fn;
+	}
 	const rowSelection = {
-		selectedRowKeys: selectedRowKeys.current,
 		onChange: onSelectChange,
 	};
 
 	//获取 数据 function search ?
-	function getTableData(searchConfig) {
-		getMeetingByPage({}, (res) => {
-			console.log(res, 'res')
+	function getTableData(searchConfig = {}, next, pageSize) {
+		setIsLoading(true)
+		getMeetingByPage({
+			page_num: next || paginationConfig.current,
+			page_size: pageSize || paginationConfig.pageSize,
+			...searchConfig
+		}, (res) => {
+			if (res.success) {
+				setPaginationConfig({
+					...paginationConfig,
+					current: res.data.current_page,
+					total: res.data.total,
+					pageSize: res.data.page_size,
+				})
+				setDataSource(res.data.result)
+				resetFn.current()
+			} else {
+				message.error('接口报错', .5)
+			}
+			setIsLoading(false)
 		})
 	}
 	useEffect(function () {
@@ -524,9 +893,11 @@ function App() {
 		getTableData()
 	}, [])
 
-
+	useEffect(function () {
+	}, [rowKey])
+	useEffect(function () {
+	}, [chartObj])
 	return <div onScroll={handleScroll} className="meeting-list-box" style={{
-		// height: '200%'
 	}} ref={node}>
 		<div className="to-top" style={{
 			position: 'fixed',
@@ -541,26 +912,44 @@ function App() {
 				<img style={{
 					width: "0.18rem"
 				}} src="/assets/img/uparrow.png" alt="" />
-				{/* <Icon type="to-top" /> */}
 			</Button>
 		</div>
 		<div className="table-box">
-			<TableComponent paginationConfig={paginationConfig} rightConfig={rightConfig.current} btnArr={btnArr.current} title={"会议保障记录表"} isBordered={true} dataSource={dataSource} rowSelection={rowSelection} columns={columns.current} />
+			<TableComponent
+				isLoading={isLoading}
+				paginationConfig={paginationConfig}
+				rightConfig={rightConfig.current}
+				btnArr={btnArr}
+				title={"会议保障记录表"}
+				isBordered={true}
+				dataSource={dataSource}
+				rowSelection={rowSelection}
+				columns={columns.current}
+				onChange={function (selectedRowKeys, selectedRows, orderByClause) {
+					let { columnKey, order } = orderByClause;
+					getTableData({
+						order_by_clause: `${columnKey} ${!order ? '' : order == "ascend" ? 'asc' : 'desc'}`,
+						...search
+
+					})
+				}}
+			/>
 		</div>
 		<div className="visual-box">
 			<div className="visual-select-box">
-				<DateRange />
+				<DateRange getResetFn={getResetFn} useChartObj={chartObj} />
 			</div>
 			<div className="visual-top">
-				<VisualTop />
+				<VisualTop useChartObj={[chartObj, setChartObj]} />
 			</div>
 			<div className="visual-bottom padding-view">
-				<VisualBottom />
+				<VisualBottom useChartObj={[chartObj, setChartObj]} />
+
 			</div>
 
-		</div>
+		</div >
 
-	</div>
+	</div >
 
 }
 

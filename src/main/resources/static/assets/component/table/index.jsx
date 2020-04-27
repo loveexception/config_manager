@@ -10,7 +10,7 @@
 	if (!w._import) {
 		w._import = {}
 	}
-	let { Input, Pagination, ConfigProvider, Table, Button, Tag, Select } = antd;
+	let { Input, Pagination, ConfigProvider, Table, Button, Tag, Select, Upload } = antd;
 	const { Search } = Input;
 	function HeaderBox(props) {
 		let { btnArr = [], title = "", rightConfig = {}, selectConfig } = props;
@@ -19,6 +19,14 @@
 			<div className="use-box">
 				<div className="use-left">
 					{!_.isEmpty(btnArr) && btnArr.map((e, index) => {
+						if (e.upload) {
+
+							return <Upload {...e.uploadProps} key={index}>
+								<Button onClick={e.click} type={e.type} size={e.size}>
+									{e.text}
+								</Button>
+							</Upload>
+						}
 						return <Button key={index} onClick={e.click} type={e.type} size={e.size}>
 							{e.text}
 						</Button>
@@ -26,15 +34,15 @@
 
 				</div>
 				<div className="use-right">
-					<Select style={{ width: 120 }} onChange={rightConfig.select.onSelectChange}>
+					<Select style={{ width: 120 }} defaultValue={rightConfig.select.defaultValue} onChange={rightConfig.select.onSelectChange}>
 						{
-							rightConfig.select && rightConfig.select.selectArr.map((element, index) => (<Option value={element.value} key={index}>{element.key}</Option>))
+							rightConfig.select && rightConfig.select.selectArr.map((element, index) => (<Option value={element.value} key={element.key}>{element.key}</Option>))
 						}
 
 					</Select>
 					<Search
 						placeholder={rightConfig.searchConfig && rightConfig.searchConfig.placeholder}
-						onSearch={value => console.log(value)}
+						onSearch={rightConfig.searchConfig.onSearch}
 						style={{ width: '2rem' }}
 					/>
 				</div>
@@ -43,7 +51,7 @@
 		</div>
 	}
 	function TableComponent(props) { // 组件名唯一
-		let { title = "传入help为true获取config信息", rightConfig, btnArr = [], help = false, rowSelection = {}, dataSource = [], data = {}, columns = [], paginationConfig = false, isBordered = false } = props;
+		let { title = "传入help为true获取config信息", total = 10, rightConfig, btnArr = [], help = false, rowSelection = {}, dataSource = [], data = {}, columns = [], paginationConfig = false, isBordered = false, isLoading = false, onChange = function () { } } = props;
 		function handleChange(pagination, filters, sorter) {
 
 		}
@@ -60,12 +68,13 @@
 			</div>
 			<div className="my-table-component-content">
 				<HeaderBox rightConfig={rightConfig} title={title} btnArr={btnArr} />
-				<ConfigProvider locale={antd.locales && antd.locales.zh_CN}>
-					<Table pagination={false} bordered={isBordered} rowSelection={rowSelection} {...data} columns={columns} dataSource={dataSource} onChange={handleChange} />
-					{paginationConfig ? <Pagination style={{
-						position: "relative",
-					}} {...paginationConfig} size="small" showQuickJumper /> : ""}
-				</ConfigProvider>
+				<div className="my-table-container">
+					<ConfigProvider locale={antd.locales && antd.locales.zh_CN}>
+						<Table loading={isLoading} pagination={false} bordered={isBordered} rowSelection={rowSelection} {...data} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={record => record.id} />
+						{paginationConfig ? <Pagination style={{
+						}} {...paginationConfig} size="small" showQuickJumper /> : ""}
+					</ConfigProvider>
+				</div>
 			</div>
 		</div>)
 	}
