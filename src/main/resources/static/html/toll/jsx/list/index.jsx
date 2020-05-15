@@ -455,6 +455,7 @@ function EditableFormTable(props) {
 		let { setLoading = function () { } } = props;
 		setLoading(true)
 		$.post('/mao/upgrades/list', results => {
+			window.listResults = results.rows;
 			setTimeout(() => {
 
 				setLoading(false)
@@ -485,57 +486,66 @@ function EditableFormTable(props) {
 		return () => { };
 	}, []);
 	let handleClick = () => {
-		console.log(props, 'props')
 		let { setLoading = function () { } } = props;
+		let isAdd = true;
 		let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
-
-		setLoading(true)
-		$.post('/mao/upgrades/addDo', data, function (results) {
-			setLoading(false)
-			if (results.code === 0) {
-				message.success(results.msg, 0.5);
-				// reset()
-				setIsAdd(false);
-				listReq();
-			} else {
-				message.error(results.msg, 0.5);
-				setIsAdd(true);
-				listReq();
-			}
-		});
-		// if (!(typeof strategy.grade === 'number')) {
-		// 	message.error('没有升级项');
-		// 	return;
-		// }
+		if (!(typeof strategy.grade === 'number')) {
+				message.error('没有升级项');
+				return;
+		}
+		Array.isArray(window.listResults) && window.listResults.forEach((e)=>{
+		        if(e.grade === strategy.grade){
+					isAdd = false
+				}
+		})
+		// strategy.grade
+		// strategy.grade
+		// console.log(window.listResults,'props')
+		// debugger
+		if(isAdd){
+				$.post('/mao/upgrades/addDo', data, function (results) {
+						if (results.code === 0) {
+								message.success(results.msg, 0.5);
+								// reset()
+								setIsAdd(false);
+								listReq();
+						} else {
+								message.error(results.msg, 0.5);
+								setIsAdd(true);
+								listReq();
+						}
+				});
+		}else{
+					if (!strategy.id || !strategy.deptId) {
+		                let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
+		                if (!obj) {
+		                        return;
+		                }
+		                strategy.id = obj.id;
+		                strategy.deptId = obj.deptId;
+		        }
+				let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
+				$.post('/mao/upgrades/editDo', data, function(results) {
+						if (results.code === 0) {
+								message.success(results.msg, 0.5);
+								listReq();
+						} else {
+								message.error(results.msg, 0.5);
+								listReq();
+						}
+				});
+		}
 		// if (isAdd) {
-		// 	if (!isRadio[strategy.grade]) {
-		// 		return;
-		// 	}
+		//         if (!isRadio[strategy.grade]) {
+		//                 return;
+		//         }
 		// } else {
-		// 	// if(!strategy.id){
-		// 	// 	strategy.grade
-		// 	// }
-		// 	if (!strategy.id || !strategy.deptId) {
-		// 		let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
-		// 		if (!obj) {
-		// 			return;
-		// 		}
-		// 		strategy.id = obj.id;
-		// 		strategy.deptId = obj.deptId;
-		// 	}
-		// 	let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
-		// 	$.post('/mao/upgrades/editDo', data, function(results) {
-		// 		if (results.code === 0) {
-		// 			message.success(results.msg, 0.5);
-		// 			listReq();
-		// 		} else {
-		// 			message.error(results.msg, 0.5);
-		// 			listReq();
-		// 		}
-		// 	});
-		// }
+		//         // if(!strategy.id){
+		//         //         strategy.grade
+		//         // }
+
 		return;
-	};
+};
 	let handleEdit = (mes, index, e) => {
 		setIsDisplay(false)
 		// debugger
