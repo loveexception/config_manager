@@ -37,7 +37,7 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/lz4/lz4-java/1.4.1/lz4-java-1.4.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/xerial/snappy/snappy-java/1.1.7.1/snappy-java-1.1.7.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/slf4j/slf4j-api/1.7.28/slf4j-api-1.7.28.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/nutz/nutzboot-starter-caffeine/2.3.6.v20190621/nutzboot-starter-caffeine-2.3.6.v20190621.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/nutz/nutzboot-starter-caffeine/2.3.5.v20190516/nutzboot-starter-caffeine-2.3.5.v20190516.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/github/ben-manes/caffeine/caffeine/2.6.2/caffeine-2.6.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/nutz/nutzboot-starter-shiro/2.3.8-SNAPSHOT/nutzboot-starter-shiro-2.3.8-SNAPSHOT.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/nutz/nutz-integration-shiro/1.r.68-SNAPSHOT/nutz-integration-shiro-1.r.68-SNAPSHOT.jar" enabled="true" runInBatchMode="false"/>

@@ -488,6 +488,7 @@ function EditableFormTable(props) {
 	let handleClick = () => {
 		let { setLoading = function () { } } = props;
 		let isAdd = true;
+		setLoading(true)
 		let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
 		if (!(typeof strategy.grade === 'number')) {
 				message.error('没有升级项');
@@ -507,23 +508,20 @@ function EditableFormTable(props) {
 						if (results.code === 0) {
 								message.success(results.msg, 0.5);
 								// reset()
-								setIsAdd(false);
 								listReq();
 						} else {
 								message.error(results.msg, 0.5);
-								setIsAdd(true);
 								listReq();
 						}
+						setLoading(false)
 				});
 		}else{
-					if (!strategy.id || !strategy.deptId) {
 		                let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
 		                if (!obj) {
 		                        return;
 		                }
 		                strategy.id = obj.id;
 		                strategy.deptId = obj.deptId;
-		        }
 				let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
 				$.post('/mao/upgrades/editDo', data, function(results) {
 						if (results.code === 0) {
@@ -533,7 +531,9 @@ function EditableFormTable(props) {
 								message.error(results.msg, 0.5);
 								listReq();
 						}
-				});
+							setLoading(false)
+						
+					});
 		}
 		// if (isAdd) {
 		//         if (!isRadio[strategy.grade]) {
