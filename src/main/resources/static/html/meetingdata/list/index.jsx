@@ -958,27 +958,7 @@ function App() {
 					/>
 				</Button>
 			</div>
-			<div className="table-box">
-				<TableComponent
-					isLoading={isLoading}
-					paginationConfig={paginationConfig}
-					rightConfig={rightConfig.current}
-					btnArr={btnArr}
-					title={'会议保障记录表'}
-					isBordered={true}
-					dataSource={dataSource}
-					rowSelection={rowSelection}
-					columns={columns.current}
-					onChange={function (selectedRowKeys, selectedRows, orderByClause) {
-						let { columnKey, order } = orderByClause;
-						getTableData({
-							order_by_clause: `${columnKey} ${!order ? '' : order == 'ascend' ? 'asc' : 'desc'}`,
-							...search,
-						});
-					}}
-				/>
-			</div>
-			{/* <div className="visual-box">
+			<div className="visual-box">
 				<div className="visual-select-box">
 					<DateRange getResetFn={getResetFn} useChartObj={chartObj} />
 				</div>
@@ -988,7 +968,7 @@ function App() {
 				<div className="visual-bottom padding-view">
 					<VisualBottom useChartObj={[chartObj, setChartObj]} />
 				</div>
-			</div> */}
+			</div>
 		</div>
 	);
 }
