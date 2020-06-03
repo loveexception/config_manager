@@ -23,53 +23,53 @@
 		<script th:inline="javascript">
 			var prefix = ctx + 'wx/tOtherMessages';
 
-			$(function() {
+			$(function () {
 				var options = {
 					url: prefix + '/list',
 					createUrl: prefix + '/add',
 					updateUrl: prefix + '/edit/{id}',
 					removeUrl: prefix + '/remove',
 					exportUrl: prefix + '/export',
-					modalName: 'kafka的推送',
+					modalName: '维护提醒',
 					search: false,
 					showExport: true,
 					columns: [
 						{
-							checkbox: true
+							checkbox: true,
 						},
 						{
 							field: 'cnName',
-							title: '设备名称'
+							title: '设备名称',
 						},
 						{
 							field: 'sno',
 							title: '设备序列号',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'dept_id',
 							title: '所属机构',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'dept.deptName',
-							title: '公司'
+							title: '公司',
 						},
 						{
 							field: 'message',
 							title: '内容',
-							sortable: true
+							sortable: true,
 						},
 						{
 							title: '操作',
 							align: 'center',
-							formatter: function(value, row, index) {
+							formatter: function (value, row, index) {
 								var actions = [];
 								actions.push('<a class="btn btn-danger btn-xs " href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 								return actions.join('');
-							}
-						}
-					]
+							},
+						},
+					],
 				};
 				$.table.init(options);
 			});
