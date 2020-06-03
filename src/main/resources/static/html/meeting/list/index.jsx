@@ -207,6 +207,7 @@ function VisualTop(props) {
 	let pie = useRef(null);
 	let circle = useRef(null);
 	// 圆柱
+
 	useEffect(() => {
 		circle.current.firstChild && circle.current.removeChild(circle.current.firstChild);
 		const data = []; //{ year: '正常例会', value: 5 },
@@ -216,31 +217,32 @@ function VisualTop(props) {
 				value: e.duration,
 			});
 		});
-		G2.registerShape('interval', 'border-radius', {
-			draw(cfg, container) {
-				const points = cfg.points;
-				let path = [];
-				path.push(['M', points[0].x, points[0].y]);
-				path.push(['L', points[1].x, points[1].y]);
-				path.push(['L', points[2].x, points[2].y]);
-				path.push(['L', points[3].x, points[3].y]);
-				path.push('Z');
-				path = this.parsePath(path); // 将 0 - 1 转化为画布坐标
-				const group = container.addGroup();
-				group.addShape('rect', {
-					attrs: {
-						x: path[1][1], // 矩形起始点为左上角
-						y: path[1][2],
-						width: path[2][1] - path[1][1],
-						height: path[0][2] - path[1][2],
-						fill: cfg.color,
-						radius: (path[2][1] - path[1][1]) / 2,
-					},
-				});
+		console.log(data, 'data');
+		// G2.registerShape('interval', 'border-radius', {
+		// 	draw(cfg, container) {
+		// 		const points = cfg.points;
+		// 		let path = [];
+		// 		path.push(['M', points[0].x, points[0].y]);
+		// 		path.push(['L', points[1].x, points[1].y]);
+		// 		path.push(['L', points[2].x, points[2].y]);
+		// 		path.push(['L', points[3].x, points[3].y]);
+		// 		path.push('Z');
+		// 		path = this.parsePath(path); // 将 0 - 1 转化为画布坐标
+		// 		const group = container.addGroup();
+		// 		group.addShape('rect', {
+		// 			attrs: {
+		// 				x: path[1][1], // 矩形起始点为左上角
+		// 				y: path[1][2],
+		// 				width: path[2][1] - path[1][1],
+		// 				height: path[0][2] - path[1][2],
+		// 				fill: cfg.color,
+		// 				radius: (path[2][1] - path[1][1]) / 2,
+		// 			},
+		// 		});
 
-				return group;
-			},
-		});
+		// 		return group;
+		// 	},
+		// });
 
 		const chart = new G2.Chart({
 			container: 'circle',
@@ -766,11 +768,6 @@ function App() {
 		//模板下载
 		getDownLoadUrl({}, function (res) {
 			if (res.success) {
-				// responseType: 'blob',
-				// downLoad(res.url, (res) => {
-				// 	console.log(res)
-				// })
-				// parent.open(res.data)
 				window.top.open(res.data);
 				// console.log(, 'xx')
 				// window.open(res.data)

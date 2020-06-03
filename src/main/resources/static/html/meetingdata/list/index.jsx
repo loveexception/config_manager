@@ -391,17 +391,6 @@ function VisualBottom(props) {
 	let [visualBottomData, setVisualBottomData] = useState({});
 	let [chartObj, setChartObj] = props.useChartObj;
 	let line = useRef(null);
-	let emptyImg = (
-		<svg className="ant-empty-img-simple" width="64" height="41" viewBox="0 0 64 41" xmlns="http://www.w3.org/2000/svg">
-			<g transform="translate(0 1)" fill="none" fill-rule="evenodd">
-				<ellipse class="ant-empty-img-simple-ellipse" cx="32" cy="33" rx="32" ry="7"></ellipse>
-				<g class="ant-empty-img-simple-g" fill-rule="nonzero">
-					<path d="M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z"></path>
-					<path d="M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z" class="ant-empty-img-simple-path"></path>
-				</g>
-			</g>
-		</svg>
-	);
 	useEffect(() => {
 		line.current.firstChild && line.current.removeChild(line.current.firstChild);
 		let data = [];
@@ -522,199 +511,6 @@ function App() {
 		return () => {};
 	});
 	// let [deleteFn, setDeleteFn] = useState()
-	let columns = useRef([
-		{
-			title: '会议名称',
-			dataIndex: 'name',
-			key: 'name',
-			width: '12%',
-			align: 'center',
-			sorter: true,
-		},
-		{
-			title: '开始时间',
-			dataIndex: 'begin_time',
-			key: 'begin_time',
-			width: '12%',
-			align: 'center',
-			sorter: true,
-		},
-		{
-			title: '结束时间',
-			dataIndex: 'end_time',
-			key: 'end_time',
-			width: '12%',
-			align: 'center',
-			sorter: true,
-		},
-		{
-			title: '会议时长',
-			dataIndex: 'duration',
-			key: 'duration',
-			width: '12%',
-			align: 'center',
-			render(text, record) {
-				return text + '小时';
-			},
-		},
-		{
-			title: '会议级别',
-			dataIndex: 'level_name',
-			key: 'level_name',
-			width: '10%',
-			align: 'center',
-
-			// render(text) {
-
-			// 	return [
-			// 		{ key: '年中', value: 0 },
-			// 		{ key: '年终', value: 1 },
-			// 		{ key: '季度', value: 2 },
-			// 		{ key: '月例会', value: 3 },
-			// 		{ key: '周例会', value: 4 },
-			// 		{ key: '迎峰度夏', value: 5 },
-			// 		{ key: '迎峰度冬', value: 6 },
-			// 	][text].key
-			// }
-		},
-		{
-			title: '保证人员',
-			dataIndex: 'user_name',
-			key: 'user_name',
-			width: '10%',
-			align: 'center',
-		},
-		{
-			title: '描述',
-			dataIndex: 'remark',
-			key: 'remark',
-			width: '20%',
-			// align: 'center'
-		},
-		{
-			title: '操作',
-			key: '操作',
-			width: '10%',
-			align: 'center',
-			render(text, record) {
-				return (
-					<div
-						style={{
-							display: 'flex',
-							justifyContent: 'space-around',
-						}}
-					>
-						<MyIcon
-							_props={{
-								style: {
-									fontSize: '0.18rem',
-								},
-							}}
-							click={() => {
-								window.currentEditObj = { ...record, begin_time: moment(record.begin_time), end_time: moment(record.end_time), level_id: record.level_name };
-								$.modal.openFull('修改会议', `/html/meeting/edit/index.html?edit=true&id=${record.id}`);
-							}}
-							iconKey={'FormOutlined'}
-							placement={'top'}
-							text={'修改'}
-						/>
-
-						<MyIcon
-							_props={{
-								style: {
-									fontSize: '0.18rem',
-								},
-							}}
-							iconKey={'DeleteOutlined'}
-							click={function () {
-								deleteFn([record.id]);
-							}}
-							placement={'top'}
-							text={'删除'}
-						/>
-					</div>
-				);
-			},
-		},
-	]);
-	let btnArr = [
-		{
-			type: 'primary',
-			size: 'default',
-			text: '新增',
-			click: newAdd,
-		},
-		{
-			type: 'dashed',
-			size: 'default',
-			text: '删除',
-			click: function () {
-				if (rowKey.length === 0) {
-					message.info('请选择删除项.', 0.5);
-					return;
-				}
-				confirm({
-					content: '你确定要删除这些数据吗?',
-					onOk() {
-						deleteFn();
-					},
-					onCancel() {},
-				});
-			},
-		},
-		{
-			type: 'dashed',
-			size: 'default',
-			text: '模板下载',
-			click: dowloadFn,
-		},
-		{
-			type: 'dashed',
-			size: 'default',
-			text: '批量导入',
-			upload: true,
-			uploadProps: {
-				action: 'http://172.16.16.9/api/backgroundinterface/meeting/uploadMeetingExcel',
-				method: 'post',
-				headers: {
-					dept_id: localStorage.getItem('deptId'),
-				},
-				accept: '.xlsx',
-				beforeUpload: (file, fileList) => {
-					let reg = /\.(xlsx)+$/;
-					let isImg = reg.test(file.name);
-					if (isImg) {
-						return true;
-					} else {
-						message.error('文件格式不对', 0.5);
-						return false;
-					}
-					// console.log(file.type, fileList, 'file, fileList')
-				},
-				onChange(info) {
-					console.log(info, 'info');
-					if (info.file.status === undefined) {
-						return;
-					}
-					if (info.file.status !== 'uploading') {
-						message.loading(`${info.file.name} 上传中...`);
-					}
-					if (info.file.status === 'done') {
-						// _EditableTable.props.reqListFn()
-						setTimeout(() => {
-							chartFn({}, chartObj);
-						}, 1000);
-						message.destroy();
-						message.success(`${info.file.name} 上传成功.`, 0.5);
-					} else if (info.file.status === 'error') {
-						message.destroy();
-						message.error(`${info.file.name} 上传失败.`, 0.5);
-					}
-				},
-			},
-			click: allImport,
-		},
-	];
 	let selectValue = useRef({
 		config: [
 			// {key: '全部', value: 0 },
@@ -761,16 +557,10 @@ function App() {
 
 		deleteFn([id]);
 	}
-	function allImport() {}
 	function dowloadFn() {
 		//模板下载
 		getDownLoadUrl({}, function (res) {
 			if (res.success) {
-				// responseType: 'blob',
-				// downLoad(res.url, (res) => {
-				// 	console.log(res)
-				// })
-				// parent.open(res.data)
 				window.top.open(res.data);
 				// console.log(, 'xx')
 				// window.open(res.data)
@@ -899,38 +689,6 @@ function App() {
 	}, []);
 
 	useEffect(function () {}, [rowKey]);
-	useEffect(
-		function () {
-			// let page_size = _paginationConfig.pageSize;
-			// let page_num = _paginationConfig.current;
-			// 	getTableData = function getTableData(searchConfig = {}, next, pageSize) {
-			// 		setIsLoading(true);
-			// 		getMeetingByPage(
-			// 			{
-			// 				page_size: pageSize || page_size,
-			// 				page_num: next || page_num,
-			// 				...searchConfig,
-			// 			},
-			// 			(res) => {
-			// 				if (res.success) {
-			// 					setPaginationConfig({
-			// 						...paginationConfig,
-			// 						current: res.data.current_page,
-			// 						total: res.data.total,
-			// 						pageSize: res.data.page_size,
-			// 					});
-			// 					setDataSource(res.data.result);
-			// 					resetFn.current();
-			// 				} else {
-			// 					message.error('接口报错', 0.5);
-			// 				}
-			// 				setIsLoading(false);
-			// 			}
-			// 		);
-			// 	};
-		},
-		[_paginationConfig]
-	);
 	return (
 		<div onScroll={handleScroll} className="meeting-list-box" style={{}} ref={node}>
 			<div
