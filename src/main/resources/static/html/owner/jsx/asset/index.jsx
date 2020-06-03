@@ -8,7 +8,7 @@ for (var i = 0; i < scripts.length; i++) {
 		domId = script.getAttribute('domId');
 	}
 }
-$.modal.openFull = function(title, url, width, height) {
+$.modal.openFull = function (title, url, width, height) {
 	//如果是移动端，就使用自适应大小弹窗
 	if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
 		width = 'auto';
@@ -38,15 +38,15 @@ $.modal.openFull = function(title, url, width, height) {
 		// btn: ['确定', '关闭'],
 		// 弹层外区域关闭
 		shadeClose: false,
-		yes: function(index, layero) {
+		yes: function (index, layero) {
 			var iframeWin = layero.find('iframe')[0];
 			iframeWin.contentWindow.submitHandler();
 		},
-		cancel: function(index, layero) {
+		cancel: function (index, layero) {
 			var iframeWin = layero.find('iframe')[0];
 			return iframeWin.contentWindow.cancelHandler();
 			// return true;
-		}
+		},
 	});
 	layer.full(index);
 };
@@ -74,32 +74,32 @@ class ChartCircle extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: []
+			data: [],
 		};
 	}
 	componentDidMount() {
 		let { chartData = [] } = this.props.chartData;
 		let data = [];
 		let allCount = 0;
-		chartData.forEach(item => {
+		chartData.forEach((item) => {
 			allCount += item.count;
 		});
 		!_.isEmpty(chartData) &&
-			chartData.forEach(e => {
+			chartData.forEach((e) => {
 				if (e.asset === '已用') {
 					data.unshift({
 						type: `已用:${((e.count / allCount) * 100).toFixed(0)}%`,
-						value: e.count
+						value: e.count,
 					});
 				} else {
 					data.push({
 						type: `闲置:${((e.count / allCount) * 100).toFixed(0)}%`,
-						value: e.count
+						value: e.count,
 					});
 				}
 			});
 		this.setState({
-			data
+			data,
 		});
 	}
 	componentDidUpdate() {
@@ -107,27 +107,27 @@ class ChartCircle extends React.PureComponent {
 		let { chartData = [] } = this.props;
 		let data = [];
 		let allCount = 0;
-		chartData.forEach(item => {
+		chartData.forEach((item) => {
 			allCount += item.count;
 		});
 		!_.isEmpty(chartData) &&
-			chartData.forEach(e => {
+			chartData.forEach((e) => {
 				if (e.asset === '已用') {
 					data.unshift({
 						type: `已用:${((e.count / allCount) * 100).toFixed(0)}%`,
-						value: e.count
+						value: e.count,
 					});
 				} else {
 					data.push({
 						type: `闲置:${((e.count / allCount) * 100).toFixed(0)}%`,
-						value: e.count
+						value: e.count,
 					});
 				}
 			});
 		if (data.length != this.state.data.length) {
 			this.setState(
 				{
-					data
+					data,
 				},
 				() => {
 					this.init();
@@ -145,14 +145,14 @@ class ChartCircle extends React.PureComponent {
 			type: 'percent',
 			field: 'value',
 			dimension: 'type',
-			as: 'percent'
+			as: 'percent',
 		});
 		var chart = new G2.Chart({
 			container: 'mountNode',
 			forceFit: true,
 			height: '350',
 			width: '450',
-			padding: 'auto'
+			padding: 'auto',
 		});
 		chart.source(dv);
 		chart.legend(false);
@@ -160,7 +160,7 @@ class ChartCircle extends React.PureComponent {
 			radius: 0.75,
 			innerRadius: 0.5,
 			startAngle: startAngle,
-			endAngle: startAngle + Math.PI * 2
+			endAngle: startAngle + Math.PI * 2,
 		});
 		chart
 			.intervalStack()
@@ -173,15 +173,15 @@ class ChartCircle extends React.PureComponent {
 					fill: 'white',
 					fontSize: 12,
 					shadowBlur: 2,
-					shadowColor: 'rgba(0, 0, 0, .45)'
+					shadowColor: 'rgba(0, 0, 0, .45)',
 				},
 				formatter: function formatter(val) {
 					return ((val - 0) * 100).toFixed(0) + '%';
-				}
+				},
 			});
 		chart.guide().html({
 			position: ['50%', '50%'],
-			html: '<div></div>'
+			html: '<div></div>',
 			//  html: '<div class="g2-guide-html"><p class="title">总计</p><p class="value">19670</p></div>'
 		});
 		chart.render();
@@ -199,7 +199,7 @@ class ChartCircle extends React.PureComponent {
 		var labels = [];
 		addPieLabel(chart);
 		canvas.draw();
-		chart.on('afterpaint', function() {
+		chart.on('afterpaint', function () {
 			addPieLabel(chart);
 		});
 		//main
@@ -223,7 +223,7 @@ class ChartCircle extends React.PureComponent {
 					x: routerPoint.x,
 					y: routerPoint.y,
 					r: r + OFFSET,
-					fill: '#bfbfbf'
+					fill: '#bfbfbf',
 				};
 				// 判断文本的方向
 				if (edgePoint.x < center.x) {
@@ -235,17 +235,17 @@ class ChartCircle extends React.PureComponent {
 				}
 			} // end of for
 			var maxCountForOneSide = parseInt(canvasHeight / LINEHEIGHT, 10);
-			halves.forEach(function(half, index) {
+			halves.forEach(function (half, index) {
 				// step 2: reduce labels
 				if (half.length > maxCountForOneSide) {
-					half.sort(function(a, b) {
+					half.sort(function (a, b) {
 						return b._percent - a._percent;
 					});
 					half.splice(maxCountForOneSide, half.length - maxCountForOneSide);
 				}
 
 				// step 3: distribute position (x and y)
-				half.sort(function(a, b) {
+				half.sort(function (a, b) {
 					return a.y - b.y;
 				});
 				antiCollision(half, index);
@@ -255,7 +255,7 @@ class ChartCircle extends React.PureComponent {
 		function getEndPoint(center, angle, r) {
 			return {
 				x: center.x + r * Math.cos(angle),
-				y: center.y + r * Math.sin(angle)
+				y: center.y + r * Math.sin(angle),
 			};
 		}
 
@@ -270,10 +270,10 @@ class ChartCircle extends React.PureComponent {
 				fontSize: 17, // 字体大小
 				fill: '#808080',
 				text: label._data.type, //+ '\n' + label._data.value,
-				textBaseline: 'bottom'
+				textBaseline: 'bottom',
 			};
 			var lastPoint = {
-				y: y
+				y: y,
 			};
 
 			if (label._side === 'left') {
@@ -289,7 +289,7 @@ class ChartCircle extends React.PureComponent {
 
 			// 绘制文本
 			var text = labelGroup.addShape('Text', {
-				attrs: labelAttrs
+				attrs: labelAttrs,
 			});
 			labels.push(text);
 			// 绘制连接线
@@ -299,13 +299,13 @@ class ChartCircle extends React.PureComponent {
 				points = [
 					[_anchor.x, _anchor.y],
 					[_router.x, y],
-					[lastPoint.x, lastPoint.y]
+					[lastPoint.x, lastPoint.y],
 				];
 			} else {
 				points = [
 					[_anchor.x, _anchor.y],
 					[_router.x, _router.y],
-					[lastPoint.x, lastPoint.y]
+					[lastPoint.x, lastPoint.y],
 				];
 			}
 
@@ -313,8 +313,8 @@ class ChartCircle extends React.PureComponent {
 				attrs: {
 					points: points,
 					lineWidth: 1,
-					stroke: fill
-				}
+					stroke: fill,
+				},
 			});
 		}
 
@@ -326,7 +326,7 @@ class ChartCircle extends React.PureComponent {
 
 			var maxY = 0;
 			var minY = Number.MIN_VALUE;
-			var boxes = half.map(function(label) {
+			var boxes = half.map(function (label) {
 				var labelY = label.y;
 				if (labelY > maxY) {
 					maxY = labelY;
@@ -336,7 +336,7 @@ class ChartCircle extends React.PureComponent {
 				}
 				return {
 					size: LINEHEIGHT,
-					targets: [labelY - startY]
+					targets: [labelY - startY],
 				};
 			});
 			if (maxY - startY > totalH) {
@@ -344,7 +344,7 @@ class ChartCircle extends React.PureComponent {
 			}
 
 			while (overlapping) {
-				boxes.forEach(function(box) {
+				boxes.forEach(function (box) {
 					var target = (Math.min.apply(minY, box.targets) + Math.max.apply(minY, box.targets)) / 2;
 					box.pos = Math.min(Math.max(minY, target - box.size / 2), totalH - box.size);
 				});
@@ -374,9 +374,9 @@ class ChartCircle extends React.PureComponent {
 
 			// step 4: normalize y and adjust x
 			i = 0;
-			boxes.forEach(function(b) {
+			boxes.forEach(function (b) {
 				var posInCompositeBox = startY; // middle of the label
-				b.targets.forEach(function() {
+				b.targets.forEach(function () {
 					half[i].y = b.pos + posInCompositeBox + LINEHEIGHT / 2;
 					posInCompositeBox += LINEHEIGHT;
 					i++;
@@ -384,7 +384,7 @@ class ChartCircle extends React.PureComponent {
 			});
 
 			// (x - cx)^2 + (y - cy)^2 = totalR^2
-			half.forEach(function(label) {
+			half.forEach(function (label) {
 				var rPow2 = label.r * label.r;
 				var dyPow2 = Math.pow(Math.abs(label.y - center.y), 2);
 				if (rPow2 < dyPow2) {
@@ -455,40 +455,40 @@ function Pillar(props) {
 			//				forceFit: true,
 			width: 450,
 			height: 390,
-			padding: [10, 20, 50, 51]
+			padding: [10, 20, 50, 51],
 		});
 		setChartFlag(true);
 		chart.source(data);
 		chart.scale('value', {
-			alias: '分类统计(台)'
+			alias: '分类统计(台)',
 		});
 		chart.axis('', {
 			label: {
 				textStyle: {
-					fill: 'pink'
-				}
+					fill: 'pink',
+				},
 			},
 			tickLine: {
 				alignWithLabel: false,
-				length: 0
-			}
+				length: 0,
+			},
 		});
 
 		chart.axis('value', {
 			label: {
 				textStyle: {
-					fill: '#aaaaaa'
-				}
-			}
+					fill: '#aaaaaa',
+				},
+			},
 		});
 
 		chart.tooltip({
-			share: true
+			share: true,
 		});
 		chart
 			.interval()
 			.position('title*value')
-			.opacity('title', function(val) {
+			.opacity('title', function (val) {
 				//				if(val === '视频') {
 				//					return 0.4;
 				//				}
@@ -499,7 +499,7 @@ function Pillar(props) {
 					return 0;
 				},
 				stroke: '#636363',
-				lineDash: [3, 9]
+				lineDash: [3, 9],
 			})
 			.color('#30359D');
 		chart.render();
@@ -511,7 +511,7 @@ function Pillar(props) {
 				if (e.type) {
 					result.push({
 						title: e.type,
-						value: e.count - 0
+						value: e.count - 0,
 					});
 				}
 				return;
@@ -564,7 +564,7 @@ function AssetFooter(props) {
 	}, [props, changeCount]);
 
 	function reqChange() {
-		$.get('/wx/tOtherMessages/change', obj => {
+		$.get('/wx/tOtherMessages/change', (obj) => {
 			if (obj.code == 0) {
 				changFlag = false;
 				setChangeCount(obj.data);
@@ -592,7 +592,7 @@ function AssetFooter(props) {
 				</div>
 			</div>
 			{/*  text={} */}
-			<Frame right={{ isRight: true }} isEditUpdata={isEditUpdata} rightHandleClick={rightHandleClick}></Frame>
+			<Frame reqFunc={props.reqFunc} right={{ isRight: true }} isEditUpdata={isEditUpdata} rightHandleClick={rightHandleClick}></Frame>
 			<div className="option-box-right" onClick={rightHandleClick}>
 				<img className="option-left-img" src="/assets/img/footer-arrow.png" alt="" />
 				<div className="option-left-text">{text.rightText}</div>
@@ -633,20 +633,20 @@ function Frame(props) {
 	}, [props]);
 
 	function reqMessage() {
-		$.get('/wx/tOtherMessages/messages', result => {
+		$.get('/wx/tOtherMessages/messages', (result) => {
 			if (result.code == 0) {
 				let resultArr = [];
 				let obj = result.data;
 				if (Array.isArray(obj)) {
 					messageFlag = false;
-					obj.forEach(item => {
+					obj.forEach((item) => {
 						let { sno, cnName = '', id, message } = item;
 						resultArr.push({
 							sno,
 							cnName,
 							message,
 							id,
-							key: id
+							key: id,
 						});
 					});
 					setMessageArr(resultArr);
@@ -660,12 +660,12 @@ function Frame(props) {
 		onChange: (selectedRowKeys, selectedRows) => {},
 		onSelect: (record = {}, selected, selectedRows) => {
 			if (selected) {
-				setReqArrList(list => {
+				setReqArrList((list) => {
 					return [...list, record.id];
 				});
 			} else {
-				setReqArrList(list => {
-					let index = reqArrList.findIndex(id => {
+				setReqArrList((list) => {
+					let index = reqArrList.findIndex((id) => {
 						return record.id === id;
 					});
 
@@ -677,14 +677,14 @@ function Frame(props) {
 		onSelectAll: (selected, selectedRows = [], changeRows) => {
 			if (selected) {
 				//点击 全部 的回调 if true allckecked
-				let result = selectedRows.map(e => {
+				let result = selectedRows.map((e) => {
 					return e.id;
 				});
 				setReqArrList(result);
 			} else {
 				setReqArrList([]);
 			}
-		}
+		},
 	};
 	function reqUpdata(arr = []) {
 		let url = `/wx/tIotDevices/change?`;
@@ -695,7 +695,7 @@ function Frame(props) {
 				url += `id=${id}&`;
 			}
 		});
-		$.get(url, function(obj) {
+		$.get(url, function (obj) {
 			if (obj.code == 0) {
 				reqRestFnc();
 				antd.message.success('操作成功', 0.5);
@@ -714,7 +714,7 @@ function Frame(props) {
 				ids += `${id},`;
 			}
 		});
-		$.post(url, { ids }, function(obj) {
+		$.post(url, { ids }, function (obj) {
 			if (obj.code == 0) {
 				reqMessage();
 				antd.message.success('操作成功', 0.5);
@@ -729,42 +729,42 @@ function Frame(props) {
 			title: '资产机器码',
 			width: 200,
 			dataIndex: 'sno',
-			key: 'sno'
+			key: 'sno',
 		},
 		{
 			title: '资产状态',
 			dataIndex: 'assetStatus',
 			key: 'assetStatus',
-			width: 150
+			width: 150,
 		},
 		{
 			title: '资产编码',
 			dataIndex: 'enName',
 			key: '资产编码',
-			width: 100
+			width: 100,
 		},
 		{
 			title: '资产名称',
 			dataIndex: 'cnName',
 			key: '资产名称',
-			width: 150
+			width: 150,
 		},
 		{
 			title: '部门',
 			dataIndex: 'dept',
 			key: '部门',
-			width: 150
+			width: 150,
 		},
 		{
 			title: '检查时间',
 			dataIndex: 'gatewayExtsno',
 			key: '检查时间',
-			width: 200
+			width: 200,
 		},
 		{
 			title: '型号',
 			dataIndex: 'kind',
-			key: '类型'
+			key: '类型',
 		},
 		{ title: '厂家', dataIndex: 'kindmap', key: '厂家', width: 150 },
 		{
@@ -775,29 +775,29 @@ function Frame(props) {
 			render: (a, record) => (
 				<LinkButton
 					text="确认"
-					onClick={function() {
+					onClick={function () {
 						handleReq(record);
 					}}
 				/>
-			)
-		}
+			),
+		},
 	];
 	const columnsUpdata = [
 		{
 			title: 'sno',
 			dataIndex: 'sno',
-			key: 'sno'
+			key: 'sno',
 		},
 
 		{
 			title: '资产名称',
 			dataIndex: 'cnName',
-			key: '资产名称'
+			key: '资产名称',
 		},
 		{
 			title: '提醒',
 			dataIndex: 'message',
-			key: '提醒'
+			key: '提醒',
 		},
 		{
 			title: '操作',
@@ -807,17 +807,17 @@ function Frame(props) {
 			render: (a, record) => (
 				<LinkButton
 					text="确认"
-					onClick={function() {
+					onClick={function () {
 						handleReqMessage(record);
 					}}
 				/>
-			)
-		}
+			),
+		},
 	];
 	function handleReq(data) {
 		if (Array.isArray(data)) {
 			let arr = [];
-			data.forEach(e => {
+			data.forEach((e) => {
 				arr.push(e);
 			});
 			data.length > 0 ? reqUpdata(arr) : '';
@@ -828,7 +828,7 @@ function Frame(props) {
 	function handleReqMessage(data) {
 		if (Array.isArray(data)) {
 			let arr = [];
-			data.forEach(e => {
+			data.forEach((e) => {
 				arr.push(e);
 			});
 			data.length > 0 ? reqUpdataMessage(arr) : '';
@@ -840,9 +840,9 @@ function Frame(props) {
 		$.get(
 			'/wx/tIotDevices/out_time',
 			{
-				next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
+				next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)),
 			},
-			function(obj) {
+			function (obj) {
 				if (obj.code == 0) {
 					let arr = obj.rows;
 					let reqArrRest = [];
@@ -865,7 +865,7 @@ function Frame(props) {
 								kindmap,
 								kind: kind.cnName,
 								id,
-								key: id
+								key: id,
 							});
 						});
 					setData(reqArrRest);
@@ -882,7 +882,7 @@ function Frame(props) {
 		return result;
 	}
 	let linkButtonConfig = {
-		text: '确认'
+		text: '确认',
 	};
 	//selet callback
 	function resetReq() {
@@ -895,7 +895,7 @@ function Frame(props) {
 		<div className="modal-box">
 			<Modal title={props.right && props.right.isRight ? '更换提醒' : '检修提醒'} width={'80%'} afterClose={resetReq} footer={null} style={{ top: 0 }} visible={modal1Visible} cancelText="取消" okText="确认" onOk={() => setModal1Visible(false)} onCancel={() => setModal1Visible(false)}>
 				<LinkButton
-					onClick={function() {
+					onClick={function () {
 						if (props.right && props.right.isRight) {
 							handleReqMessage(reqArrList);
 						} else {
@@ -934,7 +934,7 @@ class AssetContent extends React.PureComponent {
 			pillar: [],
 			reqFlag: false,
 			isEdit: false,
-			couterUpdata: 0
+			couterUpdata: 0,
 		};
 	}
 	reqFunc = () => {
@@ -944,17 +944,17 @@ class AssetContent extends React.PureComponent {
 		}
 		let url = '/wx/tIotDevices/';
 		let params = {
-			next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))
+			next_time: dateUtil(new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)),
 		};
-		$.get(url + 'count', params, obj => {
+		$.get(url + 'count', params, (obj) => {
 			if (obj.code == 0) {
 				this.setState({
 					couter: obj.data.count, //更改 数量 左1
-					isLoading: false
+					isLoading: false,
 				});
 			} else {
 				this.setState({
-					isLoading: false
+					isLoading: false,
 				});
 				antd.message.error('接口报错', 0.5);
 			}
@@ -963,25 +963,25 @@ class AssetContent extends React.PureComponent {
 	componentDidMount() {
 		this.init();
 		this.reqFunc();
-		$.get('/wx/tIotDevices/money', obj => {
+		$.get('/wx/tIotDevices/money', (obj) => {
 			if (obj.code == 0) {
 				if (Array.isArray(obj.data) && obj.data.length > 0) {
-					let resultArr = obj.data.map(e => {
+					let resultArr = obj.data.map((e) => {
 						e.count = e.count - 0;
 						e.sum = e.sum - 0;
 					});
 					this.setState({
-						chartData: obj.data
+						chartData: obj.data,
 					});
 				}
 			} else {
 				console.log('接口报错');
 			}
 		});
-		$.get('/wx/tIotDevices/group', obj => {
+		$.get('/wx/tIotDevices/group', (obj) => {
 			if (obj.code == 0) {
 				this.setState({
-					pillar: obj.data
+					pillar: obj.data,
 				});
 			} else {
 				console.log('接口报错');
