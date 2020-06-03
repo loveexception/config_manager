@@ -268,7 +268,7 @@ class EditableTable extends React.Component {
 					if (strNumber == 0) {
 						strNumber = strNumber.slice(0, strNumber.length - 1) + '1';
 					}
-					return strNumber + 'MB';
+					return <span>{strNumber + 'MB'}</span>;
 				},
 				// editable: true,
 			},
@@ -293,7 +293,7 @@ class EditableTable extends React.Component {
 					if (!text) {
 						return;
 					}
-					return moment(text).format('YYYY-MM-DD HH:mm:ss');
+					return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
 					// return dateUtil(new Date(record));
 				},
 
@@ -594,10 +594,29 @@ function ButtonList(props) {
 							message.loading(`${info.file.name} 上传中...`);
 						}
 						if (info.file.status === 'done') {
-							diagramuploadImg();
+							try {
+								let { data = {} } = info.file.response;
+								let { file_name, size, url, name } = data;
+								let _name = name.split('.')[0];
+								let suffix_name = name.split('.')[1];
+								DiagramAction.diagramuploadImg(
+									{
+										file_name,
+										size,
+										url,
+										suffix_name,
+										name: _name,
+									},
+									function (res) {
+										message.destroy();
+										message.success(`${info.file.name} 上传成功.`, 0.5);
+									}
+								);
+							} catch (error) {
+								message.error('添加失败');
+							}
+
 							_EditableTable.props.reqListFn();
-							message.destroy();
-							message.success(`${info.file.name} 上传成功.`, 0.5);
 						} else if (info.file.status === 'error') {
 							message.destroy();
 							message.error(`${info.file.name} 上传失败.`, 0.5);
