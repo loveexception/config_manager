@@ -1,0 +1,1 @@
+ alter table `t_iot_devops_reason` modify id int auto_increment;
