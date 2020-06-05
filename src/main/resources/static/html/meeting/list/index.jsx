@@ -612,6 +612,7 @@ function App() {
 									fontSize: '0.18rem',
 								},
 							}}
+							overlayClassName="edit"
 							click={() => {
 								window.currentEditObj = { ...record, begin_time: moment(record.begin_time), end_time: moment(record.end_time), level_id: record.level_name };
 								$.modal.openFull('修改会议', `/html/meeting/edit/index.html?edit=true&id=${record.id}`);
@@ -627,6 +628,7 @@ function App() {
 									fontSize: '0.18rem',
 								},
 							}}
+							overlayClassName="del"
 							iconKey={'DeleteOutlined'}
 							click={function () {
 								deleteFn([record.id]);
@@ -855,6 +857,7 @@ function App() {
 	//获取 数据 function search ?
 	let getTableData = function getTableData(searchConfig = {}, next, pageSize) {
 		// paginationConfig
+		let page_num = next || paginationConfig.handleClosure.current || 1;
 		// useEffect(
 		// 	(state) => {
 		// 		console.log(state, 'state');
@@ -864,7 +867,7 @@ function App() {
 		setIsLoading(true);
 		getMeetingByPage(
 			{
-				page_num: next || paginationConfig.handleClosure.current,
+				page_num,
 				page_size: pageSize || paginationConfig.handleClosure.pageSize,
 				...searchConfig,
 			},
