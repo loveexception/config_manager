@@ -5,6 +5,7 @@ let { message } = antd;
 let { _import = {} } = window;
 let { EditComponent } = _import;
 let { saveMeeting, updateMeeting, getMeetingLevelByDept } = window.backgroundInterface;
+let { Spin } = antd;
 let isEdit = location.search.split('?')[1];
 // console.log(location.search)
 // let isEdit = false;
@@ -39,6 +40,7 @@ function dateUtil(time) {
 function App(props) {
 	let [inputMessage, setInputMessage] = React.useState({});
 	let [selectDept, setSelectDept] = React.useState([]); // object key value
+	let [isShow, setIsShow] = React.useState(false);
 	let liObj = [
 		{
 			leftName: '会议名称',
@@ -114,6 +116,7 @@ function App(props) {
 
 	function commitFn(data) {
 		//发送请求
+		setIsShow(true);
 		if (isEdit === true) {
 			// updateMeeting({ ...data, id, begin_time: dateUtil(data.begin_time), end_time: dateUtil(data.end_time) }, (res) => {
 			let level = selectDept.find((e) => {
@@ -127,10 +130,11 @@ function App(props) {
 				// 	"level": 1,
 				// 	"user_name": "苏苏"
 				// }, (res) => {
+				setIsShow(false);
 				if (res.success) {
-					$.modal.close();
 					parent.getTableData();
 					message.success('修改成功');
+					$.modal.close();
 				} else {
 					message.error('修改失败');
 				}
@@ -145,7 +149,8 @@ function App(props) {
 				// 	"level": 1,
 				// 	"user_name": "苏苏"
 				// }, (res) => {
-				$.modal.close();
+				setIsShow(false);
+				// $.modal.close();
 				if (res.success) {
 					message.success('添加成功');
 					parent.getTableData();
@@ -158,7 +163,9 @@ function App(props) {
 	}
 	return (
 		<div className="meeting-edit-box">
-			<EditComponent formName={'meeting-edit-box'} inputMessage={inputMessage} liObj={liObj} title={isEdit ? '修改基本信息' : '新增基本信息'} commitFn={commitFn} />
+			<Spin spinning={isShow}>
+				<EditComponent formName={'meeting-edit-box'} inputMessage={inputMessage} liObj={liObj} title={isEdit ? '修改基本信息' : '新增基本信息'} commitFn={commitFn} />
+			</Spin>
 		</div>
 	);
 }
