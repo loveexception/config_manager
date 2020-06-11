@@ -20,7 +20,13 @@
         </div>
 
 
-
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <label class="radio-box"> <input type="radio" name="status" value="true"  th:checked="'true'==${tag.status}" /> 正常 </label>
+                <label class="radio-box"> <input type="radio" name="status" value="false" th:checked="'false'==${tag.status}" /> 停用 </label>
+            </div>
+        </div>
 
     </form>
 </div>
