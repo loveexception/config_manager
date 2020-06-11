@@ -208,7 +208,6 @@ public class TTopoBasesController implements AdminKey {
 			if(Lang.isNotEmpty(tTopoBases)){
 				tTopoBases.setUpdateBy(ShiroUtils.getSysUserId());
 				tTopoBases.setUpdateTime(new Date());
-				
 				tTopoBasesService.update(tTopoBases);
 			}
 			return Result.success("system.success");
