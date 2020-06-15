@@ -69,7 +69,7 @@ TagController implements AdminKey {
 					"%" + name + "%");
 			cnd.and(group);
 		}
-		cnd.and("status", "=", "true");
+		//cnd.and("status", "=", "true");
 		cnd.and("delflag", "=", "false");
 		if (!isAdmin()) {
 			SqlExpressionGroup group = Cnd.exps("dept_id", "=", DEPT_ADMIN).or("dept_id", "=",
