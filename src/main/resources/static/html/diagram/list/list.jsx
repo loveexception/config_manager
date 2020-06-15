@@ -28,19 +28,20 @@ function toZip(imgSrcList, fileName) {
 	let zip = new JSZip(); //实例化一个压缩文件对象
 	let imgFolder = zip.folder(fileName); //新建一个图片文件夹用来存放图片，参数为文件名
 	for (let i = 0; i < imgSrcList.length; i++) {
-		let src = imgSrcList[i];
+		let currentImg = imgSrcList[i];
+		let src = imgSrcList[i].file_url;
 		let tempImage = new Image();
 		tempImage.src = src;
 		tempImage.crossOrigin = '*';
 		tempImage.onload = () => {
-			imgFolder.file(i + 1 + '.jpg', getBase64Image(tempImage), { base64: true });
+			imgFolder.file(currentImg.name + '.' + currentImg.suffix_name, getBase64Image(tempImage), { base64: true });
+			if (imgSrcList.length === i + 1) {
+				zip.generateAsync({ type: 'blob' }).then(function (content) {
+					saveAs(content, 'zip');
+				});
+			}
 		};
 	}
-	setTimeout(() => {
-		zip.generateAsync({ type: 'blob' }).then(function (content) {
-			saveAs(content, 'zip');
-		});
-	}, 3000);
 }
 
 function getBase64Image(img) {
@@ -107,7 +108,8 @@ let uploadFn = (arr = undefined, ListFn) => {
 		if (res.success) {
 			let data = res.data;
 			let file_url_list = _.map(data, 'file_url');
-			toZip(file_url_list, '系统拓扑图');
+			// console.log(res.data, 'file_url_list');
+			toZip(data, '系统拓扑图');
 		}
 	});
 };
