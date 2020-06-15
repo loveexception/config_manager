@@ -54,7 +54,7 @@ mvn clean package nutzboot:shade
 不去服务上查看新包版本。
 
 ```
-mvn clean package nutzboot:shade -o -DskipTests -Dmaven.test.skip=true  ios
+mvn clean package nutzboot:shade -o -DskipTests -Dmaven.test.skip=true  
 
 mvn clean package nutzboot:shade -o -DskipTests
 ```
