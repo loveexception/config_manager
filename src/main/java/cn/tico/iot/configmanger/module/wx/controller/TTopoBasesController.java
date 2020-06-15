@@ -171,11 +171,21 @@ public class TTopoBasesController implements AdminKey {
 		User user = ShiroUtils.getSysUser();
 		String deptid = user.getDeptId();
 
-		List<Tag> tags = tagService.query(
-				Cnd.where("status","=",true)
-				.and("delflag","=",false)
-				.and("dept_id","=",deptid)
-		);
+		Cnd cnd = Cnd.NEW();
+
+		if(!isAdmin()){
+			SqlExpressionGroup
+					group = Cnd
+					.exps("dept_id", "=", DEPT_ADMIN)
+					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+			cnd.and(group);
+		}
+
+		cnd.and("delflag","=","false");
+
+		cnd.and("en_name","like","%\\_show");
+
+		List<Tag> tags =tagService.query(cnd);
 		List<NutMap> result =  tags.stream().map(tag -> {
 			NutMap map = NutMap.NEW()
 					.addv("id",tag.getId())
@@ -189,10 +199,66 @@ public class TTopoBasesController implements AdminKey {
 			if(Strings.equalsIgnoreCase(tTopoBases.getShowTagId(),tag.getId())){
 				map.addv("show","true");
 			}
+
 			return map;
 		}).collect(Collectors.toList());
+
 		req.setAttribute("show",result);
+
+		cnd = Cnd.NEW();
+		cnd.and("delflag","=","false");
+		cnd.and("en_name","like","%\\_unshow");
+		if(!isAdmin()){
+			SqlExpressionGroup
+					group = Cnd
+					.exps("dept_id", "=", DEPT_ADMIN)
+					.or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
+			cnd.and(group);
+		}
+		tags =tagService.query(cnd);
+
+
+		result =  tags.stream().map(tag -> {
+			NutMap map = NutMap.NEW()
+					.addv("id",tag.getId())
+					.addv("cnName",tag.getCnName())
+					.addv("enName",tag.getEnName())
+					.addv("deptId",tag.getDeptid())
+					;
+			if(Strings.equalsIgnoreCase(tTopoBases.getHideTagId(),tag.getId())){
+				map.addv("hide","true");
+			}
+			if(Strings.equalsIgnoreCase(tTopoBases.getShowTagId(),tag.getId())){
+				map.addv("show","true");
+			}
+
+			return map;
+		}).collect(Collectors.toList());
 		req.setAttribute("hide",result);
+
+
+
+
+
+
+//		List<NutMap> result =  tags.stream().map(tag -> {
+//			NutMap map = NutMap.NEW()
+//					.addv("id",tag.getId())
+//					.addv("cnName",tag.getCnName())
+//					.addv("enName",tag.getEnName())
+//					.addv("deptId",tag.getDeptid())
+//					;
+//			if(Strings.equalsIgnoreCase(tTopoBases.getHideTagId(),tag.getId())){
+//				map.addv("hide","true");
+//			}
+//			if(Strings.equalsIgnoreCase(tTopoBases.getShowTagId(),tag.getId())){
+//				map.addv("show","true");
+//			}
+//
+//			return map;
+//		}).collect(Collectors.toList());
+//		req.setAttribute("show",result);
+//		req.setAttribute("hide",result);
 	}
 
 	/**

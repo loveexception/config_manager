@@ -84,15 +84,6 @@ public class KindController  implements AdminKey {
             cnd.and("status","=",status);
         }
 
-        if(!isAdmin()){
-            SqlExpressionGroup
-                    group = Cnd
-                    .exps("dept_id", "=", DEPT_ADMIN)
-                    .or("dept_id", "=", ShiroUtils.getSysUser() .getDeptId());
-            cnd.and(group);
-        }
-
-
         return kindService.query(cnd);
     }
 

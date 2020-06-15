@@ -48,12 +48,26 @@ public class TIotDevopsReasonController {
 	@RequiresPermissions("wx:tIotDevopsReason:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
-			@Param("beginTime") Date beginTime, @Param("endTime") Date endTime,
-			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
+	public Object list(
+			@Param("pageNum") int pageNum,
+			@Param("pageSize") int pageSize,
+			@Param("faultReason") String faultReason,
+			@Param("faultType") String faultType,
+			@Param("faultTypeEn") String faultTypeEn,
+
+			@Param("beginTime") Date beginTime,
+			@Param("endTime") Date endTime,
+			@Param("orderByColumn") String orderByColumn,
+			@Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
-		if (!Strings.isBlank(name)) {
-			// cnd.and("name", "like", "%" + name +"%");
+		if (!Strings.isBlank(faultReason)){
+			cnd.and("fault_reason", "like", "%" + faultReason +"%");
+		}
+		if (!Strings.isBlank(faultType)){
+			cnd.and("fault_type", "like", "%" + faultType +"%");
+		}
+		if (!Strings.isBlank(faultTypeEn)){
+			cnd.and("fault_type_en", "like", "%" + faultTypeEn +"%");
 		}
 		if (Lang.isNotEmpty(beginTime)) {
 			cnd.and("create_time", ">=", beginTime);
