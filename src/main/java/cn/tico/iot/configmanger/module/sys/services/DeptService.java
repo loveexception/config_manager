@@ -5,6 +5,8 @@ import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
@@ -111,7 +113,9 @@ public class DeptService extends Service<Dept> {
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         dept.setUpdateBy(ShiroUtils.getSysUserId());
         dept.setUpdateTime(new Date());
-        return this.dao().update(dept);
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
+
+        return forup.update(dept);
     }
 
     public boolean checkDeptNameUnique(String id,String parentId,String menuName) {
