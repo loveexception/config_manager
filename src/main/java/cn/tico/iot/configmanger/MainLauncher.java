@@ -147,8 +147,8 @@ public class MainLauncher {
 	 * @param ioc
 	 */
 	private void initSysTask(Ioc ioc) {
-		LocationManager locationManager = ioc.get(LocationManager.class);
-		locationManager.init();
+		//LocationManager locationManager = ioc.get(LocationManager.class);
+		//locationManager.init();
 
 //		 QuartzManager quartzManager = ioc.get(QuartzManager.class);
 //		 TaskService taskService = ioc.get(TaskService.class);
