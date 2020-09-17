@@ -79,7 +79,7 @@ public class ApiService {
         String ids[] = kind.getAncestors().split(",");
         Cnd cnd = Cnd.NEW();
         cnd.and("id", "in", ids);
-        cnd.and("level", ">", "0");
+        //cnd.and("level", ">", "0");
         cnd.and("delflag","=","false");
 
         cnd.orderBy("level", "asc");
@@ -95,7 +95,7 @@ public class ApiService {
         String ids[] = location.getAncestors().split(",");
         Cnd cnd = Cnd.NEW();
         cnd.and("id", "in", ids);
-        cnd.and("level", ">", "0");
+       // cnd.and("level", ">", "0");
         cnd.and("delflag","=","false");
 
         cnd.orderBy("level", "asc");
