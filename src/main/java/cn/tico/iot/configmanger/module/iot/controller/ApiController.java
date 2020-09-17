@@ -148,12 +148,8 @@ public class ApiController implements AdminKey {
 			HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		cnd.and("ext_sno","=",extsno);
-<<<<<<< HEAD
-		cnd.and("'delFlag'","=","false");
-=======
-		cnd.and("status","=","true");
-		cnd.and("delflag","=","false");
->>>>>>> bug gateway 重用BUG
+		cnd.and("gateway.status","=","true");
+		cnd.and("gateway.delflag","=","false");
 		List<SubGateway> list = this.dao.queryByJoin(SubGateway.class , "^gateway$",cnd);
 		return  Result.success("system.success",list);
 	}
