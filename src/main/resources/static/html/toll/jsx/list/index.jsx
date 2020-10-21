@@ -8,7 +8,7 @@ let MIcon = function (props) {
 
 // const data = [];
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
-const reqConfig = ['warning', 'major', 'minor', 'critical'];
+const reqConfig = ['minor','major',  'warning',  'critical'];
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
 let setInitValue = () => { };
