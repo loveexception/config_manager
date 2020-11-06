@@ -1,3 +1,4 @@
+git log --oneline >./src/main/resources/version.log
 mvn clean package nutzboot:shade -o -DskipTests -Dmaven.test.skip=true
 scp ./target/config-manager.jar root@172.16.16.9:/opt/jar/configManager
 curl 'http://172.16.16.9:9001/index.html?processname=java-config-manager&action=restart' \
