@@ -72,6 +72,7 @@ public class LoginController {
             }
 
             map.addv("dept_id",user.getDeptId());
+            map.addv("phonenumber",user.getPhonenumber());
             map.addv("user_id",user.getId());
             map.addv("location_id",user.getLocationId());
             map.addv("login_name",user.getLoginName());
