@@ -3,6 +3,8 @@ package cn.tico.iot.configmanger.module.sys.controllers;
 import cn.tico.iot.configmanger.common.base.Result;
 import cn.tico.iot.configmanger.common.manager.AsyncManager;
 import cn.tico.iot.configmanger.common.manager.factory.AsyncFactory;
+import cn.tico.iot.configmanger.module.assets.enums.LoginType;
+import cn.tico.iot.configmanger.module.assets.model.CustomerToken;
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.User;
@@ -58,7 +60,8 @@ public class LoginController {
 //            errCount = NumberUtils.toInt(Strings.sNull(SecurityUtils.getSubject().getSession(true).getAttribute("errCount")));
             Subject subject = SecurityUtils.getSubject();
             ThreadContext.bind(subject);
-            subject.login(new UsernamePasswordToken(username,password,rememberMe));
+            //subject.login(new UsernamePasswordToken(username,password,rememberMe));
+            subject.login(new CustomerToken(username,password, LoginType.PASSWORD,rememberMe));
             User user = (User) subject.getPrincipal();
             AsyncManager.me().execute(asyncFactory.recordLogininfor(user.getLoginName(), true,"登录成功"));
             userService.recordLoginInfo(user);

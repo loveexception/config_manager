@@ -1,5 +1,7 @@
 package cn.tico.iot.configmanger.common.shiro;
 
+import cn.tico.iot.configmanger.module.assets.model.CustomerToken;
+import cn.tico.iot.configmanger.module.assets.shiro.MyHashedCredentialsMatcher;
 import cn.tico.iot.configmanger.module.sys.models.User;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import org.apache.shiro.authc.*;
@@ -51,7 +53,8 @@ public class SimpleAuthorizingRealm extends AuthorizingRealm {
 
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+		//UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+		CustomerToken upToken = (CustomerToken) token;
 		if (Lang.isEmpty(upToken) || Strings.isEmpty(upToken.getUsername())) {
 			throw Lang.makeThrow(AuthenticationException.class, "Account name is empty");
 		}
@@ -75,7 +78,7 @@ public class SimpleAuthorizingRealm extends AuthorizingRealm {
 
 	public SimpleAuthorizingRealm(CacheManager cacheManager, CredentialsMatcher matcher) {
 		super(cacheManager, matcher);
-		HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+		HashedCredentialsMatcher hashedCredentialsMatcher = new MyHashedCredentialsMatcher();
 		hashedCredentialsMatcher.setHashAlgorithmName("SHA-256");
 		hashedCredentialsMatcher.setHashIterations(1024);
 		// 这一行决定hex还是base64
