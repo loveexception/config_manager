@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 	<meta charset="utf-8" />
+
 	<head th:include="include :: header"></head>
+
 	<body class="gray-bg">
 		<div class="container-div">
 			<div class="row">
@@ -45,9 +47,24 @@
 		</div>
 		<div th:include="include :: footer"></div>
 		<script th:inline="javascript">
+			function add0(m) {
+				return m < 10 ? '0' + m : m;
+			}
+			function _format(shijianchuo) {
+				//shijianchuo是整数，否则要parseInt转换
+				var time = new Date(shijianchuo);
+				var y = time.getFullYear();
+				var m = time.getMonth() + 1;
+				var d = time.getDate();
+				var h = time.getHours();
+				var mm = time.getMinutes();
+				var s = time.getSeconds();
+				return y + '-' + add0(m) + '-' + add0(d);
+			}
+
 			var prefix = ctx + 'wx/tIotDevices';
 
-			$(function() {
+			$(function () {
 				var options = {
 					url: prefix + '/list',
 					createUrl: prefix + '/add',
@@ -59,32 +76,32 @@
 					showExport: true,
 					columns: [
 						{
-							checkbox: true
+							checkbox: true,
 						},
 						{
 							field: 'cnName',
 							title: '设备名称',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'sno',
 							title: '设备序列号',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'ip',
 							title: '设备ip',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'dept.deptName',
-							title: '所述机构'
+							title: '所述机构',
 						},
 
 						{
 							field: 'kindmap',
 							title: '品牌',
-							sortable: true
+							sortable: true,
 						},
 						// {
 						// 	title: '型号',
@@ -95,62 +112,65 @@
 						{
 							field: 'kind.cnName',
 							title: '设备型号',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'orderTime',
 							title: '入库日期',
-							sortable: true
+							sortable: true,
+							formatter: function (value, row, index) {
+								if (!value) {
+									return value;
+								}
+								return '<span  >' + _format(value) + '</span>';
+							},
 						},
 						{
 							field: 'location.cnName',
 							title: '资产位置',
-							sortable: true
+							sortable: true,
 						},
 						{
 							field: 'assetStatus',
 							title: '运行状态',
 							sortable: true,
 							align: 'center',
-							formatter: function(value, row, index) {
+							formatter: function (value, row, index) {
 								if (value == '2') {
 									return '<span class=" text-primary"  onclick="change(this)">正常</span>';
 								}
 								return '<span class=" text-danger" onclick="change(this)" >停用</span>';
-							}
+							},
 						},
 						{
 							title: '软件版本',
-							sortable: true
+							sortable: true,
 						},
 
 						{
 							title: '操作',
 							align: 'center',
-							formatter: function(value, row, index) {
+							formatter: function (value, row, index) {
 								var actions = [];
 								actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
 								actions.push('<a class="btn btn-danger btn-xs " href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 								return actions.join('');
-							}
-						}
-					]
+							},
+						},
+					],
 				};
 				$.table.init(options);
 			});
 
 			function change(it) {
-				var id = $(it)
-					.parents('tr')
-					.find('td>input[type=hidden]')
-					.val();
+				var id = $(it).parents('tr').find('td>input[type=hidden]').val();
 
 				$.ajax({
 					url: prefix + '/change?id=' + id,
 					type: 'get',
-					success: function(data) {
+					success: function (data) {
 						$.table.refresh();
-					}
+					},
 				});
 			}
 		</script>

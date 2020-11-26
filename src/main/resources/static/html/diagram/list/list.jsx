@@ -1,26 +1,24 @@
-// import React, { PureComponent, useState } from 'react';
-// import { Popconfirm, Upload, Form, Message, Icon, Input, InputNumber, Button, Checkbox, Row, Col, AutoComplete, Table } from 'antd';
-// import PubSub from 'pubsub-js';
-
-// import './index.less';
 let { PureComponent, useState } = React;
 let DiagramAction = window.DiagramAction;
 let { Popconfirm, Upload, Form, message, Icon, Input, InputNumber, Button, Table, Tooltip, Modal } = antd;
 let { confirm } = Modal;
 let Message = message;
 // modal 显示
-function showConfirm(_ok) {
+function showConfirm(_ok, _EditableTable) {
 	confirm({
-		title: '你确定要删除这几张图片吗',
+		title: '你确定要删除这些图片吗',
+		okText: '确认',
+		cancelText: '取消',
 		// content: 'Some descriptions',
 		onOk() {
 			// console.log('OK');
 			// _ok()
-			_ok()
+			if (_ok()) {
+				_EditableTable.state.checkArr = [];
+			}
 			// flag = true
 		},
-		onCancel() {
-		},
+		onCancel() {},
 	});
 }
 // let PubSub  = pubsub-js
@@ -30,19 +28,20 @@ function toZip(imgSrcList, fileName) {
 	let zip = new JSZip(); //实例化一个压缩文件对象
 	let imgFolder = zip.folder(fileName); //新建一个图片文件夹用来存放图片，参数为文件名
 	for (let i = 0; i < imgSrcList.length; i++) {
-		let src = imgSrcList[i];
+		let currentImg = imgSrcList[i];
+		let src = imgSrcList[i].file_url;
 		let tempImage = new Image();
 		tempImage.src = src;
 		tempImage.crossOrigin = '*';
 		tempImage.onload = () => {
-			imgFolder.file(i + 1 + '.jpg', getBase64Image(tempImage), { base64: true });
+			imgFolder.file(currentImg.name + '.' + currentImg.suffix_name, getBase64Image(tempImage), { base64: true });
+			if (imgSrcList.length === i + 1) {
+				zip.generateAsync({ type: 'blob' }).then(function (content) {
+					saveAs(content, 'zip');
+				});
+			}
 		};
 	}
-	setTimeout(() => {
-		zip.generateAsync({ type: 'blob' }).then(function (content) {
-			saveAs(content, 'zip');
-		});
-	}, 3000);
 }
 
 function getBase64Image(img) {
@@ -56,7 +55,6 @@ function getBase64Image(img) {
 	return dataURL;
 }
 
-
 const ButtonGroup = Button.Group;
 let Search = Input.Search;
 
@@ -65,23 +63,22 @@ const pageSize = 6;
 const align = 'left';
 
 // 删除调用函数
-let deleteFn = (arr = undefined, ListFn) => {
+let deleteFn = (arr = undefined, ListFn, _EditableTable) => {
 	if (!arr) {
 		return;
 	}
-
 	let reqArr = [];
 	Array.isArray(arr) &&
-		arr.forEach(e => {
+		arr.forEach((e) => {
 			reqArr.push(e.id);
 		});
-	DiagramAction.diagramMRmImg({ ids: reqArr }, res => {
+	DiagramAction.diagramMRmImg({ ids: reqArr }, (res) => {
 		if (res.success) {
 			Message.success('操作成功', 0.5);
+			// _EditableTable.state.checkArr = []
 			setTimeout(function () {
-
-				ListFn && ListFn()
-			}, 0)
+				ListFn && ListFn();
+			}, 0);
 		}
 	});
 };
@@ -98,20 +95,21 @@ let uploadFn = (arr = undefined, ListFn) => {
 		return;
 	}
 	if (arr.length === 0) {
-		message.info('请选择下载文件.', .5)
+		message.info('请选择下载文件.', 0.5);
 	}
 
 	let reqArr = [];
 	Array.isArray(arr) &&
-		arr.forEach(e => {
+		arr.forEach((e) => {
 			reqArr.push(e.id);
 		});
 	// downloadFile('POST', 1, '你好', {})
-	DiagramAction.diagramMDownImg({ ids: reqArr }, res => {
+	DiagramAction.diagramMDownImg({ ids: reqArr }, (res) => {
 		if (res.success) {
 			let data = res.data;
 			let file_url_list = _.map(data, 'file_url');
-			toZip(file_url_list, '系统拓扑图');
+			// console.log(res.data, 'file_url_list');
+			toZip(data, '系统拓扑图');
 		}
 	});
 };
@@ -135,7 +133,7 @@ class EditableCell extends React.Component {
 			editing: false,
 		};
 	}
-	getInput = record => {
+	getInput = (record) => {
 		return (
 			<Input
 				ref={this.inputRef}
@@ -186,12 +184,12 @@ class EditableCell extends React.Component {
 						)}
 					</Form.Item>
 				) : (
-						children
-					)}
+					children
+				)}
 			</td>
 		) : (
-				<td>{children}</td>
-			);
+			<td>{children}</td>
+		);
 	};
 
 	render() {
@@ -207,7 +205,7 @@ class EditableTable extends React.Component {
 			editingKey: '',
 			checkArr: [],
 			sortFlagName: true,
-			currentPage: 1
+			currentPage: 1,
 		};
 		//ref
 		this.rename = React.createRef();
@@ -218,6 +216,7 @@ class EditableTable extends React.Component {
 				dataIndex: 'name',
 				width: '25%',
 				editable: true,
+				align: 'center',
 				// sorter: (current, next, asd) => {
 				// 	let { currentPage } = this.state;
 				// 	if (asd === 'ascend') {
@@ -247,6 +246,7 @@ class EditableTable extends React.Component {
 				title: '大小',
 				dataIndex: 'file_size',
 				width: '15%',
+				align: 'center',
 				// sorter: (current, next, asd, xxx) => {
 
 				// 	// console.log(current, next, asd, xxx, 'current')
@@ -263,21 +263,22 @@ class EditableTable extends React.Component {
 
 				render(text) {
 					if (!text) {
-						return
+						return;
 					}
 					let strNumber = (text / 1024 / 1024).toFixed(2);
 					// console.log((text / 1024 / 1024).toFixed(2), '(text / 1024 / 1024).toFixed(2)')
 					if (strNumber == 0) {
-						strNumber = strNumber.slice(0, strNumber.length - 1) + '1'
+						strNumber = strNumber.slice(0, strNumber.length - 1) + '1';
 					}
-					return strNumber + 'MB'
-				}
+					return <span>{strNumber + 'MB'}</span>;
+				},
 				// editable: true,
 			},
 			{
 				title: '修改时间',
 				dataIndex: 'mod_time',
 				width: '40%',
+				align: 'center',
 				// align: 'center',
 				// align,
 				// sorter: (current, next, asd) => {
@@ -292,9 +293,9 @@ class EditableTable extends React.Component {
 				sorter: true,
 				render(text) {
 					if (!text) {
-						return
+						return;
 					}
-					return moment(text).format('YYYY-MM-DD HH:mm:ss')
+					return <span>{moment(text).format('YYYY-MM-DD HH:mm:ss')}</span>;
 					// return dateUtil(new Date(record));
 				},
 
@@ -303,7 +304,7 @@ class EditableTable extends React.Component {
 			{
 				title: '操作',
 				dataIndex: 'operation',
-				// align: 'center',
+				align: 'center',
 				render: (text, record) => {
 					const { editingKey } = this.state;
 					// const editable = this.isEditing(record);
@@ -313,35 +314,42 @@ class EditableTable extends React.Component {
 							<li>
 								<div className="svg-content" disabled={editingKey !== ''}>
 									<Tooltip placement="top" title={'查看图片'}>
-										<Icon type="eye" onClick={() => {
-											$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`)
-											// $.modal.open(record.name + '查看', `/html / diagram / view / view.html ? id = ${ record.id } & name= ${ record.name } `)
-											// router.push(`view ? id = ${ record.id }& name=${record.name}`);
-										}} />
+										<Icon
+											type="eye"
+											onClick={() => {
+												$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`);
+												// $.modal.open(record.name + '查看', `/html / diagram / view / view.html ? id = ${ record.id } & name= ${ record.name } `)
+												// router.push(`view ? id = ${ record.id }& name=${record.name}`);
+											}}
+										/>
 									</Tooltip>
 								</div>
 							</li>
 							<li>
 								<Tooltip placement="top" title={'下载图片'}>
-									<Icon type="cloud-download" onClick={() => {
-										uploadFn([record]);
-									}} />
+									<Icon
+										type="cloud-download"
+										onClick={() => {
+											uploadFn([record]);
+										}}
+									/>
 								</Tooltip>
 
-								<div
-									className="svg-content"
-
-								>
+								<div className="svg-content">
 									<span className="iconfont ticobackicon-upload " style={{ fontSize: '0.22rem' }}></span>
 								</div>
 							</li>
 							<li>
-								<Popconfirm placement="top" title={'确定要删除图片吗?'} onConfirm={() => {
-									deleteFn([record], this.props.reqListFn);
-								}} okText="删除" cancelText="取消">
-									<div
-										className="svg-content"
-									>
+								<Popconfirm
+									placement="top"
+									title={'确定要删除图片吗?'}
+									onConfirm={() => {
+										deleteFn([record], this.props.reqListFn);
+									}}
+									okText="删除"
+									cancelText="取消"
+								>
+									<div className="svg-content">
 										<Tooltip placement="top" title={'删除图片'}>
 											<Icon type="delete" />
 										</Tooltip>
@@ -369,17 +377,20 @@ class EditableTable extends React.Component {
 		this.paginationChange = (targetCurrent, x) => {
 			let { currentPage } = this.state;
 			if (x === undefined) {
-				return
+				return;
 			}
-			this.setState({
-				currentPage: targetCurrent
-			}, () => {
-				this.props.reqListFn && this.props.reqListFn(targetCurrent);
-			})
+			this.setState(
+				{
+					currentPage: targetCurrent,
+				},
+				() => {
+					this.props.reqListFn && this.props.reqListFn(targetCurrent);
+				}
+			);
 		};
 	}
 
-	isEditing = record => record.key === this.state.editingKey;
+	isEditing = (record) => record.key === this.state.editingKey;
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows, i) => {
 			// console.log(SetIsOff, 'SetIsOff', );
@@ -389,7 +400,7 @@ class EditableTable extends React.Component {
 			// selectedRows[selectedRowKeys - 1].age = Date.now();
 			this.setState({ checkArr: selectedRows }); //genggai
 		},
-		getCheckboxProps: record => ({
+		getCheckboxProps: (record) => ({
 			disabled: record.name === 'Disabled User', // Column configuration not to be checked
 			name: record.name,
 		}),
@@ -417,7 +428,7 @@ class EditableTable extends React.Component {
 				id: key,
 				name,
 			},
-			res => {
+			(res) => {
 				if (res.success) {
 					Message.success('修改成功', 0.5);
 					this.props.reqListFn && this.props.reqListFn(this.state.currentPage);
@@ -427,7 +438,7 @@ class EditableTable extends React.Component {
 			}
 		);
 		const newData = [...this.state.data];
-		const index = newData.findIndex(item => key === item.key);
+		const index = newData.findIndex((item) => key === item.key);
 		if (index > -1) {
 			const item = newData[index];
 			newData.splice(index, 1, {
@@ -457,13 +468,13 @@ class EditableTable extends React.Component {
 				cell: EditableCell,
 			},
 		};
-		const columns = this.columns.map(col => {
+		const columns = this.columns.map((col) => {
 			if (!col.editable) {
 				return col;
 			}
 			return {
 				...col,
-				onCell: record => {
+				onCell: (record) => {
 					record.save = this.save;
 					return {
 						record,
@@ -493,12 +504,12 @@ class EditableTable extends React.Component {
 						onChange: this.paginationChange,
 						// pageSizeOptions: ,
 					}}
-					rowKey={record => record.id}
+					rowKey={(record) => record.id}
 					rowSelection={this.rowSelection}
 					onChange={(selectedRowKeys, selectedRows, orderByClause) => {
 						let { columnKey, order } = orderByClause;
 						// console.log(this.props, 'ss'),
-						this.props.reqListFn(this.state.currentPage, order ? `${columnKey} ${order.slice(0, -3)}` : '')
+						this.props.reqListFn(this.state.currentPage, order ? `${columnKey} ${order.slice(0, -3)}` : '');
 						this.setState({
 							checkArr: selectedRows,
 						});
@@ -511,10 +522,9 @@ class EditableTable extends React.Component {
 //  ↓ table
 const EditableFormTable = Form.create()(EditableTable);
 // ajax Fn
-function uploadingFn(xx) {
-}
+function uploadingFn(xx) {}
 // refresh name  fn
-function refresh() { }
+function refresh() {}
 
 // 按钮 排s
 function ButtonList(props) {
@@ -529,9 +539,7 @@ function ButtonList(props) {
 	// }, 10);
 	function upDataChecked(o, key) {
 		setIsOff(o);
-		// console.log(checkedArr);
 		checkedArr.current.length = 0;
-		// console.log(key, 'key');
 		checkedArr.current.push(...key);
 		// checkedArr
 	}
@@ -539,10 +547,8 @@ function ButtonList(props) {
 	// SetIsOff = setIsOff;
 
 	PubSub.subscribe('_EditableTable', (n, _this) => {
-		// console.log(232, n, _this, '=======');
 		set_EditableTable(_this);
 		// _this.setState();
-		// console.log(_this, '_this');
 	});
 	React.useEffect(() => {
 		return;
@@ -552,19 +558,72 @@ function ButtonList(props) {
 			<div className="button-list-box" style={{ ...props.style }}>
 				<Upload
 					className="upload-btn"
-					onChange={info => {
+					onChange={(info) => {
 						// console.log(info, 'info');
 						if (info.file.response && info.file.response.success) {
 							// console.log(_EditableTable, '_EditableTable');
 							_EditableTable.props.reqListFn && _EditableTable.props.reqListFn();
 						}
 					}}
+					accept={'.png,.bmp,.jpg,.tif,.gif,.pcx,.tga,.exif,.fpx,.svg,.psd,.raw'}
 					headers={{
-						dept_id: localStorage.getItem('deptId')
+						dept_id: localStorage.getItem('deptId'),
 					}}
-					action="http://172.16.16.9/api/backgroundinterface/topology/upload"
+					action="http://172.16.16.9/api/fileserver/fileUpload/uploadImage"
 					method="post"
+					beforeUpload={(file, fileList) => {
+						let reg = /\.(jpg|gif|bmp|tif|png|pcx|jpeg|exif|tga|svg|raw|psd|)+$/;
+						// console.log(file, 'file.type ')
+						// console.log(file.type.split('/')[1])
+
+						let isImg = reg.test(file.name);
+						if (isImg) {
+							return true;
+						} else {
+							message.error('文件格式不对', 0.5);
+							return false;
+						}
+
+						// console.log(file.type, fileList, 'file, fileList')
+					}}
 					enctype="multipart/form-data"
+					onChange={(info, info2) => {
+						// console.log(info, 'info')
+						if (info.file.status === undefined) {
+							return;
+						}
+						if (info.file.status !== 'uploading') {
+							message.loading(`${info.file.name} 上传中...`);
+						}
+						if (info.file.status === 'done') {
+							try {
+								let { data = {} } = info.file.response;
+								let { file_name, size, url, name } = data;
+								let _name = name.split('.')[0];
+								let suffix_name = name.split('.')[1];
+								DiagramAction.diagramuploadImg(
+									{
+										file_name,
+										size,
+										url,
+										suffix_name,
+										name: _name,
+									},
+									function (res) {
+										message.destroy();
+										message.success(`${info.file.name} 上传成功.`, 0.5);
+									}
+								);
+							} catch (error) {
+								message.error('添加失败');
+							}
+
+							_EditableTable.props.reqListFn();
+						} else if (info.file.status === 'error') {
+							message.destroy();
+							message.error(`${info.file.name} 上传失败.`, 0.5);
+						}
+					}}
 				>
 					<Button type="primary" style={{ marginRight: '0.4rem' }}>
 						<Icon type="cloud-upload" />
@@ -583,12 +642,12 @@ function ButtonList(props) {
 					<Button
 						onClick={() => {
 							if (_EditableTable.state.checkArr.length === 0) {
-								message.info('请选择要删除的图片.', .5)
-								return
+								message.info('请选择要删除的图片.', 0.5);
+								return;
 							}
-							showConfirm(
-								function () { deleteFn(_EditableTable.state.checkArr, _EditableTable.props.reqListFn) }
-							)
+							showConfirm(function () {
+								deleteFn(_EditableTable.state.checkArr, _EditableTable.props.reqListFn, _EditableTable);
+							});
 						}}
 					>
 						<Icon type="delete" />
@@ -607,8 +666,7 @@ function ButtonList(props) {
 			</div>
 			<Search
 				placeholder="按名称搜索"
-				onSearch={value => {
-
+				onSearch={(value) => {
 					_EditableTable.props.searchFn && _EditableTable.props.searchFn(value);
 					// console.log(value);
 				}}
@@ -621,10 +679,10 @@ function ButtonList(props) {
 // 总函数
 function Topo() {
 	let [data, setData] = useState([]);
-	let [loading, setLoading] = useState(true)
+	let [loading, setLoading] = useState(true);
 	let [_pagination, set_pagination] = useState({
 		current: 1,
-		pageSize
+		pageSize,
 	});
 	// setTimeout(() => {
 	// 	setData(dataSource);
@@ -634,7 +692,7 @@ function Topo() {
 		// for (let i = 0; i < pageSize + 1 - data.length; i++) {
 		// 	data.push({})
 		// }
-		return data
+		return data;
 	}
 	function searchFn(searchValue, orderByClause, page_num = 1) {
 		let sValue = searchValue && searchValue.trim();
@@ -651,7 +709,7 @@ function Topo() {
 					let data = res.data;
 					let arr = data.result;
 					Array.isArray(arr) &&
-						arr.forEach(e => {
+						arr.forEach((e) => {
 							e.key = e.id;
 						});
 					// console.log(res.data.result);
@@ -669,10 +727,9 @@ function Topo() {
 		);
 	}
 	function reqListFn(page_num = 1, orderByClause) {
-		setLoading(true)
-
+		setLoading(true);
+		let reqFlag = false;
 		if (false) {
-
 		} else {
 			if (typeof page_num === 'number') {
 				DiagramAction.diagramList(
@@ -681,14 +738,14 @@ function Topo() {
 						orderByClause: orderByClause ? orderByClause : 'mod_time desc',
 						page_num,
 						page_size: pageSize,
-						_pagination
+						_pagination,
 					},
 					function (res) {
 						if (res.success) {
 							let data = res.data;
 							let arr = data.result;
 							Array.isArray(arr) &&
-								arr.forEach(e => {
+								arr.forEach((e) => {
 									e.key = e.id;
 								});
 							// console.log(res.data.result);
@@ -707,14 +764,14 @@ function Topo() {
 					}
 				);
 			} else if (typeof page_num === 'object') {
-				let pagenum = _pagination.current * pageSize
+				let pagenum = _pagination.current * pageSize;
 				let params = {
 					// orderByClause: orderByClause ? orderByClause : 'time asc',
 					orderByClause: orderByClause ? orderByClause : 'mod_time desc',
 					page_num: pagenum,
 					page_size: pageSize,
-					orderByClause: page_num.sortMes
-				}
+					orderByClause: page_num.sortMes,
+				};
 
 				// if (page_num.asc) {
 
@@ -724,7 +781,7 @@ function Topo() {
 						let data = res.data;
 						let arr = data.result;
 						Array.isArray(arr) &&
-							arr.forEach(e => {
+							arr.forEach((e) => {
 								e.key = e.id;
 							});
 						setData(filterFn(data.result));
@@ -738,11 +795,11 @@ function Topo() {
 					} else {
 						Message.error('接口报错', 0.5);
 					}
-				})
+				});
 			}
 		}
 		// console.log(EditableFormTable)
-		setLoading(false)
+		setLoading(false);
 	}
 	React.useEffect(function () {
 		// debugger

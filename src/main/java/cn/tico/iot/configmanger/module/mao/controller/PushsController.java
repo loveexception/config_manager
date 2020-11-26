@@ -156,16 +156,16 @@ public class PushsController {
 		}
 	}
 
-	/**
-	 * 修改推送方式
-	 */
-	@At("/edit/?")
-	@Ok("th://mao/pushs/edit.html")
-	public void edit(String id, HttpServletRequest req) {
-		Pushs pushs = pushsService.fetch(id);
+	// /**
+	//  * 修改推送方式
+	//  */
+	// @At("/edit/?")
+	// @Ok("th://mao/pushs/edit.html")
+	// public void edit(String id, HttpServletRequest req) {
+	// 	Pushs pushs = pushsService.fetch(id);
 
-		req.setAttribute("pushs",pushs);
-	}
+	// 	req.setAttribute("pushs",pushs);
+	// }
 
 	/**
 	 * 修改保存推送方式

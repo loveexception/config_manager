@@ -68,17 +68,17 @@ public class TUiMetricsController {
 	@RequiresPermissions("wx:tUiMetrics:list")
 	@At
 	@Ok("json")
-	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("name") String name,
+	public Object list(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("cnName") String name,
 			@Param("kindTypeId") String kindTypeId, @Param("beginTime") Date beginTime, @Param("endTime") Date endTime,
 			@Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc, HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)) {
-			cnd.and("cn_name", "like", "%" + name + "%");
+			cnd.and("t_ui_metrics.cn_name", "like", "%" + name + "%");
 		}
 		if (!Strings.isBlank(kindTypeId)) {
 			cnd.and("kind_type_id", "like", "%" + kindTypeId + "%");
 		}
-		cnd.orderBy("order_num", "asc");
+		cnd.orderBy("t_ui_metrics.order_num", "asc");
 		Pager pager = new Pager(pageNum, pageSize);
 		List<TUiMetrics> list = tUiMetricsService.dao().queryByJoin(TUiMetrics.class, "", cnd, pager);
 

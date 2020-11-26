@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8" />
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title></title>
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<link rel="shortcut icon" href="favicon.ico" />
+
+	<link href="/assets/css/style.css" rel="stylesheet" />
+	<!-- react.js -->
+	<script src="/assets/react/react.development.js"></script>
+	<script src="/assets/react/react-dom.development.js"></script>
+	<!-- babel.js -->
+	<script src="/assets/react/babel.min.js"></script>
+	<!-- moment.js -->
+	<script src="/assets/react/moment/moment.js"></script>
+	<script src="/assets/react/moment/locale/zh-cn.js"></script>
+	<!-- antd.css -->
+	<link rel="stylesheet" type="text/css" href="/assets/react/antd4/antd.min.css" />
+	<!-- pubsub  js> -->
+	<script src="/assets/js/pubSub.js"></script>
+	<!-- antd.js -->
+	<script src="/assets/react/antd4/antd.min.js"></script>
+	<script src="/assets/react/antd4/locale/antd-with-locales.min.js"></script>
+	<script src="/assets/react/antd4/icon.antd.min.js"></script>
+
+	<!-- antv -->
+	<script src="/assets/react/antv/g2/g2.min.js"></script>
+	<!-- dataSet  -->
+	<script src="/assets/react/antv/data-set.min.js"></script>
+	<script src="/assets/Adaptive/index.js"></script>
+	<script src="./reqlist.js"></script>
+	<!-- <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script> -->
+	<!-- 自定义组件 -->
+	<script type="text/babel" src="/assets/component/table/index.jsx"> </script>
+	<script type="text/babel" src="/assets/component/icon/index.jsx"> </script>
+
+	<link rel="stylesheet/less" type="text/css" href="/assets/component/table/index.less">
+	<link rel="stylesheet/less" type="text/css" href="/assets/component/icon/index.less">
+	<!-- less.js -->
+	<link rel="stylesheet/less" type="text/css" href="./index.less" />
+	<script src="/assets/react/less.min.js"></script>
+</head>
+<style>
+	#meeting-level-box {
+		padding: 0.2rem 0.5rem 0;
+		height: 100%;
+		background-color: #F5F5F5;
+	}
+
+	.layui-layer-btn,
+	.layui-layer-btn {
+		display: none;
+		height: 0;
+		width: 0;
+		overflow: hidden;
+	}
+</style>
+
+<body class="gray-bg">
+	<div id="meeting-level-box"></div>
+	<script>
+		window.rootNode = document.getElementById('meeting-level-box');
+	</script>
+	<script src="/assets/js/jquery.min.js"></script>
+	<!-- 遮罩层 -->
+	<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
+	<script src="/assets/plugins/iCheck/icheck.min.js"></script>
+	<script src="/assets/plugins/layer/layer.min.js"></script>
+	<script src="/assets/plugins/layui/layui.js"></script>
+	<!-- <script src="/assets/js/common.js?v=3.1.0"></script> -->
+	<script src="/assets/js/ui.js?v=3.1.0"></script>
+	<script type="text/babel" src="./index.jsx" domId="meeting-level-box"></script>
+	<script>
+		var ctx = '\/';
+	</script>
+</body>
+
+</html>

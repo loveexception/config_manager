@@ -60,11 +60,8 @@ import java.util.stream.Collectors;
 public class DeviceController implements AdminKey {
 	private static final Log log = Logs.get();
 
-
 	@Inject
 	private UserService userService;
-
-
 
 	@Inject
 	private DeviceService deviceService;
@@ -75,8 +72,7 @@ public class DeviceController implements AdminKey {
 	@Inject
 	private GatewayService gatewayService;
 	@Inject
-    private SubGatewayService subGatewayService;
-
+	private SubGatewayService subGatewayService;
 
 	@Inject
 	private PersonService personService;
@@ -87,16 +83,15 @@ public class DeviceController implements AdminKey {
 	@Inject
 	private PersonRulerService personRulerService;
 
-
 	@Inject
-	private GitBlock  gitBlock;
-
+	private GitBlock gitBlock;
 
 	@Inject
 	private TagService tagService;
 
 	@Inject
 	private ExcelDeviceService excelDeviceService;
+
 
 	@RequiresPermissions("iot:device:view")
 	@At("")
@@ -108,60 +103,69 @@ public class DeviceController implements AdminKey {
 	/**
 	 * 查询业务列表
 	 */
+	/**
+	 * @Description 
+	  * @Param pageNum: 
+	 * @Param pageSize: 
+	 * @Param name: 
+	 * @Param orderByColumn: 
+	 * @Param isAsc: 
+	 * @Param deptid: 
+	 * @Param locationid: 
+	 * @Param req:
+	  * @Return: java.lang.Object
+	 * @Author maodajun@gmail.com
+	 * @Date 2020/8/19
+	 */
 	@At("/device_list")
 	@Ok("json")
-	public Object deviceList(
-			@Param("pageNum")int pageNum
-			, @Param("pageSize")int pageSize
-			, @Param("cnName") String name
-			, @Param("orderByColumn") String orderByColumn
-			, @Param("isAsc") String isAsc
-			, @Param("deptid") String deptid
-			, @Param("locationid") String locationid,
-			HttpServletRequest req) {
+	public Object deviceList(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize,
+			@Param("cnName") String name, @Param("orderByColumn") String orderByColumn, @Param("isAsc") String isAsc,
+			@Param("deptid") String deptid, @Param("locationid") String locationid, HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)) {
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%")
+			SqlExpressionGroup group = Cnd
+					.exps("cn_name", "like", "%" + name + "%")
 					.or("en_name", "like", "%" + name + "%")
-					.or("sno","like", "%" + name + "%");
+					.or("sno", "like", "%" + name + "%");
 			cnd.and(group);
 		}
 		Dept dept = new Dept();
-		SqlExpressionGroup
-				group = Cnd
-				.exps("dept_id", "=", DEPT_ADMIN);
+		SqlExpressionGroup group = Cnd.exps("dept_id", "=", DEPT_ADMIN);
 		if (!isAdmin()) {
 			group.or("dept_id", "=", ShiroUtils.getSysUser().getDeptId());
 			dept.setId(ShiroUtils.getSysUser().getDeptId());
-		}else if(Strings.isNotBlank(deptid)){
-			group.or("dept_id", "=",deptid);
-		}else {
-			group.or("1","=","1");
+		} else if (Strings.isNotBlank(deptid)) {
+			group.or("dept_id", "=", deptid);
+		} else {
+			group.or("1", "=", "1");
 		}
-		if(Strings.isNotBlank(locationid)){
-			cnd.and("location_id","=",locationid);
+		if (Strings.isNotBlank(locationid)) {
+			cnd.and("location_id", "=", locationid);
 		}
-
 
 		cnd.and(group);
 		cnd.and("delflag", "=", "false");
 		cnd.and("status", "=", "true");
 		cnd.and("asset_status", "=", "2");
 
-		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc, "^dept|kind|location|driver|gateway|tags$");
+		Object obj = deviceService.tableList(pageNum, pageSize, cnd, orderByColumn, isAsc,
+				"^dept|kind|location|driver|gateway|tags$");
 
-		return Result.success("system.success",obj);
+		return Result.success("system.success", obj);
 
 	}
+
 	/**
 	 * 用户权限
+	 * 
 	 * @return
 	 */
 	private boolean isAdmin() {
 
 		User user = ShiroUtils.getSysUser();
-		if(Lang.isEmpty(user)){
+		if (Lang.isEmpty(user)) {
 			return false;
 		}
 
@@ -169,6 +173,7 @@ public class DeviceController implements AdminKey {
 
 		return roles.contains(ROLE_ADMIN);
 	}
+
 	/**
 	 * 查寻业务
 	 */
@@ -176,10 +181,10 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	public Object deviceOne(@Param("id") String id, HttpServletRequest req) {
 		try {
-			Device obj =  deviceService.fetch(id);
-			obj  = deviceService.fetchLinks(obj,"^dept|kind|location|driver|gateway|tags$");
+			Device obj = deviceService.fetch(id);
+			obj = deviceService.fetchLinks(obj, "^dept|kind|location|driver|gateway|tags$");
 
-			return Result.success("system.success" ,obj);
+			return Result.success("system.success", obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -191,15 +196,15 @@ public class DeviceController implements AdminKey {
 	@At("/device_remove")
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object deviceRemove(@Param("..")Device device, HttpServletRequest req) {
+	public Object deviceRemove(@Param("..") Device device, HttpServletRequest req) {
 		try {
 			device = deviceService.fetch(device.getId());
-			int  i = deviceService.vDelete(device.getId());
+			int i = deviceService.vDelete(device.getId());
 
-            String extsno = getExtsno(device);
-            subGatewayService.kafka(extsno);
+			String extsno = getExtsno(device);
+			subGatewayService.kafka(extsno);
 			deviceService.kafka(Arrays.asList(device));
-			return Result.success("system.success",i);
+			return Result.success("system.success", i);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -214,13 +219,22 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	public Object deviceInsertUpdate(@Param("data") Device device, HttpServletRequest req) {
 		try {
+			// 先取出原始的EXTSNO
+			String oldextsno = getExtsno(device);
 			Object obj = deviceService.insertUpdate(device);
-			return Result.success("system.success",obj);
+			// 再取出新的EXTSNO
+			String extsno = getExtsno(device);
+
+			if (Strings.isBlank(oldextsno)) {
+
+			} else if (!Strings.equals(extsno, oldextsno)) {
+				subGatewayService.kafka(oldextsno);
+			}
+			return Result.success("system.success", obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
-
 
 	/**
 	 * 新增保存业务
@@ -231,44 +245,36 @@ public class DeviceController implements AdminKey {
 	@AdaptBy(type = UploadAdaptor.class, args = { "${app.root}/WEB-INF/tmp" })
 	public Object deviceUpload(@Param("devices") File f, HttpServletRequest req) {
 		try {
-			User user =	ShiroUtils.getSysUser();
+			User user = ShiroUtils.getSysUser();
 			String deptid = user.getDeptId();
 			InputStream is = Files.findFileAsStream(f.getAbsolutePath());
-			List<Device> deviceList =  J4E.fromExcel(is, Device.class, null);
-			List <Device> result  = deviceList.stream().map(
-					dev ->{
-					NutMap map = excelDeviceService.mapById(dev);
-					map = excelDeviceService.cnNamesChanges(map);
-					NutMap d = Lang.obj2nutmap(dev);
-					d.putAll(map);
-					return d;
+			List<Device> deviceList = J4E.fromExcel(is, Device.class, null);
+			List<Device> result = deviceList.stream().map(dev -> {
+				NutMap map = excelDeviceService.mapById(dev);
+				map = excelDeviceService.cnNamesChanges(map);
+				NutMap d = Lang.obj2nutmap(dev);
+				d.putAll(map);
+				return d;
 
-			}).map(
-					map -> Mapl.maplistToT(map,Device.class)
+			}).map(map -> Mapl.maplistToT(map, Device.class)
 
 			).collect(Collectors.toList());
-			//新增项目
+			// 新增项目
 			result.stream().filter(device -> Strings.isNotBlank(device.getSno()))
-					.filter(device -> Strings.isBlank(device.getId()))
-					.map(device -> {
+					.filter(device -> Strings.isBlank(device.getId())).map(device -> {
 						device.setAssetStatus("2");
 						device.setAlertStatus("normal");
-						if(!isAdmin()){
+						if (!isAdmin()) {
 							device.setDeptid(deptid);
 						}
 						return device;
-					})
-					.forEach(device -> deviceService.insertUpdate(device));
-			//修改
+					}).forEach(device -> deviceService.insertUpdate(device));
+			// 修改
 			result.stream().filter(device -> Strings.isNotBlank(device.getSno()))
 					.filter(device -> Strings.isNotBlank(device.getId()))
-					.forEach(
-							device -> deviceService.insertUpdate(device)
-					);
+					.forEach(device -> deviceService.insertUpdate(device));
 
-
-
-			return Result.success("system.success",result);
+			return Result.success("system.success", result);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -283,33 +289,29 @@ public class DeviceController implements AdminKey {
 	@Ok("json")
 	public Object deviceChecked(@Param("data") Device device, HttpServletRequest req) {
 		try {
-			if(Lang.isEmpty(device.getKindid())||device.getKindid().length()==0){
-				return Result.error(9,"not choose kind ");
+			if (Lang.isEmpty(device.getKindid()) || device.getKindid().length() == 0) {
+				return Result.error(9, "not choose kind ");
 			}
-			Cnd cnd = Cnd.where("kind_id","=",device.getKindid());
+			Cnd cnd = Cnd.where("kind_id", "=", device.getKindid());
 
 			List<Driver> drivers = driverService.query(cnd);
 
-			if(Lang.isEmpty(drivers)){
-				return Result.error(10,"not find driver");
+			if (Lang.isEmpty(drivers)) {
+				return Result.error(10, "not find driver");
 			}
 			cnd = Cnd.NEW();
 
 			List<Gateway> gateways = gatewayService.query(cnd);
 
-			if(Lang.isEmpty(gateways)){
-				return Result.error(11,"not find gate way ");
+			if (Lang.isEmpty(gateways)) {
+				return Result.error(11, "not find gate way ");
 			}
 
-			return deviceInsertUpdate(device,req);
+			return deviceInsertUpdate(device, req);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
-
-
-
-
 
 	/**
 	 * 新增保存业务
@@ -318,10 +320,10 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object deviceInsertAll(@Param("data") Driver[] driver,HttpServletRequest req) {
+	public Object deviceInsertAll(@Param("data") Driver[] driver, HttpServletRequest req) {
 		try {
-			Object obj =  deviceService.insertAll(Arrays.asList(driver));
-			return Result.success("system.success",obj);
+			Object obj = deviceService.insertAll(Arrays.asList(driver));
+			return Result.success("system.success", obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -334,62 +336,60 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object editAllDriver(@Param("data") Driver[] driver,HttpServletRequest req) {
+	public Object editAllDriver(@Param("data") Driver[] driver, HttpServletRequest req) {
 		try {
-			Object obj =  	 deviceService.updateAll(Arrays.asList(driver));
-			return Result.success("system.success",obj);
+			Object obj = deviceService.updateAll(Arrays.asList(driver));
+			return Result.success("system.success", obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
 
-
-
 	/**
-	 *  个性化查寻
+	 * 个性化查寻
 	 */
 	@At("/person_list")
 	@Ok("json")
-	public Object personList(@Param("..") Person person , HttpServletRequest req) {
+	public Object personList(@Param("..") Person person, HttpServletRequest req) {
 		try {
 
 			Cnd cnd = Cnd.NEW();
-			cnd.and("delflag","=","false");
-			cnd.and("normal_id","=",person.getNormalid());
+			cnd.and("delflag", "=", "false");
+			cnd.and("normal_id", "=", person.getNormalid());
 			Object obj = personService.query(cnd);
-			return Result.success("system.success",obj);
+			return Result.success("system.success", obj);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
 
-
 	/**
-	 *  个性化查寻
+	 * 个性化查寻
 	 */
 	@At("/person_add_update")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object personAdd(@Param("data") Person person , HttpServletRequest req) {
+	public Object personAdd(@Param("data") Person person, HttpServletRequest req) {
 		try {
-			person = personService.insertEntity(person,"^grades$");
-			return Result.success("system.success",person);
+			person = personService.insertEntity(person, "^grades$");
+			return Result.success("system.success", person);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
+
 	/**
-	 *  个性化查寻
+	 * 个性化查寻
 	 */
 	@At("/person_add_update")
 	@POST
 	@Ok("json")
-	public Object personAdd(@Param("id") String id , HttpServletRequest req) {
+	public Object personAdd(@Param("id") String id, HttpServletRequest req) {
 		try {
 
 			int index = personService.vDelete(id);
-			return Result.success("system.success",index);
+			return Result.success("system.success", index);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -402,14 +402,15 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object personRulerChange(@Param("insert") PersonRuler[] addruler, @Param("update") PersonRuler[] editruler, @Param("normalid") String driverid, HttpServletRequest req) {
+	public Object personRulerChange(@Param("insert") PersonRuler[] addruler, @Param("update") PersonRuler[] editruler,
+			@Param("normalid") String driverid, HttpServletRequest req) {
 		try {
-			List obj1 = personRulerService.insertEntitys(Arrays.asList(addruler),driverid);
+			List obj1 = personRulerService.insertEntitys(Arrays.asList(addruler), driverid);
 
 			int obj2 = personRulerService.updateEntitys(Arrays.asList(editruler));
-            Person normal = new Person();
-            normal.setNormalid(driverid);
-            return personList(normal,req);
+			Person normal = new Person();
+			normal.setNormalid(driverid);
+			return personList(normal, req);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -420,62 +421,59 @@ public class DeviceController implements AdminKey {
 	 */
 	@At("/person_add_all")
 	@Ok("json")
-	public Object personAddAll(@Param("..") Person person,HttpServletRequest req) {
+	public Object personAddAll(@Param("..") Person person, HttpServletRequest req) {
 		try {
 			Cnd cnd = Cnd.NEW();
-			cnd.and("deviceid","=",person.getDeviceid())
-					.and("normalid","=",person.getNormalid());
-			List<Person> result = personService.dao().queryByJoin(Person.class,"^normal|device|grades$",cnd);
-			if(Lang.isNotEmpty(result)){
-                for (Person p:result) {
-                    for (PersonGrade grade:p.getGrades()) {
-                        personService.dao().fetchLinks(grade,"^rulers$");
-                    }
-                }
-                return Result.success("system.success",result);
+			cnd.and("deviceid", "=", person.getDeviceid()).and("normalid", "=", person.getNormalid());
+			List<Person> result = personService.dao().queryByJoin(Person.class, "^normal|device|grades$", cnd);
+			if (Lang.isNotEmpty(result)) {
+				for (Person p : result) {
+					for (PersonGrade grade : p.getGrades()) {
+						personService.dao().fetchLinks(grade, "^rulers$");
+					}
+				}
+				return Result.success("system.success", result);
 
-			}else{
-			    cnd = Cnd.NEW();
-			    cnd.and("normalid","=",person.getNormalid());
-			    List<Grade> grades = personService.dao().queryByJoin(Grade.class,"^rulers$",cnd);
-			    List<PersonGrade> personGrades = new ArrayList<PersonGrade>();
-                for (Grade grade:grades
-                     ) {
-                    PersonGrade personGrade = new PersonGrade();
-                    personGrade.setGrade(grade.getGrade());
-                    personGrade.setCnName(grade.getCnName());
-                    personGrade.setEnName(grade.getEnName());
-                    List<PersonRuler> personRulers = new ArrayList<PersonRuler>();
-                    for(Ruler ruler:grade.getRulers()){
-                    	PersonRuler personRuler = new PersonRuler();
-                    	personRuler.setNormalid(ruler.getNormalid());
-                    	personRuler.setLogic(ruler.getLogic());
-                    	personRuler.setVal(ruler.getVal());
-                    	personRuler.setSymble(ruler.getSymble());
-                    	personRuler.setOrderNum(ruler.getOrderNum());
+			} else {
+				cnd = Cnd.NEW();
+				cnd.and("normalid", "=", person.getNormalid());
+				List<Grade> grades = personService.dao().queryByJoin(Grade.class, "^rulers$", cnd);
+				List<PersonGrade> personGrades = new ArrayList<PersonGrade>();
+				for (Grade grade : grades) {
+					PersonGrade personGrade = new PersonGrade();
+					personGrade.setGrade(grade.getGrade());
+					personGrade.setCnName(grade.getCnName());
+					personGrade.setEnName(grade.getEnName());
+					List<PersonRuler> personRulers = new ArrayList<PersonRuler>();
+					for (Ruler ruler : grade.getRulers()) {
+						PersonRuler personRuler = new PersonRuler();
+						personRuler.setNormalid(ruler.getNormalid());
+						personRuler.setLogic(ruler.getLogic());
+						personRuler.setVal(ruler.getVal());
+						personRuler.setSymble(ruler.getSymble());
+						personRuler.setOrderNum(ruler.getOrderNum());
 
-                    	personRulers.add(personRuler);
+						personRulers.add(personRuler);
 
-                    }
-                    personGrade.setRulers(personRulers);
+					}
+					personGrade.setRulers(personRulers);
 
-                    personGrades.add(personGrade);
+					personGrades.add(personGrade);
 
-                }
+				}
 
-			    person.setGrades(personGrades);
-                result = new ArrayList<Person>();
+				person.setGrades(personGrades);
+				result = new ArrayList<Person>();
 
-                result.add(person);
+				result.add(person);
 
-            }
+			}
 
-			return Result.success("system.success",result);
+			return Result.success("system.success", result);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
-
 
 	@At("/person_grades")
 	@Ok("json")
@@ -483,58 +481,59 @@ public class DeviceController implements AdminKey {
 		Object obj = null;
 
 		Cnd cnd = Cnd.NEW();
-		if(Strings.isBlank(grade.getPersonid())){
-			return Result.success("system.success",null);
+		if (Strings.isBlank(grade.getPersonid())) {
+			return Result.success("system.success", null);
 		}
-		cnd.and("personid","=",grade.getPersonid());
-		if(Strings.isNotBlank(grade.getGrade())){
-			cnd.and("grade","=",grade.getGrade());
+		cnd.and("personid", "=", grade.getPersonid());
+		if (Strings.isNotBlank(grade.getGrade())) {
+			cnd.and("grade", "=", grade.getGrade());
 		}
-		obj =  personGradeService.queryEntity(cnd);
-		return  Result.success("system.success",   obj );
+		obj = personGradeService.queryEntity(cnd);
+		return Result.success("system.success", obj);
 	}
+
 	/**
-	 *  个性化查寻
+	 * 个性化查寻
 	 */
 	@At("/person_grade_add")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object personGradeAdd(@Param("data") PersonGrade personGrade , HttpServletRequest req) {
+	public Object personGradeAdd(@Param("data") PersonGrade personGrade, HttpServletRequest req) {
 		try {
 			personGrade = personGradeService.insertEntity(personGrade);
-			return Result.success("system.success",personGrade);
+			return Result.success("system.success", personGrade);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
+
 	/**
-	 *  个性化查寻
+	 * 个性化查寻
 	 */
 	@At("/person_grade_remove")
 	@POST
 	@Ok("json")
-	public Object personGradeRemove(@Param("id") String id , HttpServletRequest req) {
+	public Object personGradeRemove(@Param("id") String id, HttpServletRequest req) {
 		try {
 			int del = personGradeService.deleteEntity(id);
-			return Result.success("system.success",del);
+			return Result.success("system.success", del);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
 	}
 
-
 	/**
-	 *  个性化查寻
+	 * 个性化查寻
 	 */
 	@At("/person_grade_add_all")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object personGradeAddAll(@Param("data") PersonGrade[] grades , HttpServletRequest req) {
+	public Object personGradeAddAll(@Param("data") PersonGrade[] grades, HttpServletRequest req) {
 		try {
 			List<PersonGrade> result = personGradeService.saveEntitys(grades);
-			return Result.success("system.success",result);
+			return Result.success("system.success", result);
 		} catch (Exception e) {
 			return Result.error("system.error");
 		}
@@ -544,75 +543,68 @@ public class DeviceController implements AdminKey {
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object over(@Param("data")Device device ,HttpServletRequest req ){
-	    //先取出原始的EXTSNO
-        String oldextsno = getExtsno(device);
-
+	public Object over(@Param("data") Device device, HttpServletRequest req) {
+		// 先取出原始的EXTSNO
+		String oldextsno = getExtsno(device);
 
 		deviceService.insertUpdate(device);
 		device = deviceService._fetch(device);
-        deviceService.kafka(Arrays.asList(device));
+		deviceService.kafka(Arrays.asList(device));
 
-        //再取出新的EXTSNO
-        String extsno = getExtsno(device);
+		// 再取出新的EXTSNO
+		String extsno = getExtsno(device);
 
-        if(Strings.isNotBlank(extsno)){
+		if (Strings.isNotBlank(extsno)) {
 			subGatewayService.kafka(extsno);
 		}
-		if(Strings.isBlank(oldextsno)){
+		if (Strings.isBlank(oldextsno)) {
 
-		}else if(!Strings.equals(extsno,oldextsno)){
+		} else if (!Strings.equals(extsno, oldextsno)) {
 			subGatewayService.kafka(extsno);
 		}
 
-		return  Result.success("system.success",device);
+		return Result.success("system.success", device);
 	}
 
-
-
-    public String getExtsno(@Param("data") Device device) {
-        if(Lang.isEmpty(device)){
-        	return null;
+	public String getExtsno(@Param("data") Device device) {
+		if (Lang.isEmpty(device)) {
+			return null;
 		}
-		if(Strings.isBlank(device.getId())){
-            return null;
-        }
-        Device dev = deviceService.fetch(device.getId()) ;
-        if(Lang.isEmpty(dev)){
-        	return null;
+		if (Strings.isBlank(device.getId())) {
+			return null;
 		}
-        if (Strings.isBlank(dev.getGatewayid())){
-            return null;
-        }
-        Gateway gateway = gatewayService.fetch(dev.getGatewayid());
-        if(Lang.isEmpty(gateway)){
-            return null;
-        }
-        if(Strings.isBlank(gateway.getSubid())){
-        	return null;
+		Device dev = deviceService.fetch(device.getId());
+		if (Lang.isEmpty(dev)) {
+			return null;
 		}
-        SubGateway sub = subGatewayService.fetch(gateway.getSubid());
-        if(Lang.isEmpty(sub)){
-            return null;
-        }
+		if (Strings.isBlank(dev.getGatewayid())) {
+			return null;
+		}
+		Gateway gateway = gatewayService.fetch(dev.getGatewayid());
+		if (Lang.isEmpty(gateway)) {
+			return null;
+		}
+		if (Strings.isBlank(gateway.getSubid())) {
+			return null;
+		}
+		SubGateway sub = subGatewayService.fetch(gateway.getSubid());
+		if (Lang.isEmpty(sub)) {
+			return null;
+		}
 
-        return sub.getExtSno();
-    }
-
-
+		return sub.getExtSno();
+	}
 
 	@At("/drivers_update")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object updataDrivers(@Param("data")List<String> deviceids
-			,@Param("driverid") String driverid
-			,HttpServletRequest req ){
-
+	public Object updataDrivers(@Param("data") List<String> deviceids, @Param("driverid") String driverid,
+			HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
 
-		cnd.and("id","in",deviceids	);
+		cnd.and("id", "in", deviceids);
 
 		List<Device> devices = deviceService.query(cnd);
 		List<Device> result = Lists.newArrayList();
@@ -624,52 +616,42 @@ public class DeviceController implements AdminKey {
 		}
 		deviceService.update(result);
 
-
-
-
 		deviceService.kafka(result);
 
 		Set<String> extsnos = new HashSet<String>();
-		for (Device device:result){
-            //changGit(device);
-            String extsno = getExtsno(device);
-            extsnos.add(extsno);
-        }
+		for (Device device : result) {
+			// changGit(device);
+			String extsno = getExtsno(device);
+			extsnos.add(extsno);
+		}
 
-        for (String extsno : extsnos){
+		for (String extsno : extsnos) {
 			subGatewayService.kafka(extsno);
-        }
+		}
 
-		return  Result.success("system.success",result);
+		return Result.success("system.success", result);
 	}
-
-
 
 	@At("/drivers_tags")
 	@POST
 	@Ok("json")
 	@AdaptBy(type = JsonAdaptor.class)
-	public Object updataTags(@Param("data")List<String> deviceids
-			,@Param("tagid") String tagid
-			,HttpServletRequest req ){
-
+	public Object updataTags(@Param("data") List<String> deviceids, @Param("tagid") String tagid,
+			HttpServletRequest req) {
 
 		Cnd cnd = Cnd.NEW();
 
-		cnd.and("id","in",deviceids	);
-
+		cnd.and("id", "in", deviceids);
 
 		List<Device> devices = deviceService.query(cnd);
 
 		Tag tag = tagService.fetch(tagid);
 
-
-
 		List<Device> result = Lists.newArrayList();
 		for (int i = 0; i < deviceids.size(); i++) {
 			Device device = devices.get(i);
 			device = deviceService.extAttr(device);
-			if(Lang.isEmpty(device.getTags())){
+			if (Lang.isEmpty(device.getTags())) {
 				device.setTags(new ArrayList<Tag>());
 			}
 			device.getTags().add(tag);
@@ -682,7 +664,6 @@ public class DeviceController implements AdminKey {
 
 		deviceService.kafka(result);
 
-
-		return  Result.success("system.success",result);
+		return Result.success("system.success", result);
 	}
 }

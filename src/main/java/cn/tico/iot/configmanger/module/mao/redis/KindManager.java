@@ -40,23 +40,23 @@ public class KindManager extends BaseManager {
 
     @Aop("redis")
     public void init(){
-        Logs.get().debugf("location redis path : %s ",KEY_PATH);
-
-        KEY_PATH = conf.get("redis.pre.key.kind");
-
-        Set<String> keys= jedis().keys(KEY_PATH+"*");
-        Logs.get().debugf("keys",keys);
-        keys.stream().forEach(key->jedis().del(key));
-
-        List <Kind> all = kindService.findAllKinds();
-        List<Kind> copy = Lists.newArrayList(all);
-        all = all.stream()
-                .map(kind -> findAncestors(kind,copy))
-                .map(kind -> fatherName(kind))
-                .collect(Collectors.toList());
-        all = children(all);
-
-        all.forEach(location -> jedis().set(KEY_PATH+location.getId(),Json.toJson(location)));
+//        Logs.get().debugf("location redis path : %s ",KEY_PATH);
+//
+//        KEY_PATH = conf.get("redis.pre.key.kind");
+//
+//        Set<String> keys= jedis().keys(KEY_PATH+"*");
+//        Logs.get().debugf("keys",keys);
+//        keys.stream().forEach(key->jedis().del(key));
+//
+//        List <Kind> all = kindService.findAllKinds();
+//        List<Kind> copy = Lists.newArrayList(all);
+//        all = all.stream()
+//                .map(kind -> findAncestors(kind,copy))
+//                .map(kind -> fatherName(kind))
+//                .collect(Collectors.toList());
+//        all = children(all);
+//
+//        all.forEach(location -> jedis().set(KEY_PATH+location.getId(),Json.toJson(location)));
 
     }
 

@@ -1,4 +1,4 @@
-let { Select, Radio, Button, Icon, Popconfirm, PageHeader, List, Avatar, Table, Input, InputNumber, Form, message } = antd;
+let { Select, Radio, Button, Icon, Popconfirm, PageHeader, Spin, List, Avatar, Table, Input, InputNumber, Form, message } = antd;
 const { Option } = Select;
 let MIcon = function (props) {
 	//重写 Icon  字体大小保持一直 样式 公共设置 等
@@ -8,7 +8,7 @@ let MIcon = function (props) {
 
 // const data = [];
 const textFormat = <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
-const reqConfig = ['warning', 'major', 'minor', 'critical'];
+const reqConfig = ['minor','major',  'warning',  'critical'];
 const EditableContext = React.createContext();
 let { useEffect, useState } = React;
 let setInitValue = () => { };
@@ -172,7 +172,9 @@ class FooterEditableFormTable extends React.PureComponent {
 										if (!value[1].id) {
 											return;
 										}
+										this.props.setLoading && this.props.setLoading(true)
 										$.post('/mao/upgrades/remove', { ids: value[1].id }, results => {
+											this.props.setLoading && this.props.setLoading(false)
 											if (results.code === 0) {
 												message.success(results.msg, 0.5);
 												this.props.listReq && this.props.listReq();
@@ -294,7 +296,16 @@ class FooterEditableFormTable extends React.PureComponent {
 
 		return (
 			<FooterEditableContext.Provider value={this.props.form}>
-				<Table components={components} bordered dataSource={this.state.data} columns={columns} rowClassName="editable-row" pagination={false} />
+				<Table  {...{
+					...this.props,
+					components,
+					dataSource: this.state.data,
+					columns,
+					rowClassName: "editable-row",
+					pagination: false,
+					bordered: true
+				}}
+				/>
 			</FooterEditableContext.Provider>
 		);
 	}
@@ -441,13 +452,19 @@ function EditableFormTable(props) {
 		}
 	];
 	function listReq() {
+		let { setLoading = function () { } } = props;
+		setLoading(true)
 		$.post('/mao/upgrades/list', results => {
+			window.listResults = results.rows;
+			setTimeout(() => {
+
+				setLoading(false)
+			});
 			if (Array.isArray(results.rows)) {
 				let isRadio = [true, true, true, true];
 				results.rows.forEach(e => {
 					isRadio[e.grade] = false;
 				});
-				// debugger
 				props.upDataIsPolling && props.upDataIsPolling(results.rows.length);
 				setRowData(results.rows);
 				setIsRadio(isRadio);
@@ -469,52 +486,66 @@ function EditableFormTable(props) {
 		return () => { };
 	}, []);
 	let handleClick = () => {
+		let { setLoading = function () { } } = props;
+		let isAdd = true;
+		setLoading(true)
 		let data = Object.assign(strategy, { level: reqConfig[strategy.grade], countDown: isValue(strategy.countDown), cycle: isValue(strategy.cycle) });
-		$.post('/mao/upgrades/addDo', data, function (results) {
-			if (results.code === 0) {
-				message.success(results.msg, 0.5);
-				// reset()
-				setIsAdd(false);
-				listReq();
-			} else {
-				message.error(results.msg, 0.5);
-				setIsAdd(true);
-				listReq();
-			}
-		});
-		// if (!(typeof strategy.grade === 'number')) {
-		// 	message.error('没有升级项');
-		// 	return;
-		// }
+		if (!(typeof strategy.grade === 'number')) {
+				message.error('没有升级项');
+				return;
+		}
+		Array.isArray(window.listResults) && window.listResults.forEach((e)=>{
+		        if(e.grade === strategy.grade){
+					isAdd = false
+				}
+		})
+		// strategy.grade
+		// strategy.grade
+		// console.log(window.listResults,'props')
+		// debugger
+		if(isAdd){
+				$.post('/mao/upgrades/addDo', data, function (results) {
+						if (results.code === 0) {
+								message.success(results.msg, 0.5);
+								// reset()
+								listReq();
+						} else {
+								message.error(results.msg, 0.5);
+								listReq();
+						}
+						setLoading(false)
+				});
+		}else{
+		                let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
+		                if (!obj) {
+		                        return;
+		                }
+		                strategy.id = obj.id;
+		                strategy.deptId = obj.deptId;
+				let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
+				$.post('/mao/upgrades/editDo', data, function(results) {
+						if (results.code === 0) {
+								message.success(results.msg, 0.5);
+								listReq();
+						} else {
+								message.error(results.msg, 0.5);
+								listReq();
+						}
+							setLoading(false)
+						
+					});
+		}
 		// if (isAdd) {
-		// 	if (!isRadio[strategy.grade]) {
-		// 		return;
-		// 	}
+		//         if (!isRadio[strategy.grade]) {
+		//                 return;
+		//         }
 		// } else {
-		// 	// if(!strategy.id){
-		// 	// 	strategy.grade
-		// 	// }
-		// 	if (!strategy.id || !strategy.deptId) {
-		// 		let obj = Array.isArray(rowData) && rowData.find(e => e.grade == strategy.grade);
-		// 		if (!obj) {
-		// 			return;
-		// 		}
-		// 		strategy.id = obj.id;
-		// 		strategy.deptId = obj.deptId;
-		// 	}
-		// 	let data = Object.assign(strategy, { level: reqConfig[strategy.grade] });
-		// 	$.post('/mao/upgrades/editDo', data, function(results) {
-		// 		if (results.code === 0) {
-		// 			message.success(results.msg, 0.5);
-		// 			listReq();
-		// 		} else {
-		// 			message.error(results.msg, 0.5);
-		// 			listReq();
-		// 		}
-		// 	});
-		// }
+		//         // if(!strategy.id){
+		//         //         strategy.grade
+		//         // }
+
 		return;
-	};
+};
 	let handleEdit = (mes, index, e) => {
 		setIsDisplay(false)
 		// debugger
@@ -598,7 +629,8 @@ class Toll extends React.Component {
 		this.flag = true;
 		this.state = {
 			isUpgrade: true,
-			isPolling: true
+			isPolling: true,
+			isLoading: true
 		};
 	}
 	componentDidMount() {
@@ -613,10 +645,8 @@ class Toll extends React.Component {
 			this.flag = false;
 		}
 		if (rowLength > 0) {
-			// this.setState({isUpgrade:true})
 			this.setState({ isPolling: false });
 		} else {
-			// this.setState({isUpgrade:false})
 			this.setState({ isPolling: true });
 		}
 	};
@@ -624,6 +654,11 @@ class Toll extends React.Component {
 	isUpgradeFn = (boolean) => {
 		this.setState({ isUpgrade: boolean });
 	};
+	setLoading = (bool) => {
+		this.setState({
+			isLoading: bool
+		})
+	}
 	render() {
 		let { isUpgrade } = this.state;
 		return (
@@ -636,9 +671,11 @@ class Toll extends React.Component {
 					) : (
 							''
 						)}
-					<div className="bottom-margin">
-						<EditableFormTable upDataIsPolling={this.upDataIsPolling} isUpgrade={isUpgrade} isUpgradeFn={this.isUpgradeFn} />
-					</div>
+					<Spin spinning={this.state.isLoading} tip="">
+						<div className="bottom-margin">
+							<EditableFormTable setLoading={this.setLoading} upDataIsPolling={this.upDataIsPolling} isUpgrade={isUpgrade} isUpgradeFn={this.isUpgradeFn} />
+						</div>
+					</Spin>
 				</div>
 			</div>
 		);

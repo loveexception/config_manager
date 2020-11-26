@@ -46,22 +46,50 @@ public class OtherEmpController {
 
     /**
      * 查询运维人员列表
+     *  no=
+     * &deptName=
+     * &title=
+     * &tel=
+     * &email=
+     * &cnName=
+     * &enName=
      */
     @RequiresPermissions("wx:otherEmp:list")
     @At
     @Ok("json")
     public Object list(@Param("pageNum") int pageNum,
                        @Param("pageSize") int pageSize,
-                       @Param("name") String name,
+                       @Param("deptName") String deptName,
+                       @Param("title") String title,
+                       @Param("tel") String tel,
+                       @Param("cnName") String cnName,
+                       @Param("enName") String enName,
+
+
+
                        @Param("beginTime") Date beginTime,
                        @Param("endTime") Date endTime,
                        @Param("orderByColumn") String orderByColumn,
                        @Param("isAsc") String isAsc,
                        HttpServletRequest req) {
         Cnd cnd = Cnd.NEW();
-        if (!Strings.isBlank(name)) {
-            //cnd.and("name", "like", "%" + name +"%");
+
+        if (!Strings.isBlank(deptName)) {
+            cnd.and("dept_name", "like", "%" + deptName +"%");
         }
+        if (!Strings.isBlank(title)) {
+            cnd.and("title", "like", "%" + title +"%");
+        }
+        if (!Strings.isBlank(tel)) {
+            cnd.and("tel", "like", "%" + tel +"%");
+        }
+        if (!Strings.isBlank(cnName)) {
+            cnd.and("cn_name", "like", "%" + cnName +"%");
+        }
+        if (!Strings.isBlank(enName)) {
+            cnd.and("en_name", "like", "%" + enName +"%");
+        }
+
         if (Lang.isNotEmpty(beginTime)) {
             cnd.and("create_time", ">=", beginTime);
         }
