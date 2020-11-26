@@ -1,10 +1,11 @@
-package cn.tico.iot.configmanger.module.assets;
+package cn.tico.iot.configmanger.module.assets.controller;
 
 import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.common.utils.TreeUtils;
 import cn.tico.iot.configmanger.module.assets.model.CustomerToken;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
 import cn.tico.iot.configmanger.module.sys.models.User;
+import cn.tico.iot.configmanger.module.sys.services.ConfigService;
 import cn.tico.iot.configmanger.module.sys.services.MenuService;
 import cn.tico.iot.configmanger.module.sys.services.UserService;
 import com.alibaba.fastjson.JSON;
@@ -44,6 +45,8 @@ public class AssetsManagerController {
     private MenuService menuService;
     @Inject
     private UserService userService;
+    @Inject
+    private ConfigService configService;
 
     /**
      * @description: 访问资产管理前的免密登录
@@ -115,9 +118,11 @@ public class AssetsManagerController {
             subject.logout();
         }
 
+        String cloudIndex = configService.getValue("cloud_index");
         Map<String, Object> map = new HashMap<>();
         map.put("success",true);
         map.put("code",0);
+        map.put("data",cloudIndex);
         map.put("msg","退出登陆成功");
         return map;
     }

@@ -205,11 +205,11 @@
             url: "http://127.0.0.1:8090/assets/loginOut",
             success: function (res) {
                 if (res.code==0){
-                    window.location.href = 'http://cloud.aiplat.cn:12345/#/console';
+                    window.location.href = res.data;
                 }
             },
-            error:function () {
-                window.location.href = 'http://cloud.aiplat.cn:12345/#/console';
+            error:function (res) {
+                window.location.href = res.data;
             }
         });
     }
