@@ -179,7 +179,6 @@
     <!--右侧部分结束-->
 
 </div>
-
 <!-- 全局js -->
 <!--  jQuery v2.1.4 -->
 <script th:src="@{/assets/js/jquery.min.js}"></script>
@@ -202,14 +201,15 @@
 <script>
     function toConsole(){
         $.ajax({
-            url: "http://127.0.0.1:8090/assets/loginOut",
+            url: '/assets/loginOut',
+            type: 'GET',
             success: function (res) {
                 if (res.code==0){
-                    window.location.href = res.data;
+                     window.location.href = res.data;
                 }
             },
             error:function (res) {
-                window.location.href = res.data;
+                //window.location.href = res.data;
             }
         });
     }
