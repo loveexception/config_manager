@@ -39,25 +39,25 @@ public class LocationManager {
 
     //@Aop("redis")
     public void init(){
-        Logs.get().debugf("location redis path : %s ",KEY_PATH);
-
-        KEY_PATH = conf.get("redis.pre.key.location");
-        String redispath = conf.get("redis.host");
-        Logs.get().debug(redispath);
-
-        Set<String> keys= redisService.keys(KEY_PATH+"*");
-        Logs.get().debugf("keys%s",keys.size());
-        keys.stream().forEach(key->redisService.del(key));
-
-        List <Location> all = locationService.findAllLocations();
-        List<Location> copy = Lists.newArrayList(all);
-        all = all.stream()
-                .map(location -> findAncestors(location,copy))
-                .map(location -> fatherName(location))
-                .collect(Collectors.toList());
-
-        all = children(all);
-        Logs.get().debug(all);
+//        Logs.get().debugf("location redis path : %s ",KEY_PATH);
+//
+//        KEY_PATH = conf.get("redis.pre.key.location");
+//        String redispath = conf.get("redis.host");
+//        Logs.get().debug(redispath);
+//
+//        Set<String> keys= redisService.keys(KEY_PATH+"*");
+//        Logs.get().debugf("keys%s",keys.size());
+//        keys.stream().forEach(key->redisService.del(key));
+//
+//        List <Location> all = locationService.findAllLocations();
+//        List<Location> copy = Lists.newArrayList(all);
+//        all = all.stream()
+//                .map(location -> findAncestors(location,copy))
+//                .map(location -> fatherName(location))
+//                .collect(Collectors.toList());
+//
+//        all = children(all);
+//        Logs.get().debug(all);
 //        all.forEach(location ->
 //            redisService.set(
 //                    KEY_PATH+location.getId()
