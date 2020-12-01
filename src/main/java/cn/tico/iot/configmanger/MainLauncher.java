@@ -9,7 +9,6 @@ import cn.tico.iot.configmanger.module.iot.graphql.KafkaBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.OtherMessageBlock;
 import cn.tico.iot.configmanger.module.iot.graphql.SubGatewayBlock;
 import cn.tico.iot.configmanger.module.mao.common.MyActionChainMaker;
-import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import com.alibaba.fastjson.JSON;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
 import cn.tico.iot.configmanger.module.sys.models.User;
@@ -30,7 +29,6 @@ import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.*;
-import org.nutz.mvc.filter.CrossOriginFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -147,8 +145,8 @@ public class MainLauncher {
 	 * @param ioc
 	 */
 	private void initSysTask(Ioc ioc) {
-		LocationManager locationManager = ioc.get(LocationManager.class);
-		locationManager.init();
+//		LocationManager locationManager = ioc.get(LocationManager.class);
+//		locationManager.init();
 
 //		 QuartzManager quartzManager = ioc.get(QuartzManager.class);
 //		 TaskService taskService = ioc.get(TaskService.class);

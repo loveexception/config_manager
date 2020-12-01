@@ -2,7 +2,6 @@ package cn.tico.iot.configmanger.module.mao.graphql;
 
 import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
-import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
 import com.google.common.collect.Lists;
 import io.leangen.graphql.annotations.GraphQLArgument;
 import io.leangen.graphql.annotations.GraphQLContext;
@@ -22,8 +21,7 @@ import java.util.List;
 public class LocationGrap  {
 
 
- @Inject
-    LocationManager locationManager;
+
 
 
     @Inject
@@ -37,11 +35,7 @@ public class LocationGrap  {
 
     @GraphQLQuery
     public List<Location> locations(@GraphQLContext Device device) {
-        List<Location> locations =  locationManager.allFamilyWithMe(device.getLocationid());
-        Logs.get().debug(locations);
-        if(Lang.isNotEmpty(locations)){
-            return locations;
-        }
+
         Location location = dao.fetch(Location.class,device.getLocationid());
         String ancestors =location.getAncestors();
         String[] array = Strings.splitIgnoreBlank(ancestors);
@@ -56,10 +50,7 @@ public class LocationGrap  {
         if(Strings.isBlank(id)){
             return null;
         }
-        Location location =  locationManager.get(id);
-        if(Lang.isNotEmpty(location)){
-            return location;
-        }
+
         return dao.fetch(Location.class,id);
     }
 

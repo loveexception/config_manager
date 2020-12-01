@@ -5,10 +5,9 @@ import cn.tico.iot.configmanger.module.iot.models.base.Location;
 import cn.tico.iot.configmanger.module.iot.models.device.Device;
 import cn.tico.iot.configmanger.module.iot.models.device.Gateway;
 import cn.tico.iot.configmanger.module.iot.models.driver.Driver;
-import cn.tico.iot.configmanger.module.mao.redis.LocationManager;
+import cn.tico.iot.configmanger.module.iot.services.LocationService;
 import cn.tico.iot.configmanger.module.sys.models.Dept;
 import com.google.common.collect.Lists;
-import lombok.Data;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.util.cri.SqlExpressionGroup;
@@ -26,14 +25,20 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @IocBean
 public class ExcelDeviceService extends Device{
+    static final String REG_STAT = ".*(";
+    static final String REG_END = ").*";
+    static final String SPLIT =":";
     @Inject
     public Dao dao;
     @Inject
-    LocationManager locationManager;
+    public LocationService locationService;
+
+
 
     static final NutMap K2B = new NutMap()
             
@@ -123,9 +128,38 @@ public class ExcelDeviceService extends Device{
     }
 
     private String locationName(String cnName) {
-        List<Location> all = locationManager.all();
-        return locationManager.byName(cnName,all).getId();
+        //List<Location> all = locationManager.all();
+        List <Location> all = locationService.findAllLocations();
 
+        return byName(cnName,all).getId();
+
+    }
+    public Location byName(String longSplitName,List<Location> all){
+        String[] array =Strings.splitIgnoreBlank(longSplitName,SPLIT);
+        List<String> names = Lang.array2list(array);
+        String last = Lists.newLinkedList(names).getLast();
+
+
+        List<Location> ones = all.stream()
+                .filter(one-> isMatchByKey(last, one.getCnName()))
+                .filter(one ->{
+
+                    String langName = Strings.sBlank(one.getParentName(),"")+SPLIT+one.getCnName();
+                    boolean b =  names.stream().allMatch(name -> isMatchByKey(name, langName));
+                    return b;
+                }).collect(Collectors.toList());
+        if(Lang.isEmpty(ones)){
+            return null;
+        }
+        if(ones.size()!=1){
+            return null;
+
+        }
+        return ones.get(0);
+
+    }
+    public static boolean isMatchByKey(String last, String cnName) {
+        return Strings.isMatch(Pattern.compile(REG_STAT + last + REG_END), cnName);
     }
 
 

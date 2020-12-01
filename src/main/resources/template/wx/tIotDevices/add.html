@@ -60,7 +60,7 @@
 				<div class="form-group">
 					<label class="col-sm-3 control-label">投运日期：</label>
 					<div class="col-sm-8">
-						<input id="orderTime" name="orderTime" class="time-input form-control" type="text"th:value="${#dates.format(new java.util.Date(tIotDevices.orderTime), 'yyyy-MM-dd HH:mm')}"  />
+						<input id="orderTime" name="orderTime" class="time-input form-control" type="text" />
 					</div>
 				</div>
 
@@ -106,8 +106,8 @@
 			});
 
 			function submitHandler() {
-				let o =  $('#form-tIotDevices-edit').serialize();
-				let T = document.getElementById('orderTime')
+				let o =  $('#form-tIotDevices-add').serialize();
+				let T = document.getElementById('orderTime');
 				let v = T.value;
 				if ($.validate.form()) {
 				if(v){
