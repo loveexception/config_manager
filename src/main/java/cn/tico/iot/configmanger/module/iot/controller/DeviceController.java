@@ -92,6 +92,7 @@ public class DeviceController implements AdminKey {
 	@Inject
 	private ExcelDeviceService excelDeviceService;
 
+
 	@RequiresPermissions("iot:device:view")
 	@At("")
 	@Ok("th:/iot/device/list.html")
@@ -102,6 +103,20 @@ public class DeviceController implements AdminKey {
 	/**
 	 * 查询业务列表
 	 */
+	/**
+	 * @Description 
+	  * @Param pageNum: 
+	 * @Param pageSize: 
+	 * @Param name: 
+	 * @Param orderByColumn: 
+	 * @Param isAsc: 
+	 * @Param deptid: 
+	 * @Param locationid: 
+	 * @Param req:
+	  * @Return: java.lang.Object
+	 * @Author maodajun@gmail.com
+	 * @Date 2020/8/19
+	 */
 	@At("/device_list")
 	@Ok("json")
 	public Object deviceList(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize,
@@ -110,8 +125,10 @@ public class DeviceController implements AdminKey {
 
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)) {
-			SqlExpressionGroup group = Cnd.exps("cn_name", "like", "%" + name + "%")
-					.or("en_name", "like", "%" + name + "%").or("sno", "like", "%" + name + "%");
+			SqlExpressionGroup group = Cnd
+					.exps("cn_name", "like", "%" + name + "%")
+					.or("en_name", "like", "%" + name + "%")
+					.or("sno", "like", "%" + name + "%");
 			cnd.and(group);
 		}
 		Dept dept = new Dept();
