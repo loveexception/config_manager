@@ -67,7 +67,7 @@ public class OtherWorkflowController {
 					   HttpServletRequest req) {
 		Cnd cnd = Cnd.NEW();
 		if (!Strings.isBlank(name)){
-			//cnd.and("name", "like", "%" + name +"%");
+			cnd.and("cn_name", "like", "%" + name +"%");
 		}
 		if(Lang.isNotEmpty(beginTime)){
 			cnd.and("create_time",">=", beginTime);

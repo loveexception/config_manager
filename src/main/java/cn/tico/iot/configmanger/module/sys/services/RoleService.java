@@ -1,11 +1,14 @@
 package cn.tico.iot.configmanger.module.sys.services;
 
 import cn.tico.iot.configmanger.common.base.Service;
+import cn.tico.iot.configmanger.common.utils.ShiroUtils;
 import cn.tico.iot.configmanger.module.sys.models.Menu;
 import cn.tico.iot.configmanger.module.sys.models.Role;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.FieldFilter;
 import org.nutz.dao.sql.Criteria;
+import org.nutz.dao.util.Daos;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -13,6 +16,7 @@ import org.nutz.lang.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -77,7 +81,10 @@ public class RoleService extends Service<Role> {
             List<Menu> menuList = menuService.query(cri);
             data.setMenus(menuList);
         }
-        int count = dao().update(data);
+        Dao forup = Daos.ext(this.dao(), FieldFilter.create(this.getEntityClass(), true));
+        data.setUpdateTime(new Date());
+        data.setUpdateBy(ShiroUtils.getSysUserId());
+        int count = forup.update(data);
         dao().insertRelation(data, "menus");
         return count;
     }

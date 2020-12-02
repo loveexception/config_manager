@@ -59,7 +59,6 @@ public class OtherEmpController {
     @Ok("json")
     public Object list(@Param("pageNum") int pageNum,
                        @Param("pageSize") int pageSize,
-                       @Param("no") String no,
                        @Param("deptName") String deptName,
                        @Param("title") String title,
                        @Param("tel") String tel,
@@ -74,9 +73,7 @@ public class OtherEmpController {
                        @Param("isAsc") String isAsc,
                        HttpServletRequest req) {
         Cnd cnd = Cnd.NEW();
-        if (!Strings.isBlank(no)) {
-            cnd.and("no", "like", "%" + no +"%");
-        }
+
         if (!Strings.isBlank(deptName)) {
             cnd.and("dept_name", "like", "%" + deptName +"%");
         }

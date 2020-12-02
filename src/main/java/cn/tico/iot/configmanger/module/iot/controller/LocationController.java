@@ -27,6 +27,8 @@ import org.nutz.plugins.slog.annotation.Slog;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 /**
@@ -267,6 +269,35 @@ public class LocationController implements AdminKey {
         }
 
         List<Location> locations =  locationService.query(cnd);
+        Location root = locationService.zip(locations);
+
+        String json = new Gson().toJson(root);
+        Object obj  = Json.fromJson(json);
+        return Result.success("system.success",obj);
+    }
+
+    @At("/tree_parent_filter")
+    @Ok("json")
+    public Object  treeParentFilter(@Param("deptid") String id) {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("dept_id","=",id);
+        List<Location> locations =  locationService.query(cnd);
+        Set set = new HashSet();;
+
+        locations.stream().forEach((location -> {
+            set.add(location.getId());
+            Arrays.stream(location.getAncestors().split(",")).forEach((temp) -> {
+                set.add(temp);
+            });
+        }));
+
+        log.info(set);
+        cnd = Cnd.NEW();
+        cnd.and("id","in",set);
+        locations = locationService.query(cnd);
+
+
+
         Location root = locationService.zip(locations);
 
         String json = new Gson().toJson(root);

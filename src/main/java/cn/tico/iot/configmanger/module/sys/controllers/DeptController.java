@@ -66,11 +66,16 @@ public class DeptController {
 //    }
     @At
     @Ok("json")
-    public Object list(@Param("deptName") String deptName, HttpServletRequest req) {
+    public Object list(@Param("deptName") String deptName
+            ,@Param("status")String status
+            , HttpServletRequest req) {
 
         Cnd cnd = Cnd.NEW();
         if (Strings.isNotBlank(deptName)) {
             cnd.and("dept_name", "like", "%" + deptName + "%");
+        }
+        if(Strings.isNotBlank(status)){
+            cnd.and("status","=",status);
         }
         User user = ShiroUtils.getSysUser();
 

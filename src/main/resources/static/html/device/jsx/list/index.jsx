@@ -245,7 +245,7 @@ class ListBox extends React.PureComponent {
 	};
 	getCascaderList = deptid => {
 		$.ajax({
-			url: `/iot/location/tree_parent?deptid=${deptid}`,
+			url: `/iot/location/tree_parent_filter?deptid=${deptid}`,
 			// data: {},
 			cache: false,
 			contentType: false,
