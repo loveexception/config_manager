@@ -1,8 +1,8 @@
 (function (w) {
 	// 地址
 
-	const href = 'http://172.16.16.9/api/backgroundinterface/meeting/';
-	const href2 = 'http://172.16.16.9/api/backgroundinterface/meetingLevel/'
+	const href =  w.locationParams.ip + '/api/backgroundinterface/meeting/';
+	const href2 = w.locationParams.ip + '/api/backgroundinterface/meetingLevel/'
 	// /batchDeleteMeeting
 	w.backgroundInterface = {
 		getMeetingByPage,
@@ -16,13 +16,13 @@
 		downLoad
 	};
 	function getDeptId() {
-		let id = localStorage.getItem('deptId');
-		if (id === null) {
-			console.log('deptId 为空 请重新登陆')
-		}
-		return id
-	}
+		// let id = localStorage.getItem('deptId');
+		// if (id === null) {
+		// 	console.log('deptId 为空 请重新登陆')
+		// }
 
+		return w.locationParams.dept_id
+	}
 	function getDownLoadUrl(params, callback) {
 		$.ajax({
 			cache: true,

@@ -484,7 +484,7 @@ function App() {
 					}} click={() => {
 						console.log(record, 'record')
 						window.currentEditObj = { ...record };
-						$.modal.openFull('修改会议', `/html/meetinglevel/edit/index.html?edit=true&id=${record.id}`)
+						$.modal.openFull('修改会议', `/html/meetinglevel/edit/index.html?edit=true&id=${record.id}` + `&dept_id=${window.locationParams.dept_id}&ip=${window.locationParams.ip}`)
 					}} iconKey={"FormOutlined"} placement={"top"} text={"修改"} />
 					<Popconfirm placement="top" title={'确定此级别吗?'} onConfirm={() => {
 						// deleteFn([record], this.props.reqListFn);
@@ -566,7 +566,7 @@ function App() {
 			obj[key] = '';
 		}
 		window.currentEditObj = obj;
-		$.modal.openFull('添加级别', '/html/meetinglevel/edit/index.html?edit=false&id=502')
+		$.modal.openFull('添加级别', '/html/meetinglevel/edit/index.html?edit=false&id=502' + `&dept_id=${window.locationParams.dept_id}&ip=${window.locationParams.ip}`)
 	}
 	function confirmDelete() {
 		deleteIcon()

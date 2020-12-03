@@ -1,7 +1,8 @@
 (function (w) {
 
 	// 地址
-	const href = 'http://172.16.16.9/api/backgroundinterface/';
+	const href = w.locationParams.ip + '/api/backgroundinterface/';
+
 	w.DiagramAction = {
 		diagramList,
 		diagramuploadImg,
@@ -15,11 +16,12 @@
 
 	};
 	function getDeptId() {
-		let id = localStorage.getItem('deptId');
-		if (id === null) {
-			console.log('deptId 为空 请重新登陆')
-		}
-		return id
+		// let id = localStorage.getItem('deptId');
+		// if (id === null) {
+		// 	console.log('deptId 为空 请重新登陆')
+		// }
+
+		return w.locationParams.dept_id
 	}
 	function diagramList(params, callback) {
 		$.ajax({

@@ -5,7 +5,6 @@ const scaleArr = [];
 for (let i = 0.1; i < 2.1; i += 0.1) {
 	scaleArr.push(i.toFixed(1))
 }
-const href = 'http://172.16.16.9/api/webManage/';
 // console.log(, 'dd')
 let urlData = {};
 window.location.search.slice(1).split('&').map((e) => {
@@ -493,7 +492,6 @@ function Topo(props) {
 				>
 					适应窗口大小
 					{/* <svg aria-hidden="true" className="upload" ref={zoomOutBtn} style={{}}>
-						<use xlinkHref="#ticobackicon-narrow"></use>
 					</svg> */}
 				</div>
 

@@ -317,7 +317,7 @@ class EditableTable extends React.Component {
 										<Icon
 											type="eye"
 											onClick={() => {
-												$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}`);
+												$.modal.openFull(record.name, `/html/diagram/view/view.html?id=${record.id}&name=${record.name}` + `&dept_id=${window.locationParams.dept_id}&ip=${window.locationParams.ip}`);
 												// $.modal.open(record.name + '查看', `/html / diagram / view / view.html ? id = ${ record.id } & name= ${ record.name } `)
 												// router.push(`view ? id = ${ record.id }& name=${record.name}`);
 											}}
@@ -569,7 +569,7 @@ function ButtonList(props) {
 					headers={{
 						dept_id: localStorage.getItem('deptId'),
 					}}
-					action="http://172.16.16.9/api/fileserver/fileUpload/uploadImage"
+					action={window.locationParams.ip + "/api/fileserver/fileUpload/uploadImage"}
 					method="post"
 					beforeUpload={(file, fileList) => {
 						let reg = /\.(jpg|gif|bmp|tif|png|pcx|jpeg|exif|tga|svg|raw|psd|)+$/;

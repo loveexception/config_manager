@@ -615,7 +615,7 @@ function App() {
 							overlayClassName="edit"
 							click={() => {
 								window.currentEditObj = { ...record, begin_time: moment(record.begin_time), end_time: moment(record.end_time), level_id: record.level_name };
-								$.modal.openFull('修改会议', `/html/meeting/edit/index.html?edit=true&id=${record.id}`);
+								$.modal.openFull('修改会议', `/html/meeting/edit/index.html?edit=true&id=${record.id}` + `&dept_id=${window.locationParams.dept_id}&ip=${window.locationParams.ip}`);
 							}}
 							iconKey={'FormOutlined'}
 							placement={'top'}
@@ -678,10 +678,10 @@ function App() {
 			text: '批量导入',
 			upload: true,
 			uploadProps: {
-				action: 'http://172.16.16.9/api/backgroundinterface/meeting/uploadMeetingExcel',
+				action: w.locationParams.ip +'/api/backgroundinterface/meeting/uploadMeetingExcel',
 				method: 'post',
 				headers: {
-					dept_id: localStorage.getItem('deptId'),
+					dept_id: w.locationParams.dept_id,
 				},
 				accept: '.xlsx',
 				beforeUpload: (file, fileList) => {
@@ -755,7 +755,7 @@ function App() {
 			obj[key] = undefined;
 		}
 		window.currentEditObj = obj;
-		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false&id=502');
+		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false&id=502' + `&dept_id=${window.locationParams.dept_id}&ip=${window.locationParams.ip}` );
 	}
 	function confirmDelete() {
 		deleteIcon();

@@ -547,7 +547,7 @@ function App() {
 			obj[key] = undefined;
 		}
 		window.currentEditObj = obj;
-		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false&id=502');
+		$.modal.openFull('新增会议', '/html/meeting/edit/index.html?edit=false&id=502'+ `&dept_id=${window.locationParams.dept_id}&ip=${window.locationParams.ip}`);
 	}
 	function confirmDelete() {
 		deleteIcon();
