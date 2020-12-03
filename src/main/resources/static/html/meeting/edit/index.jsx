@@ -154,6 +154,7 @@ function App(props) {
 				if (res.success) {
 					message.success('添加成功');
 					parent.getTableData();
+					$.modal.close()
 				} else {
 					message.error('添加失败');
 				}
