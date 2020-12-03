@@ -1,7 +1,7 @@
 (function (w) {
 
 	// 地址
-	const href = w.locationParams.ip + '/api/backgroundinterface/';
+	const href = "http://"+ w.locationParams.ip + '/api/backgroundinterface/';
 
 	w.DiagramAction = {
 		diagramList,

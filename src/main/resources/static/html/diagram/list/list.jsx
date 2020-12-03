@@ -569,7 +569,7 @@ function ButtonList(props) {
 					headers={{
 						dept_id: localStorage.getItem('deptId'),
 					}}
-					action={window.locationParams.ip + "/api/fileserver/fileUpload/uploadImage"}
+					action={"http://"+ window.locationParams.ip + "/api/fileserver/fileUpload/uploadImage"}
 					method="post"
 					beforeUpload={(file, fileList) => {
 						let reg = /\.(jpg|gif|bmp|tif|png|pcx|jpeg|exif|tga|svg|raw|psd|)+$/;

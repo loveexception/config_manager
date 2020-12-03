@@ -678,7 +678,7 @@ function App() {
 			text: '批量导入',
 			upload: true,
 			uploadProps: {
-				action: w.locationParams.ip +'/api/backgroundinterface/meeting/uploadMeetingExcel',
+				action: "http://"+  w.locationParams.ip +'/api/backgroundinterface/meeting/uploadMeetingExcel',
 				method: 'post',
 				headers: {
 					dept_id: w.locationParams.dept_id,

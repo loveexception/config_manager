@@ -1,9 +1,9 @@
 (function (w) {
 	// 地址
 
-	const href = w.locationParams.ip +'/api/backgroundinterface/meeting/';
+	const href ="http://"+  w.locationParams.ip +'/api/backgroundinterface/meeting/';
 
-	const href2 = w.locationParams.ip + '/api/backgroundinterface/meetingLevel/'
+	const href2 = "http://"+ w.locationParams.ip + '/api/backgroundinterface/meetingLevel/'
 	// /batchDeleteMeeting
 	w.backgroundInterface = {
 		getMeetingByPage,
