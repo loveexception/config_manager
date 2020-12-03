@@ -678,10 +678,10 @@ function App() {
 			text: '批量导入',
 			upload: true,
 			uploadProps: {
-				action: "http://"+  w.locationParams.ip +'/api/backgroundinterface/meeting/uploadMeetingExcel',
+				action: "http://"+  window.locationParams.ip +'/api/backgroundinterface/meeting/uploadMeetingExcel',
 				method: 'post',
 				headers: {
-					dept_id: w.locationParams.dept_id,
+					dept_id: window.locationParams.dept_id,
 				},
 				accept: '.xlsx',
 				beforeUpload: (file, fileList) => {
