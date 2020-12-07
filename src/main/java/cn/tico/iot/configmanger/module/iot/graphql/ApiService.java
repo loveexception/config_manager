@@ -57,8 +57,39 @@ public class ApiService {
         }
         return null;
     }
+    @GraphQLQuery(name = "subGateWay")
+    public List<SubGateway> getGateWayBySno(@GraphQLArgument(name = "ext_sno") String ext_sno) {
+        Logs.get().infof("maodajun ---> sno:%s" + ext_sno);
+        if (Strings.isBlank(ext_sno)) {
+            return null;
+        }
+        Cnd cnd = Cnd.NEW();
+        cnd.and("t_iot_sub_gateways.ext_sno", "=", ext_sno);
+        cnd.and("t_iot_sub_gateways.status","=","true");
+        cnd.and("t_iot_sub_gateways.delflag","=","false");
+        List<SubGateway> gateways = dao.queryByJoin(SubGateway.class, "gateway", cnd);
 
-
+        return gateways;
+    }
+    @GraphQLQuery(name = "device")
+    public List<Device> devices(@GraphQLContext Gateway gateway) {
+        Cnd cnd = Cnd.NEW();
+        cnd.and("t_iot_devices.gateway_id", "=", gateway.getId());
+        cnd.and("t_iot_devices.delflag","=","false");
+        List<Device> result = dao.queryByJoin(Device.class,"^driver$", cnd);
+        return result;
+    }
+    @GraphQLQuery(name = "filename")
+    public String filename(@GraphQLContext Driver driver) {
+        if(Lang.isEmpty(driver)){
+            return "";
+        }
+        if(Strings.isBlank(driver.getPath())){
+            return "";
+        }
+       String[] array =  Strings.splitIgnoreBlank(driver.getPath(),"/");
+        return array[array.length-1];
+    }
     @GraphQLQuery(name = "normals")
     public List<Normal> getNormals(@GraphQLContext Driver driver) {
         Cnd cnd = Cnd.NEW();

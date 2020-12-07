@@ -56,9 +56,11 @@ public class DeviceEnvModel extends I18NModel {
      * ip
      */
     @Column("ip")
-    @Comment("ip ")
+    @Comment("ip")
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @J4EName( "IP地址")
+    @GraphQLQuery(name = "ip", description = "ip")
+
     private String ip;
 
     /**
@@ -67,6 +69,7 @@ public class DeviceEnvModel extends I18NModel {
     @Column("cycle")
     @Comment("采集间隔")
     @J4EName( "采集间隔")
+    @GraphQLQuery(name = "cycle", description = "采集间隔")
 
     private int cycle;
 
@@ -78,6 +81,7 @@ public class DeviceEnvModel extends I18NModel {
 
     @ColDefine(type = ColType.VARCHAR, width = 32)
     @J4EName( "单位")
+    @GraphQLQuery(name = "unit", description = "单位")
 
     private String unit="ms";
 
@@ -89,6 +93,7 @@ public class DeviceEnvModel extends I18NModel {
 
     @ColDefine(type = ColType.VARCHAR, width = 255)
     @J4EName( "用户名")
+    @GraphQLQuery(name = "username",  description = "用户名")
 
     private String username;
 
@@ -99,6 +104,7 @@ public class DeviceEnvModel extends I18NModel {
     @Comment("密码")
     @ColDefine(type = ColType.VARCHAR, width = 64)
     @J4EName( "密码")
+    @GraphQLQuery(name = "password", description = "密码")
 
     private String password;
     /**
