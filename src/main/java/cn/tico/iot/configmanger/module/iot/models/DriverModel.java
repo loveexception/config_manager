@@ -2,6 +2,7 @@ package cn.tico.iot.configmanger.module.iot.models;
 
 import cn.tico.iot.configmanger.module.iot.models.base.Kind;
 import cn.tico.iot.configmanger.module.iot.bean.I18NModel;
+import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
@@ -47,7 +48,9 @@ public class DriverModel extends I18NModel {
 
 
     @One(field = "kindid",key="id")
+    @GraphQLQuery(name = "kind", description = "驱动模版")
     private Kind kind;
+
     private List<Kind> kinds;
 
 

@@ -114,15 +114,11 @@ public class ApiController implements AdminKey {
 			@Param("sno") String sno,
 			HttpServletRequest req
 	) {
-
 		Segment seg = new CharSegment(this.GRAPH_DEVICE);
 		seg.set("sno",sno);
 		String sql =seg.toString();
 		Object temp  =  graphql( sql,req ) ;
-
-
 		return temp;
-
 	}
 
 	/**
