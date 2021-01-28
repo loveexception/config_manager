@@ -6,7 +6,7 @@ import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
 @Data
-@Table("t_iot_sub_gateways")
+@Table("gateway_manager.t_iot_sub_gateways")
 public class SubGateway extends CommonModel {
 
 

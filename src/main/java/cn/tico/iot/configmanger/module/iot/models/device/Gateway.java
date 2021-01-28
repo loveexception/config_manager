@@ -7,7 +7,7 @@ import org.nutz.dao.entity.annotation.*;
 import org.nutz.lang.Lang;
 
 @Data
-@Table("t_iot_gateways")
+@Table("gateway_manager.t_iot_gateways")
 public class Gateway extends DeviceEnvModel {
 
     /**
